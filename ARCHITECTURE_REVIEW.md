@@ -37,7 +37,7 @@
 |------|------|------|
 | 기간(Date-range) 기반 필터링 | ✅ | start_date, end_date → submittedDate 쿼리 |
 | 페이징 처리 (start, batch_size) | ✅ | fetch_metadata_batch(start, limit) |
-| 5~10초 랜덤 딜레이 | ✅ | `time.sleep(random.uniform(5, 10))` 페이지 간 |
+| 60~120초 랜덤 딜레이 | ✅ | `MIN_DELAY~MAX_DELAY` (페이지/API/다운로드 전 각각) |
 
 **⚠️ 설계 불일치**: run_backfill은 Q&A 생성(QaGenerator)을 포함하고 있음.  
 "Q&A는 llm_debate_scheduler만 전담" 원칙과 맞지 않음.  

@@ -6,6 +6,7 @@
 """
 
 import os
+from functools import lru_cache
 
 # Ollama URL (ChatOllama import 전에 설정)
 os.environ.setdefault("OLLAMA_HOST", "http://localhost:11434")
@@ -33,8 +34,9 @@ TOP_K = 5  # 검색할 문서 수
 SYSTEM_PROMPT = """오직 다음 제공된 문서만을 바탕으로 질문에 대답해. 문서에 없는 내용은 지어내지 마. 답을 모르면 "문서에 해당 정보가 없습니다."라고 해."""
 
 
+@lru_cache(maxsize=1)
 def get_chroma_collection():
-    """Chroma DB 컬렉션 반환"""
+    """Chroma DB 컬렉션 반환 (모듈 로딩 시 1회 캐싱)"""
     embedding_fn = SentenceTransformerEmbeddingFunction(
         model_name=EMBEDDING_MODEL,
         device="cpu",

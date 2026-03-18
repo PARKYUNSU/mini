@@ -3,7 +3,8 @@
 과거 데이터 일괄 수집 (Backfill) - 기간 기반
 - start_date, end_date로 수집 기간 지정 (정보 오염 방지)
 - arXiv API submittedDate 필터 + 페이징
-- 5~10초 랜덤 딜레이로 Rate Limit 방지
+- MIN_DELAY~MAX_DELAY(기본 60~120초) 랜덤 딜레이로 Rate Limit 방지
+  (페이지 간, API 호출 전, PDF 다운로드 전 각각 적용)
 - raw_data_queue 저장 + ChromaDB 적재
 """
 
@@ -137,7 +138,7 @@ def run_backfill(
             print(f"\n⏱️  시간 제한({time_limit_sec}초) 도달. 수집 종료.")
             break
 
-        # 페이지 간 5~10초 랜덤 딜레이 (첫 페이지 제외)
+        # 페이지 간 MIN_DELAY~MAX_DELAY(60~120초) 랜덤 딜레이 (첫 페이지 제외)
         if start_offset > 0:
             delay = random.uniform(MIN_DELAY, MAX_DELAY)
             print(f"\n⏳ Rate Limit 방지: {delay:.1f}초 대기 중...")

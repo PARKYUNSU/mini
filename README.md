@@ -7,8 +7,8 @@ arXiv 논문 수집·파싱, RAG, 파인튜닝 데이터 생성, 텔레그램 �
 ## 1. 실행 순서
 
 ```bash
-# 1) 가상환경 활성화
-cd "/Volumes/T7 Shield/mini"
+# 1) 프로젝트 루트로 이동 후 가상환경 활성화
+cd /path/to/mini   # 저장소 클론 경로
 source .venv/bin/activate
 
 # 2) arXiv 논문 수집 → RAG DB 적재 → raw_data_queue 저장 (최초 1회 필수)
@@ -106,6 +106,7 @@ mini/
 │   ├── rag_processor.py
 │   └── qa_generator.py
 ├── agent_tools/            # Agent가 성공한 코드 저장
+├── agent_learnings/        # 오답 노트 (재시도 후 성공한 에러·해결 요약)
 ├── chroma_db/              # RAG 벡터 DB
 ├── raw_data_queue/         # 원본 크롤링 데이터 (JSONL)
 └── finetune_datasets/      # 토론 기반 파인튜닝 데이터 + 토론 이력 인덱스
@@ -118,8 +119,8 @@ mini/
 M2 맥 미니에서 24시간 백그라운드 운영 시, **SSH 접속이 끊겨도 무중단** 실행하려면 `nohup` 사용:
 
 ```bash
-# 프로젝트 디렉터리로 이동 후 가상환경 활성화
-cd "/Volumes/T7 Shield/mini"   # 또는 실제 경로
+# 프로젝트 루트로 이동 후 가상환경 활성화
+cd /path/to/mini   # 저장소 클론 경로
 source .venv/bin/activate
 
 # 스케줄러 백그라운드 실행 (매일 06:00 arXiv, 매주 토 02:00 LLM 토론)
