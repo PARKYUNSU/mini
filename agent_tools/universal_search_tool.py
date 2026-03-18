@@ -1,5 +1,6 @@
 """
-이 도구는 최신 인터넷 정보, 뉴스, 환율, 수학 계산 등을 검색할 때 사용하는 만능 웹 검색기입니다.
+스크래핑 기반 웹 검색 도구. DuckDuckGo(기본)·Google·WolframAlpha 지원.
+최신 정보·뉴스·환율 등 검색 시 사용. HTML 구조 변경·차단에 취약하므로 DuckDuckGo 우선 권장.
 """
 
 import re
@@ -30,7 +31,8 @@ def universal_search(
     time_filter: str = "",
 ) -> str:
     """
-    이 도구는 최신 인터넷 정보, 뉴스, 환율, 수학 계산 등을 검색할 때 사용하는 만능 웹 검색기입니다.
+    스크래핑 기반 웹 검색. DuckDuckGo(기본)·Google·WolframAlpha 지원.
+    Google 실패 시 DuckDuckGo로 자동 재시도.
 
     Args:
         keyword: 검색어
@@ -52,14 +54,28 @@ def universal_search(
 
     try:
         if engine == "google":
-            return _search_google(keyword, time_filter, headers)
+            result = _search_google(keyword, time_filter, headers)
+            # Google 실패(차단/구조변경) 시 DuckDuckGo로 fallback
+            if "찾을 수 없습니다" in result or "차단" in result:
+                return f"[Google 실패 → DuckDuckGo로 재시도]\n\n{_search_duckduckgo(keyword, headers)}"
+            return result
         if engine == "duckduckgo":
             return _search_duckduckgo(keyword, headers)
         if engine == "wolframalpha":
             return _search_wolframalpha(keyword, headers)
     except requests.exceptions.RequestException as e:
+        if engine == "google":
+            try:
+                return f"[Google 요청 실패] DuckDuckGo로 재시도:\n\n{_search_duckduckgo(keyword, headers)}"
+            except Exception:
+                return f"검색 요청 오류: {e}"
         return f"검색 요청 오류: {e}"
     except Exception as e:
+        if engine == "google":
+            try:
+                return f"[Google 처리 실패] DuckDuckGo로 재시도:\n\n{_search_duckduckgo(keyword, headers)}"
+            except Exception:
+                return f"검색 처리 오류: {e}"
         return f"검색 처리 오류: {e}"
 
     return "지원하지 않는 검색 엔진입니다."
@@ -145,23 +161,33 @@ def _search_wolframalpha(keyword: str, headers: dict) -> str:
         if meta and meta.get("content"):
             text_parts.append(meta["content"])
         else:
-            text_parts.append("WolframAlpha는 JavaScript로 결과를 동적 로딩합니다. 정적 크롤링으로는 제한적입니다.")
+            text_parts.append(
+                "[WolframAlpha 제한] 이 도구는 정적 HTML만 파싱합니다. "
+                "WolframAlpha는 JavaScript로 결과를 동적 로딩해, 수학·계산 결과가 추출되지 않을 수 있습니다. "
+                "정확한 결과가 필요하면 wolframalpha.com에서 직접 검색하거나, 공식 API를 사용하세요."
+            )
             text_parts.append(f"직접 확인: {url}")
 
-    return "\n".join(text_parts[:5]) if text_parts else "WolframAlpha 결과를 추출할 수 없습니다."
+    return "\n".join(text_parts[:5]) if text_parts else (
+        "[WolframAlpha 제한] 정적 크롤링으로 결과를 추출할 수 없습니다. "
+        "수학·과학 계산은 wolframalpha.com에서 직접 검색하세요."
+    )
 
 
 def _parse_user_request(user_request: str) -> tuple[str, str, str]:
-    """user_request에서 keyword, engine, time_filter 추출"""
+    """user_request에서 keyword, engine, time_filter 추출. 문장 끝 suffix만 제거해 검색어 손실 방지."""
     req = (user_request or "").strip()
     if not req:
         return "", "duckduckgo", ""
 
-    # 엔진 추출
+    # 엔진 추출 (문장 앞/뒤에 있을 때만)
     engine = "duckduckgo"
-    if "구글" in req or "google" in req.lower():
+    req_lower = req.lower()
+    if re.match(r"^(구글|google)\s*(으로|로)?\s*", req, re.I) or req.endswith(" 구글로") or req.endswith(" google"):
         engine = "google"
-    elif "울프람" in req or "wolfram" in req.lower() or "수학" in req or "계산" in req:
+    elif re.match(r"^(울프람|wolfram)\s*(으로|로)?\s*", req, re.I) or "울프람" in req or "wolfram" in req_lower:
+        engine = "wolframalpha"
+    elif "수학" in req or "계산" in req:
         engine = "wolframalpha"
 
     # 시간 필터 (구글용)
@@ -174,27 +200,25 @@ def _parse_user_request(user_request: str) -> tuple[str, str, str]:
         time_filter = "qdr:m"
     elif "올해" in req or "최근 일년" in req or "일년" in req:
         time_filter = "qdr:y"
-    elif "최근 1시간" in req or "1시간" in req:
+    elif "최근 1시간" in req:
         time_filter = "qdr:h"
 
-    # 검색어 추출: 검색/알려 관련 꼬리 제거
+    # 검색어: 문장 끝 suffix만 제거 (중간 검색어 손실 방지)
     keyword = req
     for suffix in (
-        r"\s*검색해\s*줘",
-        r"\s*검색해\s*줘요",
-        r"\s*검색해",
-        r"\s*검색",
-        r"\s*알려\s*줘",
-        r"\s*알려\s*줘요",
-        r"\s*알려줘",
-        r"\s*알려줘요",
-        r"\s*찾아\s*줘",
-        r"\s*찾아줘",
-        r"\s*구글로\s*",
-        r"\s*듀크듀크고로\s*",
-        r"\s*울프람으로\s*",
+        r"검색해\s*줘요?$",
+        r"검색해\s*줘$",
+        r"검색해$",
+        r"검색\s*해\s*줘요?$",
+        r"알려\s*줘요?$",
+        r"알려줘요?$",
+        r"찾아\s*줘요?$",
+        r"찾아줘$",
+        r"계산해\s*줘요?$",
     ):
         keyword = re.sub(suffix, "", keyword, flags=re.IGNORECASE).strip()
+    # 문장 앞 엔진 표현만 제거 (구글로, 듀크듀크고로, 울프람으로)
+    keyword = re.sub(r"^(구글|google|듀크듀크고|duckduckgo|울프람|wolfram)\s*(으로|로)\s*", "", keyword, flags=re.I).strip()
 
     return keyword or req, engine, time_filter
 

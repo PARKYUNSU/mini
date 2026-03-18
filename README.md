@@ -146,6 +146,13 @@ tail -f agent.log
 pip install -r requirements.txt
 ```
 
+### 검색 도구 (`universal_search_tool`) 의존성
+
+- **beautifulsoup4**: 웹 검색 결과 HTML 파싱 (필수)
+- **requests**: HTTP 요청 (이미 requirements에 포함)
+
+이 도구는 DuckDuckGo·Google·WolframAlpha를 스크래핑합니다. HTML 구조 변경·봇 차단에 취약하므로 DuckDuckGo를 기본값으로 사용합니다. Google 실패 시 DuckDuckGo로 자동 fallback됩니다.
+
 ---
 
 ## 7. 라이선스
