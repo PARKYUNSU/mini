@@ -5,9 +5,8 @@ Multi-Agent 동적 코딩 텔레그램 봇
 - 일상/RAG: 즉시 답변. 기존 도구: 즉시 실행. 새 코드: 승인 후 실행.
 """
 
-import base64
+import contextlib
 import os
-import tempfile
 
 os.environ.setdefault("OLLAMA_HOST", "http://localhost:11434")
 
@@ -26,12 +25,9 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Literal, Optional, TypedDict
 
-from e2b_code_interpreter import Sandbox
-
 import chromadb
 from chromadb.config import Settings
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
-from dotenv import load_dotenv
 from langchain_community.chat_models.ollama import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -40,168 +36,68 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, StateGraph
 from langgraph.types import Command, interrupt
 import telebot
-from telebot.types import ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
+from telebot.types import ReplyKeyboardRemove
 
-load_dotenv()
+from agent_config import (
+    AGENT_LEARNINGS_PATH,
+    AGENT_TOOLS_DIR,
+    BACKFILL_LOG_PATH,
+    BACKFILL_PID_PATH,
+    BACKFILL_SCRIPT_PATH,
+    CHAT_MEMORY_DB_PATH,
+    CHECKPOINT_DB_PATH,
+    CHROMA_DB_PATH,
+    CODE_TIMEOUT_SEC,
+    COLLECTION_NAME,
+    EMBEDDING_MODEL,
+    ERROR_LOG_MAX_CHARS,
+    GEMINI_API_KEY,
+    GEMINI_MODEL,
+    LLM_RETRY_DELAY_SEC,
+    LLM_RETRY_MAX,
+    MEMORY_BUFFER,
+    MEMORY_K,
+    PROJECT_ROOT,
+    RAG_TOP_K,
+    TELEGRAM_TOKEN,
+    ALLOWED_CHAT_ID,
+    ollama_kwargs,
+)
+from agent_sandbox import run_code_sandbox as _run_code_sandbox
+from agent_telegram import (
+    CANCEL_RESTART_CMDS as _CANCEL_RESTART_CMDS,
+    main_keyboard as _main_keyboard,
+    safe_telegram_edit as _safe_telegram_edit,
+    safe_telegram_send as _safe_telegram_send,
+    safe_telegram_send_and_get as _safe_telegram_send_and_get,
+    strip_wake_word as _strip_wake_word,
+)
+from agent_vision import (
+    build_message_content as _build_message_content,
+    download_photo_to_base64 as _download_photo_to_base64,
+    run_vision_analysis as _run_vision_analysis,
+)
 
-# 재시작/취소용 키보드 (Reply Keyboard - 하단 고정 버튼)
-def _main_keyboard() -> ReplyKeyboardMarkup:
-    mk = ReplyKeyboardMarkup(resize_keyboard=True)
-    mk.add(KeyboardButton("🔄 재시작"), KeyboardButton("❌ 취소"))
-    return mk
 
-_CANCEL_RESTART_CMDS = ("/cancel", "취소", "취소해", "재시작", "/restart", "🔄 재시작", "❌ 취소")
-
-# 호출어 제거: "윤수르, ~" → 순수 목적 텍스트만 라우터로 전달
-def _strip_wake_word(text: str) -> str:
-    cleaned = re.sub(r"^윤수르[,\.\s]*", "", text.strip()).strip()
-    return cleaned if cleaned else text.strip()
-
-
-def _safe_telegram_send(bot, chat_id: str, text: str, parse_mode=None, **kwargs) -> bool:
-    """Broken pipe, ConnectionError, ReadTimeout 방어. 실패 시 False 반환."""
-    try:
-        bot.send_message(chat_id, text, parse_mode=parse_mode, **kwargs)
-        return True
-    except (ConnectionError, BrokenPipeError) as e:
-        print(f"[DEBUG] 텔레그램 전송 일시 오류 (무시): {e}")
+def _is_execution_failure(result: str) -> bool:
+    """
+    실행 결과가 실패인지 판정. 문자열 부분 매칭 대신 명시적 실패 지표만 사용.
+    (정상 출력에 'Error', 'Timeout' 등이 포함되어도 오탐 방지)
+    """
+    if not result or not isinstance(result, str):
         return False
-    except OSError as e:
-        if getattr(e, "errno", None) == 32:
-            print(f"[DEBUG] 텔레그램 전송 Broken pipe (무시): {e}")
-            return False
-        raise
-    except Exception as e:
-        err_str = str(e).lower()
-        if "readtimeout" in err_str or "broken pipe" in err_str:
-            print(f"[DEBUG] 텔레그램 전송 타임아웃/파이프 (무시): {e}")
-            return False
-        raise
-
-
-def _safe_telegram_send_and_get(bot, chat_id: str, text: str, **kwargs):
-    """전송 후 성공 시 메시지 객체 반환, 실패 시 None (status_msg용)."""
-    try:
-        return bot.send_message(chat_id, text, **kwargs)
-    except (ConnectionError, BrokenPipeError) as e:
-        print(f"[DEBUG] 텔레그램 전송 일시 오류 (무시): {e}")
-        return None
-    except OSError as e:
-        if getattr(e, "errno", None) == 32:
-            print(f"[DEBUG] 텔레그램 전송 Broken pipe (무시): {e}")
-            return None
-        raise
-    except Exception as e:
-        err_str = str(e).lower()
-        if "readtimeout" in err_str or "broken pipe" in err_str:
-            print(f"[DEBUG] 텔레그램 전송 타임아웃/파이프 (무시): {e}")
-            return None
-        raise
-
-
-def _safe_telegram_edit(bot, text: str, chat_id: str, message_id: int) -> bool:
-    """edit_message_text용 Broken pipe/ConnectionError 방어."""
-    try:
-        bot.edit_message_text(text, chat_id, message_id)
+    r = result.strip()
+    if r.startswith("실행 오류") or r.startswith("도구 실행 오류") or r.startswith("도구 '"):
         return True
-    except (ConnectionError, BrokenPipeError) as e:
-        print(f"[DEBUG] 텔레그램 수정 일시 오류 (무시): {e}")
-        return False
-    except OSError as e:
-        if getattr(e, "errno", None) == 32:
-            print(f"[DEBUG] 텔레그램 수정 Broken pipe (무시): {e}")
-            return False
-        raise
-    except Exception as e:
-        err_str = str(e).lower()
-        if "readtimeout" in err_str or "broken pipe" in err_str:
-            print(f"[DEBUG] 텔레그램 수정 타임아웃/파이프 (무시): {e}")
-            return False
-        raise
-
-
-def _download_photo_to_base64(bot, message) -> tuple[str, str] | None:
-    """텔레그램 사진을 최고해상도로 다운로드 후 Base64 반환. (base64_str, user_request) 또는 None."""
-    if not message.photo:
-        return None
-    t0 = time.perf_counter()
-    try:
-        file_id = message.photo[-1].file_id
-        file_info = bot.get_file(file_id)
-        file_bytes = bot.download_file(file_info.file_path)
-        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
-            tmp.write(file_bytes)
-            tmp_path = tmp.name
-        try:
-            with open(tmp_path, "rb") as f:
-                b64 = base64.b64encode(f.read()).decode("utf-8")
-        finally:
-            Path(tmp_path).unlink(missing_ok=True)
-        user_request = (message.caption or "").strip()
-        if not user_request:
-            user_request = "이 이미지를 자세히 분석하고 무엇인지 설명해 줘."
-        elapsed = time.perf_counter() - t0
-        print(f"[DEBUG] Vision: 사진 다운로드+Base64 {elapsed:.2f}s ({len(b64)//1024}KB)", flush=True)
-        return (b64, user_request)
-    except Exception as e:
-        print(f"[DEBUG] 사진 다운로드/Base64 변환 오류: {e}\n{traceback.format_exc()}")
-        return None
-
-
-def _build_message_content(text: str, image_base64: str | None):
-    """텍스트만 또는 LangChain 멀티모달 리스트 포맷 반환. image_base64 있으면 함께 전달."""
-    if not image_base64:
-        return text
-    return [
-        {"type": "text", "text": text},
-        {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_base64}"},
-    ]
-
-
-def _run_vision_analysis(bot, chat_id: str, user_request: str, base64_image: str, status_msg) -> str | None:
-    """Qwen Vision으로 이미지 분석. 결과 문자열 반환, 실패 시 None."""
-    t0 = time.perf_counter()
-    try:
-        llm = ChatOllama(**_ollama_kwargs(temperature=0.2))
-        content = [
-            {"type": "text", "text": user_request},
-            {"type": "image_url", "image_url": f"data:image/jpeg;base64,{base64_image}"},
-        ]
-        resp = llm.invoke([HumanMessage(content=content)])
-        elapsed = time.perf_counter() - t0
-        print(f"[DEBUG] Vision: Ollama 추론 {elapsed:.2f}s (응답 {len(resp.content or '')}자)", flush=True)
-        return (resp.content or "").strip()
-    except Exception as e:
-        print(f"[DEBUG] Vision 분석 오류: {e}\n{traceback.format_exc()}")
-        return None
-
-
-# ============ 설정 ============
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-ALLOWED_CHAT_ID = os.getenv("ALLOWED_CHAT_ID")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-CHROMA_DB_PATH = "./chroma_db"
-COLLECTION_NAME = "arxiv_papers"
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-OLLAMA_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b")
-OLLAMA_TIMEOUT = 120  # 요청 타임아웃(초) - Broken pipe 방지
-OLLAMA_KEEP_ALIVE = "10m"  # 모델 메모리 유지 - 연결 끊김 감소
-GEMINI_MODEL = "gemini-2.5-flash"
-MEMORY_K = 5  # 최근 K턴 원본 유지
-MEMORY_BUFFER = 15  # 요약 전 버퍼 크기 (과거 메시지 축적용)
-RAG_TOP_K = 3
-AGENT_TOOLS_DIR = Path("./agent_tools")
-AGENT_LEARNINGS_PATH = Path("agent_learnings/ERRORS.md")
-CODE_TIMEOUT_SEC = 30
-ERROR_LOG_MAX_CHARS = 1000
-CHECKPOINT_DB_PATH = "./agent_checkpoints.db"
-CHAT_MEMORY_DB_PATH = "./chat_memory.db"
-PROJECT_ROOT = Path(__file__).resolve().parent
-BACKFILL_SCRIPT_PATH = PROJECT_ROOT / "run_backfill.py"
-BACKFILL_LOG_PATH = PROJECT_ROOT / "backfill_2023_2026.log"
-BACKFILL_PID_PATH = PROJECT_ROOT / ".backfill.pid"
-LLM_RETRY_MAX = 3  # Broken pipe 등 일시적 오류 시 최대 재시도 횟수
-LLM_RETRY_DELAY_SEC = 1.5  # 재시도 간 대기(초)
+    if r == "승인되지 않음":
+        return True
+    if "실행할 기존 도구가 없습니다" in r:
+        return True
+    if "적합한 도구를 선택하지 못했습니다" in r or "적합한 기존 도구를 찾지 못했습니다" in r:
+        return True
+    if "검색 요청 오류" in r or "검색 처리 오류" in r:
+        return True
+    return False
 
 
 def _is_transient_error(e: BaseException) -> bool:
@@ -273,7 +169,7 @@ class ChromaRAGTool:
         if not any(v in query for v in vague):
             return query
         try:
-            llm = ChatOllama(**_ollama_kwargs(temperature=0))
+            llm = ChatOllama(**ollama_kwargs(temperature=0))
             resp = llm.invoke([
                 SystemMessage(content="대화 맥락을 보고 사용자가 '그거', '더 자세히' 등으로 물어본 대상의 구체적 검색어를 1문장으로만 출력. 검색어만."),
                 HumanMessage(content=f"[대화]\n{session_context[:800]}\n\n[현재 질문]\n{query}\n\n검색어:"),
@@ -512,7 +408,7 @@ class SessionMemory:
 
     def _get_llm(self) -> ChatOllama:
         if self._llm is None:
-            self._llm = ChatOllama(**_ollama_kwargs(temperature=0.3))
+            self._llm = ChatOllama(**ollama_kwargs(temperature=0.3))
         return self._llm
 
     def add_turn(self, user_msg: str, assistant_msg: str) -> None:
@@ -579,6 +475,37 @@ _recent_tools: dict[str, list[dict[str, str]]] = {}
 # 사진 먼저 보낸 후 텍스트 후속 질문 시 문맥 유지용 (chat_id → base64)
 _pending_image: dict[str, str] = {}
 
+# chat_id 단위 동시성 제어 (ThreadPool + 전역 dict race 방지)
+_chat_locks: dict[str, threading.Lock] = {}
+_lock_for_locks = threading.Lock()
+
+
+def _get_chat_lock(chat_id: str) -> threading.Lock:
+    """chat_id별 Lock 반환. 동일 chat_id에 대한 접근을 직렬화."""
+    with _lock_for_locks:
+        if chat_id not in _chat_locks:
+            _chat_locks[chat_id] = threading.Lock()
+        return _chat_locks[chat_id]
+
+
+def _extract_chat_id_from_thread(thread_id: str) -> str:
+    """thread_id(tg_123 또는 tg_123_456)에서 chat_id 추출."""
+    if not thread_id or not thread_id.startswith("tg_"):
+        return thread_id or ""
+    parts = thread_id.split("_")
+    return parts[1] if len(parts) >= 2 else thread_id
+
+
+@contextlib.contextmanager
+def _with_chat_lock(chat_id: str):
+    """chat_id 전역 state 접근 시 사용하는 context manager."""
+    lock = _get_chat_lock(chat_id)
+    lock.acquire()
+    try:
+        yield
+    finally:
+        lock.release()
+
 
 def _infer_tool_tag(tool_name: str, request_hint: str = "") -> str:
     text = f"{tool_name} {request_hint}".lower()
@@ -598,18 +525,20 @@ def _infer_tool_tag(tool_name: str, request_hint: str = "") -> str:
 
 
 def _remember_tool(chat_id: str, tool_name: str, request_hint: str = "") -> None:
-    bucket = _recent_tools.setdefault(chat_id, [])
-    bucket = [x for x in bucket if x.get("tool_name") != tool_name]
-    bucket.insert(0, {
-        "tool_name": tool_name,
-        "tag": _infer_tool_tag(tool_name, request_hint),
-        "request_hint": request_hint[:200],
-    })
-    _recent_tools[chat_id] = bucket[:5]
+    with _with_chat_lock(chat_id):
+        bucket = _recent_tools.setdefault(chat_id, [])
+        bucket = [x for x in bucket if x.get("tool_name") != tool_name]
+        bucket.insert(0, {
+            "tool_name": tool_name,
+            "tag": _infer_tool_tag(tool_name, request_hint),
+            "request_hint": request_hint[:200],
+        })
+        _recent_tools[chat_id] = bucket[:5]
 
 
 def _resolve_recent_tool_reference(chat_id: str, user_request: str) -> Optional[str]:
-    recent = _recent_tools.get(chat_id, [])
+    with _with_chat_lock(chat_id):
+        recent = list(_recent_tools.get(chat_id, []))  # 스냅샷 복사
     if not recent:
         return None
 
@@ -643,30 +572,32 @@ def _resolve_recent_tool_reference(chat_id: str, user_request: str) -> Optional[
 
 
 def get_session(chat_id: str) -> SessionMemory:
-    if chat_id not in _sessions:
-        loaded = _chat_memory_store.load(chat_id)
-        if loaded:
-            messages_list, summary = loaded
-            recent = deque(messages_list, maxlen=MEMORY_BUFFER)
-            _sessions[chat_id] = SessionMemory(
-                chat_id=chat_id,
-                recent_messages=recent,
-                summary=summary or "",
-            )
-        else:
-            _sessions[chat_id] = SessionMemory(chat_id=chat_id)
-    return _sessions[chat_id]
+    with _with_chat_lock(chat_id):
+        if chat_id not in _sessions:
+            loaded = _chat_memory_store.load(chat_id)
+            if loaded:
+                messages_list, summary = loaded
+                recent = deque(messages_list, maxlen=MEMORY_BUFFER)
+                _sessions[chat_id] = SessionMemory(
+                    chat_id=chat_id,
+                    recent_messages=recent,
+                    summary=summary or "",
+                )
+            else:
+                _sessions[chat_id] = SessionMemory(chat_id=chat_id)
+        return _sessions[chat_id]
 
 
 def clear_session(chat_id: str) -> None:
     """재시작/취소 시: SessionMemory를 RAM·DB에서 완전 초기화"""
-    _chat_memory_store.clear(chat_id)
-    if chat_id in _sessions:
-        del _sessions[chat_id]
-    if chat_id in _recent_tools:
-        del _recent_tools[chat_id]
-    if chat_id in _pending_image:
-        del _pending_image[chat_id]
+    with _with_chat_lock(chat_id):
+        _chat_memory_store.clear(chat_id)
+        if chat_id in _sessions:
+            del _sessions[chat_id]
+        if chat_id in _recent_tools:
+            del _recent_tools[chat_id]
+        if chat_id in _pending_image:
+            del _pending_image[chat_id]
 
 
 def _read_backfill_pid() -> Optional[int]:
@@ -749,18 +680,13 @@ def _stop_backfill_process() -> tuple[bool, str]:
 
 
 # ============ LLM 인스턴스 ============
-def _ollama_kwargs(**extra) -> dict:
-    """Ollama 공통 옵션: timeout·keep_alive로 Broken pipe 방지"""
-    return {"model": OLLAMA_MODEL, "timeout": OLLAMA_TIMEOUT, "keep_alive": OLLAMA_KEEP_ALIVE, **extra}
-
-
 def get_planner_llm():
-    return ChatOllama(**_ollama_kwargs(temperature=0.2))
+    return ChatOllama(**ollama_kwargs(temperature=0.2))
 
 
 def get_router_llm():
     """라우터 전용: 1토큰만 출력, temperature=0으로 극한 최적화"""
-    return ChatOllama(**_ollama_kwargs(temperature=0, num_predict=1))
+    return ChatOllama(**ollama_kwargs(temperature=0, num_predict=1))
 
 
 def get_executor_llm():
@@ -836,57 +762,35 @@ def _match_whitelisted_tool(user_request: str, req_lower: str) -> Optional[str]:
     return None
 
 
-def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
-    """Router: 사용자 질문을 3가지 경로로 분류 (로컬 Qwen 2.5 7B)"""
-    print("[DEBUG] Router: 진입")
-    conf = config.get("configurable", {})
-    chat_id = str(conf.get("chat_id", ""))
-    user_request = str(state.get("user_request") or "").strip()
-    req_lower = user_request.lower().strip()
-    print(f"[DEBUG] Router: user_request={user_request[:80]}...")
-
-    # --------- L1: 하드 룰 (우선순위 최상단) ---------
+def _router_step1_hard_rules(
+    user_request: str, req_lower: str, chat_id: str
+) -> Optional[dict]:
+    """
+    1단계: 명백한 하드룰. 매칭 시 즉시 반환, None이면 2단계로.
+    """
     has_url = bool(re.search(r"https?://\S+", user_request))
 
-    # 0) 일상/메모리/짧은 산수는 무조건 A
     if _is_smalltalk_or_memory_request(user_request, req_lower):
-        print("[DEBUG] Router: A 하드룰 감지 → A(direct_answer) 직행")
         return {"route_type": "direct_answer", "router_choice": "A"}
-
-    # 1) 화이트리스트에 있는 기존 도구만 B 허용
     whitelisted_tool = _match_whitelisted_tool(user_request, req_lower)
     if whitelisted_tool:
-        print(f"[DEBUG] Router: B 화이트리스트 감지 → B(use_existing_tool) 직행 ({whitelisted_tool})")
         return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": whitelisted_tool}
-
-    # 1.5) 최근 생성/사용 도구 참조 → B 복귀
     recent_tool = _resolve_recent_tool_reference(chat_id, user_request)
     if recent_tool and (AGENT_TOOLS_DIR / f"{recent_tool}.py").exists():
-        print(f"[DEBUG] Router: 최근 도구 참조 감지 → B(use_existing_tool) 직행 ({recent_tool})")
         return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": recent_tool}
-
-    # 2) URL이 포함된 일반 요청은 무조건 C 강제 (RAG 환각 방지)
     if has_url:
-        print("[DEBUG] Router: URL 감지 → C(Planner) 강제")
         return {"route_type": "planner", "router_choice": "C"}
-
-    # [최상단] 단순 텍스트 창작(글짓기) → A 직행 (코드 불필요, Broken pipe 방지)
     text_creation_markers = (
         "문자 메시지", "문자 메세지", "문자 ", "SMS", "초안 작성", "이메일 ", "이메일 작성", "메일 ",
         "인사말", "인사말 추천", "번역해 줘", "번역해줘", "글쓰기", "글 짜", "내용 만들어",
         "메시지 만들어", "메시지 내용", "메세지 만들어", "메세지 내용", "초안 만들어", "작성해 줘", "써 줘", "써줘",
     )
     if any(m in user_request for m in text_creation_markers):
-        print("[DEBUG] Router: 텍스트 창작 감지 → A(direct_answer) 직행")
         return {"route_type": "direct_answer", "router_choice": "A"}
-    # "'만들어 줘' + 텍스트 대상" → A (파이썬 도구/시스템 아님)
     text_targets = ("문자", "이메일", "메일", "인사말", "글", "초안", "내용", "메시지")
     if ("만들어" in user_request or "써" in user_request or "작성" in user_request) and any(t in user_request for t in text_targets):
         if not any(c in user_request for c in ("코드", "크롤링", "스크래핑", "API", "파이썬", "스크립트", "도구")):
-            print("[DEBUG] Router: 글/텍스트 대상 '만들어 줘' 감지 → A(direct_answer) 직행")
             return {"route_type": "direct_answer", "router_choice": "A"}
-
-    # [최상단] 명백한 코딩 지시 → 메모리 무시하고 C 강제 (행동 우선순위)
     action_keywords = (
         "도구를 만들어 줘", "도구 만들어 줘", "코드를 짜 줘", "코드 짜 줘", "코드 짜줘", "코드 짜달라",
         "크롤링해 줘", "크롤링 해 줘", "크롤링해달라", "스크래핑해 줘",
@@ -894,63 +798,43 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
     )
     if any(kw in user_request for kw in action_keywords):
         return {"route_type": "planner", "router_choice": "C"}
-
-    # SessionMemory에서 직전 1~2턴 문맥 (Context-Aware Routing)
-    session = get_session(chat_id)
-    session_context = session.get_recent_context(max_turns=2)
-
-    # 기존 도구 사용 요청 → use_existing_tool 직행 (B 경로)
     existing_tool_keywords = ("기존 도구", "저장된 도구", "agent_tools", "이미 있는 도구", "만들어진 도구")
     if any(kw in user_request for kw in existing_tool_keywords) or ("도구" in user_request and "사용" in user_request):
         return {"route_type": "use_existing_tool", "router_choice": "B"}
-
-    # ChromaDB/논문 조회·요약·설명 → direct_answer(RAG) 직행 (절대 C 금지)
     paper_actions = ("목록", "알려줘", "뭐 있어", "조회", "검색", "요약", "자세히", "설명", "정리", "요약해", "설명해")
     if ("chromadb" in req_lower or "논문" in user_request) and any(w in user_request for w in paper_actions):
         return {"route_type": "direct_answer", "router_choice": "B"}
-
-    # 지식/텍스트 요청 (요약·설명·알려·번역) → D(RAG) 직행 (코딩 불필요)
     knowledge_verbs = ("요약해 줘", "설명해 줘", "알려 줘", "번역해 줘", "자세히 설명", "요약해줘", "설명해줘")
     code_blockers = ("코드", "크롤링", "스크래핑", "API", "파이썬", "스크립트", "짜줘", "만들어 줘")
     if any(k in user_request for k in knowledge_verbs) and not any(c in user_request for c in code_blockers):
         return {"route_type": "direct_answer", "router_choice": "B"}
-
-    # 후속 질문 → C(코딩) 절대 금지, A 또는 D로 (문맥 인지)
+    coding_keywords = (
+        "도구 만들어", "도구 만들", "코드 짜", "코드 작성", "크롤링", "스크래핑",
+        "계산", "파이썬", "스크립트", "자동화", "분석 도구", "데이터 분석",
+        "API 호출", "파일 읽", "파일 쓰",
+    )
     followup_indicators = ("더 자세히", "자세히", "그게", "그거", "그것", "그게 무슨", "무슨 뜻", "설명해 줘", "알려 줘")
-    if any(f in user_request for f in followup_indicators) and len(user_request) <= 50:
-        pass
-    else:
-        # 코딩/행동 요구 → C(Plan & Code) 직행 (수학·API·파일·데이터만)
-        coding_keywords = (
-            "도구 만들어", "도구 만들", "코드 짜", "코드 작성", "크롤링", "스크래핑",
-            "계산", "파이썬", "스크립트", "자동화", "분석 도구", "데이터 분석",
-            "API 호출", "파일 읽", "파일 쓰",
-        )
+    if not (any(f in user_request for f in followup_indicators) and len(user_request) <= 50):
         if any(kw in user_request for kw in coding_keywords):
             return {"route_type": "planner", "router_choice": "C"}
+    return None
 
-    rag = ChromaRAGTool()
-    skill_lib = AgentSkillLibrary()
-    rag_context = rag.search(user_request)  # 최신 질문만 사용 (과거 메모리 배제)
-    tools_context = skill_lib.get_tools_context()
 
-    # agent_tools/ 보유 도구 목록 동적 주입 (os.listdir + .py 필터)
-    tools_dir = Path(__file__).resolve().parent / "agent_tools"
-    tool_names = []
-    if tools_dir.exists():
-        for f in sorted(tools_dir.glob("*.py")):
-            try:
-                content = f.read_text(encoding="utf-8")
-                doc = ""
-                if '"""' in content:
-                    parts = content.split('"""')
-                    if len(parts) >= 2:
-                        doc = parts[1].strip().split("\n")[0][:80]
-                tool_names.append(f"{f.stem}" + (f": {doc}" if doc else ""))
-            except Exception:
-                tool_names.append(f.stem)
-    tools_list_str = ", ".join(tool_names) if tool_names else "(없음)"
+def _router_step2_build_features(user_request: str, req_lower: str) -> dict:
+    """2단계: LLM 분류용 feature dict (디버깅·프롬프트 보강용)."""
+    has_url = bool(re.search(r"https?://\S+", user_request))
+    return {
+        "has_url": has_url,
+        "has_text_creation": any(m in user_request for m in ("문자", "이메일", "번역", "인사말", "글쓰기", "초안")),
+        "has_coding_keywords": any(k in user_request for k in ("코드", "크롤링", "스크래핑", "API", "파이썬", "스크립트")),
+        "len": len(user_request),
+    }
 
+
+def _router_step3_llm_classify(
+    user_request: str, session_context: str, rag_context: str, tools_context: str, tools_list_str: str
+) -> dict:
+    """3단계: LLM 분류. 하드룰에 걸리지 않은 경우만 호출."""
     llm = get_router_llm()
     system_prompt = f"""<role>
 라우터. 입력을 A/B/C/D 중 하나로만 분류한다.
@@ -991,14 +875,61 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
     if raw.startswith("A") or raw == "A":
         route, choice = "direct_answer", "A"
     elif raw.startswith("B") or raw == "B":
-        route, choice = "use_existing_tool", "B"  # B = 기존 도구 사용
+        route, choice = "use_existing_tool", "B"
     elif raw.startswith("D") or raw == "D":
-        route, choice = "direct_answer", "B"  # D = RAG(문서 검색)
+        route, choice = "direct_answer", "B"
     else:
         route, choice = "planner", "C"
-
-    print(f"[DEBUG] Router: LLM 분류={raw} → route={route}, choice={choice}")
     return {"route_type": route, "router_choice": choice}
+
+
+def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
+    """Router: 1단계 하드룰 → 2단계 feature → 3단계 LLM 분류"""
+    print("[DEBUG] Router: 진입")
+    conf = config.get("configurable", {})
+    chat_id = str(conf.get("chat_id", ""))
+    user_request = str(state.get("user_request") or "").strip()
+    req_lower = user_request.lower().strip()
+    print(f"[DEBUG] Router: user_request={user_request[:80]}...")
+
+    # 1단계: 명백한 하드룰
+    result = _router_step1_hard_rules(user_request, req_lower, chat_id)
+    if result:
+        rule_name = result.get("route_type", "")
+        choice = result.get("router_choice", "")
+        print(f"[DEBUG] Router: 1단계 하드룰 → {rule_name} ({choice})")
+        return result
+
+    # 2단계: feature dict (LLM 분류용 컨텍스트)
+    features = _router_step2_build_features(user_request, req_lower)
+
+    # 3단계: LLM 분류
+    session = get_session(chat_id)
+    session_context = session.get_recent_context(max_turns=2)
+    rag = ChromaRAGTool()
+    skill_lib = AgentSkillLibrary()
+    rag_context = rag.search(user_request)
+    tools_context = skill_lib.get_tools_context()
+
+    tools_dir = Path(__file__).resolve().parent / "agent_tools"
+    tool_names = []
+    if tools_dir.exists():
+        for f in sorted(tools_dir.glob("*.py")):
+            try:
+                content = f.read_text(encoding="utf-8")
+                doc = ""
+                if '"""' in content:
+                    parts = content.split('"""')
+                    if len(parts) >= 2:
+                        doc = parts[1].strip().split("\n")[0][:80]
+                tool_names.append(f"{f.stem}" + (f": {doc}" if doc else ""))
+            except Exception:
+                tool_names.append(f.stem)
+    tools_list_str = ", ".join(tool_names) if tool_names else "(없음)"
+
+    result = _router_step3_llm_classify(user_request, session_context, rag_context, tools_context, tools_list_str)
+    print(f"[DEBUG] Router: 3단계 LLM 분류 → {result.get('route_type')} (features={features})")
+    return result
 
 
 def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
@@ -1209,10 +1140,9 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
                     tool_name = "fill_google_form" if "fill_google_form" in tool_names and "fill" in raw else None
                     if not tool_name:
                         tool_name = next((n for n in tool_names if n.lower() in raw or raw in n.lower()), None)
-                    if not tool_name:
-                        tool_name = tool_names[0] if tool_names else None
                     used_tool_name = tool_name or ""
-                    result = _run_tool_on_host(tool_name, user_request) if tool_name else "적합한 도구를 선택하지 못했습니다."
+                    # 못 고르면 실행하지 않음 (Host 도구는 보수적 선택)
+                    result = _run_tool_on_host(tool_name, user_request) if tool_name else "적합한 도구를 선택하지 못했습니다. fill_google_form을 사용하세요."
             else:
                 prompt = f"""[기존 도구 목록 - agent_tools/]
 {chr(10).join(tools_list)}
@@ -1226,9 +1156,8 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
                 raw = (resp.content or "").strip().replace(".py", "").strip().lower()
                 tool_names = [n for n, _ in tools]
                 tool_name = next((n for n in tool_names if n.lower() in raw or raw in n.lower()), None)
-                if not tool_name:
-                    tool_name = next((n for n in tool_names if any(w in n.lower() for w in raw.split() if len(w) > 2)), None)
                 used_tool_name = tool_name or ""
+                # 못 고르면 실행하지 않음 (Host 도구는 보수적 선택, fuzzy fallback 제거)
                 result = _run_tool_on_host(tool_name, user_request) if tool_name else "적합한 기존 도구를 찾지 못했습니다. 요청 목적이나 도구명을 더 구체적으로 말씀해 주세요."
 
         if chat_id and used_tool_name:
@@ -1261,10 +1190,13 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
     thread_id = str(conf.get("thread_id", ""))
 
     # 재개(Resume) 시: 캐시 또는 state에 계획이 있으면 LLM·메시지 생략 (중복 방지)
-    existing_plan = state.get("plan") or _plan_cache.get(thread_id)
+    plan_cid = _extract_chat_id_from_thread(thread_id)
+    with _with_chat_lock(plan_cid) if plan_cid else contextlib.nullcontext():
+        existing_plan = state.get("plan") or (_plan_cache.get(thread_id) if plan_cid else None)
+        if existing_plan:
+            if thread_id in _plan_cache:
+                del _plan_cache[thread_id]
     if existing_plan:
-        if thread_id in _plan_cache:
-            del _plan_cache[thread_id]
         approval = interrupt({"plan": existing_plan, "status": "pending"})
         approval_str = str(approval).strip().lower() if approval else ""
         if "승인" in approval_str or approval_str == "승인":
@@ -1377,7 +1309,8 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
         else:
             print("[DEBUG] Planner: 텔레그램 전송 실패 (일시 오류)")
 
-    _plan_cache[thread_id] = plan_lines
+    with _with_chat_lock(plan_cid) if plan_cid else contextlib.nullcontext():
+        _plan_cache[thread_id] = plan_lines
     approval = interrupt({"plan": plan_lines, "status": "pending"})
     approval_str = str(approval).strip().lower() if approval else ""
 
@@ -1389,6 +1322,7 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
 def planner_debate_node(state: AgentState) -> dict:
     """Planner Debate: 승인된 계획을 내부적으로 한 번 더 검토/보정.
     사용자에게는 토론 내용을 노출하지 않고, 개선된 plan만 다음 단계로 전달."""
+    t0 = time.perf_counter()
     print("[DEBUG] PlannerDebate: 진입")
     if state.get("approval_status") != "approved":
         return {}
@@ -1468,50 +1402,13 @@ def planner_debate_node(state: AgentState) -> dict:
                 revised_lines.append(ln)
 
     if not revised_lines:
+        elapsed = time.perf_counter() - t0
+        print(f"[DEBUG] PlannerDebate: 보정 없음 (소요 {elapsed:.2f}s)")
         return {"plan": original_plan}
 
-    print(f"[DEBUG] PlannerDebate: 계획 보정 완료 ({len(revised_lines)}단계)")
+    elapsed = time.perf_counter() - t0
+    print(f"[DEBUG] PlannerDebate: 계획 보정 완료 ({len(revised_lines)}단계, 소요 {elapsed:.2f}s)")
     return {"plan": revised_lines}
-
-
-def _run_code_sandbox(code: str) -> str:
-    """E2B 클라우드 샌드박스에서 코드 실행 (30초 timeout, Host 완전 격리).
-    맥 미니의 .env 환경 변수를 샌드박스 내부로 주입하여 os.getenv()가 동작하도록 함."""
-    if not os.getenv("E2B_API_KEY"):
-        return "실행 오류: E2B_API_KEY가 .env에 설정되지 않았습니다."
-
-    load_dotenv(override=True)  # 최신 .env 반영 (사용자가 승인 전에 추가한 키 포함)
-    env_dict = {k: v for k, v in os.environ.items() if isinstance(v, str) and k != "E2B_API_KEY"}
-    # WEATHER_API_KEY 별칭 (Planner가 WEATHER_API_KEY 요구 시 OPENWEATHERMAP_API_KEY 사용)
-    if "OPENWEATHERMAP_API_KEY" in env_dict and "WEATHER_API_KEY" not in env_dict:
-        env_dict["WEATHER_API_KEY"] = env_dict["OPENWEATHERMAP_API_KEY"]
-
-    try:
-        with Sandbox.create() as sandbox:
-            execution = sandbox.run_code(code, timeout=CODE_TIMEOUT_SEC, envs=env_dict)
-
-            if execution.error:
-                err_msg = (
-                    f"{execution.error.name}: {execution.error.value}\n"
-                    f"{execution.error.traceback or ''}"
-                )
-                truncated = err_msg[-ERROR_LOG_MAX_CHARS:] if len(err_msg) > ERROR_LOG_MAX_CHARS else err_msg
-                return f"실행 오류: {truncated}"
-
-            stdout_parts = execution.logs.stdout if execution.logs else []
-            stderr_parts = execution.logs.stderr if execution.logs else []
-            stdout = "".join(stdout_parts).strip() if stdout_parts else ""
-            stderr = "".join(stderr_parts).strip() if stderr_parts else ""
-
-            result_text = execution.text or ""
-            combined = stdout or result_text or stderr
-            return combined.strip() or "실행 완료 (출력 없음)"
-
-    except Exception as e:
-        err_str = str(e)
-        if len(err_str) > ERROR_LOG_MAX_CHARS:
-            err_str = f"...{err_str[-ERROR_LOG_MAX_CHARS:]}"
-        return f"실행 오류: {type(e).__name__}: {err_str}"
 
 
 def executor_node(state: AgentState) -> dict:
@@ -1647,7 +1544,7 @@ def monitor_node(state: AgentState) -> dict:
     max_retry = 2
     user_request = state.get("user_request", "")
 
-    is_error = "오류" in result or "Error" in result or "Exception" in result or "Timeout" in result
+    is_error = _is_execution_failure(result)
 
     # 1) 문법/런타임 에러 → 기존 로직: 에러 분석 후 재시도
     if is_error and retry < max_retry:
@@ -1687,7 +1584,7 @@ def monitor_node(state: AgentState) -> dict:
 def route_after_monitor(state: AgentState) -> Literal["executor", "__end__"]:
     result = state.get("execution_result", "")
     retry = state.get("retry_count", 0)
-    is_error = "오류" in result or "Error" in result or "Exception" in result or "Timeout" in result
+    is_error = _is_execution_failure(result)
     content_irrelevant = state.get("content_irrelevant", False)
     if (is_error or content_irrelevant) and retry < 2:
         return "executor"
@@ -1746,7 +1643,8 @@ def main():
         try:
             state = graph.get_state(cfg)
             if state and state.next:
-                _pending_approvals[cid] = (cfg["configurable"]["thread_id"], cfg)
+                with _with_chat_lock(cid):
+                    _pending_approvals[cid] = (cfg["configurable"]["thread_id"], cfg)
         except Exception:
             pass
 
@@ -1754,8 +1652,9 @@ def main():
         """image_base64: 직전 턴 이미지(문맥용). Vision 라우팅은 message.photo 있을 때만."""
         print(f"[DEBUG] run_or_resume: 진입 is_resume={is_resume}, image_ctx={bool(image_base64)}")
         tid = thread_id or f"tg_{chat_id}"
-        if not is_resume and _thread_version.get(chat_id, 0) > 0:
-            tid = f"tg_{chat_id}_{_thread_version[chat_id]}"
+        with _with_chat_lock(chat_id):
+            if not is_resume and _thread_version.get(chat_id, 0) > 0:
+                tid = f"tg_{chat_id}_{_thread_version[chat_id]}"
         cfg = config if config else {"configurable": {"thread_id": tid, "chat_id": chat_id, "bot": bot}}
         try:
             for attempt in range(LLM_RETRY_MAX):
@@ -1807,11 +1706,13 @@ def main():
             values = state.values if hasattr(state, "values") else {}
             if state.next:
                 print("[DEBUG] run_or_resume: interrupt(승인대기) → _pending_approvals 등록")
-                _pending_approvals[chat_id] = (cfg["configurable"]["thread_id"], cfg)
+                with _with_chat_lock(chat_id):
+                    _pending_approvals[chat_id] = (cfg["configurable"]["thread_id"], cfg)
                 return
 
-            if chat_id in _pending_approvals:
-                del _pending_approvals[chat_id]
+            with _with_chat_lock(chat_id):
+                if chat_id in _pending_approvals:
+                    del _pending_approvals[chat_id]
 
             session = get_session(chat_id)
             user_msg_for_memory = values.get("user_request", user_text) if is_resume else user_text
@@ -1848,7 +1749,7 @@ def main():
             saved_tool = None
             retry_count = values.get("retry_count", 0)
             error_hint = values.get("error_hint", "")
-            if code and not ("오류" in result or "Error" in result or "Exception" in result or "Timeout" in result):
+            if code and not _is_execution_failure(result):
                 saved_tool = AgentSkillLibrary().save_tool(code, request)
                 if saved_tool:
                     _remember_tool(chat_id, Path(saved_tool).stem, request)
@@ -1983,7 +1884,8 @@ def main():
                             else:
                                 _safe_telegram_edit(bot, "⚠️ 이미지 분석에 실패했습니다. 다시 시도해 주세요.", chat_id, status_msg.message_id)
                         if ans:
-                            _pending_image[chat_id] = base64_image
+                            with _with_chat_lock(chat_id):
+                                _pending_image[chat_id] = base64_image
                             session = get_session(chat_id)
                             session.add_turn(f"[이미지] {user_request}", ans)
                             session.maybe_compress()
@@ -2012,17 +1914,21 @@ def main():
 
             # 1차 방어: Rule-based 취소/재시작 문지기 (최상단)
             if text in _CANCEL_RESTART_CMDS:
-                if chat_id in _pending_approvals:
-                    del _pending_approvals[chat_id]
-                _thread_version[chat_id] = int(time.time() * 1000)
+                with _with_chat_lock(chat_id):
+                    if chat_id in _pending_approvals:
+                        del _pending_approvals[chat_id]
+                    _thread_version[chat_id] = int(time.time() * 1000)
                 clear_session(chat_id)  # 대화 메모리 RAM·DB 완전 초기화
                 bot.reply_to(message, "✅ 재시작되었습니다. 새로운 질문을 해 주세요.", reply_markup=ReplyKeyboardRemove())
                 return
 
             thread_id = f"tg_{chat_id}"
 
-            if chat_id in _pending_approvals:
-                tid, cfg = _pending_approvals[chat_id]
+            with _with_chat_lock(chat_id):
+                pending = chat_id in _pending_approvals
+                if pending:
+                    tid, cfg = _pending_approvals[chat_id]
+            if pending:
                 if "승인" in text or "거절" in text:
                     print("[DEBUG] Handler: 승인/거절 → 스레드로 run_or_resume(is_resume=True)")
                     status_msg = _safe_telegram_send_and_get(bot, chat_id, "⚙️ 작업을 시작합니다...") if "승인" in text else None
@@ -2034,10 +1940,10 @@ def main():
                             _safe_telegram_send(bot, chat_id, f"🚨 내부 시스템 에러: {str(e)[:500]}")
                     _executor.submit(_do_resume)
                     return
-                # Auto-Cancel & Reroute: 승인/거절/취소가 아닌 엉뚱한 입력 → 이전 계획 취소 후 새 질문으로 처리
-                del _pending_approvals[chat_id]
-                _thread_version[chat_id] = int(time.time() * 1000)
-                clear_session(chat_id)  # 대화 메모리 RAM·DB 완전 초기화
+                # Auto-Cancel & Reroute: 승인/거절/취소가 아닌 엉뚱한 입력 → 계획만 취소, 메모리는 유지
+                with _with_chat_lock(chat_id):
+                    del _pending_approvals[chat_id]
+                    _thread_version[chat_id] = int(time.time() * 1000)
                 _safe_telegram_send(bot, chat_id, "이전 계획을 취소하고 새로운 요청을 처리합니다.")
                 # fall through: 아래에서 방금 입력한 text를 새 질문으로 Router부터 재실행
 
@@ -2046,7 +1952,8 @@ def main():
 
             def _do_run():
                 try:
-                    ctx_image = _pending_image.get(chat_id)  # 문맥용. Vision 라우팅 아님.
+                    with _with_chat_lock(chat_id):
+                        ctx_image = _pending_image.get(chat_id)  # 문맥용. Vision 라우팅 아님.
                     run_or_resume(chat_id, text, thread_id, is_resume=False, status_msg=status_msg, image_base64=ctx_image)
                     if status_msg:
                         try:
