@@ -69,9 +69,10 @@ def _cron_worker_loop() -> None:
                     continue
                 print(f"[cron] 실행: {job_id} → {prompt[:40]}... (chat={chat_id})")
                 result = run_scheduled_job(prompt, chat_id)
-                mark_job_run(job_id)
-                if result != "ok":
-                    print(f"[cron] 실행 실패: {result}")
+                if result == "ok":
+                    mark_job_run(job_id)
+                else:
+                    print(f"[cron] 실행 실패 (next_run 유지): {result}")
         except Exception as e:
             print(f"[cron] worker 예외: {e}")
         time.sleep(60)

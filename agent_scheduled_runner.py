@@ -42,6 +42,7 @@ def run_scheduled_job(prompt: str, chat_id: str) -> str:
                 "thread_id": f"tg_sched_{chat_id}_{os.urandom(4).hex()}",
                 "chat_id": chat_id,
                 "bot": None,
+                "is_scheduled": True,  # planner 경로 차단 → direct_answer/use_existing_tool만 사용
             }
         }
 

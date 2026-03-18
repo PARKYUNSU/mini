@@ -905,6 +905,7 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
     print("[DEBUG] Router: 진입")
     conf = config.get("configurable", {})
     chat_id = str(conf.get("chat_id", ""))
+    is_scheduled = conf.get("is_scheduled", False)
     user_request = str(state.get("user_request") or "").strip()
     req_lower = user_request.lower().strip()
     print(f"[DEBUG] Router: user_request={user_request[:80]}...")
@@ -915,6 +916,9 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         rule_name = result.get("route_type", "")
         choice = result.get("router_choice", "")
         print(f"[DEBUG] Router: 1단계 하드룰 → {rule_name} ({choice})")
+        if is_scheduled and rule_name == "planner":
+            result = {"route_type": "direct_answer", "router_choice": "B"}
+            print("[DEBUG] Router: 스케줄 작업 → planner 차단, direct_answer로 우회")
         return result
 
     # 2단계: feature dict (LLM 분류용 컨텍스트)
@@ -946,6 +950,10 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
     result = _router_step3_llm_classify(user_request, session_context, rag_context, tools_context, tools_list_str)
     print(f"[DEBUG] Router: 3단계 LLM 분류 → {result.get('route_type')} (features={features})")
+    # 스케줄 작업: planner는 승인 대기로 멈추므로, direct_answer로 강제 우회
+    if is_scheduled and result.get("route_type") == "planner":
+        result = {"route_type": "direct_answer", "router_choice": "B"}
+        print("[DEBUG] Router: 스케줄 작업 → planner 차단, direct_answer로 우회")
     return result
 
 
