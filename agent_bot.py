@@ -473,18 +473,20 @@ _plan_cache: dict[str, list[str]] = {}
 _thread_version: dict[str, int] = {}
 _recent_tools: dict[str, list[dict[str, str]]] = {}
 # 사진 먼저 보낸 후 텍스트 후속 질문 시 문맥 유지용 (chat_id → base64)
+# 수명 정책: 1회 소비. 텍스트 요청에서 pop으로 가져와 사용 후 즉시 제거. 새 이미지 수신 시 덮어쓰기.
 _pending_image: dict[str, str] = {}
 
 # chat_id 단위 동시성 제어 (ThreadPool + 전역 dict race 방지)
-_chat_locks: dict[str, threading.Lock] = {}
+# RLock: get_session 등이 run_or_resume 내부에서 호출될 때 재진입 허용
+_chat_locks: dict[str, threading.RLock] = {}
 _lock_for_locks = threading.Lock()
 
 
-def _get_chat_lock(chat_id: str) -> threading.Lock:
-    """chat_id별 Lock 반환. 동일 chat_id에 대한 접근을 직렬화."""
+def _get_chat_lock(chat_id: str) -> threading.RLock:
+    """chat_id별 RLock 반환. 동일 chat_id에 대한 run_or_resume·session 수정을 직렬화."""
     with _lock_for_locks:
         if chat_id not in _chat_locks:
-            _chat_locks[chat_id] = threading.Lock()
+            _chat_locks[chat_id] = threading.RLock()
         return _chat_locks[chat_id]
 
 
@@ -572,6 +574,11 @@ def _resolve_recent_tool_reference(chat_id: str, user_request: str) -> Optional[
 
 
 def get_session(chat_id: str) -> SessionMemory:
+    """
+    chat_id에 해당하는 SessionMemory 반환.
+    주의: 반환된 객체는 thread-safe하지 않음. session.add_turn, maybe_compress, save 등
+    수정은 반드시 _with_chat_lock(chat_id) 내부에서만 수행할 것.
+    """
     with _with_chat_lock(chat_id):
         if chat_id not in _sessions:
             loaded = _chat_memory_store.load(chat_id)
@@ -1649,12 +1656,17 @@ def main():
             pass
 
     def run_or_resume(chat_id: str, user_text: str, thread_id: Optional[str] = None, config: Optional[dict] = None, is_resume: bool = False, status_msg=None, image_base64: Optional[str] = None):
-        """image_base64: 직전 턴 이미지(문맥용). Vision 라우팅은 message.photo 있을 때만."""
+        """image_base64: 직전 턴 이미지(문맥용). Vision 라우팅은 message.photo 있을 때만.
+        chat_id 단위로 직렬화되어 동시에 2개 이상 실행되지 않음."""
+        with _with_chat_lock(chat_id):
+            _run_or_resume_body(chat_id, user_text, thread_id, config, is_resume, status_msg, image_base64, graph, bot)
+
+    def _run_or_resume_body(chat_id: str, user_text: str, thread_id: Optional[str], config: Optional[dict], is_resume: bool, status_msg, image_base64: Optional[str], graph, bot):
+        """run_or_resume 실제 로직. 호출 시 이미 _with_chat_lock(chat_id) 내부여야 함."""
         print(f"[DEBUG] run_or_resume: 진입 is_resume={is_resume}, image_ctx={bool(image_base64)}")
         tid = thread_id or f"tg_{chat_id}"
-        with _with_chat_lock(chat_id):
-            if not is_resume and _thread_version.get(chat_id, 0) > 0:
-                tid = f"tg_{chat_id}_{_thread_version[chat_id]}"
+        if not is_resume and _thread_version.get(chat_id, 0) > 0:
+            tid = f"tg_{chat_id}_{_thread_version[chat_id]}"
         cfg = config if config else {"configurable": {"thread_id": tid, "chat_id": chat_id, "bot": bot}}
         try:
             for attempt in range(LLM_RETRY_MAX):
@@ -1706,13 +1718,11 @@ def main():
             values = state.values if hasattr(state, "values") else {}
             if state.next:
                 print("[DEBUG] run_or_resume: interrupt(승인대기) → _pending_approvals 등록")
-                with _with_chat_lock(chat_id):
-                    _pending_approvals[chat_id] = (cfg["configurable"]["thread_id"], cfg)
+                _pending_approvals[chat_id] = (cfg["configurable"]["thread_id"], cfg)
                 return
 
-            with _with_chat_lock(chat_id):
-                if chat_id in _pending_approvals:
-                    del _pending_approvals[chat_id]
+            if chat_id in _pending_approvals:
+                del _pending_approvals[chat_id]
 
             session = get_session(chat_id)
             user_msg_for_memory = values.get("user_request", user_text) if is_resume else user_text
@@ -1886,10 +1896,10 @@ def main():
                         if ans:
                             with _with_chat_lock(chat_id):
                                 _pending_image[chat_id] = base64_image
-                            session = get_session(chat_id)
-                            session.add_turn(f"[이미지] {user_request}", ans)
-                            session.maybe_compress()
-                            session.save()
+                                session = get_session(chat_id)
+                                session.add_turn(f"[이미지] {user_request}", ans)
+                                session.maybe_compress()
+                                session.save()
                         print(f"[DEBUG] Vision: 전체 소요 {time.perf_counter() - t_start:.2f}s", flush=True)
                     except Exception as e:
                         err_detail = str(e)[:300]
@@ -1953,7 +1963,7 @@ def main():
             def _do_run():
                 try:
                     with _with_chat_lock(chat_id):
-                        ctx_image = _pending_image.get(chat_id)  # 문맥용. Vision 라우팅 아님.
+                        ctx_image = _pending_image.pop(chat_id, None)  # 1회 소비: 사용 후 즉시 제거
                     run_or_resume(chat_id, text, thread_id, is_resume=False, status_msg=status_msg, image_base64=ctx_image)
                     if status_msg:
                         try:
