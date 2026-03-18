@@ -3,7 +3,7 @@
 통합 스케줄러 - M2 맥 미니 24시간 운영용
 - arXiv 파이프라인: 매일 06:00
 - LLM 토론 배치: 매주 토요일 02:00 (2시간)
-- RAG/Agent 봇은 별도 프로세스로 실행 (python bot.py, python agent_bot.py)
+- 메인 봇(agent_bot.py)은 별도 프로세스로 실행
 """
 
 import os
@@ -23,7 +23,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 
 
 def run_arxiv_pipeline() -> None:
-    """main.py 실행 (arXiv 수집 → RAG → Q&A)"""
+    """main.py 실행 (arXiv 수집 → RAG → raw_data_queue)"""
     print("\n" + "=" * 60)
     print("📚 [스케줄] arXiv 파이프라인 실행")
     print("=" * 60)
@@ -70,7 +70,7 @@ def main() -> None:
     print("📅 통합 스케줄러 시작")
     print("   - arXiv 파이프라인: 매일 06:00")
     print("   - LLM 토론: 매주 토요일 02:00")
-    print("   - RAG/Agent 봇: 별도 터미널에서 python bot.py / python agent_bot.py")
+    print("   - 메인 봇: 별도 터미널에서 python agent_bot.py")
     print("   Ctrl+C로 종료\n")
 
     while True:

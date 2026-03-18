@@ -3,9 +3,10 @@ RAG 처리 모듈 (RagProcessor)
 - 마크다운 본문을 의미 단위로 청킹 후 Chroma DB에 적재
 """
 
+import os
 import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 import chromadb
 from chromadb.config import Settings
@@ -19,7 +20,7 @@ class RagProcessor:
 
     def __init__(
         self,
-        db_path: str | Path = "./test_chroma_db",
+        db_path: Union[str, Path] = "./chroma_db",
         embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
         chunk_size: int = 500,
         chunk_overlap: int = 50,
@@ -34,6 +35,7 @@ class RagProcessor:
             collection_name: Chroma 컬렉션 이름
         """
         self.db_path = Path(db_path)
+        os.makedirs(self.db_path, exist_ok=True)
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.collection_name = collection_name

@@ -5,19 +5,23 @@
 """
 
 import json
+import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 
 class DataStorage:
     """파싱 결과를 JSONL 파일에 누적 저장하는 클래스"""
 
-    def __init__(self, output_path: str | Path = "test_science_data.jsonl"):
+    def __init__(self, output_path: Union[str, Path] = "raw_data_queue/crawled_papers.jsonl"):
         """
         Args:
             output_path: JSONL 저장 경로
         """
         self.output_path = Path(output_path)
+        parent = self.output_path.parent
+        if parent != Path("."):
+            os.makedirs(parent, exist_ok=True)
 
     def save_paper(self, data: dict[str, Any]) -> bool:
         """
@@ -74,7 +78,7 @@ class DataStorage:
         }
 
     @staticmethod
-    def remove_temp_pdf(pdf_path: str | Path) -> bool:
+    def remove_temp_pdf(pdf_path: Union[str, Path]) -> bool:
         """
         처리 완료된 임시 PDF 파일을 삭제합니다.
 

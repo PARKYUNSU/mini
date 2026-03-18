@@ -11,7 +11,7 @@ def test_ollama():
     try:
         from langchain_community.chat_models.ollama import ChatOllama
         from langchain_core.messages import HumanMessage
-        llm = ChatOllama(model="qwen2.5:7b", temperature=0.2)
+        llm = ChatOllama(model=os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b"), temperature=0.2)
         r = llm.invoke([HumanMessage(content="1+1은? 한 단어로")])
         print(f"   OK: {r.content[:50]}...")
     except Exception as e:

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-텔레그램 RAG 봇
+[Legacy] 단순 RAG 테스트용 봇
 - Chroma DB 유사도 검색 → Ollama(Qwen)로 답변 생성
+- 메인 봇은 agent_bot.py (RAG + Agent 통합). 24시간 구동 시 agent_bot만 사용.
 """
 
 import os
@@ -22,10 +23,10 @@ load_dotenv()
 # 환경 변수 (RAG_BOT_TOKEN 우선, 없으면 TELEGRAM_TOKEN)
 TELEGRAM_TOKEN = os.getenv("RAG_BOT_TOKEN") or os.getenv("TELEGRAM_TOKEN")
 ALLOWED_CHAT_ID = os.getenv("ALLOWED_CHAT_ID")
-CHROMA_DB_PATH = "./test_chroma_db"
+CHROMA_DB_PATH = "./chroma_db"
 COLLECTION_NAME = "arxiv_papers"
 OLLAMA_BASE_URL = "http://localhost:11434"
-OLLAMA_MODEL = "qwen2.5:7b"
+OLLAMA_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b")
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K = 5  # 검색할 문서 수
 

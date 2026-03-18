@@ -120,14 +120,57 @@ class ArxivFetcher:
     def fetch_metadata_list(self) -> list[PaperMetadata]:
         """
         arXiv API에서 논문 메타데이터 목록을 가져옵니다.
+        (start=0, limit=self.limit)
 
         Returns:
             PaperMetadata 리스트 (실패 시 빈 리스트)
         """
+        return self.fetch_metadata_batch(start=0, limit=self.limit)
+
+    def _build_search_query(
+        self,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> str:
+        """
+        search_query 문자열 생성.
+        submittedDate 형식: [YYYYMMDDhhmm TO YYYYMMDDhhmm] (arXiv API, GMT)
+        - 0600 = 00:00 UTC 권장 (arXiv 예시)
+        """
+        base = f"cat:{self.category}"
+        if start_date and end_date:
+            # "2023-01-01" -> "202301010600", "2023-12-31" -> "202312312359"
+            start_ts = start_date.replace("-", "") + "0600"
+            end_ts = end_date.replace("-", "") + "2359"
+            base = f"{base} AND submittedDate:[{start_ts} TO {end_ts}]"
+        return base
+
+    def fetch_metadata_batch(
+        self,
+        start: int = 0,
+        limit: Optional[int] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> list[PaperMetadata]:
+        """
+        arXiv API에서 페이징으로 논문 메타데이터를 가져옵니다.
+        (백필/대량 수집용)
+
+        Args:
+            start: 오프셋 (0부터 시작)
+            limit: 가져올 개수 (None이면 self.limit 사용)
+            start_date: 수집 시작일 (YYYY-MM-DD, 기간 기반 백필용)
+            end_date: 수집 종료일 (YYYY-MM-DD, 기간 기반 백필용)
+
+        Returns:
+            PaperMetadata 리스트 (실패 시 빈 리스트)
+        """
+        batch_limit = limit if limit is not None else self.limit
+        search_query = self._build_search_query(start_date, end_date)
         params = {
-            "search_query": f"cat:{self.category}",
-            "start": 0,
-            "max_results": self.limit,
+            "search_query": search_query,
+            "start": start,
+            "max_results": batch_limit,
             "sortBy": "submittedDate",
             "sortOrder": "descending",
         }

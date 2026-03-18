@@ -1,5 +1,5 @@
 requests>=2.31.0
-pymupdf4llm>=1.0.0
+pymupdf4llm>=0.0.27
 
 # 듀얼 파이프라인 (RAG + 파인튜닝)
 langchain-text-splitters>=0.3.0

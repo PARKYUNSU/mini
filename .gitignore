@@ -5,14 +5,20 @@
 .venv/
 
 # 출력 데이터
-test_science_data.jsonl
-test_finetune_data.jsonl
-test_chroma_db/
+raw_data_queue/
+finetune_datasets/
+chroma_db/
 agent_checkpoints.db
 agent_checkpoints.db-shm
 agent_checkpoints.db-wal
 chat_memory.db
 *.log
+
+# macOS
+.DS_Store
+
+# 테스트 결과
+batch_test_results.json
 
 # Python
 __pycache__/

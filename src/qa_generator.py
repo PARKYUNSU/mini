@@ -6,7 +6,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import google.generativeai as genai
 
@@ -32,7 +32,7 @@ JSON 형식 (이 구조만 정확히 따르세요):
 
     def __init__(
         self,
-        output_path: str | Path = "./test_finetune_data.jsonl",
+        output_path: Union[str, Path] = "./finetune_datasets/qa_data.jsonl",
         model_name: str = "gemini-2.5-flash",
         system_prompt: str = "당신은 최신 AI 논문을 분석하는 수석 연구원입니다.",
     ):
@@ -43,6 +43,9 @@ JSON 형식 (이 구조만 정확히 따르세요):
             system_prompt: 시스템 프롬프트 (최종 JSONL에 합쳐서 저장)
         """
         self.output_path = Path(output_path)
+        parent = self.output_path.parent
+        if parent != Path("."):
+            os.makedirs(parent, exist_ok=True)
         self.model_name = model_name
         self.system_prompt = system_prompt
         self._configure_api()

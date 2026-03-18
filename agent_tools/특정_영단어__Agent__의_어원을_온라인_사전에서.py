@@ -1,0 +1,1 @@
+print("구글 사전 웹페이지의 URL을 제공해 주세요. 예를 들어, 'https://dictionary.google.com/'과 같은 URL을 입력해 주십시오.")
