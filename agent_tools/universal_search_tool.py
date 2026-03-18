@@ -174,23 +174,52 @@ def _search_wolframalpha(keyword: str, headers: dict) -> str:
     )
 
 
+# 엔진 탐지: 문장 어디든 독립 토큰+조사 패턴만 인정. 우선순위: wolfram > google > duckduckgo
+_ENGINE_PATTERNS = [
+    (r"(?:^|\s)(울프람|wolfram|wolframalpha)(?:로|으로)?(?:\s|$)", "wolframalpha"),
+    (r"(?:^|\s)(구글|google)(?:로|으로)?(?:\s|$)", "google"),
+    (r"(?:^|\s)(듀크듀크고|duckduckgo)(?:로|으로)?(?:\s|$)", "duckduckgo"),
+]
+
+# keyword에서 제거할 엔진 토큰 (독립 토큰+조사만, 부분 문자열 제거 방지)
+_ENGINE_REMOVE_PATTERNS = [
+    r"(?:^|\s)(울프람|wolfram|wolframalpha)(?:로|으로)?(?=\s|$)",
+    r"(?:^|\s)(구글|google)(?:로|으로)?(?=\s|$)",
+    r"(?:^|\s)(듀크듀크고|duckduckgo)(?:로|으로)?(?=\s|$)",
+]
+
+# 문장 끝 suffix 제거 (검색어 손실 방지)
+_SUFFIX_PATTERNS = (
+    r"검색해\s*줘요?$",
+    r"검색해\s*줘$",
+    r"검색해\s*봐$",
+    r"검색해\s*봐요?$",
+    r"검색해$",
+    r"검색\s*해\s*줘요?$",
+    r"조회해\s*줘요?$",
+    r"조회해줘$",
+    r"알려\s*줘요?$",
+    r"알려줘요?$",
+    r"찾아\s*줘요?$",
+    r"찾아줘$",
+    r"보여\s*줘요?$",
+    r"보여줘$",
+    r"알아봐\s*줘요?$",
+    r"알아봐줘$",
+    r"계산해\s*줘요?$",
+)
+
+
 def _parse_user_request(user_request: str) -> tuple[str, str, str]:
-    """user_request에서 keyword, engine, time_filter 추출. 문장 끝 suffix만 제거해 검색어 손실 방지."""
-    req = (user_request or "").strip()
+    """
+    user_request에서 keyword, engine, time_filter 추출.
+    3단계: (1) 정규화 (2) 엔진·시간 탐지 (3) 엔진 토큰·suffix 제거.
+    """
+    req = re.sub(r"\s+", " ", (user_request or "").strip())
     if not req:
         return "", "duckduckgo", ""
 
-    # 엔진 추출 (문장 앞/뒤에 있을 때만)
-    engine = "duckduckgo"
-    req_lower = req.lower()
-    if re.match(r"^(구글|google)\s*(으로|로)?\s*", req, re.I) or req.endswith(" 구글로") or req.endswith(" google"):
-        engine = "google"
-    elif re.match(r"^(울프람|wolfram)\s*(으로|로)?\s*", req, re.I) or "울프람" in req or "wolfram" in req_lower:
-        engine = "wolframalpha"
-    elif "수학" in req or "계산" in req:
-        engine = "wolframalpha"
-
-    # 시간 필터 (구글용)
+    # 1단계: 시간 필터 추출 (google에서만 사용)
     time_filter = ""
     if "오늘" in req or "오늘자" in req:
         time_filter = "qdr:d"
@@ -203,22 +232,23 @@ def _parse_user_request(user_request: str) -> tuple[str, str, str]:
     elif "최근 1시간" in req:
         time_filter = "qdr:h"
 
-    # 검색어: 문장 끝 suffix만 제거 (중간 검색어 손실 방지)
+    # 2단계: 엔진 탐지 (문장 어디든, 우선순위: wolfram > google > duckduckgo)
+    engine = "duckduckgo"
+    for pattern, eng in _ENGINE_PATTERNS:
+        if re.search(pattern, req, re.I):
+            engine = eng
+            break
+    if engine == "duckduckgo" and ("수학" in req or "계산" in req):
+        engine = "wolframalpha"  # 명시 없을 때만 의미 기반 추론
+
+    # 3단계: keyword 정리 — 엔진 토큰 제거 후 suffix 제거
     keyword = req
-    for suffix in (
-        r"검색해\s*줘요?$",
-        r"검색해\s*줘$",
-        r"검색해$",
-        r"검색\s*해\s*줘요?$",
-        r"알려\s*줘요?$",
-        r"알려줘요?$",
-        r"찾아\s*줘요?$",
-        r"찾아줘$",
-        r"계산해\s*줘요?$",
-    ):
+    for pat in _ENGINE_REMOVE_PATTERNS:
+        keyword = re.sub(pat, " ", keyword, flags=re.I)
+    keyword = re.sub(r"\s+", " ", keyword).strip()
+
+    for suffix in _SUFFIX_PATTERNS:
         keyword = re.sub(suffix, "", keyword, flags=re.IGNORECASE).strip()
-    # 문장 앞 엔진 표현만 제거 (구글로, 듀크듀크고로, 울프람으로)
-    keyword = re.sub(r"^(구글|google|듀크듀크고|duckduckgo|울프람|wolfram)\s*(으로|로)\s*", "", keyword, flags=re.I).strip()
 
     return keyword or req, engine, time_filter
 
