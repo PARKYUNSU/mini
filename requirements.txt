@@ -18,6 +18,9 @@ pyTelegramBotAPI>=4.14.0
 # LLM 토론 스케줄러
 schedule>=1.2.0
 
+# 24시간 무중단 운영용 재시도 (지수 백오프)
+tenacity>=8.2.0
+
 # Multi-Agent 코딩 봇
 e2b-code-interpreter>=1.0.0
 langgraph>=0.2.0

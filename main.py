@@ -14,6 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import telebot
 
+from retry_utils import retry_on_network_error
 from src.arxiv_fetcher import ArxivFetcher, PaperMetadata
 from src.cleanup import cleanup_legacy_files
 from src.data_storage import DataStorage
@@ -45,6 +46,15 @@ def _get_telegram_targets() -> tuple[str, list[str]]:
     return token, chat_ids
 
 
+@retry_on_network_error
+def _do_send_telegram(token: str, chat_ids: list[str], message: str) -> None:
+    """네트워크 재시도 적용 텔레그램 전송"""
+    bot = telebot.TeleBot(token)
+    for cid in chat_ids:
+        bot.send_message(cid, message)
+    print(f"✅ 텔레그램 알림 전송 성공: {len(chat_ids)}명")
+
+
 def _send_telegram_notification(message: str) -> bool:
     token, chat_ids = _get_telegram_targets()
     if not token or not chat_ids:
@@ -56,10 +66,7 @@ def _send_telegram_notification(message: str) -> bool:
         return False
 
     try:
-        bot = telebot.TeleBot(token)
-        for cid in chat_ids:
-            bot.send_message(cid, message)
-            print(f"✅ 텔레그램 알림 전송 성공: chat_id={cid}")
+        _do_send_telegram(token, chat_ids, message)
         return True
     except Exception as e:
         print(f"⚠️ 텔레그램 알림 전송 실패: {e}")

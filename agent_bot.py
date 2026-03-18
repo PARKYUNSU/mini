@@ -760,6 +760,12 @@ def _match_whitelisted_tool(user_request: str, req_lower: str) -> Optional[str]:
         if tool.exists():
             return "google_form_reader"
 
+    schedule_list_keywords = ("스케줄 목록", "등록된 스케줄", "예약 목록", "스케줄 보여", "스케줄 조회", "스케줄 리스트")
+    if any(kw in req_lower for kw in schedule_list_keywords):
+        tool = AGENT_TOOLS_DIR / "schedule_list_jobs.py"
+        if tool.exists():
+            return "schedule_list_jobs"
+
     # 현재 서울 날씨 전용 도구만 B 허용. 미세먼지/부산/제주 등은 제외.
     weather_tool = AGENT_TOOLS_DIR / "서울_지금_현재_날씨_알려줘.py"
     if weather_tool.exists():
@@ -808,6 +814,10 @@ def _router_step1_hard_rules(
     existing_tool_keywords = ("기존 도구", "저장된 도구", "agent_tools", "이미 있는 도구", "만들어진 도구")
     if any(kw in user_request for kw in existing_tool_keywords) or ("도구" in user_request and "사용" in user_request):
         return {"route_type": "use_existing_tool", "router_choice": "B"}
+    # 스케줄 등록: 매일/매주 X시에 Y 해줘 → schedule_add_job
+    schedule_keywords = ("매일", "매주", "매월", "정기적으로", "스케줄", "예약", "알람", "리마인더")
+    if any(kw in user_request for kw in schedule_keywords) and (AGENT_TOOLS_DIR / "schedule_add_job.py").exists():
+        return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "schedule_add_job"}
     paper_actions = ("목록", "알려줘", "뭐 있어", "조회", "검색", "요약", "자세히", "설명", "정리", "요약해", "설명해")
     if ("chromadb" in req_lower or "논문" in user_request) and any(w in user_request for w in paper_actions):
         return {"route_type": "direct_answer", "router_choice": "B"}
@@ -1058,15 +1068,19 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
     return {"direct_response": answer}
 
 
-def _run_tool_on_host(tool_name: str, user_request: str) -> str:
+def _run_tool_on_host(tool_name: str, user_request: str, chat_id: str = "") -> str:
     """
     agent_tools/ 도구를 맥 미니 본체(Host)에서 직접 실행. E2B 샌드박스 절대 사용 안 함.
     - run(user_request) 함수가 있으면 호출
     - 없으면 스크립트로 subprocess 실행 후 stdout 캡처
+    - schedule_* 도구는 chat_id를 SCHEDULE_CHAT_ID 환경변수로 전달
     """
     import importlib.util
     import subprocess
     import sys
+
+    if tool_name and tool_name.startswith("schedule_") and chat_id:
+        os.environ["SCHEDULE_CHAT_ID"] = chat_id
 
     tools_dir = Path(__file__).resolve().parent / "agent_tools"
     tool_path = tools_dir / f"{tool_name}.py"
@@ -1123,14 +1137,14 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
         llm = get_executor_llm()
         if selected_tool_name and selected_tool_name in [n for n, _ in tools]:
             used_tool_name = selected_tool_name
-            result = _run_tool_on_host(used_tool_name, user_request)
+            result = _run_tool_on_host(used_tool_name, user_request, chat_id)
         else:
             # 입력/기입 요청 → fill_google_form 강제 (읽기 도구 오용 방지)
             form_write_keywords = ("입력해", "기입해", "입력해 줘", "기입해 줘", "기입해 봐", "입력해 봐", "써 봐", "넣어")
             if "http" in user_request and any(kw in user_request for kw in form_write_keywords):
                 if "fill_google_form" in [n for n, _ in tools]:
                     used_tool_name = "fill_google_form"
-                    result = _run_tool_on_host(used_tool_name, user_request)
+                    result = _run_tool_on_host(used_tool_name, user_request, chat_id)
                 else:
                     prompt = f"""[기존 도구 목록 - agent_tools/]
 {chr(10).join(tools_list)}
@@ -1149,7 +1163,7 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
                         tool_name = next((n for n in tool_names if n.lower() in raw or raw in n.lower()), None)
                     used_tool_name = tool_name or ""
                     # 못 고르면 실행하지 않음 (Host 도구는 보수적 선택)
-                    result = _run_tool_on_host(tool_name, user_request) if tool_name else "적합한 도구를 선택하지 못했습니다. fill_google_form을 사용하세요."
+                    result = _run_tool_on_host(tool_name, user_request, chat_id) if tool_name else "적합한 도구를 선택하지 못했습니다. fill_google_form을 사용하세요."
             else:
                 prompt = f"""[기존 도구 목록 - agent_tools/]
 {chr(10).join(tools_list)}
@@ -1165,7 +1179,7 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
                 tool_name = next((n for n in tool_names if n.lower() in raw or raw in n.lower()), None)
                 used_tool_name = tool_name or ""
                 # 못 고르면 실행하지 않음 (Host 도구는 보수적 선택, fuzzy fallback 제거)
-                result = _run_tool_on_host(tool_name, user_request) if tool_name else "적합한 기존 도구를 찾지 못했습니다. 요청 목적이나 도구명을 더 구체적으로 말씀해 주세요."
+                result = _run_tool_on_host(tool_name, user_request, chat_id) if tool_name else "적합한 기존 도구를 찾지 못했습니다. 요청 목적이나 도구명을 더 구체적으로 말씀해 주세요."
 
         if chat_id and used_tool_name:
             _remember_tool(chat_id, used_tool_name, user_request)

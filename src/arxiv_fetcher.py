@@ -2,16 +2,23 @@
 arXiv 논문 수집 모듈 (ArxivFetcher)
 - arXiv API를 통해 cs.AI 카테고리 논문 검색 및 메타데이터 추출
 - PDF 다운로드 URL 제공
+- 네트워크 요청에 tenacity 재시도 (1분→3분→5분, 최대 3회)
 """
 
 import random
+import sys
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 from urllib.parse import urlencode
 
 import requests
+
+# retry_utils (프로젝트 루트)
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from retry_utils import retry_on_network_error
 
 
 # arXiv API 네임스페이스 (Atom 1.0)
@@ -66,6 +73,11 @@ class ArxivFetcher:
         """IP 차단 방지를 위한 랜덤 딜레이"""
         delay = random.uniform(self.min_delay, self.max_delay)
         time.sleep(delay)
+
+    @retry_on_network_error
+    def _get_with_retry(self, url: str, timeout: int = 30, stream: bool = False):
+        """네트워크 재시도 적용 GET 요청"""
+        return self._session.get(url, timeout=timeout, stream=stream)
 
     def _parse_entry(self, entry: ET.Element) -> Optional[PaperMetadata]:
         """Atom XML entry 요소에서 PaperMetadata 추출"""
@@ -179,7 +191,7 @@ class ArxivFetcher:
         try:
             self._random_delay()
             print("📡 arXiv API 요청 중...")
-            response = self._session.get(url, timeout=30)
+            response = self._get_with_retry(url, timeout=30)
             response.raise_for_status()
         except requests.RequestException as e:
             print(f"❌ API 요청 실패: {e}")
@@ -211,7 +223,7 @@ class ArxivFetcher:
         """
         try:
             self._random_delay()
-            response = self._session.get(pdf_url, timeout=60, stream=True)
+            response = self._get_with_retry(pdf_url, timeout=60, stream=True)
             response.raise_for_status()
             with open(save_path, "wb") as f:
                 for chunk in response.iter_content(chunk_size=8192):

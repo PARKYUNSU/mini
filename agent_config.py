@@ -30,6 +30,8 @@ CHAT_MEMORY_DB_PATH = "./chat_memory.db"
 BACKFILL_SCRIPT_PATH = PROJECT_ROOT / "run_backfill.py"
 BACKFILL_LOG_PATH = PROJECT_ROOT / "backfill_2023_2026.log"
 BACKFILL_PID_PATH = PROJECT_ROOT / ".backfill.pid"
+# cron_engine: 스케줄 작업 저장 경로 (add_job, list_jobs 등)
+CRON_JOBS_DIR = PROJECT_ROOT / ".cron"
 LLM_RETRY_MAX = 3
 LLM_RETRY_DELAY_SEC = 1.5
 

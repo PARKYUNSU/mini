@@ -1,19 +1,32 @@
 """
 스크래핑 기반 웹 검색 도구. DuckDuckGo(기본)·Google·WolframAlpha 지원.
 최신 정보·뉴스·환율 등 검색 시 사용. HTML 구조 변경·차단에 취약하므로 DuckDuckGo 우선 권장.
+네트워크 요청에 tenacity 재시도 (1분→3분→5분, 최대 3회).
 """
 
 import re
+import sys
 import urllib.parse
+from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+
+# retry_utils (프로젝트 루트)
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from retry_utils import retry_on_network_error
 
 # 구글 봇 차단 회피용 Chrome User-Agent (완전 위장)
 _USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 )
+
+@retry_on_network_error
+def _get_with_retry(url: str, headers: dict, timeout: int = 12) -> requests.Response:
+    """네트워크 재시도 적용 GET 요청"""
+    return requests.get(url, headers=headers, timeout=timeout)
+
 
 # Google time filter 매핑 (tbs 파라미터)
 _TIME_FILTER_MAP = {
@@ -87,7 +100,7 @@ def _search_google(keyword: str, time_filter: str, headers: dict) -> str:
     if time_filter and time_filter in _TIME_FILTER_MAP:
         url += f"&tbs={time_filter}"
 
-    resp = requests.get(url, headers=headers, timeout=12)
+    resp = _get_with_retry(url, headers, timeout=12)
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 
@@ -118,7 +131,7 @@ def _search_duckduckgo(keyword: str, headers: dict) -> str:
     encoded = urllib.parse.quote_plus(keyword)
     url = f"https://duckduckgo.com/html/?q={encoded}"
 
-    resp = requests.get(url, headers=headers, timeout=12)
+    resp = _get_with_retry(url, headers, timeout=12)
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 
@@ -145,7 +158,7 @@ def _search_wolframalpha(keyword: str, headers: dict) -> str:
     encoded = urllib.parse.quote_plus(keyword)
     url = f"https://www.wolframalpha.com/input?i={encoded}"
 
-    resp = requests.get(url, headers=headers, timeout=12)
+    resp = _get_with_retry(url, headers, timeout=12)
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 

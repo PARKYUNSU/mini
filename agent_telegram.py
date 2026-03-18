@@ -1,8 +1,10 @@
-"""텔레그램 전송·편집 유틸 (Broken pipe, ReadTimeout 방어)"""
+"""텔레그램 전송·편집 유틸 (Broken pipe, ReadTimeout 방어 + tenacity 재시도)"""
 
 import re
 
 from telebot.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
+
+from retry_utils import retry_on_network_error
 
 CANCEL_RESTART_CMDS = ("/cancel", "취소", "취소해", "재시작", "/restart", "🔄 재시작", "❌ 취소")
 
@@ -19,9 +21,15 @@ def strip_wake_word(text: str) -> str:
     return cleaned if cleaned else text.strip()
 
 
+@retry_on_network_error
+def _telegram_send_impl(bot, chat_id: str, text: str, parse_mode=None, **kwargs) -> None:
+    """네트워크 재시도 적용 전송 (일시적 에러만 1분→3분→5분 재시도)"""
+    bot.send_message(chat_id, text, parse_mode=parse_mode, **kwargs)
+
+
 def safe_telegram_send(bot, chat_id: str, text: str, parse_mode=None, **kwargs) -> bool:
     try:
-        bot.send_message(chat_id, text, parse_mode=parse_mode, **kwargs)
+        _telegram_send_impl(bot, chat_id, text, parse_mode=parse_mode, **kwargs)
         return True
     except (ConnectionError, BrokenPipeError) as e:
         print(f"[DEBUG] 텔레그램 전송 일시 오류 (무시): {e}")
@@ -39,9 +47,14 @@ def safe_telegram_send(bot, chat_id: str, text: str, parse_mode=None, **kwargs) 
         raise
 
 
+@retry_on_network_error
+def _telegram_send_and_get_impl(bot, chat_id: str, text: str, **kwargs):
+    return bot.send_message(chat_id, text, **kwargs)
+
+
 def safe_telegram_send_and_get(bot, chat_id: str, text: str, **kwargs):
     try:
-        return bot.send_message(chat_id, text, **kwargs)
+        return _telegram_send_and_get_impl(bot, chat_id, text, **kwargs)
     except (ConnectionError, BrokenPipeError) as e:
         print(f"[DEBUG] 텔레그램 전송 일시 오류 (무시): {e}")
         return None
@@ -58,9 +71,14 @@ def safe_telegram_send_and_get(bot, chat_id: str, text: str, **kwargs):
         raise
 
 
+@retry_on_network_error
+def _telegram_edit_impl(bot, text: str, chat_id: str, message_id: int) -> None:
+    bot.edit_message_text(text, chat_id, message_id)
+
+
 def safe_telegram_edit(bot, text: str, chat_id: str, message_id: int) -> bool:
     try:
-        bot.edit_message_text(text, chat_id, message_id)
+        _telegram_edit_impl(bot, text, chat_id, message_id)
         return True
     except (ConnectionError, BrokenPipeError) as e:
         print(f"[DEBUG] 텔레그램 수정 일시 오류 (무시): {e}")
