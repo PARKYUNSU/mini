@@ -769,16 +769,22 @@ def _match_whitelisted_tool(user_request: str, req_lower: str) -> Optional[str]:
         if tool.exists():
             return "schedule_list_jobs"
 
-    # 뉴스/웹 검색: tavily_search_tool (유일한 검색 엔진, DuckDuckGo/구글 크롤링 금지)
-    search_keywords = (
-        "뉴스 검색", "뉴스 검색해", "뉴스 요약", "최신 뉴스", "IT 뉴스", "뉴스 찾아", "뉴스 알려",
-        "검색해", "검색해 줘", "검색해줘", "검색해줘요", "검색해 줘요", "검색해 봐", "검색해봐",
-        "최신", "오늘 뉴스", "인터넷 검색", "웹 검색",
-    )
-    if any(kw in user_request for kw in search_keywords):
-        tool = AGENT_TOOLS_DIR / "tavily_search_tool.py"
-        if tool.exists():
-            return "tavily_search_tool"
+    # 뉴스/웹 검색: tavily_search_tool (유일한 검색 엔진)
+    # RAG/논문/ChromaDB 요청은 제외 → direct_answer로 가야 함
+    rag_blockers = ("논문", "chromadb", "chroma", "paper", "저장된", "목록")
+    if any(b in req_lower for b in rag_blockers):
+        pass  # Tavily로 보내지 않음
+    else:
+        search_keywords = (
+            "뉴스 검색", "뉴스 검색해", "뉴스 요약", "최신 뉴스", "IT 뉴스", "뉴스 찾아", "뉴스 알려",
+            "검색해 줘", "검색해줘", "검색해줘요", "검색해 줘요", "검색해 봐", "검색해봐",
+            "오늘 뉴스", "인터넷 검색", "웹 검색",
+        )
+        # "검색해", "최신" 단독은 제거 (논문 검색해줘, 최신 ChromaDB 등과 충돌)
+        if any(kw in user_request for kw in search_keywords):
+            tool = AGENT_TOOLS_DIR / "tavily_search_tool.py"
+            if tool.exists():
+                return "tavily_search_tool"
 
     # 현재 서울 날씨 전용 도구만 B 허용. 미세먼지/부산/제주 등은 제외.
     weather_tool = AGENT_TOOLS_DIR / "서울_지금_현재_날씨_알려줘.py"
@@ -804,7 +810,10 @@ def _router_step1_hard_rules(
         return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": whitelisted_tool}
     recent_tool = _resolve_recent_tool_reference(chat_id, user_request)
     if recent_tool and (AGENT_TOOLS_DIR / f"{recent_tool}.py").exists():
-        return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": recent_tool}
+        # RAG/논문 요청은 tavily recent_tool로 보내지 않음
+        rag_blockers = ("논문", "chromadb", "chroma", "paper", "저장된")
+        if recent_tool != "tavily_search_tool" or not any(b in req_lower for b in rag_blockers):
+            return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": recent_tool}
     if has_url:
         return {"route_type": "planner", "router_choice": "C"}
     text_creation_markers = (
@@ -1185,10 +1194,15 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
                 used_tool_name = tool_name or ""
                 result = _run_tool_on_host(tool_name, user_request, chat_id) if tool_name else "적합한 도구를 선택하지 못했습니다. fill_google_form을 사용하세요."
         else:
-            # 검색/뉴스 요청 시 tavily_search_tool 강제
+            # 검색/뉴스 요청 시 tavily_search_tool 강제 (RAG/논문 제외)
+            req_lower = user_request.lower()
+            rag_blockers = ("논문", "chromadb", "chroma", "paper", "저장된")
             search_trigger = (
-                "검색" in user_request
-                or ("뉴스" in user_request and any(k in user_request for k in ("최신", "오늘", "요약", "알려", "찾아", "IT")))
+                not any(b in req_lower for b in rag_blockers)
+                and (
+                    "검색" in user_request
+                    or ("뉴스" in user_request and any(k in user_request for k in ("최신", "오늘", "요약", "알려", "찾아", "IT")))
+                )
             )
             if search_trigger and "tavily_search_tool" in [n for n, _ in tools]:
                 used_tool_name = "tavily_search_tool"
@@ -1213,12 +1227,11 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
         if chat_id and used_tool_name:
             _remember_tool(chat_id, used_tool_name, user_request)
 
-    # tavily_search_tool 결과 → Qwen으로 한국어 요약 (텔레그램 글자 제한·가독성)
+    # tavily_search_tool 결과 → Gemini로 한국어 요약 (빠른 응답)
     is_summarized = False
     if used_tool_name == "tavily_search_tool" and result and not result.startswith(("실행 오류", "도구 실행 오류", "TAVILY_API_KEY", "검색어를 입력")):
         try:
-            llm = get_planner_llm()
-            resp = llm.invoke([
+            resp = get_executor_llm().invoke([
                 HumanMessage(content=f"""아래 검색 결과를 한국어로 요약해 줘.
 - 각 뉴스별로 2~3문장으로 핵심만 전달
 - 5개 뉴스 모두 포함 (일부 누락 금지)
