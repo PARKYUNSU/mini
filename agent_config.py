@@ -9,6 +9,7 @@ load_dotenv()
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")  # Tavily Search (웹 검색 유일 엔진)
 ALLOWED_CHAT_ID = os.getenv("ALLOWED_CHAT_ID")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 CHROMA_DB_PATH = "./chroma_db"

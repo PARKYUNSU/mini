@@ -1,5 +1,6 @@
 requests>=2.31.0
-beautifulsoup4>=4.12.0  # universal_search_tool (웹 검색 스크래핑)
+beautifulsoup4>=4.12.0  # WolframAlpha 파싱용
+tavily-python>=0.3.0  # tavily_search_tool (AI 검색 엔진)
 pymupdf4llm>=0.0.27
 
 # 듀얼 파이프라인 (RAG + 파인튜닝)
