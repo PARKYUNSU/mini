@@ -24,13 +24,15 @@ def main():
 
     job = jobs[args.id]
     job["status"] = "active"
-    job["next_run_at"] = compute_next_run(
+    nr = compute_next_run(
         schedule_type=job["schedule_type"],
         time_of_day=job.get("time_of_day"),
         days_of_week=job.get("days_of_week"),
         day_of_month=job.get("day_of_month"),
-        interval=job.get("interval")
-    ).isoformat()
+        interval=job.get("interval"),
+        timezone=job.get("timezone") or "Asia/Seoul",
+    )
+    job["next_run_at"] = nr.isoformat() if nr else None
     job["updated_at"] = datetime.now().isoformat()
     save_jobs(data)
 

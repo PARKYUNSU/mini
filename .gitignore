@@ -8,6 +8,9 @@
 .backfill.pid
 .backfill.start_count
 
+# 로컬 크론 잡 상태 (jobs.json 등)
+.cron/
+
 # 출력 데이터
 raw_data_queue/
 finetune_datasets/

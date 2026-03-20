@@ -22,7 +22,8 @@ GEMINI_MODEL = "gemini-2.5-flash"
 MEMORY_K = 5
 MEMORY_BUFFER = 15
 RAG_TOP_K = 3
-AGENT_TOOLS_DIR = Path("./agent_tools")
+# cwd와 무관하게 항상 패키지 기준 (상대 경로만 쓰면 다른 디렉터리에서 실행 시 도구 미탐지)
+AGENT_TOOLS_DIR = PROJECT_ROOT / "agent_tools"
 AGENT_LEARNINGS_PATH = Path("agent_learnings/ERRORS.md")
 CODE_TIMEOUT_SEC = 30
 ERROR_LOG_MAX_CHARS = 1000

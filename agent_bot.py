@@ -883,6 +883,21 @@ def _match_whitelisted_tool(user_request: str, req_lower: str) -> Optional[str]:
         if tool.exists():
             return "schedule_show_job"
 
+    # 구조화 스케줄 명령 (delete / edit … LLM 도구 선택 없음)
+    _sched_cmd = (user_request or "").strip()
+    if re.match(r"(?i)^(?:delete|삭제)\s+JOB-[A-Z0-9]+\s*$", _sched_cmd):
+        tool = AGENT_TOOLS_DIR / "schedule_delete_job.py"
+        if tool.exists():
+            return "schedule_delete_job"
+    if re.match(r"(?i)^edit\s+JOB-[A-Z0-9]+\s+time\s+\d{1,2}:\d{2}\s*$", _sched_cmd):
+        tool = AGENT_TOOLS_DIR / "schedule_edit_job.py"
+        if tool.exists():
+            return "schedule_edit_job"
+    if re.match(r"(?i)^edit\s+JOB-[A-Z0-9]+\s+prompt\s+.+", _sched_cmd, re.DOTALL):
+        tool = AGENT_TOOLS_DIR / "schedule_edit_job.py"
+        if tool.exists():
+            return "schedule_edit_job"
+
     # 저장된 도구 목록 → agent_tools_list (agent_tools/ 폴더 목록, 프로젝트 루트 아님)
     tool_list_trigger = ("저장된 도구", "기존 도구", "등록된 도구", "agent_tools")
     tool_list_action = ("목록", "알려", "보여", "검색", "조회", "뭐 있어")
@@ -975,6 +990,12 @@ def _router_step1_hard_rules(
         return {"route_type": "planner", "router_choice": "C"}
     existing_tool_keywords = ("기존 도구", "저장된 도구", "agent_tools", "이미 있는 도구", "만들어진 도구")
     if any(kw in user_request for kw in existing_tool_keywords) or ("도구" in user_request and "사용" in user_request):
+        # 목록/검색 의도면 LLM 선택 말고 agent_tools_list 고정 (최근 날씨 도구 오선택 방지)
+        if any(kw in user_request for kw in existing_tool_keywords) and any(
+            a in req_lower for a in ("목록", "검색", "조회", "보여", "알려", "뭐 있어", "뭐있어")
+        ):
+            if (AGENT_TOOLS_DIR / "agent_tools_list.py").exists():
+                return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "agent_tools_list"}
         return {"route_type": "use_existing_tool", "router_choice": "B"}
     # 스케줄 등록: 매일/매주 X시에 Y 해줘 → schedule_add_job
     schedule_keywords = ("매일", "매주", "매월", "정기적으로", "스케줄", "예약", "알람", "리마인더")

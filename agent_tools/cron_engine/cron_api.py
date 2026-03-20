@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 cron_engine Python API. agent_tools에서 직접 호출.
-- add_job, list_jobs, pause_job, resume_job, show_job, get_due_jobs
+- add_job, list_jobs, pause_job, resume_job, show_job, delete_job, edit_job_time, edit_job_prompt, get_due_jobs
 - prompt, chat_id 필드 지원 (스케줄 실행 시 윤수르가 텔레그램 선톡)
 """
 from __future__ import annotations
@@ -150,14 +150,15 @@ def resume_job(job_id: str) -> str:
 
     job = jobs[job_id]
     job["status"] = "active"
-    job["next_run_at"] = compute_next_run(
+    nr = compute_next_run(
         schedule_type=job["schedule_type"],
         time_of_day=job.get("time_of_day"),
         days_of_week=job.get("days_of_week"),
         day_of_month=job.get("day_of_month"),
         interval=job.get("interval"),
         timezone=job.get("timezone") or "Asia/Seoul",
-    ).isoformat()
+    )
+    job["next_run_at"] = nr.isoformat() if nr else None
     job["updated_at"] = datetime.now().isoformat()
     save_jobs(data)
 
@@ -175,6 +176,95 @@ def show_job(job_id: str) -> str:
     if job_id not in jobs:
         return f"Job not found: {job_id}"
     return json.dumps(jobs[job_id], indent=2, ensure_ascii=False)
+
+
+def _canonical_job_id(raw: str) -> str | None:
+    m = re.search(r"(JOB-[A-Z0-9]+)", (raw or "").upper())
+    return m.group(1) if m else None
+
+
+def delete_job(job_id: str) -> str:
+    """작업 영구 삭제. Returns: 성공/실패 메시지"""
+    jid = _canonical_job_id(job_id)
+    if not jid:
+        return "job id를 찾을 수 없습니다. 예: delete JOB-A1B2"
+    data = load_jobs()
+    jobs = data.get("jobs", {})
+    if jid not in jobs:
+        return f"Job not found: {jid}"
+    title = jobs[jid].get("title", "")
+    del jobs[jid]
+    save_jobs(data)
+    stats = load_stats()
+    stats["total_jobs_deleted"] = stats.get("total_jobs_deleted", 0) + 1
+    save_stats(stats)
+    return f"✓ Deleted {jid}\n  (was: {title})"
+
+
+def _normalize_hhmm(h: int, m: int) -> str:
+    if not (0 <= h <= 23 and 0 <= m <= 59):
+        raise ValueError("time은 00:00~23:59 범위여야 합니다.")
+    return f"{h:02d}:{m:02d}"
+
+
+def edit_job_time(job_id: str, time_of_day: str) -> str:
+    """time_of_day를 HH:MM으로 변경하고 next_run_at 재계산. interval 타입은 미지원."""
+    jid = _canonical_job_id(job_id)
+    if not jid:
+        return "job id를 찾을 수 없습니다. 예: edit JOB-A1B2 time 09:00"
+    data = load_jobs()
+    jobs = data.get("jobs", {})
+    if jid not in jobs:
+        return f"Job not found: {jid}"
+    job = jobs[jid]
+    if job.get("schedule_type") == "interval":
+        return f"{jid}은 interval(분 간격) 작업입니다. 시간 대신 스케줄 재등록이 필요합니다."
+
+    raw = (time_of_day or "").strip()
+    tm = re.match(r"^(\d{1,2}):(\d{2})$", raw)
+    if not tm:
+        return "time 형식은 HH:MM 이어야 합니다. 예: 09:00"
+    try:
+        hhmm = _normalize_hhmm(int(tm.group(1)), int(tm.group(2)))
+    except ValueError as e:
+        return str(e)
+
+    job["time_of_day"] = hhmm
+    try:
+        nr = compute_next_run(
+            schedule_type=job["schedule_type"],
+            time_of_day=job["time_of_day"],
+            days_of_week=job.get("days_of_week") or [],
+            day_of_month=job.get("day_of_month"),
+            interval=job.get("interval"),
+            timezone=job.get("timezone") or "Asia/Seoul",
+        )
+    except Exception as e:
+        return f"다음 실행 시각 계산 오류: {e}"
+    job["next_run_at"] = nr.isoformat() if nr else None
+    job["updated_at"] = datetime.now().isoformat()
+    save_jobs(data)
+    return f"✓ Updated {jid} time={hhmm}\n  Next run: {job['next_run_at']}"
+
+
+def edit_job_prompt(job_id: str, prompt: str) -> str:
+    """실행 시 전달되는 prompt(및 title 앞 30자) 변경. next_run_at은 그대로."""
+    jid = _canonical_job_id(job_id)
+    if not jid:
+        return "job id를 찾을 수 없습니다. 예: edit JOB-A1B2 prompt 오늘 IT 뉴스"
+    p = (prompt or "").strip()
+    if not p:
+        return "prompt가 비어 있습니다."
+    data = load_jobs()
+    jobs = data.get("jobs", {})
+    if jid not in jobs:
+        return f"Job not found: {jid}"
+    job = jobs[jid]
+    job["prompt"] = p
+    job["title"] = p[:30] if len(p) > 30 else p
+    job["updated_at"] = datetime.now().isoformat()
+    save_jobs(data)
+    return f"✓ Updated {jid} prompt\n  {p[:200]}{'...' if len(p) > 200 else ''}"
 
 
 def _zone_for_job(tz_name: str | None) -> ZoneInfo:

@@ -26,7 +26,11 @@ def main():
     parser.add_argument("--days_of_week", help="Comma-separated: mon,tue,fri")
     parser.add_argument("--day_of_month", type=int, help="1-31")
     parser.add_argument("--interval", type=int, help="Minutes for interval schedules")
-    parser.add_argument("--timezone", default="Asia/Tokyo")
+    parser.add_argument(
+        "--timezone",
+        default="Asia/Seoul",
+        help="IANA 타임존 (기본 Asia/Seoul, next_run_at 계산과 job.timezone에 동일 적용)",
+    )
     parser.add_argument("--start_date")
     parser.add_argument("--end_date")
     parser.add_argument("--tags")
@@ -54,7 +58,8 @@ def main():
         time_of_day=args.time_of_day,
         days_of_week=parse_csv(args.days_of_week),
         day_of_month=args.day_of_month,
-        interval=args.interval
+        interval=args.interval,
+        timezone=args.timezone,
     )
 
     job = {
