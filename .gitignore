@@ -11,6 +11,9 @@
 # 로컬 크론 잡 상태 (jobs.json 등)
 .cron/
 
+# agent_bot 단일 인스턴스 flock (내용은 PID, 잠금은 FD로만 유효)
+.agent_bot_singleton.lock
+
 # 출력 데이터
 raw_data_queue/
 finetune_datasets/

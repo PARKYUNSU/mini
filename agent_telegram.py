@@ -6,6 +6,19 @@ from telebot.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemo
 
 from retry_utils import retry_on_network_error
 
+try:
+    from telebot.apihelper import ApiTelegramException
+except ImportError:
+
+    class ApiTelegramException(Exception):
+        """telebot 미설치/구버전 시 스텁"""
+
+
+def _telegram_api_err_str(exc: BaseException) -> str:
+    if isinstance(exc, ApiTelegramException):
+        return f"{getattr(exc, 'error_code', '')} {getattr(exc, 'description', str(exc))}".strip()
+    return str(exc)
+
 CANCEL_RESTART_CMDS = ("/cancel", "취소", "취소해", "재시작", "/restart", "🔄 재시작", "❌ 취소")
 
 # <think>, <thinking> 등 Chain-of-Thought 태그 제거 (출력 정제)
@@ -53,13 +66,18 @@ def safe_telegram_send(bot, chat_id: str, text: str, parse_mode=None, **kwargs) 
         if getattr(e, "errno", None) == 32:
             print(f"[DEBUG] 텔레그램 전송 Broken pipe (무시): {e}")
             return False
-        raise
+        print(f"[WARN] 텔레그램 전송 OSError: {e}")
+        return False
+    except ApiTelegramException as e:
+        print(f"[WARN] 텔레그램 API 오류(send): {_telegram_api_err_str(e)}")
+        return False
     except Exception as e:
         err_str = str(e).lower()
         if "readtimeout" in err_str or "broken pipe" in err_str:
             print(f"[DEBUG] 텔레그램 전송 타임아웃/파이프 (무시): {e}")
             return False
-        raise
+        print(f"[WARN] 텔레그램 전송 실패: {e}")
+        return False
 
 
 @retry_on_network_error
@@ -78,13 +96,18 @@ def safe_telegram_send_and_get(bot, chat_id: str, text: str, **kwargs):
         if getattr(e, "errno", None) == 32:
             print(f"[DEBUG] 텔레그램 전송 Broken pipe (무시): {e}")
             return None
-        raise
+        print(f"[WARN] 텔레그램 send_and_get OSError: {e}")
+        return None
+    except ApiTelegramException as e:
+        print(f"[WARN] 텔레그램 API 오류(send_and_get): {_telegram_api_err_str(e)}")
+        return None
     except Exception as e:
         err_str = str(e).lower()
         if "readtimeout" in err_str or "broken pipe" in err_str:
             print(f"[DEBUG] 텔레그램 전송 타임아웃/파이프 (무시): {e}")
             return None
-        raise
+        print(f"[WARN] 텔레그램 send_and_get 실패: {e}")
+        return None
 
 
 @retry_on_network_error
@@ -104,10 +127,46 @@ def safe_telegram_edit(bot, text: str, chat_id: str, message_id: int) -> bool:
         if getattr(e, "errno", None) == 32:
             print(f"[DEBUG] 텔레그램 수정 Broken pipe (무시): {e}")
             return False
-        raise
+        print(f"[WARN] 텔레그램 수정 OSError: {e}")
+        return False
+    except ApiTelegramException as e:
+        print(f"[WARN] 텔레그램 API 오류(edit): {_telegram_api_err_str(e)}")
+        return False
     except Exception as e:
         err_str = str(e).lower()
         if "readtimeout" in err_str or "broken pipe" in err_str:
             print(f"[DEBUG] 텔레그램 수정 타임아웃/파이프 (무시): {e}")
             return False
-        raise
+        print(f"[WARN] 텔레그램 수정 실패: {e}")
+        return False
+
+
+def notify_chat_error(
+    bot,
+    chat_id: str,
+    *,
+    headline: str = "🚨 처리 중 오류가 발생했습니다.",
+    detail: str = "",
+    status_message_id: int | None = None,
+    max_len: int = 3600,
+) -> bool:
+    """
+    사용자에게 오류를 반드시 보이게 함. parse_mode 없이 평문만 사용(400 방지).
+    status_message_id가 있으면 먼저 해당 메시지를 편집하고, 실패 시 새 메시지 전송.
+    내부 예외는 삼킴(로그만).
+    """
+    if not bot or not chat_id:
+        return False
+    d = (detail or "").strip().replace("<", "‹").replace(">", "›")
+    if len(d) > max_len:
+        d = d[: max_len - 30] + "\n…(이하 생략)"
+    body = f"{headline}\n\n{d}" if d else headline
+    body = strip_thinking_tags(body)
+    try:
+        if status_message_id is not None:
+            if safe_telegram_edit(bot, body[:4096], chat_id, status_message_id):
+                return True
+        return safe_telegram_send(bot, chat_id, body[:4096])
+    except Exception as e:
+        print(f"[WARN] notify_chat_error 자체 실패: {e}")
+        return False
