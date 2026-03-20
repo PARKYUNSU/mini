@@ -21,6 +21,7 @@ CRON_DIR = _get_cron_dir()
 JOBS_FILE = os.path.join(CRON_DIR, "jobs.json")
 RUNS_FILE = os.path.join(CRON_DIR, "runs.json")
 STATS_FILE = os.path.join(CRON_DIR, "stats.json")
+JOB_RUNS_JSONL = os.path.join(CRON_DIR, "job_runs.jsonl")  # 실행 이력 (append-only)
 
 def ensure_dir():
     os.makedirs(CRON_DIR, exist_ok=True)
@@ -85,3 +86,15 @@ def load_stats():
 
 def save_stats(data):
     _atomic_save(STATS_FILE, data)
+
+
+def append_job_run(evt: dict) -> None:
+    """실행 이력 1줄 append (JSONL). 운영 관측용."""
+    ensure_dir()
+    import json
+    line = json.dumps(evt, ensure_ascii=False) + "\n"
+    try:
+        with open(JOB_RUNS_JSONL, "a", encoding="utf-8") as f:
+            f.write(line)
+    except OSError:
+        pass

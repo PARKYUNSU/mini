@@ -55,6 +55,7 @@ python run_backfill.py -s 2024-06-01 -e 2024-12-31 -b 20  # 20개씩 페이징
 | `ALLOWED_CHAT_ID` | 접근 허용 Chat ID (쉼표 구분) | ✅ |
 | `LOCAL_LLM_MODEL` | 로컬 LLM 모델명 (기본값: `qwen3.5:9b`) | |
 | `E2B_API_KEY` | Agent 코드 실행 (E2B 샌드박스) | Agent 봇 사용 시 |
+| `TAVILY_API_KEY` | 웹/뉴스 검색 (Tavily) | 검색 기능 사용 시 |
 
 ---
 
@@ -137,6 +138,14 @@ tail -f agent.log
 - **arXiv 파이프라인**: 매일 06:00 실행 (수집 → RAG → raw_data_queue)
 - **LLM 토론**: 매주 토요일 02:00 실행 (2시간, raw_data_queue → finetune_datasets)
 - **메인 봇**: 위 nohup으로 백그라운드 실행 시 SSH 종료 후에도 유지됨
+
+### 텔레그램으로 등록한 스케줄 (cron_engine)
+
+- **실행 주체**: `run_scheduler.py`가 떠 있어야 함. `agent_bot.py`만 켜 두면 **등록만 되고 실행 루프는 돌지 않음**.
+- **시간 기준**: 작업에 저장된 `timezone`(기본 `Asia/Seoul`) 기준 **한국 시간**으로 `next_run_at`을 계산·비교함. 텔레그램 API와 무관.
+- **실패·실행 여부 확인**:
+  - `scheduler.log`에서 `[cron] 실행:` / `[cron] worker 예외:` 검색
+  - `.cron/job_runs.jsonl` — 각 실행의 `status`: `succeeded` / `failed` / `skipped`
 
 ---
 

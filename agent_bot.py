@@ -478,7 +478,7 @@ _recent_tools: dict[str, list[dict[str, str]]] = {}
 # 사진 먼저 보낸 후 텍스트 후속 질문 시 문맥 유지용 (chat_id → base64)
 # 수명 정책: 1회 소비. 텍스트 요청에서 pop으로 가져와 사용 후 즉시 제거. 새 이미지 수신 시 덮어쓰기.
 _pending_image: dict[str, str] = {}
-# 논문 모드: ON이면 모든 질문 → RAG. OFF면 논문 키워드 있을 때만 RAG.
+# 논문 모드: ON이면 논문 관련 질문 우선 RAG. OFF면 논문 키워드 있을 때만 RAG. (인사·날씨·스케줄 등은 기존대로)
 _paper_mode: dict[str, bool] = {}
 
 # chat_id 단위 동시성 제어 (ThreadPool + 전역 dict race 방지)
@@ -526,9 +526,12 @@ def _is_rag_allowed(chat_id: str, user_request: str) -> bool:
 
 
 def _is_factual_lookup(user_request: str) -> bool:
-    """사실 조회 질문 (Tavily 적합): X 알아?, X 뭐야?, X 설명해줘 등."""
-    r = (user_request or "").strip()
+    """사실 조회 질문 (Tavily 적합): X 알아?, X 뭐야?, X 설명해줘 등. 도구/스케줄 intent는 제외."""
+    r = (user_request or "").lower().strip()
     if len(r) < 5:
+        return False
+    # 도구/스케줄/job 조회 → whitelist에서 처리, Tavily로 보내지 않음
+    if any(k in r for k in ("도구", "스케줄", "예약", "job", "chromadb", "논문 목록")):
         return False
     patterns = ("알고 있어", "알아?", "뭐야?", "뭐야 ", "설명해", "알려줘", "알려 줘")
     return any(p in r for p in patterns)
@@ -888,7 +891,7 @@ def _match_whitelisted_tool(user_request: str, req_lower: str) -> Optional[str]:
         if tool.exists():
             return "agent_tools_list"
 
-    schedule_list_keywords = ("스케줄 목록", "등록된 스케줄", "예약 목록", "스케줄 보여", "스케줄 조회", "스케줄 리스트")
+    schedule_list_keywords = ("스케줄 목록", "등록된 스케줄", "예약 목록", "스케줄 보여", "스케줄 조회", "스케줄 리스트", "스케줄 알려")
     if any(kw in req_lower for kw in schedule_list_keywords):
         tool = AGENT_TOOLS_DIR / "schedule_list_jobs.py"
         if tool.exists():
@@ -934,15 +937,16 @@ def _router_step1_hard_rules(
 
     if _is_smalltalk_or_memory_request(user_request, req_lower):
         return {"route_type": "direct_answer", "router_choice": "A"}
-    # 논문 모드 OFF + 사실 조회(X 알아?, X 뭐야?) → Tavily 직접 (LLM 분류 없이 확정)
-    if not _get_paper_mode(chat_id) and _is_factual_lookup(user_request) and (AGENT_TOOLS_DIR / "tavily_search_tool.py").exists():
-        return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "tavily_search_tool"}
+    # 화이트리스트 먼저 (도구/스케줄 목록 등이 factual_lookup에 선점되지 않도록)
     whitelisted_tool = _match_whitelisted_tool(user_request, req_lower)
     if whitelisted_tool:
         out = {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": whitelisted_tool}
         if whitelisted_tool == "tavily_search_tool":
             out["search_intent"] = "web"
         return out
+    # 논문 모드 OFF + 사실 조회(X 알아?, X 뭐야?) → Tavily (도구/스케줄 intent는 위 whitelist에서 처리됨)
+    if not _get_paper_mode(chat_id) and _is_factual_lookup(user_request) and (AGENT_TOOLS_DIR / "tavily_search_tool.py").exists():
+        return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "tavily_search_tool"}
     recent_tool = _resolve_recent_tool_reference(chat_id, user_request)
     if recent_tool and (AGENT_TOOLS_DIR / f"{recent_tool}.py").exists():
         # RAG/tool 요청은 tavily recent_tool로 보내지 않음
@@ -2211,7 +2215,7 @@ def main():
                         sub = parts[1].lower()
                         if sub in ("on", "1", "켜", "켜줘"):
                             _set_paper_mode(chat_id, True)
-                            bot.reply_to(message, "📚 논문 모드 ON. 이제 질문은 저장된 논문(ChromaDB)에서만 검색합니다.")
+                            bot.reply_to(message, "📚 논문 모드 ON. 논문 관련 질문을 저장된 논문(ChromaDB)에서 검색합니다. (인사·날씨·스케줄 등은 기존대로)")
                         elif sub in ("off", "0", "꺼", "꺼줘"):
                             _set_paper_mode(chat_id, False)
                             bot.reply_to(message, "🌐 논문 모드 OFF. 일반 답변 및 웹 검색을 사용합니다.")
@@ -2222,7 +2226,7 @@ def main():
                         cur = _get_paper_mode(chat_id)
                         _set_paper_mode(chat_id, not cur)
                         status = "ON" if not cur else "OFF"
-                        bot.reply_to(message, f"📚 논문 모드 {status}. {'저장된 논문에서만 검색합니다.' if not cur else '일반/웹 검색을 사용합니다.'}")
+                        bot.reply_to(message, f"📚 논문 모드 {status}. {'논문 관련 질문을 저장된 논문에서 검색합니다.' if not cur else '일반/웹 검색을 사용합니다.'}")
                 return
 
             # 1차 방어: Rule-based 취소/재시작 문지기 (최상단)

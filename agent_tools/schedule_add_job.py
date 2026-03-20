@@ -54,10 +54,11 @@ def _parse_add_job_request(user_request: str, chat_id: str = "") -> dict:
     # time_of_day 추출 (HH:MM)
     time_of_day = None
     if schedule_type != "interval":
-        # "8시", "08:00", "아침 8시", "오전 9시 30분"
-        m = re.search(r"(?:오전|아침|오후|저녁|낮)?\s*(\d{1,2})\s*시(?:\s*(\d{1,2})\s*분)?", req)
+        # "8시", "08:00", "아침 8시", "7시반", "오전 9시 30분"
+        m = re.search(r"(?:오전|아침|오후|저녁|낮)?\s*(\d{1,2})\s*시(?:\s*반|\s*(\d{1,2})\s*분)?", req)
         if m:
-            h, mn = int(m.group(1)), int(m.group(2) or 0)
+            h = int(m.group(1))
+            mn = 30 if re.search(r"\d\s*시\s*반", req) else int(m.group(2) or 0)
             if "오후" in req or "저녁" in req or "낮" in req:
                 if h < 12:
                     h += 12
@@ -72,7 +73,7 @@ def _parse_add_job_request(user_request: str, chat_id: str = "") -> dict:
     # prompt: 스케줄 표현 제거 후 남은 부분 (할 일)
     prompt = req
     for pat in [r"매일\s*", r"매주\s*", r"매월\s*", r"매\s*주\s*", r"매\s*월\s*", r"\d+\s*분\s*마다\s*",
-                r"아침\s*", r"오전\s*", r"오후\s*", r"저녁\s*", r"\d{1,2}\s*시(?:\s*\d{1,2}\s*분)?\s*",
+                r"아침\s*", r"오전\s*", r"오후\s*", r"저녁\s*", r"\d{1,2}\s*시(?:\s*반|\s*\d{1,2}\s*분)?\s*",
                 r"\d{1,2}:\d{2}\s*", r"월요일\s*", r"화요일\s*", r"수요일\s*", r"목요일\s*", r"금요일\s*", r"토요일\s*", r"일요일\s*",
                 r"에\s*", r"에\s*줘\s*", r"에\s*해\s*줘\s*", r"마다\s*"]:
         prompt = re.sub(pat, " ", prompt, flags=re.I)

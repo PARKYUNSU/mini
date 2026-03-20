@@ -8,6 +8,20 @@ from retry_utils import retry_on_network_error
 
 CANCEL_RESTART_CMDS = ("/cancel", "취소", "취소해", "재시작", "/restart", "🔄 재시작", "❌ 취소")
 
+# <think>, <thinking> 등 Chain-of-Thought 태그 제거 (출력 정제)
+_THINKING_PATTERN = re.compile(
+    r"</?(?:think|thinking|scratchpad)[^>]*>.*?</(?:think|thinking|scratchpad)>",
+    re.DOTALL | re.IGNORECASE,
+)
+
+
+def strip_thinking_tags(text: str) -> str:
+    """<think>...</think>, <thinking>...</thinking> 등 사고 과정 블록 제거"""
+    if not text or not isinstance(text, str):
+        return text
+    cleaned = _THINKING_PATTERN.sub("", text).strip()
+    return cleaned if cleaned else "(답변을 생성하지 못했습니다)"
+
 
 def main_keyboard() -> ReplyKeyboardMarkup:
     mk = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -24,6 +38,7 @@ def strip_wake_word(text: str) -> str:
 @retry_on_network_error
 def _telegram_send_impl(bot, chat_id: str, text: str, parse_mode=None, **kwargs) -> None:
     """네트워크 재시도 적용 전송 (일시적 에러만 1분→3분→5분 재시도)"""
+    text = strip_thinking_tags(text)
     bot.send_message(chat_id, text, parse_mode=parse_mode, **kwargs)
 
 
@@ -49,6 +64,7 @@ def safe_telegram_send(bot, chat_id: str, text: str, parse_mode=None, **kwargs) 
 
 @retry_on_network_error
 def _telegram_send_and_get_impl(bot, chat_id: str, text: str, **kwargs):
+    text = strip_thinking_tags(text)
     return bot.send_message(chat_id, text, **kwargs)
 
 
@@ -73,6 +89,7 @@ def safe_telegram_send_and_get(bot, chat_id: str, text: str, **kwargs):
 
 @retry_on_network_error
 def _telegram_edit_impl(bot, text: str, chat_id: str, message_id: int) -> None:
+    text = strip_thinking_tags(text)
     bot.edit_message_text(text, chat_id, message_id)
 
 

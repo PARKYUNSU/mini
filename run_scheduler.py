@@ -55,6 +55,7 @@ def _cron_worker_loop() -> None:
     """1분마다 cron_engine의 due job 체크 → LangGraph 트리거 → 텔레그램 선톡"""
     sys.path.insert(0, str(PROJECT_ROOT))
     from agent_tools.cron_engine.cron_api import get_due_jobs, mark_job_run
+    from agent_tools.cron_engine.lib.storage import append_job_run
     from agent_scheduled_runner import run_scheduled_job
 
     while True:
@@ -64,14 +65,34 @@ def _cron_worker_loop() -> None:
                 job_id = job.get("id")
                 prompt = job.get("prompt") or job.get("title", "")
                 chat_id = job.get("chat_id", "")
+                started_at = time.time()
+
+                def _log_run(status: str, error: str = None, message_preview: str = None):
+                    evt = {
+                        "event": "cron_job_run",
+                        "job_id": job_id,
+                        "chat_id": chat_id,
+                        "status": status,
+                        "started_at": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(started_at)),
+                        "duration_ms": int((time.time() - started_at) * 1000),
+                    }
+                    if message_preview:
+                        evt["prompt_preview"] = message_preview[:80]
+                    if error:
+                        evt["error"] = error[:200]
+                    append_job_run(evt)
+
                 if not prompt or not chat_id:
                     mark_job_run(job_id)
+                    _log_run("skipped", message_preview="prompt/chat_id 없음")
                     continue
                 print(f"[cron] 실행: {job_id} → {prompt[:40]}... (chat={chat_id})")
                 result = run_scheduled_job(prompt, chat_id)
                 if result == "ok":
                     mark_job_run(job_id)
+                    _log_run("succeeded", message_preview=prompt[:80])
                 else:
+                    _log_run("failed", error=str(result)[:200], message_preview=prompt[:80])
                     print(f"[cron] 실행 실패 (next_run 유지): {result}")
         except Exception as e:
             print(f"[cron] worker 예외: {e}")

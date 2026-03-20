@@ -4,11 +4,14 @@ cron_engine Python API. agent_tools에서 직접 호출.
 - add_job, list_jobs, pause_job, resume_job, show_job, get_due_jobs
 - prompt, chat_id 필드 지원 (스케줄 실행 시 윤수르가 텔레그램 선톡)
 """
+from __future__ import annotations
+
 import re
 import sys
 import uuid
 from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 # cron_engine/lib import를 위해 경로 추가
 _CRON_ROOT = Path(__file__).resolve().parent
@@ -64,6 +67,7 @@ def add_job(
             days_of_week=days_of_week or [],
             day_of_month=day_of_month,
             interval=interval,
+            timezone=timezone,
         )
     except Exception as e:
         return f"스케줄 계산 오류: {e}"
@@ -110,7 +114,10 @@ def list_jobs() -> str:
 
     lines = []
     for job_id, job in jobs.items():
-        lines.append(f"{job_id} | {job.get('title', '')} | {job.get('status', '')} | next={job.get('next_run_at')}")
+        tz = job.get("timezone") or "Asia/Seoul"
+        lines.append(
+            f"{job_id} | {job.get('title', '')} | {job.get('status', '')} | next={job.get('next_run_at')} ({tz})"
+        )
     return "\n".join(lines)
 
 
@@ -149,6 +156,7 @@ def resume_job(job_id: str) -> str:
         days_of_week=job.get("days_of_week"),
         day_of_month=job.get("day_of_month"),
         interval=job.get("interval"),
+        timezone=job.get("timezone") or "Asia/Seoul",
     ).isoformat()
     job["updated_at"] = datetime.now().isoformat()
     save_jobs(data)
@@ -169,23 +177,52 @@ def show_job(job_id: str) -> str:
     return json.dumps(jobs[job_id], indent=2, ensure_ascii=False)
 
 
+def _zone_for_job(tz_name: str | None) -> ZoneInfo:
+    name = (tz_name or "Asia/Seoul").strip() or "Asia/Seoul"
+    try:
+        return ZoneInfo(name)
+    except Exception:
+        return ZoneInfo("Asia/Seoul")
+
+
+def _parse_next_run_at(iso_str: str, tz_name: str) -> datetime | None:
+    """next_run_at 문자열을 해당 타임존 기준 aware datetime으로 해석 (저장값은 해당 TZ 벽시계)."""
+    try:
+        raw = (iso_str or "").strip()
+        if not raw:
+            return None
+        next_at = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        tz = _zone_for_job(tz_name)
+        if next_at.tzinfo is None:
+            return next_at.replace(tzinfo=tz)
+        return next_at.astimezone(tz)
+    except (ValueError, TypeError, OSError):
+        return None
+
+
 def get_due_jobs(now=None):
     """
     실행 시각이 된 active 작업 목록 반환.
-    Returns: list of job dicts
+    각 job의 timezone(기본 Asia/Seoul) 기준으로 next_run_at과 비교. (서버 OS 타임존과 무관)
     """
-    now = now or datetime.now()
     jobs = list(load_jobs().get("jobs", {}).values())
     due = []
     for j in jobs:
         if j.get("status") != "active" or not j.get("next_run_at"):
             continue
-        try:
-            next_at = datetime.fromisoformat(j["next_run_at"])
-            if next_at <= now:
-                due.append(j)
-        except (ValueError, TypeError):
-            pass
+        tz_name = j.get("timezone") or "Asia/Seoul"
+        tz = _zone_for_job(tz_name)
+        if now is None:
+            cur = datetime.now(tz)
+        elif now.tzinfo is None:
+            cur = now.replace(tzinfo=tz)
+        else:
+            cur = now.astimezone(tz)
+        next_at = _parse_next_run_at(j["next_run_at"], tz_name)
+        if next_at is None:
+            continue
+        if next_at <= cur:
+            due.append(j)
     return sorted(due, key=lambda x: x.get("next_run_at", ""))
 
 
@@ -206,6 +243,7 @@ def mark_job_run(job_id: str, next_run_at: str = None) -> None:
             days_of_week=job.get("days_of_week"),
             day_of_month=job.get("day_of_month"),
             interval=job.get("interval"),
+            timezone=job.get("timezone") or "Asia/Seoul",
         )
         job["next_run_at"] = nr.isoformat() if nr else None
     save_jobs(data)
