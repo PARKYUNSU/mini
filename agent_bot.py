@@ -2114,8 +2114,30 @@ def main():
                         if image_base64:
                             init_state["image_base64"] = image_base64
                         for event in graph.stream(init_state, cfg, stream_mode="updates"):
-                            if status_msg and "router" in event:
-                                _safe_telegram_edit(bot, "🔍 답변 생성 중...", chat_id, status_msg.message_id)
+                            if not status_msg:
+                                continue
+                            # router 이후에도 문구가 그대로면 '멈춤'으로 보이므로 노드별로 갱신
+                            if "router" in event:
+                                _safe_telegram_edit(bot, "🔍 요청 분류 중...", chat_id, status_msg.message_id)
+                            elif "direct_answer" in event:
+                                _safe_telegram_edit(bot, "✍️ 답변을 작성하는 중입니다...", chat_id, status_msg.message_id)
+                            elif "use_existing_tool" in event:
+                                _safe_telegram_edit(bot, "🔧 저장된 도구를 실행하는 중입니다...", chat_id, status_msg.message_id)
+                            elif "planner" in event:
+                                _safe_telegram_edit(
+                                    bot,
+                                    "📋 실행 계획을 세우는 중입니다... (RAG·LLM, 최대 1~2분)",
+                                    chat_id,
+                                    status_msg.message_id,
+                                )
+                            elif "planner_debate" in event:
+                                _safe_telegram_edit(bot, "🧠 계획을 내부 검토 중입니다...", chat_id, status_msg.message_id)
+                            elif "executor" in event:
+                                _safe_telegram_edit(bot, "💻 코드를 작성·실행하는 중입니다...", chat_id, status_msg.message_id)
+                            elif "monitor" in event:
+                                is_retry = "retry_count" in (event.get("monitor") or {})
+                                txt = "🚨 오류 분석 후 재시도 중입니다..." if is_retry else "🔍 실행 결과를 검증하는 중입니다..."
+                                _safe_telegram_edit(bot, txt, chat_id, status_msg.message_id)
 
                     print("[DEBUG] run_or_resume: graph.stream 완료")
                     break
