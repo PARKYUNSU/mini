@@ -14,6 +14,10 @@ ALLOWED_CHAT_ID = os.getenv("ALLOWED_CHAT_ID")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 CHROMA_DB_PATH = "./chroma_db"
 COLLECTION_NAME = "arxiv_papers"
+# agent_tools/ 전용 RAG (논문 DB와 분리)
+TOOL_CHROMA_DB_PATH = "./tool_chroma_db"
+TOOL_COLLECTION_NAME = "agent_tools_rag"
+TOOL_RAG_TOP_K = 3
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 OLLAMA_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b")
 OLLAMA_TIMEOUT = 120

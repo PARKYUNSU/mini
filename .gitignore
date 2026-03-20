@@ -18,6 +18,7 @@
 raw_data_queue/
 finetune_datasets/
 chroma_db/
+tool_chroma_db/
 agent_checkpoints.db
 agent_checkpoints.db-shm
 agent_checkpoints.db-wal

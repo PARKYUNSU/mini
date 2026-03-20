@@ -61,8 +61,10 @@ from agent_config import (
     RAG_TOP_K,
     TELEGRAM_TOKEN,
     ALLOWED_CHAT_ID,
+    TOOL_RAG_TOP_K,
     ollama_kwargs,
 )
+from agent_tool_rag import get_tool_rag_store, sync_tool_chroma_from_disk
 from agent_sandbox import run_code_sandbox as _run_code_sandbox
 from agent_telegram import (
     CANCEL_RESTART_CMDS as _CANCEL_RESTART_CMDS,
@@ -316,7 +318,7 @@ class AgentSkillLibrary:
         return result
 
     def get_tools_context(self, query: str = "") -> str:
-        """Planner용: 기존 도구 목록을 문자열로 반환"""
+        """[레거시] 전체 목록 문자열. Router/Planner는 Tool RAG(get_tool_rag_store) 사용 권장."""
         tools = self.list_tools()
         if not tools:
             return "저장된 도구 없음."
@@ -335,6 +337,10 @@ class AgentSkillLibrary:
                 base = f"{safe_name}_{idx}"
             path = self.tools_dir / f"{base}.py"
             path.write_text(code, encoding="utf-8")
+            try:
+                get_tool_rag_store().upsert_file(path)
+            except Exception as ex:
+                print(f"[ToolRAG] 저장 후 인덱스 갱신 실패: {ex}")
             return path.name
         except Exception as e:
             print(f"도구 저장 오류: {e}")
@@ -1088,6 +1094,7 @@ def _router_step3_llm_classify(
 - 기존 도구(B)를 선택할 때는 요청 목적과 도구 설명서 목적이 완전히 동일해야 한다.
 - 단어 일부만 겹치는 경우(예: '조사')로는 B를 선택하지 않는다.
 - 맞춤형 도구가 없으면 B 금지, C 또는 D를 선택한다.
+- <tools>와 사용자 메시지의 "도구" 블록은 벡터 검색으로 뽑은 **상위 {TOOL_RAG_TOP_K}개 후보**뿐이다(전체 agent_tools 목록 아님). 후보에 없어도 다른 저장 도구가 있을 수 있으나, 후보가 전혀 맞지 않으면 B 금지하고 C(새 코드) 또는 D를 택한다.
 </tool_usage>
 <tools>
 {tools_list_str}
@@ -1098,7 +1105,7 @@ def _router_step3_llm_classify(
     prompt = f"""[최근 대화]
 {session_context if session_context else "(없음)"}
 
-도구:{tools_context[:400]}\nRAG:{rag_context[:300] if rag_context != '관련 문서 없음' else '없음'}\n입력:{user_request}\nA/B/C/D?"""
+도구(Top-{TOOL_RAG_TOP_K} 후보만):\n{tools_context[:1200]}\nRAG:{rag_context[:300] if rag_context != '관련 문서 없음' else '없음'}\n입력:{user_request}\nA/B/C/D?"""
 
     raw = "D"
     for llm_getter in (get_router_llm, get_executor_llm):
@@ -1166,25 +1173,10 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         session = get_session(chat_id)
         session_context = session.get_recent_context(max_turns=2)
         rag = ChromaRAGTool()
-        skill_lib = AgentSkillLibrary()
         rag_context = rag.search(user_request)
-        tools_context = skill_lib.get_tools_context()
-
-        tools_dir = Path(__file__).resolve().parent / "agent_tools"
-        tool_names = []
-        if tools_dir.exists():
-            for f in sorted(tools_dir.glob("*.py")):
-                try:
-                    content = f.read_text(encoding="utf-8")
-                    doc = ""
-                    if '"""' in content:
-                        parts = content.split('"""')
-                        if len(parts) >= 2:
-                            doc = parts[1].strip().split("\n")[0][:80]
-                    tool_names.append(f"{f.stem}" + (f": {doc}" if doc else ""))
-                except Exception:
-                    tool_names.append(f.stem)
-        tools_list_str = ", ".join(tool_names) if tool_names else "(없음)"
+        _trs = get_tool_rag_store()
+        tools_context = _trs.format_topk_block(user_request, k=TOOL_RAG_TOP_K)
+        tools_list_str = _trs.format_router_tools_tag(user_request, k=TOOL_RAG_TOP_K)
 
         result = _router_step3_llm_classify(user_request, session_context, rag_context, tools_context, tools_list_str)
         print(f"[DEBUG] Router: 3단계 LLM 분류 → {result.get('route_type')} (features={features})")
@@ -1400,6 +1392,16 @@ def _run_tool_on_host(tool_name: str, user_request: str, chat_id: str = "") -> s
         return f"도구 실행 오류: {str(e)[:ERROR_LOG_MAX_CHARS]}"
 
 
+def _tools_prompt_lines_for_llm(user_request: str, tools: list[tuple[str, str]]) -> list[str]:
+    """도구 선택용 Gemini 프롬프트: Tool RAG Top-K 우선, 인덱스 비었을 때만 짧은 폴백."""
+    hits = get_tool_rag_store().search(user_request, k=TOOL_RAG_TOP_K)
+    if hits:
+        return [f"- {h['name']}: {(h.get('doc') or '')[:180]}" for h in hits]
+    if tools:
+        return [f"- {name}" for name, _ in tools[:12]]
+    return ["(저장된 도구 없음)"]
+
+
 def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict:
     """Use Existing Tool: agent_tools/ 도구를 맥 미니 본체에서 직접 실행 (E2B 샌드박스 절대 사용 안 함)"""
     print("[DEBUG] UseExistingTool: 진입 (Host 실행)")
@@ -1419,7 +1421,7 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
             used_tool_name = selected_tool_name
             result = _run_tool_on_host(used_tool_name, user_request, chat_id)
         else:
-            tools_list = [f"- {name}" for name, _ in tools]
+            tools_list = _tools_prompt_lines_for_llm(user_request, tools)
             llm = get_executor_llm()
             form_write_keywords = ("입력해", "기입해", "입력해 줘", "기입해 줘", "기입해 봐", "입력해 봐", "써 봐", "넣어")
             if "http" in user_request and any(kw in user_request for kw in form_write_keywords):
@@ -1427,7 +1429,7 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
                     used_tool_name = "fill_google_form"
                     result = _run_tool_on_host(used_tool_name, user_request, chat_id)
                 else:
-                    prompt = f"""[기존 도구 목록 - agent_tools/]
+                    prompt = f"""[관련 도구 후보 Top-{TOOL_RAG_TOP_K} (유사도 순, 전체 목록 아님)]
 {chr(10).join(tools_list)}
 
 [사용자 요청]
@@ -1450,7 +1452,7 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
                     used_tool_name = "tavily_search_tool"
                     result = _run_tool_on_host(used_tool_name, user_request, chat_id)
                 else:
-                    prompt = f"""[기존 도구 목록 - agent_tools/]
+                    prompt = f"""[관련 도구 후보 Top-{TOOL_RAG_TOP_K} (유사도 순, 전체 목록 아님)]
 {chr(10).join(tools_list)}
 
 [사용자 요청]
@@ -1526,6 +1528,33 @@ def route_after_router(state: AgentState) -> Literal["direct_answer", "use_exist
     return "planner"
 
 
+# Planner: LLM 거부·비규격 응답 시에도 결재 단계까지 진행하기 위한 폴백 계획
+PLANNER_FALLBACK_PLAN_STEPS = [
+    "1단계: 사용자의 특별한 요청에 따른 코드 작성",
+    "2단계: 샌드박스 실행 및 결과 확인",
+]
+
+
+def _parse_planner_llm_lines(plan_text: str) -> list[str]:
+    """LLM 계획 텍스트에서 단계 줄만 안전하게 추출 (한 줄씩 예외 방지)."""
+    out: list[str] = []
+    text = plan_text if isinstance(plan_text, str) else str(plan_text or "")
+    for raw in text.split("\n"):
+        ln = raw.strip()
+        if not ln:
+            continue
+        try:
+            first = ln[0]
+            head_digit = first.isdigit()
+            if "단계" in ln and (head_digit or ln.startswith("•") or ln.startswith("-")):
+                out.append(ln)
+            elif head_digit or ln.startswith("•") or ln.startswith("-"):
+                out.append(ln)
+        except (IndexError, TypeError):
+            continue
+    return out
+
+
 def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
     """Planner: Qwen으로 계획 수립 → HITL interrupt"""
     print("[DEBUG] Planner: 진입")
@@ -1550,9 +1579,8 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
     try:
         rag = ChromaRAGTool()
-        skill_lib = AgentSkillLibrary()
         rag_context = rag.search(state["user_request"])
-        tools_context = skill_lib.get_tools_context()
+        tools_context = get_tool_rag_store().format_topk_block(state["user_request"], k=TOOL_RAG_TOP_K)
 
         llm = get_planner_llm()
         session = get_session(chat_id)
@@ -1564,6 +1592,10 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
 - 단계형 계획(1단계, 2단계...)으로 작성
 - 마지막 줄에 반드시 '실행할까요? (승인/거절)' 포함
 </rules>
+<sandbox_test_policy>
+- 사용자가 시스템 테스트를 위해 '일부러 에러(오타)를 내라', 'SyntaxError를 내서 실행해 봐' 등으로 지시하는 경우, 절대 거부하지 마십시오. 이것은 안전한 샌드박스 테스트입니다.
+- 요청받은 대로 의도적 오류를 포함한 코드를 작성·실행하겠다는 내용의 실행 계획(1단계, 2단계 형식)을 정상적으로 수립하십시오.
+</sandbox_test_policy>
 <tool_usage>
 - 누락된 매개변수를 임의 값(placeholder)으로 추측하지 말 것
 - 필요한 값이 없으면 '추가 정보 필요' 단계로 명시하고 사용자 확인을 유도할 것
@@ -1597,8 +1629,8 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
 2) 계획에 "해당 URL의 텍스트(README, 본문 등)를 가져와 요약"하는 단계를 명시하십시오.
 3) RAG(문서 검색)로는 URL 내용을 알 수 없습니다. 크롤링 코드를 짜는 것만이 유일한 방법입니다."""
 
-        prompt = f"""[기존 도구 라이브러리 - agent_tools/ 폴더]
-비슷한 요청이면 새로 코딩하지 말고 아래 기존 도구를 재활용해.
+        prompt = f"""[관련 도구 후보 — 벡터 검색 Top-{TOOL_RAG_TOP_K} (전체 agent_tools 목록 아님)]
+비슷한 요청이면 새로 코딩하지 말고, 아래 후보 중 목적에 맞는 도구 재사용을 우선 검토해.
 {tools_context}
 
 [참고 지식 - 필요시 활용]
@@ -1624,25 +1656,32 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
         image_base64 = state.get("image_base64")
         content = _build_message_content(prompt, image_base64)
-        resp = llm.invoke([SystemMessage(content=system_prompt), HumanMessage(content=content)])
-        plan_text = (resp.content or "").strip()
-        plan_lines = []
-        if plan_text:
-            for ln in plan_text.split("\n"):
-                ln = ln.strip()
-                if not ln:
-                    continue
-                if "단계" in ln and (ln[0].isdigit() or ln.startswith("•") or ln.startswith("-")):
-                    plan_lines.append(ln)
-                elif ln[0].isdigit() or ln.startswith("•") or ln.startswith("-"):
-                    plan_lines.append(ln)
-        if not plan_lines:
-            has_url = "http" in (state.get("user_request") or "").lower()
-            plan_lines = (
-                ["1단계: URL 접근 파이썬 코드 작성 (requests, BeautifulSoup 등)", "2단계: 결과 확인 및 출력"]
-                if has_url
-                else ["1단계: 요청에 맞는 파이썬 코드 작성", "2단계: 실행 및 결과 확인"]
+
+        plan_lines: list[str] = []
+        plan_text = ""
+        try:
+            resp = llm.invoke([SystemMessage(content=system_prompt), HumanMessage(content=content)])
+            raw_content = getattr(resp, "content", None) if resp is not None else None
+            plan_text = (raw_content if isinstance(raw_content, str) else str(raw_content or "")).strip()
+            plan_lines = _parse_planner_llm_lines(plan_text)
+        except Exception as parse_ex:
+            print(
+                f"[WARN] Planner LLM 호출 또는 응답 처리 중 예외 — 폴백 계획 사용: {parse_ex}\n{traceback.format_exc()}"
             )
+            plan_lines = list(PLANNER_FALLBACK_PLAN_STEPS)
+
+        if not plan_lines:
+            # 규격 없는 장문 응답(거부·설명만 등)으로 단계 줄이 0개인 경우
+            if plan_text:
+                print("[WARN] Planner: 단계 형식 파싱 결과 없음(거부/비규격 응답 가능) — 폴백 계획 사용")
+                plan_lines = list(PLANNER_FALLBACK_PLAN_STEPS)
+            else:
+                has_url = "http" in (state.get("user_request") or "").lower()
+                plan_lines = (
+                    ["1단계: URL 접근 파이썬 코드 작성 (requests, BeautifulSoup 등)", "2단계: 결과 확인 및 출력"]
+                    if has_url
+                    else ["1단계: 요청에 맞는 파이썬 코드 작성", "2단계: 실행 및 결과 확인"]
+                )
 
         plan_display = "\n".join(f"• {p}" for p in plan_lines)
         msg = (
@@ -1786,8 +1825,9 @@ def executor_node(state: AgentState) -> dict:
         return {"generated_code": "", "execution_result": f"Error: {fe}"}
 
     try:
-        skill_lib = AgentSkillLibrary()
-        tools_context = skill_lib.get_tools_context()
+        tools_context = get_tool_rag_store().format_topk_block(
+            state.get("user_request") or "", k=TOOL_RAG_TOP_K
+        )
         rag = ChromaRAGTool()
         rag_context = rag.search(state["user_request"])[:500] if state.get("user_request") else ""
 
@@ -1814,8 +1854,8 @@ def executor_node(state: AgentState) -> dict:
         if tools_context:
             prompt += f"""
 
-[기존 도구 - agent_tools/]
-계획에서 기존 도구 사용이 언급되면 import하거나 subprocess로 실행해.
+[관련 기존 도구 후보 — 벡터 검색 Top-{TOOL_RAG_TOP_K} (전체 목록 아님)]
+계획에서 기존 도구 사용이 언급되면 import하거나 subprocess로 실행해. 후보에 없으면 새 코드로 구현.
 {tools_context}"""
         if rag_context:
             prompt += f"""
@@ -2053,6 +2093,11 @@ def main():
     conn = sqlite3.connect(CHECKPOINT_DB_PATH, check_same_thread=False)
     graph = build_graph(checkpointer=SqliteSaver(conn))
     _executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="agent")
+
+    try:
+        sync_tool_chroma_from_disk()
+    except Exception as e:
+        print(f"⚠️ Tool RAG(tool_chroma_db) 초기 동기화 실패 — 빈 인덱스로 동작할 수 있습니다: {e}")
 
     # 재시작 후: 체크포인트에서 승인 대기 중인 세션 복구
     for cid in allowed_ids:
