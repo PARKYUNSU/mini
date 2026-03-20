@@ -30,7 +30,7 @@
 
 - input: "저장된 도구 목록 검색해줘"
   expected_search_intent: tool
-  expected_tool: null  # Tavily 금지, 도구 선택은 LLM에 위임
+  expected_tool: agent_tools_list  # 화이트리스트: 저장된 도구+목록/검색 → agent_tools_list 고정
 
 - input: "JOB-A1B2 자세히 보여줘"
   expected_search_intent: tool
