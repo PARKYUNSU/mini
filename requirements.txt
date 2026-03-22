@@ -1,12 +1,15 @@
 requests>=2.31.0
 beautifulsoup4>=4.12.0  # WolframAlpha 파싱용
 tavily-python>=0.3.0  # tavily_search_tool (AI 검색 엔진)
+tinytuya>=1.13.0  # agent_tools/smart_plug.py (Tuya 로컬 제어)
 pymupdf4llm>=0.0.27
 
 # 듀얼 파이프라인 (RAG + 파인튜닝)
 langchain-text-splitters>=0.3.0
 langchain-core>=0.3.0
 langchain-community>=0.3.0
+# agent_bot.py ChatOllama (라우터·플래너·planner_debate 등) — 없으면 ModuleNotFoundError: langchain_ollama
+langchain-ollama>=0.2.0
 chromadb>=0.5.0
 sentence-transformers>=2.2.0
 

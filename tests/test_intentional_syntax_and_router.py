@@ -9,6 +9,7 @@ from agent_telegram import strip_wake_word
 from agent_bot import (
     _is_explicit_python_coding_request,
     _router_step1_hard_rules,
+    _skip_planner_debate_for_fast_path,
     _user_wants_intentional_exec_error,
 )
 
@@ -41,8 +42,14 @@ def test_plain_python_intro_not_forced_planner():
     assert _is_explicit_python_coding_request(text, text.lower()) is False
 
 
+def test_trivial_coding_skips_debate_heuristic():
+    assert _skip_planner_debate_for_fast_path("간단한 파이썬 구문 만들어줘") is True
+    assert _skip_planner_debate_for_fast_path("대규모 데이터 파이프라인 코드 짜줘") is False
+
+
 if __name__ == "__main__":
     test_strip_and_intentional_flag()
     test_explicit_python_router()
     test_plain_python_intro_not_forced_planner()
+    test_trivial_coding_skips_debate_heuristic()
     print("OK: intentional_syntax_and_router")

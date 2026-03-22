@@ -594,6 +594,36 @@ def _is_explicit_python_coding_request(user_request: str, req_lower: str) -> boo
     return False
 
 
+def _skip_planner_debate_for_fast_path(user_request: str) -> bool:
+    """
+    매우 가벼운 코딩 요청은 planner_debate(Ollama 비평·수정 2회, ~1분+)를 생략.
+    (의도적 SyntaxError 경로는 route_after_planner에서 별도 처리)
+    """
+    r = (user_request or "").strip()
+    if not r or len(r) > 220:
+        return False
+    low = r.lower()
+    trivial = (
+        "간단한 파이썬",
+        "간단 파이썬",
+        "간단한 코드",
+        "간단 코드",
+        "짧은 코드",
+        "짧은 파이썬",
+        "예제 코드",
+        "샘플 코드",
+        "헬로 월드",
+    )
+    if any(t in r for t in trivial):
+        return True
+    if "hello world" in low:
+        return True
+    # 한 줄짜리 수준 짧은 요청
+    if len(r) < 52 and "파이썬" in r and any(k in r for k in ("구문", "코드", "만들", "짜", "작성")):
+        return True
+    return False
+
+
 def _is_factual_lookup(user_request: str) -> bool:
     """사실 조회 질문 (Tavily 적합): X 알아?, X 뭐야?, X 설명해줘 등. 도구/스케줄 intent는 제외."""
     r = (user_request or "").lower().strip()
@@ -1969,6 +1999,7 @@ def executor_node(state: AgentState) -> dict:
 [금지] 단순 텍스트 설명·요약을 print("...")로 하드코딩하는 것은 절대 금지. 파이썬 코드는 오직 데이터 연산, API 호출, 파일 제어 등 논리적 '행동(Action)'이 필요할 때만 작성하라.
 [범용 함수 원칙] 하드코딩을 피하고, URL·파일경로·검색어 등은 반드시 변수로 받거나 sys.argv/argparse로 매개변수(Argument)화하여 범용 함수 형태로 작성하라.
 try-except로 감싸고, print()로 결과를 출력해. **API 키는 반드시 os.getenv("XXX_API_KEY")로 불러와.**
+[sys.argv] 샌드박스 인터프리터가 `-f` 등 **플래그 형태** 인자를 argv에 넣는 경우가 있다. `len(sys.argv) > 1`이어도 `argv[1].startswith("-")`이면 사용자 입력이 아니므로 **무시하고** 기본 인자만 써라.
 코드 블록만 반환 (```python ... ``` 없이 순수 코드만)."""
 
         content = _build_message_content(prompt, image_base64)
@@ -2121,12 +2152,15 @@ def route_after_monitor(state: AgentState) -> Literal["executor", "__end__"]:
 
 
 def route_after_planner(state: AgentState) -> Literal["planner_debate", "executor", "__end__"]:
-    """승인 후: 의도적 오류 샌드박스 테스트는 planner_debate(Ollama 2회) 생략 → 바로 executor."""
+    """승인 후: 의도적 오류·트리비얼 코딩은 planner_debate(Ollama 2회) 생략 → 바로 executor."""
     if state.get("approval_status") != "approved":
         return "__end__"
     user_request = state.get("user_request", "")
     if _user_wants_intentional_exec_error(user_request):
         print("[DEBUG] route_after_planner: 의도적 오류 실행 요청 → planner_debate 생략, executor로")
+        return "executor"
+    if _skip_planner_debate_for_fast_path(user_request):
+        print("[DEBUG] route_after_planner: 트리비얼 코딩 요청 → planner_debate 생략, executor로")
         return "executor"
     return "planner_debate"
 
