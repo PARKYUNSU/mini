@@ -28,7 +28,7 @@ from typing import Literal, Optional, TypedDict
 import chromadb
 from chromadb.config import Settings
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
-from langchain_community.chat_models.ollama import ChatOllama
+from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -553,6 +553,47 @@ def _is_rag_allowed(chat_id: str, user_request: str) -> bool:
     return _get_paper_mode(chat_id) or _has_explicit_paper_intent(user_request)
 
 
+def _user_wants_intentional_exec_error(user_request: str) -> bool:
+    """
+    사용자가 샌드박스에서 의도적 SyntaxError/오타 실행을 요청한 경우.
+    이 경우 Monitor가 에러를 '고쳐서' 재시도하면 요청과 정반대가 되므로 재시도하지 않는다.
+    """
+    raw = user_request or ""
+    u = raw.lower()
+    compact = u.replace(" ", "")
+    if "syntaxerror" in compact:
+        return True
+    if "syntaxerror" in raw:  # 대소문자 혼합 (SyntaxError)
+        return True
+    if "일부러" in raw or "의도적" in raw:
+        if any(k in raw for k in ("오타", "에러", "오류", "문법")):
+            return True
+        if "syntax" in u:
+            return True
+    if "고의" in raw and ("오류" in raw or "에러" in raw):
+        return True
+    return False
+
+
+def _is_explicit_python_coding_request(user_request: str, req_lower: str) -> bool:
+    """
+    파이썬으로 코드를 짜거나 실행·문법 실험을 하라는 뜻이 분명한 요청.
+    (3단계 라우터 LLM 오탐·다른 하드룰 간섭을 줄이기 위해 planner로 고정)
+    """
+    if not (user_request or "").strip():
+        return False
+    u = req_lower or user_request.lower()
+    if "파이썬" in user_request or "python" in u:
+        if any(
+            x in user_request or x in u
+            for x in ("코드", "짜", "작성", "실행", "돌려", "문법", "syntax", "프로그램", "스크립트", "더하기", "for ", "while ")
+        ):
+            return True
+    if "syntaxerror" in u.replace(" ", "") or "syntax error" in u:
+        return True
+    return False
+
+
 def _is_factual_lookup(user_request: str) -> bool:
     """사실 조회 질문 (Tavily 적합): X 알아?, X 뭐야?, X 설명해줘 등. 도구/스케줄 intent는 제외."""
     r = (user_request or "").lower().strip()
@@ -784,7 +825,13 @@ def _stop_backfill_process() -> tuple[bool, str]:
 
 # ============ LLM 인스턴스 ============
 def get_planner_llm():
+    """일반 Ollama (라우터 폴백·DirectAnswer 폴백 등). 장문 응답 허용."""
     return ChatOllama(**ollama_kwargs(temperature=0.2))
+
+
+def get_planner_plan_llm():
+    """Planner·PlannerDebate 전용: num_predict로 계획 장문·다단계 토큰 폭주 방지."""
+    return ChatOllama(**ollama_kwargs(temperature=0.2, num_predict=300))
 
 
 def get_router_llm():
@@ -967,6 +1014,28 @@ def _match_whitelisted_tool(user_request: str, req_lower: str) -> Optional[str]:
         if "서울" in user_request and "날씨" in user_request and "미세먼지" not in user_request:
             return "서울_지금_현재_날씨_알려줘"
 
+    # Tuya 로컬 스마트 플러그 (스케줄용 prompt: "스마트 플러그 켜줘" 등 → planner 우회)
+    smart_plug_tool = AGENT_TOOLS_DIR / "smart_plug.py"
+    if smart_plug_tool.exists():
+        has_on = bool(re.search(r"켜|turn\s*on|power\s*on", req_lower))
+        has_off = bool(re.search(r"꺼|끄|turn\s*off|power\s*off", req_lower))
+        plug_ctx = (
+            "플러그" in user_request
+            or "스마트플러그" in req_lower.replace(" ", "")
+            or "스마트 플러그" in user_request
+            or "스탠드 불" in user_request
+            or "스탠드조명" in req_lower.replace(" ", "")
+            or "스탠드 조명" in user_request
+            or ("스탠드" in user_request and "불" in user_request)
+            or ("스탠드" in user_request and (has_on or has_off))
+            or "tuya" in req_lower
+            or "tinytuya" in req_lower
+            or "아울렛" in user_request
+            or ("스탠드" in user_request and ("조명" in user_request or "전원" in user_request))
+        )
+        if plug_ctx and (has_on or has_off):
+            return "smart_plug"
+
     return None
 
 
@@ -980,6 +1049,9 @@ def _router_step1_hard_rules(
 
     if _is_smalltalk_or_memory_request(user_request, req_lower):
         return {"route_type": "direct_answer", "router_choice": "A"}
+    # 파이썬 코드 작성/실행·SyntaxError 실험 등 → 항상 planner (LLM 라우터·Tavily 등에 끌려가지 않게)
+    if _is_explicit_python_coding_request(user_request, req_lower):
+        return {"route_type": "planner", "router_choice": "C"}
     # 화이트리스트 먼저 (도구/스케줄 목록 등이 factual_lookup에 선점되지 않도록)
     whitelisted_tool = _match_whitelisted_tool(user_request, req_lower)
     if whitelisted_tool:
@@ -1578,11 +1650,13 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
         return {"approval_status": "rejected"}
 
     try:
+        print("[DEBUG] Planner: RAG(논문·도구) 검색 시작...")
         rag = ChromaRAGTool()
         rag_context = rag.search(state["user_request"])
         tools_context = get_tool_rag_store().format_topk_block(state["user_request"], k=TOOL_RAG_TOP_K)
+        print("[DEBUG] Planner: 로컬 Ollama 계획 생성 호출 (timeout≈120s)...")
 
-        llm = get_planner_llm()
+        llm = get_planner_plan_llm()
         session = get_session(chat_id)
 
         system_prompt = """<role>Planner</role>
@@ -1591,6 +1665,7 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
 - 한국어로만 작성
 - 단계형 계획(1단계, 2단계...)으로 작성
 - 마지막 줄에 반드시 '실행할까요? (승인/거절)' 포함
+- 🚨 [치명적 경고] 실행 계획(Plan)은 **반드시 3단계에서 최대 5단계 이내**로 아주 간결하게 작성하십시오. 절대 6단계 이상으로 길게 늘여 쓰지 마십시오.
 </rules>
 <sandbox_test_policy>
 - 사용자가 시스템 테스트를 위해 '일부러 에러(오타)를 내라', 'SyntaxError를 내서 실행해 봐' 등으로 지시하는 경우, 절대 거부하지 마십시오. 이것은 안전한 샌드박스 테스트입니다.
@@ -1645,14 +1720,16 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
 위 요청을 수행하기 위한 **자연어 실행 계획**만 단계별로 나열해. 파이썬 코드, import, 함수 정의 등은 절대 출력 금지.
 - **핵심 키워드 포함**: 사용자 요청에 URL(구글 폼, 웹페이지 등), 특정 용어, 숫자 등이 있으면 반드시 계획 각 단계에 그대로 명시하라. (예: "1단계: 다음 URL의 정적 HTML을 requests+BeautifulSoup으로 파싱: https://...")
 - 기존 도구로 해결 가능하면 '기존 도구 X 사용' 형태로.
-- 새 코드가 필요하면 'N단계: (무엇을 할지 자연어로 설명)' 형태만. 3~7단계.
+- 새 코드가 필요하면 'N단계: (무엇을 할지 자연어로 설명)' 형태만. **반드시 3~5단계만** (6단계 이상 금지).
 - 외부 API 키가 필요하면 계획 마지막에 "[주의] .env에 XXX_API_KEY 추가 후 승인해 주세요." 포함.
 
 [출력 형식 - 반드시 준수]
-1단계: (자연어 설명)
-2단계: (자연어 설명)
+1단계: (한 줄)
+2단계: (한 줄)
+3단계: (한 줄)
+(필요 시만 4~5단계, 총 5단계 초과 금지)
 ...
-예시: 1단계: requests, json 라이브러리를 사용해 API 호출"""
+예시: 1단계: requests로 API 호출 준비"""
 
         image_base64 = state.get("image_base64")
         content = _build_message_content(prompt, image_base64)
@@ -1664,6 +1741,9 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
             raw_content = getattr(resp, "content", None) if resp is not None else None
             plan_text = (raw_content if isinstance(raw_content, str) else str(raw_content or "")).strip()
             plan_lines = _parse_planner_llm_lines(plan_text)
+            if len(plan_lines) > 5:
+                print(f"[WARN] Planner: 단계 {len(plan_lines)}개 → 상한 5개로 절단 (토큰/형식 방어)")
+                plan_lines = plan_lines[:5]
         except Exception as parse_ex:
             print(
                 f"[WARN] Planner LLM 호출 또는 응답 처리 중 예외 — 폴백 계획 사용: {parse_ex}\n{traceback.format_exc()}"
@@ -1694,7 +1774,12 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
             if _safe_telegram_send(bot, chat_id, msg, parse_mode="Markdown"):
                 print("[DEBUG] Planner: 텔레그램 전송 성공")
             else:
-                print("[DEBUG] Planner: 텔레그램 전송 실패 (일시 오류)")
+                # Markdown 파싱 오류 등으로 본문이 아예 안 가는 경우 평문 재시도
+                plain = msg.replace("**", "").replace("`", "")
+                if _safe_telegram_send(bot, chat_id, plain, parse_mode=None):
+                    print("[DEBUG] Planner: 텔레그램 평문 전송 성공 (Markdown 실패 후)")
+                else:
+                    print("[DEBUG] Planner: 텔레그램 전송 실패 (일시 오류)")
 
         with _with_chat_lock(plan_cid) if plan_cid else contextlib.nullcontext():
             _plan_cache[thread_id] = plan_lines
@@ -1729,7 +1814,7 @@ def planner_debate_node(state: AgentState) -> dict:
         return {}
 
     try:
-        llm = get_planner_llm()
+        llm = get_planner_plan_llm()
         plan_text = "\n".join(original_plan)
 
         critic_system_prompt = """<role>Internal Critic</role>
@@ -1868,6 +1953,16 @@ def executor_node(state: AgentState) -> dict:
 [이전 실행 에러 - 반드시 수정할 것]
 {error_hint}"""
 
+        if _user_wants_intentional_exec_error(user_request):
+            prompt += """
+
+[특수 지시 — 의도적 문법 오류]
+사용자가 **일부러 오타/SyntaxError** 를 넣어 실행해 보라고 했다.
+- 주석으로만 '오류'를 설명하지 말 것. **실제로 파이썬 파서가 잡는 문법 오류**가 있어야 한다 (예: `print(sum(range(1,11))` 처럼 닫는 괄호 누락, 잘못된 들여쓰기, 콜론 누락).
+- 1~10 합 계산 로직은 두되, 위와 같이 **한 군데만** 의도적 오타를 넣는다.
+- 전체를 try/except로 감싸 SyntaxError를 삼키지 말 것. 인터프리터가 SyntaxError 트레이스백을 출력해야 한다.
+- except SyntaxError: pass 같은 처리 금지."""
+
         prompt += """
 
 위 [실행 계획]에 따라 파이썬 코드를 작성해.
@@ -1962,6 +2057,11 @@ def monitor_node(state: AgentState) -> dict:
 
     is_error = _is_execution_failure(result)
 
+    # 의도적 SyntaxError/오타 실행 요청: 에러 출력이 곧 성공이므로 재시도하지 않음
+    if is_error and _user_wants_intentional_exec_error(user_request):
+        print("[DEBUG] Monitor: 의도적 오류 실행 요청 → 재시도 생략")
+        return {"content_irrelevant": False}
+
     # 1) 문법/런타임 에러 → 기존 로직: 에러 분석 후 재시도
     if is_error and retry < max_retry:
         truncated = _truncate_error(result)
@@ -2006,13 +2106,29 @@ def monitor_node(state: AgentState) -> dict:
 
 
 def route_after_monitor(state: AgentState) -> Literal["executor", "__end__"]:
+    user_request = state.get("user_request", "")
     result = state.get("execution_result", "")
     retry = state.get("retry_count", 0)
     is_error = _is_execution_failure(result)
     content_irrelevant = state.get("content_irrelevant", False)
+    # 의도적 SyntaxError 시나리오: Monitor가 재시도를 막아도 retry 카운트는 0이라
+    # 아래 분기만 보면 다시 executor로 가버림 → 한 번 더 돌며 '고쳐진' 성공 출력이 나올 수 있음.
+    if is_error and _user_wants_intentional_exec_error(user_request):
+        return "__end__"
     if (is_error or content_irrelevant) and retry < 2:
         return "executor"
     return "__end__"
+
+
+def route_after_planner(state: AgentState) -> Literal["planner_debate", "executor", "__end__"]:
+    """승인 후: 의도적 오류 샌드박스 테스트는 planner_debate(Ollama 2회) 생략 → 바로 executor."""
+    if state.get("approval_status") != "approved":
+        return "__end__"
+    user_request = state.get("user_request", "")
+    if _user_wants_intentional_exec_error(user_request):
+        print("[DEBUG] route_after_planner: 의도적 오류 실행 요청 → planner_debate 생략, executor로")
+        return "executor"
+    return "planner_debate"
 
 
 # ============ 그래프 빌드 ============
@@ -2036,7 +2152,11 @@ def build_graph(checkpointer=None):
     })
     workflow.add_edge("direct_answer", END)
     workflow.add_edge("use_existing_tool", END)
-    workflow.add_conditional_edges("planner", lambda s: "planner_debate" if s.get("approval_status") == "approved" else "__end__", {"planner_debate": "planner_debate", "__end__": END})
+    workflow.add_conditional_edges(
+        "planner",
+        route_after_planner,
+        {"planner_debate": "planner_debate", "executor": "executor", "__end__": END},
+    )
     workflow.add_edge("planner_debate", "executor")
     workflow.add_edge("executor", "monitor")
     workflow.add_conditional_edges("monitor", route_after_monitor, {"executor": "executor", "__end__": END})
@@ -2163,7 +2283,24 @@ def main():
                                 continue
                             # router 이후에도 문구가 그대로면 '멈춤'으로 보이므로 노드별로 갱신
                             if "router" in event:
-                                _safe_telegram_edit(bot, "🔍 요청 분류 중...", chat_id, status_msg.message_id)
+                                # 라우터는 이미 끝난 시점이다. 다음 단계 안내를 바로 바꿔야
+                                # '분류 중'에 멈춰 보이는 현상(Planner는 interrupt 전까지 stream 이벤트 없음)을 막는다.
+                                rpatch = event.get("router") or {}
+                                rt = rpatch.get("route_type") if isinstance(rpatch, dict) else None
+                                if rt == "planner":
+                                    _safe_telegram_edit(
+                                        bot,
+                                        "📋 실행 계획 수립 중... (논문·도구 RAG + 로컬 LLM, 최대 ~2분)\n"
+                                        "승인 전까지 화면이 그대로여도 정상입니다.",
+                                        chat_id,
+                                        status_msg.message_id,
+                                    )
+                                elif rt == "direct_answer":
+                                    _safe_telegram_edit(bot, "✍️ 답변을 작성하는 중입니다...", chat_id, status_msg.message_id)
+                                elif rt == "use_existing_tool":
+                                    _safe_telegram_edit(bot, "🔧 저장된 도구를 실행하는 중입니다...", chat_id, status_msg.message_id)
+                                else:
+                                    _safe_telegram_edit(bot, "🔍 요청 분류 중...", chat_id, status_msg.message_id)
                             elif "direct_answer" in event:
                                 _safe_telegram_edit(bot, "✍️ 답변을 작성하는 중입니다...", chat_id, status_msg.message_id)
                             elif "use_existing_tool" in event:
