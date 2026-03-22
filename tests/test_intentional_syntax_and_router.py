@@ -52,6 +52,22 @@ def test_complex_python_stays_planner():
     assert r.get("route_type") == "planner"
 
 
+def test_action_keywords_does_not_bypass_three_tier():
+    """action_keywords에 걸려도 3단 분기 먼저 적용 (코드 짜줘 등이 planner로 선점되지 않음)"""
+    r = _router_step1_hard_rules("파이썬 코드 짜줘", "파이썬 코드 짜줘".lower(), "x")
+    assert r.get("route_type") == "direct_answer"
+    assert r.get("python_example_direct") is True
+
+    # "작성해"가 짧은 예제형 휴리스틱에 걸림 → planner 선점이 아니라 direct_answer
+    r2 = _router_step1_hard_rules("코드 작성해줘", "코드 작성해줘".lower(), "x")
+    assert r2.get("route_type") == "direct_answer"
+    assert r2.get("python_example_direct") is True
+
+    r3 = _router_step1_hard_rules("코드 짜줘", "코드 짜줘".lower(), "x")
+    assert r3.get("route_type") == "direct_answer"
+    assert r3.get("python_example_direct") is True
+
+
 def test_plain_python_intro_not_forced_planner():
     """설명-only 요청은 이 하드룰로 planner에 강제되지 않아야 함"""
     text = "파이썬이 뭐야?"
@@ -68,6 +84,7 @@ if __name__ == "__main__":
     test_syntax_error_run_path_is_code_run_not_planner()
     test_simple_python_snippet_is_direct_example()
     test_complex_python_stays_planner()
+    test_action_keywords_does_not_bypass_three_tier()
     test_plain_python_intro_not_forced_planner()
     test_trivial_coding_skips_debate_heuristic()
     print("OK: intentional_syntax_and_router")

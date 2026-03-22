@@ -1263,6 +1263,11 @@ def _router_step1_hard_rules(
         "코드 작성해 줘", "스크립트 만들어 줘", "자동화해 줘",
     )
     if any(kw in user_request for kw in action_keywords):
+        # 예전에는 여기서 무조건 planner → 3단 분기(example/code_run)를 못 탐.
+        # action_keywords에 걸려도 먼저 _router_python_three_tier로 보냄.
+        py_route = _router_python_three_tier(user_request, req_lower)
+        if py_route is not None:
+            return py_route
         return {"route_type": "planner", "router_choice": "C"}
     existing_tool_keywords = ("기존 도구", "저장된 도구", "agent_tools", "이미 있는 도구", "만들어진 도구")
     if any(kw in user_request for kw in existing_tool_keywords) or ("도구" in user_request and "사용" in user_request):
