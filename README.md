@@ -6,9 +6,18 @@ arXiv 논문 수집·파싱, RAG, 파인튜닝 데이터 생성, 텔레그램 �
 
 ## 1. 실행 순서
 
+**Python 3.10+** 권장 (`agent_bot.py`·LangGraph·타입 힌트). macOS 기본 `/usr/bin/python3`(3.9)은 부족할 수 있습니다.
+
 ```bash
-# 1) 프로젝트 루트로 이동 후 가상환경 활성화
+# 0) (최초 1회) 가상환경 + 의존성 — langchain-ollama 등 누락 시 테스트가 import 단계에서 실패합니다
 cd /path/to/mini   # 저장소 클론 경로
+python3.12 -m venv .venv   # 또는 python3.11
+source .venv/bin/activate
+pip install -U pip && pip install -r requirements.txt
+python scripts/check_agent_env.py   # 필수 패키지 확인 (통과해야 agent_bot·pytest 의미 있음)
+
+# 1) 프로젝트 루트로 이동 후 가상환경 활성화
+cd /path/to/mini
 source .venv/bin/activate
 
 # 2) arXiv 논문 수집 → RAG DB 적재 → raw_data_queue 저장 (최초 1회 필수)
@@ -56,6 +65,9 @@ python run_backfill.py -s 2024-06-01 -e 2024-12-31 -b 20  # 20개씩 페이징
 | `LOCAL_LLM_MODEL` | 로컬 LLM 모델명 (기본값: `qwen3.5:9b`) | |
 | `E2B_API_KEY` | Agent 코드 실행 (E2B 샌드박스) | Agent 봇 사용 시 |
 | `TAVILY_API_KEY` | 웹/뉴스 검색 (Tavily) | 검색 기능 사용 시 |
+| `TUYA_*` | Tuya 스마트 플러그 (`agent_tools/smart_plug.py`) — `TUYA_CONTROL_MODE=local`(기본) 또는 `cloud` | 플러그 제어·스케줄 실행 시 |
+
+스마트 플러그 + cron 연동은 **`docs/SMART_PLUG_CRON.md`**, LAN이 막힌 기기는 **`docs/SMART_PLUG_CLOUD.md`** 참고.
 
 ---
 
@@ -153,7 +165,11 @@ tail -f agent.log
 
 ```bash
 pip install -r requirements.txt
+python scripts/check_agent_env.py
 ```
+
+- **`langchain-ollama`**: 라우터·플래너 등 로컬 Qwen (`ChatOllama`) — `requirements.txt`에 포함. 미설치 시 `ModuleNotFoundError: langchain_ollama`.
+- 점검 스크립트: `python scripts/check_agent_env.py` (`-q` 성공 시 무출력)
 
 ### 검색 도구 (`tavily_search_tool`) 의존성
 
