@@ -139,9 +139,12 @@ _STREAM_FAILURE_TELEGRAM_MSG = (
 class AgentState(TypedDict, total=False):
     user_request: str
     image_base64: str  # 직전 턴의 이미지(문맥용). Vision 라우팅은 message.photo 있을 때만.
-    route_type: Literal["direct_answer", "use_existing_tool", "planner"]
+    route_type: Literal["direct_answer", "use_existing_tool", "planner", "code_run"]
     router_choice: Literal["A", "B", "C"]  # A=일상, B=RAG, C=Plan&Code
     direct_response: str  # Router → Direct Answer 결과
+    python_example_direct: bool  # True: 짧은 코드 예제만(승인·E2B 없음)
+    light_monitor: bool  # code_run: 관련성 검수 생략·재시도 축소
+    skip_tool_save: bool  # 성공해도 agent_tools 저장 안 함
     agent_fatal_error: str  # 노드 내부 치명 오류 시 상위에서 통합 알림
     plan: list[str]
     approval_status: Literal["pending", "approved", "rejected"]
@@ -624,6 +627,152 @@ def _skip_planner_debate_for_fast_path(user_request: str) -> bool:
     return False
 
 
+def _classify_python_pipeline_tier(user_request: str, req_lower: str) -> Literal["example", "run", "complex"]:
+    """
+    파이썬/코딩 요청을 예제형 / 실행형 / 복잡형으로 나눔 (복잡 → 실행 → 예제 우선순위 아님: 복잡 먼저).
+    """
+    r = user_request or ""
+    compact_syn = req_lower.replace(" ", "")
+
+    complex_kw = (
+        "크롤링",
+        "스크래핑",
+        "도구 만들",
+        "도구를 만들",
+        "자동화",
+        "파일 읽",
+        "파일 쓰",
+        "파일을 읽",
+        "파일에 쓰",
+        "데이터베이스",
+        "mysql",
+        "postgres",
+        "mongodb",
+        "beautifulsoup",
+        "playwright",
+        "selenium",
+        "스케줄 등록",
+        "예약 등록",
+        "파이프라인",
+        "여러 단계",
+        "멀티 스텝",
+    )
+    if any(k in r for k in complex_kw):
+        return "complex"
+    if "http://" in r or "https://" in r:
+        return "complex"
+    if "api" in req_lower and any(k in r for k in ("호출", "연동", "키", "토큰", "openapi")):
+        return "complex"
+    if "github.com" in req_lower or "gitlab" in req_lower:
+        return "complex"
+
+    run_kw = (
+        "실행해",
+        "실행 해",
+        "실행해봐",
+        "실행해 봐",
+        "돌려",
+        "돌려봐",
+        "돌려 봐",
+        "돌려줘",
+        "결과 보여",
+        "출력해 줘",
+        "출력해줘",
+        "출력 보여",
+        "syntaxerror",
+        "오타를",
+        "오타 넣",
+        "오타를 넣",
+        "에러 나",
+        "에러내",
+        "에러 내",
+        "고의",
+        "일부러",
+        "샌드박스",
+        "테스트 실행",
+        "실행 결과",
+        "실행하고",
+        "실행해서",
+    )
+    if "syntaxerror" in compact_syn:
+        return "run"
+    if any(k in r for k in run_kw):
+        return "run"
+
+    ex_kw = (
+        "예제",
+        "구문",
+        "샘플",
+        "보여줘",
+        "보여 줘",
+        "어떻게 쓰",
+        "간단한 파이썬",
+        "간단한 코드",
+        "간단 파이썬",
+        "기본 문법",
+        "문법 예제",
+        "for문",
+        "if문",
+        "리스트 컴프리헨션",
+        "comprehension",
+        "배우고 싶",
+        "입문",
+    )
+    if any(k in r for k in ex_kw):
+        return "example"
+    if len(r) < 72 and ("짜줘" in r or "만들어줘" in r or "작성해" in r) and "실행" not in r and "돌려" not in r:
+        return "example"
+    if len(r) < 56 and "파이썬" in r and "실행" not in r and "돌려" not in r and "파일" not in r:
+        return "example"
+    return "complex"
+
+
+def _router_python_three_tier(user_request: str, req_lower: str) -> Optional[dict]:
+    """
+    파이썬·코딩 하드룰: 예제 → direct_answer, 실행 → code_run, 복잡 → planner.
+    명시적 파이썬 요청 또는 coding_keywords에 걸릴 때만 동작.
+    """
+    followup_indicators = ("더 자세히", "자세히", "그게", "그거", "그것", "그게 무슨", "무슨 뜻", "설명해 줘", "알려 줘")
+    explicit = _is_explicit_python_coding_request(user_request, req_lower)
+    coding_keywords = (
+        "도구 만들어",
+        "도구 만들",
+        "코드 짜",
+        "코드 작성",
+        "크롤링",
+        "스크래핑",
+        "계산",
+        "파이썬",
+        "스크립트",
+        "자동화",
+        "분석 도구",
+        "데이터 분석",
+        "API 호출",
+        "파일 읽",
+        "파일 쓰",
+    )
+    has_kw = any(kw in user_request for kw in coding_keywords)
+    if not explicit and not has_kw:
+        return None
+    if not explicit and any(f in user_request for f in followup_indicators) and len(user_request) <= 50:
+        return None
+
+    tier = _classify_python_pipeline_tier(user_request, req_lower)
+    print(f"[DEBUG] Router: 파이썬/코딩 3단 분류 → {tier} (explicit={explicit}, has_kw={has_kw})")
+    if tier == "example":
+        return {"route_type": "direct_answer", "router_choice": "A", "python_example_direct": True}
+    if tier == "run":
+        return {
+            "route_type": "code_run",
+            "router_choice": "C",
+            "approval_status": "approved",
+            "plan": ["사용자 요청에 맞게 파이썬 코드를 작성하고 print 등으로 실행 결과를 출력한다."],
+            "light_monitor": True,
+            "skip_tool_save": True,
+        }
+    return {"route_type": "planner", "router_choice": "C"}
+
+
 def _is_factual_lookup(user_request: str) -> bool:
     """사실 조회 질문 (Tavily 적합): X 알아?, X 뭐야?, X 설명해줘 등. 도구/스케줄 intent는 제외."""
     r = (user_request or "").lower().strip()
@@ -1079,9 +1228,6 @@ def _router_step1_hard_rules(
 
     if _is_smalltalk_or_memory_request(user_request, req_lower):
         return {"route_type": "direct_answer", "router_choice": "A"}
-    # 파이썬 코드 작성/실행·SyntaxError 실험 등 → 항상 planner (LLM 라우터·Tavily 등에 끌려가지 않게)
-    if _is_explicit_python_coding_request(user_request, req_lower):
-        return {"route_type": "planner", "router_choice": "C"}
     # 화이트리스트 먼저 (도구/스케줄 목록 등이 factual_lookup에 선점되지 않도록)
     whitelisted_tool = _match_whitelisted_tool(user_request, req_lower)
     if whitelisted_tool:
@@ -1146,15 +1292,9 @@ def _router_step1_hard_rules(
     code_blockers = ("코드", "크롤링", "스크래핑", "API", "파이썬", "스크립트", "짜줘", "만들어 줘")
     if any(k in user_request for k in knowledge_verbs) and not any(c in user_request for c in code_blockers):
         return {"route_type": "direct_answer", "router_choice": "B"}
-    coding_keywords = (
-        "도구 만들어", "도구 만들", "코드 짜", "코드 작성", "크롤링", "스크래핑",
-        "계산", "파이썬", "스크립트", "자동화", "분석 도구", "데이터 분석",
-        "API 호출", "파일 읽", "파일 쓰",
-    )
-    followup_indicators = ("더 자세히", "자세히", "그게", "그거", "그것", "그게 무슨", "무슨 뜻", "설명해 줘", "알려 줘")
-    if not (any(f in user_request for f in followup_indicators) and len(user_request) <= 50):
-        if any(kw in user_request for kw in coding_keywords):
-            return {"route_type": "planner", "router_choice": "C"}
+    py_route = _router_python_three_tier(user_request, req_lower)
+    if py_route is not None:
+        return py_route
     return None
 
 
@@ -1262,9 +1402,9 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
             rule_name = result.get("route_type", "")
             choice = result.get("router_choice", "")
             print(f"[DEBUG] Router: 1단계 하드룰 → {rule_name} ({choice})")
-            if is_scheduled and rule_name == "planner":
+            if is_scheduled and rule_name in ("planner", "code_run"):
                 result = {"route_type": "direct_answer", "router_choice": "B"}
-                print("[DEBUG] Router: 스케줄 작업 → planner 차단, direct_answer로 우회")
+                print("[DEBUG] Router: 스케줄 작업 → planner/code_run 차단, direct_answer로 우회")
             result = _maybe_override_rag_route(chat_id, user_request, result)
             return result
 
@@ -1283,9 +1423,9 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         result = _router_step3_llm_classify(user_request, session_context, rag_context, tools_context, tools_list_str)
         print(f"[DEBUG] Router: 3단계 LLM 분류 → {result.get('route_type')} (features={features})")
         # 스케줄 작업: planner는 승인 대기로 멈추므로, direct_answer로 강제 우회
-        if is_scheduled and result.get("route_type") == "planner":
+        if is_scheduled and result.get("route_type") in ("planner", "code_run"):
             result = {"route_type": "direct_answer", "router_choice": "B"}
-            print("[DEBUG] Router: 스케줄 작업 → planner 차단, direct_answer로 우회")
+            print("[DEBUG] Router: 스케줄 작업 → planner/code_run 차단, direct_answer로 우회")
         result = _maybe_override_rag_route(chat_id, user_request, result)
         return result
     except Exception as e:
@@ -1324,7 +1464,25 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         answer = ""
         if router_choice == "A":
             req_lower = user_request.lower()
-            if any(x in req_lower for x in ("안녕", "hello", "hi", "반가", "좋은 아침")):
+            if state.get("python_example_direct"):
+                session_ctx = session.get_recent_context(max_turns=2)
+                sys_pe = """<role>윤수르 — 파이썬 예제 도우미</role>
+<rules>
+- 한국어
+- 한두 문장 설명 후 ```python 코드 블록으로 짧은 예제만 제시
+- 요청에 맞는 문법·구문 이해용 최소 예제. argparse·범용 CLI 템플릿 남발 금지
+- 이모지 금지. 사고 과정(thinking) 출력 금지
+</rules>"""
+                prompt = f"""[최근 대화]
+{session_ctx if session_ctx else "(없음)"}
+
+[요청]
+{user_request}
+
+위 요청에 맞게 설명과 예제 코드만 답하라."""
+                content = _build_message_content(prompt, image_base64)
+                answer = _invoke_llm_with_fallback([SystemMessage(content=sys_pe), HumanMessage(content=content)])
+            elif any(x in req_lower for x in ("안녕", "hello", "hi", "반가", "좋은 아침")):
                 answer = "안녕하세요. 윤수르입니다."
             elif any(x in user_request for x in ("누구야", "누구니", "누구세요", "자기소개", "정체", "이름이 뭐야", "윤수르")):
                 answer = "윤수르입니다."
@@ -1618,8 +1776,8 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
         return {"execution_result": err_text, "used_tool_name": used_tool_name}
 
 
-def route_after_router(state: AgentState) -> Literal["direct_answer", "use_existing_tool", "planner"]:
-    """Router 분기: A,B→direct_answer, C→planner"""
+def route_after_router(state: AgentState) -> Literal["direct_answer", "use_existing_tool", "planner", "executor"]:
+    """Router 분기: code_run→executor(승인 생략), A/B→direct_answer, 기본 planner"""
     if (state.get("agent_fatal_error") or "").strip():
         return "direct_answer"
     r = state.get("route_type", "planner")
@@ -1627,6 +1785,8 @@ def route_after_router(state: AgentState) -> Literal["direct_answer", "use_exist
         return "direct_answer"
     if r == "use_existing_tool":
         return "use_existing_tool"
+    if r == "code_run":
+        return "executor"
     return "planner"
 
 
@@ -1940,11 +2100,16 @@ def executor_node(state: AgentState) -> dict:
         return {"generated_code": "", "execution_result": f"Error: {fe}"}
 
     try:
-        tools_context = get_tool_rag_store().format_topk_block(
-            state.get("user_request") or "", k=TOOL_RAG_TOP_K
-        )
-        rag = ChromaRAGTool()
-        rag_context = rag.search(state["user_request"])[:500] if state.get("user_request") else ""
+        is_code_run = state.get("route_type") == "code_run"
+        if is_code_run:
+            tools_context = ""
+            rag_context = ""
+        else:
+            tools_context = get_tool_rag_store().format_topk_block(
+                state.get("user_request") or "", k=TOOL_RAG_TOP_K
+            )
+            rag = ChromaRAGTool()
+            rag_context = rag.search(state["user_request"])[:500] if state.get("user_request") else ""
 
         llm = get_executor_llm()
         plan_str = "\n".join(f"{i+1}. {p}" for i, p in enumerate(state.get("plan", [])))
@@ -1965,6 +2130,13 @@ def executor_node(state: AgentState) -> dict:
 
 [사용자 요청 - 참고용]
 {user_request}"""
+
+        if is_code_run:
+            prompt += """
+
+[빠른 실행 경로]
+- 짧고 직접적인 스크립트. 불필요한 argparse·범용 CLI 뼈대는 쓰지 말 것.
+- 핵심 로직과 print 출력 위주."""
 
         if tools_context:
             prompt += f"""
@@ -2083,7 +2255,7 @@ def monitor_node(state: AgentState) -> dict:
     문법 에러 없어도, 실행 결과가 user_request와 무관하면 반려(Retry)."""
     result = state.get("execution_result", "")
     retry = state.get("retry_count", 0)
-    max_retry = 2
+    max_retry = 1 if state.get("light_monitor") else 2
     user_request = state.get("user_request", "")
 
     is_error = _is_execution_failure(result)
@@ -2113,8 +2285,13 @@ def monitor_node(state: AgentState) -> dict:
             hint = f"Monitor LLM 오류: {ex}. 코드를 점검해 재시도하세요."
         return {"retry_count": retry + 1, "error_hint": hint}
 
-    # 2) 에러 없음 → 실행 결과가 user_request와 관련 있는지 검수
-    if not is_error and retry < max_retry and _is_result_irrelevant(user_request, result):
+    # 2) 에러 없음 → 실행 결과가 user_request와 관련 있는지 검수 (code_run 경로는 생략)
+    if (
+        not is_error
+        and retry < max_retry
+        and not state.get("light_monitor")
+        and _is_result_irrelevant(user_request, result)
+    ):
         try:
             llm = get_monitor_llm()
             resp = llm.invoke(
@@ -2183,6 +2360,7 @@ def build_graph(checkpointer=None):
         "direct_answer": "direct_answer",
         "use_existing_tool": "use_existing_tool",
         "planner": "planner",
+        "executor": "executor",
     })
     workflow.add_edge("direct_answer", END)
     workflow.add_edge("use_existing_tool", END)
@@ -2331,6 +2509,13 @@ def main():
                                     )
                                 elif rt == "direct_answer":
                                     _safe_telegram_edit(bot, "✍️ 답변을 작성하는 중입니다...", chat_id, status_msg.message_id)
+                                elif rt == "code_run":
+                                    _safe_telegram_edit(
+                                        bot,
+                                        "💻 코드 작성·실행 중... (승인 생략, RAG·계획 단계 생략)",
+                                        chat_id,
+                                        status_msg.message_id,
+                                    )
                                 elif rt == "use_existing_tool":
                                     _safe_telegram_edit(bot, "🔧 저장된 도구를 실행하는 중입니다...", chat_id, status_msg.message_id)
                                 else:
@@ -2437,7 +2622,7 @@ def main():
             saved_tool = None
             retry_count = values.get("retry_count", 0)
             error_hint = values.get("error_hint", "")
-            if code and not _is_execution_failure(result):
+            if code and not _is_execution_failure(result) and not values.get("skip_tool_save"):
                 saved_tool = AgentSkillLibrary().save_tool(code, request)
                 if saved_tool:
                     _remember_tool(chat_id, Path(saved_tool).stem, request)

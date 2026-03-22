@@ -2,10 +2,10 @@
 """
 동일 사용자 문장으로 LangGraph를 텔레그램 없이 돌림.
 
-  기본: interrupt → '승인' → executor/monitor 까지 + 단계별 소요 시간(초)
-  --reject: interrupt → '거절' 까지만 (Gemini/E2B 불필요)
+  기본: SyntaxError 의도 요청 → code_run 경로(승인 생략) → executor/monitor + 타이밍
+  --reject: 복잡(planner) 요청 → interrupt → '거절' (Ollama만, Gemini/E2B 불필요)
 
-로컬: Ollama(플래너), 승인 플로우 시 GEMINI_API_KEY + E2B_API_KEY.
+로컬: code_run·거절 플로우는 Ollama; 기본 완주는 GEMINI_API_KEY + E2B_API_KEY.
 """
 from __future__ import annotations
 
@@ -37,6 +37,10 @@ USER_RAW = (
     "윤수르, 파이썬으로 1부터 10까지 더하는 코드를 짜는데, "
     "일부러 오타(SyntaxError)를 하나 넣어서 실행해 봐"
 )
+# planner + interrupt 검증용 (복잡형 분류)
+USER_PLANNER_COMPLEX = (
+    "파이썬으로 mysql 데이터베이스에 연결해서 테이블 목록만 조회하는 스크립트 작성해줘"
+)
 
 
 def _run_timed_stream(graph, payload, cfg, label: str) -> dict[str, float]:
@@ -56,8 +60,8 @@ def _run_timed_stream(graph, payload, cfg, label: str) -> dict[str, float]:
 
 
 def run_reject_flow() -> int:
-    text = strip_wake_word(USER_RAW)
-    print("=== 거절 플로우만 (승인 단계에서 '거절') ===")
+    text = USER_PLANNER_COMPLEX.strip()
+    print("=== 거절 플로우 (planner → interrupt → 거절) ===")
     print("요청:", text[:90], "…" if len(text) > 90 else "")
 
     fd, db_path = tempfile.mkstemp(suffix="_e2e_reject.db")
@@ -108,7 +112,7 @@ def run_reject_flow() -> int:
 
 def run_approve_flow() -> int:
     text = strip_wake_word(USER_RAW)
-    print("=== 승인 플로우 (승인 → 실행 → SyntaxError 유지) ===")
+    print("=== code_run 플로우 (승인 생략 → 실행 → SyntaxError 유지) ===")
     print("요청:", text[:90], "…" if len(text) > 90 else "")
 
     if not os.getenv("GEMINI_API_KEY"):
@@ -139,51 +143,37 @@ def run_approve_flow() -> int:
         }
 
         t0 = time.perf_counter()
-        seg1 = _run_timed_stream(graph, init_state, cfg, "① 라우터~플래너 (승인 전, interrupt)")
+        seg = _run_timed_stream(graph, init_state, cfg, "① 라우터 → executor → monitor (한 번에)")
         st = graph.get_state(cfg)
-        print(f"   → next: {st.next}")
+        print(f"   → next: {st.next} (None이면 정상 종료)")
 
-        if not st.next:
-            print("FAIL: interrupt 없음")
-            return 3
-
-        t_approve = time.perf_counter()
-        seg2 = _run_timed_stream(graph, Command(resume="승인"), cfg, "② resume=승인 이후 (플래너 마무리~monitor)")
-        t_after_approve = time.perf_counter()
-        approve_to_end = t_after_approve - t_approve
-
-        st = graph.get_state(cfg)
         if st.next:
-            print(f"FAIL: 아직 next={st.next}")
+            print(f"FAIL: code_run은 interrupt 없이 끝나야 함. next={st.next}")
             return 3
 
         vals = st.values or {}
         total = time.perf_counter() - t0
 
         print("\n" + "=" * 60)
-        print("타임 요약")
+        print("타임 요약 (code_run, 승인 생략)")
         print("=" * 60)
-        print(f"  ① 승인 전(메시지 수신 ~ 계획·interrupt): {sum(seg1.values()):.1f}s")
-        print("      (참고: LangGraph는 interrupt 직전까지 노드 완료 이벤트가 거의 없어")
-        print("       대기 시간이 __interrupt__ 한 줄에 몰려 보일 수 있음 ≈ RAG+Ollama 플래너)")
-        if seg1:
-            for k, v in sorted(seg1.items(), key=lambda x: -x[1]):
-                print(f"      - {k}: {v:.1f}s")
-        print(f"  ② 승인 직후 ~ 최종 응답 완료:           {approve_to_end:.1f}s")
-        if seg2:
-            for k, v in sorted(seg2.items(), key=lambda x: -x[1]):
-                print(f"      - {k}: {v:.1f}s")
-        print(f"  합계(세션 전체):                        {total:.1f}s")
+        print(f"  합계: {total:.1f}s")
+        for k, v in sorted(seg.items(), key=lambda x: -x[1]):
+            print(f"      - {k}: {v:.1f}s")
         print("=" * 60)
 
-        print("\napproval_status:", vals.get("approval_status"))
+        print("\nroute_type:", vals.get("route_type"))
+        print("approval_status:", vals.get("approval_status"))
         er = vals.get("execution_result") or ""
         print("execution_result (앞 800자):\n", er[:800])
 
-        if "planner_debate" in seg2:
-            print("\n⚠️ planner_debate 가 실행됨 — 의도적 오류 요청이면 생략되어야 함")
+        if vals.get("route_type") != "code_run":
+            print("\n⚠️ route_type이 code_run이 아님")
         else:
-            print("\n✅ planner_debate 생략됨 (의도적 SyntaxError 경로)")
+            print("\n✅ code_run 경로 (planner·승인 생략)")
+
+        if "planner" not in seg:
+            print("✅ planner 노드 미실행 (code_run 기대)")
 
         if "SyntaxError" in er or "syntax" in er.lower():
             print("✅ SyntaxError 포함 (의도적 오류 시나리오)")

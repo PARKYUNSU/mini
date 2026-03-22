@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from agent_telegram import strip_wake_word
 from agent_bot import (
+    _classify_python_pipeline_tier,
     _is_explicit_python_coding_request,
     _router_step1_hard_rules,
     _skip_planner_debate_for_fast_path,
@@ -26,14 +27,29 @@ def test_strip_and_intentional_flag():
     assert _user_wants_intentional_exec_error(text) is True
 
 
-def test_explicit_python_router():
+def test_syntax_error_run_path_is_code_run_not_planner():
+    """실행+SyntaxError 요청은 승인 없이 code_run (planner 생략)"""
     text = strip_wake_word(USER_MSG)
     req_lower = text.lower()
     assert _is_explicit_python_coding_request(text, req_lower) is True
+    assert _classify_python_pipeline_tier(text, req_lower) == "run"
     r = _router_step1_hard_rules(text, req_lower, "dummy_chat_id")
     assert r is not None
+    assert r.get("route_type") == "code_run"
+    assert r.get("approval_status") == "approved"
+    assert r.get("skip_tool_save") is True
+
+
+def test_simple_python_snippet_is_direct_example():
+    r = _router_step1_hard_rules("간단한 파이썬 구문 만들어줘", "간단한 파이썬 구문 만들어줘".lower(), "x")
+    assert r.get("route_type") == "direct_answer"
+    assert r.get("python_example_direct") is True
+
+
+def test_complex_python_stays_planner():
+    msg = "파이썬으로 mysql 데이터베이스에 연결하는 코드 작성해줘"
+    r = _router_step1_hard_rules(msg, msg.lower(), "x")
     assert r.get("route_type") == "planner"
-    assert r.get("router_choice") == "C"
 
 
 def test_plain_python_intro_not_forced_planner():
@@ -49,7 +65,9 @@ def test_trivial_coding_skips_debate_heuristic():
 
 if __name__ == "__main__":
     test_strip_and_intentional_flag()
-    test_explicit_python_router()
+    test_syntax_error_run_path_is_code_run_not_planner()
+    test_simple_python_snippet_is_direct_example()
+    test_complex_python_stays_planner()
     test_plain_python_intro_not_forced_planner()
     test_trivial_coding_skips_debate_heuristic()
     print("OK: intentional_syntax_and_router")

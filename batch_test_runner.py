@@ -121,6 +121,7 @@ def test_direct(category_name, cases, chat_id):
                     {
                         "user_request": question,
                         "router_choice": route_info.get("router_choice", "A"),
+                        "python_example_direct": route_info.get("python_example_direct"),
                     },
                     config=cfg,
                 )
@@ -181,12 +182,17 @@ def run_graph_case(graph, question, chat_id, expected, idx):
             state = graph.get_state(cfg)
             values = state.values if hasattr(state, "values") else {}
         actual = values.get("router_choice", actual)
-        if values.get("route_type") == "planner":
+        if values.get("route_type") in ("planner", "code_run"):
             preview = values.get("execution_result", "")[:500]
             code = values.get("generated_code", "")
             result = values.get("execution_result", "")
             request = values.get("user_request", question)
-            if code and result and not any(x in result for x in ("오류", "Error", "Exception", "Timeout")):
+            if (
+                code
+                and result
+                and not values.get("skip_tool_save")
+                and not any(x in result for x in ("오류", "Error", "Exception", "Timeout"))
+            ):
                 saved_tool = AgentSkillLibrary().save_tool(code, request)
         elif values.get("route_type") == "use_existing_tool":
             preview = values.get("execution_result", "")[:500]
