@@ -64,7 +64,9 @@ def test_full_graph():
     try:
         from agent_bot import build_graph
         import sqlite3
-        conn = sqlite3.connect("./agent_checkpoints.db")
+
+        # LangGraph 체크포인트는 워커 스레드에서 접근함 — check_same_thread=False 필수
+        conn = sqlite3.connect("./agent_checkpoints.db", check_same_thread=False)
         from langgraph.checkpoint.sqlite import SqliteSaver
         graph = build_graph(checkpointer=SqliteSaver(conn))
         cfg = {"configurable": {"thread_id": "test_flow", "chat_id": "8587793069", "bot": None}}
