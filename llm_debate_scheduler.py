@@ -23,7 +23,7 @@ import google.generativeai as genai
 import schedule
 import telebot
 from dotenv import load_dotenv
-from langchain_community.chat_models.ollama import ChatOllama
+from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
 
 load_dotenv()
@@ -437,7 +437,11 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
     # 1. Qwen 초안
     print(f"    [1/3] Qwen 초안 생성 중...")
     try:
-        llm_qwen = ChatOllama(model=OLLAMA_MODEL, temperature=0.2)
+        llm_qwen = ChatOllama(
+            model=OLLAMA_MODEL,
+            base_url=os.getenv("OLLAMA_HOST", "http://localhost:11434"),
+            temperature=0.2,
+        )
         draft_prompt = f"""다음 학술 논문 본문을 읽고, 핵심 내용을 묻고 답하는 Q&A 1세트를 작성해.
 형식: 질문 1개 + 답변 1개. JSON 형태로 instruction과 output만 출력해.
 설명 문장, 머리말, 코드블록 마크다운 없이 아래 JSON 객체 1개만 출력:

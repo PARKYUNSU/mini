@@ -31,7 +31,7 @@ def _load_yaml(path: Path) -> list:
 
 
 def test_search_intent():
-    from agent_bot import _get_search_intent
+    from agent_router_rules import get_search_intent
 
     cases_path = Path(__file__).parent / "golden_routing_cases.yaml"
     cases = _load_yaml(cases_path)
@@ -42,21 +42,22 @@ def test_search_intent():
         expected = c.get("expected_search_intent")
         if expected is None:
             continue
-        got = _get_search_intent(inp, inp.lower())
+        got = get_search_intent(inp, inp.lower())
         assert got == expected, f"[{i+1}] {inp!r} → expected {expected}, got {got}"
     print(f"  OK: search_intent {len(cases)} cases")
 
 
 def test_whitelisted_tool():
-    from agent_bot import _match_whitelisted_tool
+    from agent_router_rules import match_whitelisted_tool
 
     cases_path = Path(__file__).parent / "golden_routing_cases.yaml"
+    agent_tools_dir = Path(__file__).resolve().parents[1] / "agent_tools"
     cases = _load_yaml(cases_path)
 
     for i, c in enumerate(cases):
         inp = c.get("input", "")
         expected = c.get("expected_tool")
-        got = _match_whitelisted_tool(inp, inp.lower())
+        got = match_whitelisted_tool(inp, inp.lower(), agent_tools_dir)
         exp_val = None if expected is None or expected == "null" else expected
         assert got == exp_val, f"[{i+1}] {inp!r} → expected tool {exp_val}, got {got}"
     print(f"  OK: whitelisted_tool {len(cases)} cases")

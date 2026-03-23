@@ -23,6 +23,7 @@ from retry_utils import retry_on_network_error
 
 # arXiv API 네임스페이스 (Atom 1.0)
 ATOM_NS = "http://www.w3.org/2005/Atom"
+OPENSEARCH_NS = "http://a9.com/-/spec/opensearch/1.1/"
 ARXIV_NS = {
     "atom": ATOM_NS,
     "arxiv": "http://arxiv.org/schemas/atom",
@@ -156,6 +157,42 @@ class ArxivFetcher:
             end_ts = end_date.replace("-", "") + "2359"
             base = f"{base} AND submittedDate:[{start_ts} TO {end_ts}]"
         return base
+
+    def get_search_total_results(
+        self,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> Optional[int]:
+        """
+        동일 검색식에 대해 arXiv API가 보고하는 총 결과 수(opensearch:totalResults).
+        백필 진행률·완주 여부 확인용. (네트워크/파싱 실패 시 None)
+        """
+        search_query = self._build_search_query(start_date, end_date)
+        params = {
+            "search_query": search_query,
+            "start": 0,
+            "max_results": 1,
+            "sortBy": "submittedDate",
+            "sortOrder": "descending",
+        }
+        url = f"{self.BASE_URL}?{urlencode(params)}"
+        try:
+            response = self._get_with_retry(url, timeout=30)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            print(f"⚠️  API 총건수 조회 실패: {e}")
+            return None
+        try:
+            root = ET.fromstring(response.content)
+            el = root.find(f".//{{{OPENSEARCH_NS}}}totalResults")
+            if el is not None and el.text and el.text.strip():
+                return int(el.text.strip())
+            for elem in root.iter():
+                if elem.tag.endswith("totalResults") and elem.text and elem.text.strip():
+                    return int(elem.text.strip())
+        except (ET.ParseError, ValueError) as e:
+            print(f"⚠️  API 총건수 파싱 실패: {e}")
+        return None
 
     def fetch_metadata_batch(
         self,

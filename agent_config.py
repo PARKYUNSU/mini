@@ -43,5 +43,11 @@ LLM_RETRY_DELAY_SEC = 1.5
 
 
 def ollama_kwargs(**extra) -> dict:
-    """Ollama 공통 옵션: timeout·keep_alive로 Broken pipe 방지"""
-    return {"model": OLLAMA_MODEL, "timeout": OLLAMA_TIMEOUT, "keep_alive": OLLAMA_KEEP_ALIVE, **extra}
+    """Ollama 공통 옵션: base_url·timeout·keep_alive (langchain_ollama.ChatOllama 호환)."""
+    return {
+        "model": OLLAMA_MODEL,
+        "base_url": os.getenv("OLLAMA_HOST", "http://localhost:11434"),
+        "timeout": OLLAMA_TIMEOUT,
+        "keep_alive": OLLAMA_KEEP_ALIVE,
+        **extra,
+    }

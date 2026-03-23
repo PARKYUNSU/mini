@@ -100,23 +100,24 @@ def _cron_worker_loop() -> None:
 
 
 def main() -> None:
-    if not os.getenv("GEMINI_API_KEY"):
-        print("❌ .env에 GEMINI_API_KEY를 설정하세요.")
-        return
-
-    # 매일 06:00 - arXiv 파이프라인
-    schedule.every().day.at("06:00").do(run_arxiv_pipeline)
-
-    # 매주 토요일 02:00 - LLM 토론 (2시간 배치)
-    schedule.every().saturday.at("02:00").do(run_llm_debate)
+    # Gemini 없어도 cron_engine(봇 스케줄)은 돌아야 함. 예전에는 여기서 return 해 Ollama 전용일 때 job이 영원히 안 돌았음.
+    if os.getenv("GEMINI_API_KEY"):
+        schedule.every().day.at("06:00").do(run_arxiv_pipeline)
+        schedule.every().saturday.at("02:00").do(run_llm_debate)
+    else:
+        print(
+            "⚠️ GEMINI_API_KEY 없음 — arXiv(06:00)·LLM토론(토 02:00)만 건너뜁니다.\n"
+            "   cron_engine(등록한 매일/주간 작업)은 계속 동작합니다."
+        )
 
     # cron_engine: 1분마다 due job 체크 → 윤수르 LangGraph 트리거 → 텔레그램 선톡
     cron_thread = threading.Thread(target=_cron_worker_loop, daemon=True)
     cron_thread.start()
 
     print("📅 통합 스케줄러 시작")
-    print("   - arXiv 파이프라인: 매일 06:00")
-    print("   - LLM 토론: 매주 토요일 02:00")
+    if os.getenv("GEMINI_API_KEY"):
+        print("   - arXiv 파이프라인: 매일 06:00")
+        print("   - LLM 토론: 매주 토요일 02:00")
     print("   - cron_engine: 1분마다 due job 체크 → 텔레그램 선톡")
     print("   - 메인 봇: 별도 터미널에서 python agent_bot.py")
     print("   Ctrl+C로 종료\n")

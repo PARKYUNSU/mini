@@ -109,7 +109,11 @@ mini/
 ├── main.py                 # arXiv 파이프라인 (수집 → RAG → raw_data_queue)
 ├── run_backfill.py         # 과거 논문 대량 수집 (백필: 수집/RAG 전용)
 ├── bot.py                  # [Legacy] 단순 RAG 테스트용
-├── agent_bot.py            # 메인 봇 (RAG + Agent 통합)
+├── agent_bot.py            # 텔레그램 진입·run_or_resume (그래프는 agent_graph)
+├── agent_graph.py          # LangGraph 조립 (build_graph)
+├── agent_nodes.py          # 라우터·플래너·실행기·모니터 노드
+├── agent_session.py        # 세션 메모리·오답 노트·논문 모드·플랜 캐시 등
+├── agent_prompts.py        # LLM 시스템/유저 프롬프트 문자열
 ├── llm_debate_scheduler.py # LLM 토론 스케줄러 (학습용 Q&A 생성 전담)
 ├── run_scheduler.py        # 통합 스케줄러 (main + 토론)
 ├── src/
@@ -170,6 +174,26 @@ python scripts/check_agent_env.py
 
 - **`langchain-ollama`**: 라우터·플래너 등 로컬 Qwen (`ChatOllama`) — `requirements.txt`에 포함. 미설치 시 `ModuleNotFoundError: langchain_ollama`.
 - 점검 스크립트: `python scripts/check_agent_env.py` (`-q` 성공 시 무출력)
+
+**회귀 확인 (권장 순서):**
+
+```bash
+source .venv/bin/activate
+python scripts/check_agent_env.py          # 또는 -q (성공 시 무출력)
+python -c "import agent_bot; import agent_graph; print('import OK')"   # 모듈 스모크
+pip install -r requirements-dev.txt        # 최초 1회: pytest
+pytest tests/ -v --tb=short                # 라우터·골든 케이스 (가벼움, LLM 불필요)
+```
+
+- **`test_agent_flow.py`**: Ollama·Gemini·Chroma·E2B 등 **실서비스 연동** 점검. `ollama serve` 및 `.env` 준비 후 수동 실행 (`python test_agent_flow.py`). 첫 단계에서 LLM 응답 대기로 시간이 걸릴 수 있음.
+- **`batch_test_runner.py`**: LangGraph + 라우터/직접응답을 **실제 LLM**으로 돌리는 배치. API·로컬 모델 준비된 환경에서만 실행 권장.
+
+**라우터 단위 테스트 (pytest 없이):** `agent_router_rules.py`는 langchain/chromadb 없이 import 가능합니다.
+
+```bash
+python tests/test_intentional_syntax_and_router.py
+python tests/test_routing_golden.py
+```
 
 ### 검색 도구 (`tavily_search_tool`) 의존성
 

@@ -9,9 +9,14 @@ load_dotenv()
 def test_ollama():
     print("1. Ollama (Planner) 테스트...")
     try:
-        from langchain_community.chat_models.ollama import ChatOllama
         from langchain_core.messages import HumanMessage
-        llm = ChatOllama(model=os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b"), temperature=0.2)
+        from langchain_ollama import ChatOllama
+
+        llm = ChatOllama(
+            model=os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b"),
+            base_url=os.getenv("OLLAMA_HOST", "http://localhost:11434"),
+            temperature=0.2,
+        )
         r = llm.invoke([HumanMessage(content="1+1은? 한 단어로")])
         print(f"   OK: {r.content[:50]}...")
     except Exception as e:

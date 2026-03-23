@@ -11,7 +11,8 @@ from agent_config import ollama_kwargs
 
 # Lazy import to avoid loading Ollama at module load
 def _get_ollama_llm():
-    from langchain_community.chat_models.ollama import ChatOllama
+    from langchain_ollama import ChatOllama
+
     return ChatOllama(**ollama_kwargs(temperature=0.2))
 
 

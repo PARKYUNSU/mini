@@ -127,6 +127,14 @@ def run_backfill(
         print(f"   ⏱️  시간 제한: {time_limit_sec // 3600}시간 {time_limit_sec % 3600 // 60}분")
     print("=" * 60)
 
+    print("📊 arXiv API 총 검색 결과(opensearch:totalResults) 조회 중...")
+    api_total = fetcher.get_search_total_results(start_date, end_date)
+    if api_total is not None:
+        print(f"   → 이 쿼리 기준 총 {api_total:,}건 (페이징 끝까지 가면 메타데이터 수신 합이 이 값과 같아야 함)")
+    else:
+        print("   → 총건수를 가져오지 못했습니다. 로그의 메타 수신 합만 참고하세요.")
+    print()
+
     total_success = 0
     total_fetched = 0
     success_papers: list[tuple[str, str]] = []
@@ -250,8 +258,28 @@ def run_backfill(
             break
 
     print("\n" + "=" * 60)
-    print(f"🎉 백필 완료: {total_success}/{total_fetched}개 논문 처리 성공")
+    print(f"🎉 백필 종료: 저장 성공 {total_success:,}건 / 메타데이터 수신 합 {total_fetched:,}건")
+    if api_total is not None:
+        print(f"   arXiv API 총건수(totalResults): {api_total:,}건")
+        if total_fetched == api_total:
+            print("   → 수신 합 = API 총건: 해당 기간·카테고리 목록 페이징을 끝까지 본 상태로 보면 됩니다.")
+        elif total_fetched < api_total:
+            print("   → 수신 합 < API 총건: 시간 제한·오류·중지 등으로 중간에 끊겼을 수 있습니다.")
+    if total_fetched > 0 and total_success < total_fetched:
+        print(f"   참고: 수신 대비 저장 성공이 적음 (다운로드·파싱 실패 또는 이미 저장된 중복 등)")
     print("=" * 60 + "\n")
+
+    stat_bits: list[str] = []
+    if api_total is not None:
+        stat_bits.append(f"API총건: {api_total:,}")
+    stat_bits.append(f"메타수신합: {total_fetched:,}")
+    stat_bits.append(f"저장성공: {total_success:,}")
+    if api_total is not None:
+        if total_fetched == api_total:
+            stat_bits.append("페이징완주")
+        elif total_fetched < api_total:
+            stat_bits.append("페이징미완주가능")
+    stats_line = " | ".join(stat_bits)
 
     # 텔레그램 알림 (TELEGRAM_TOKEN, ALLOWED_CHAT_ID 설정 시)
     if success_papers:
@@ -261,7 +289,8 @@ def run_backfill(
             "🔔 arXiv 백필 수집 알림\n"
             f"실행 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
             f"처리 결과: {total_success}개 논문 수집 및 RAG 적재 완료\n"
-            f"수집 기간: {start_date} ~ {end_date}\n\n"
+            f"수집 기간: {start_date} ~ {end_date} ({category})\n"
+            f"{stats_line}\n\n"
             "[신규 논문]\n"
             + "\n".join(preview_lines)
         )
@@ -274,7 +303,8 @@ def run_backfill(
         _send_telegram_notification(
             "ℹ️ arXiv 백필 수집 스킵\n"
             f"실행 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-            f"수집 기간: {start_date} ~ {end_date}\n"
+            f"수집 기간: {start_date} ~ {end_date} ({category})\n"
+            f"{stats_line}\n"
             "사유: 처리 성공한 논문이 없습니다."
         )
 

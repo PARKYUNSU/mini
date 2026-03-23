@@ -1,0 +1,3 @@
+# 개발·회귀 테스트 (선택)
+-r requirements.txt
+pytest>=8.0.0
