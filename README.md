@@ -185,7 +185,7 @@ pip install -r requirements-dev.txt        # 최초 1회: pytest
 pytest tests/ -v --tb=short                # 라우터·골든 케이스 (가벼움, LLM 불필요)
 ```
 
-- **`test_agent_flow.py`**: Ollama·Gemini·Chroma·E2B·LangGraph 점검. 4번 E2B는 `실행 오류`면 **FAIL**로 표시. 5a는 `print(1+1)`이 산수 하드룰로 **direct_answer** 가는 스모크, 5b는 **code_run→executor** 경로 확인. `ollama serve` 및 `.env` 필요. LLM·E2B 대기로 느릴 수 있음.
+- **`test_agent_flow.py`**: Ollama·Gemini·Chroma·E2B·LangGraph 점검. 4번 E2B는 `실행 오류`면 **FAIL**로 표시. 5a는 `print(1+1)`이 산수 하드룰로 **direct_answer** 스모크. 5b는 **code_run→executor** (문장에 `hello` 등이 들어가면 인사 하드룰로 빠지므로 피함). `ollama serve` 및 `.env` 필요.
 - **`batch_test_runner.py`**: LangGraph + 라우터/직접응답을 **실제 LLM**으로 돌리는 배치. API·로컬 모델 준비된 환경에서만 실행 권장.
 
 **라우터 단위 테스트 (pytest 없이):** `agent_router_rules.py`는 langchain/chromadb 없이 import 가능합니다.

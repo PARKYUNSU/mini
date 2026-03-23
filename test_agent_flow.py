@@ -3,7 +3,8 @@
 
 - 5a: `print(1+1) 실행해줘` 는 라우터 산수 패턴(`\\d+\\+\\d+`)에 걸려 **direct_answer** 로 가는 것이
   현재 규칙상 정상입니다 (스모크: 그래프·SqliteSaver·체크포인트).
-- 5b: `+` 없는 실행 문장으로 **code_run → executor** 경로를 추가 검증합니다.
+- 5b: **code_run → executor** 경로 검증. `len('hello')` 처럼 문장 안에 `hello`가 들어가면
+  인사 하드룰(`hi`/`hello` 부분일치)에 걸려 direct_answer가 되므로 **피해야 함**.
 """
 import os
 os.environ.setdefault("OLLAMA_HOST", "http://localhost:11434")
@@ -125,15 +126,15 @@ def test_full_graph_smoke():
 
 
 def test_full_graph_code_run():
-    """`\\d+ \\+ \\d+` 형태가 없어 산수 하드룰을 피하고 code_run으로 가는지 확인."""
+    """산수 패턴(`1+1`)·인사 하드룰(문장 속 `hello` 등)을 피해 code_run인지 확인."""
     print("5b. LangGraph code_run → executor 경로...")
     try:
         from agent_bot import build_graph
         import sqlite3
         from langgraph.checkpoint.sqlite import SqliteSaver
 
-        # '+' 산수 패턴 없음 → is_smalltalk 산수 룰 미적용, '실행해' → tier run → code_run
-        msg = "파이썬으로 len('hello')를 print하는 한 줄만 실행해 줘"
+        # 파이썬+코드+실행해 → tier run. (len('hello')는 req_lower에 'hello'가 들어가 인사로 오분류됨)
+        msg = "파이썬으로 1부터 10까지 합을 print하는 코드 실행해줘"
         conn = sqlite3.connect("./agent_checkpoints.db", check_same_thread=False)
         graph = build_graph(checkpointer=SqliteSaver(conn))
         cfg = {"configurable": {"thread_id": "test_flow_coderun", "chat_id": "8587793069", "bot": None}}
