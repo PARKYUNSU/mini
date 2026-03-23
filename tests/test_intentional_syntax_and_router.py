@@ -3,20 +3,41 @@
 
 agent_telegram은 import 시 pyTelegramBotAPI 등이 필요하므로,
 라우터만 검증할 때는 wake word 제거를 테스트 내에서 처리합니다.
+
+환경: agent_bot은 langchain_ollama·chromadb 등 전체 의존성을 끌어옵니다.
+venv + `pip install -r requirements.txt` 후 `python scripts/check_agent_env.py` 로 선확인 권장 (README §1·§6).
 """
 import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_ROOT))
 
-from agent_bot import (
-    _classify_python_pipeline_tier,
-    _is_explicit_python_coding_request,
-    _router_step1_hard_rules,
-    _skip_planner_debate_for_fast_path,
-    _user_wants_intentional_exec_error,
-)
+try:
+    from agent_bot import (
+        _classify_python_pipeline_tier,
+        _is_explicit_python_coding_request,
+        _router_step1_hard_rules,
+        _skip_planner_debate_for_fast_path,
+        _user_wants_intentional_exec_error,
+    )
+except ModuleNotFoundError as e:
+    _hint = f"""
+[테스트 import 실패] {e}
+
+이 메시지는 README·scripts/check_agent_env.py 보강이 필요한 이유와 같습니다.
+agent_bot.py는 라우터 테스트만 해도 langchain_ollama, chromadb 등이 모두 필요합니다.
+
+해결 (프로젝트 루트: {_ROOT}):
+  1) Python 3.10+ venv 권장
+  2) pip install -r requirements.txt
+  3) python scripts/check_agent_env.py
+
+자세한 절차: README.md \"1. 실행 순서\", \"6. 의존성\"
+"""
+    print(_hint, file=sys.stderr)
+    raise SystemExit(1) from e
 
 
 def _strip_wake_word(text: str) -> str:
