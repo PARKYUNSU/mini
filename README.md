@@ -201,7 +201,7 @@ pytest tests/ -m external -q               # 키·서비스 준비된 환경에�
   - **B · integration**: `tests/test_node_contracts.py`(router/direct_answer/executor/monitor mock), `tests/test_graph_smoke.py`.  
   - **C · external**: `tests/test_external_integration.py` — 로컬에서 키·Ollama 있을 때만 의미 있음.  
   - **D · 수동**: `test_agent_flow.py` 스크립트(SKIP/FAIL 구분).
-- **GitHub Actions**: 저장소 루트에 `.github/workflows/ci.yml` — `mini/`에서 `check_agent_env.py -q` 후 `pytest tests/`.
+- **GitHub Actions**: 이 저장소 루트의 `.github/workflows/ci.yml` — `check_agent_env.py -q` 후 `pytest tests/ -m "not external" -q` (Ollama/Gemini/E2B 실호출 제외).
 - **`batch_test_runner.py`**: LangGraph + 라우터/직접응답을 **실제 LLM**으로 돌리는 배치. API·로컬 모델 준비된 환경에서만 실행 권장.
 
 **라우터 단위 테스트 (pytest 없이):** `agent_router_rules.py`는 langchain/chromadb 없이 import 가능합니다.
