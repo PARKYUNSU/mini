@@ -64,6 +64,8 @@ python run_backfill.py -s 2024-06-01 -e 2024-12-31 -b 20  # 20개씩 페이징
 | `ALLOWED_CHAT_ID` | 접근 허용 Chat ID (쉼표 구분) | ✅ |
 | `LOCAL_LLM_MODEL` | 로컬 LLM 모델명 (기본값: `qwen3.5:9b`) | |
 | `E2B_API_KEY` | Agent 코드 실행 (E2B 샌드박스) | Agent 봇 사용 시 |
+| `E2B_SANDBOX_ENV_MODE` | `full`(기본): 호스트 환경 전부를 샌드박스에 전달. `minimal`: LANG·UTF-8 등만 전달(`.env` 역슬래시·unicodeescape 이슈 완화) | |
+| `E2B_SANDBOX_EXTRA_KEYS` | `minimal`일 때 추가로 넘길 키 목록(쉼표 구분), 예: `WEATHER_API_KEY,TAVILY_API_KEY` | |
 | `TAVILY_API_KEY` | 웹/뉴스 검색 (Tavily) | 검색 기능 사용 시 |
 | `TUYA_*` | Tuya 스마트 플러그 (`agent_tools/smart_plug.py`) — `TUYA_CONTROL_MODE=local`(기본) 또는 `cloud` | 플러그 제어·스케줄 실행 시 |
 
@@ -110,6 +112,8 @@ mini/
 ├── run_backfill.py         # 과거 논문 대량 수집 (백필: 수집/RAG 전용)
 ├── bot.py                  # [Legacy] 단순 RAG 테스트용
 ├── agent_bot.py            # 텔레그램 진입·run_or_resume (그래프는 agent_graph)
+├── agent_backfill_telegram.py  # /backfill_* 용 run_backfill 프로세스 제어
+├── pyproject.toml          # pytest 마커·(선택) ruff 설정
 ├── agent_graph.py          # LangGraph 조립 (build_graph)
 ├── agent_nodes.py          # 라우터·플래너·실행기·모니터 노드
 ├── agent_session.py        # 세션 메모리·오답 노트·논문 모드·플랜 캐시 등
@@ -174,18 +178,30 @@ python scripts/check_agent_env.py
 
 - **`langchain-ollama`**: 라우터·플래너 등 로컬 Qwen (`ChatOllama`) — `requirements.txt`에 포함. 미설치 시 `ModuleNotFoundError: langchain_ollama`.
 - 점검 스크립트: `python scripts/check_agent_env.py` (`-q` 성공 시 무출력)
+- 선택 플래그: `--keys` (Gemini/E2B/텔레그램/Tavily 키 요약), `--services` (Ollama HTTP), `--models` (HF 캐시·임베딩 흔적)
 
 **회귀 확인 (권장 순서):**
 
 ```bash
 source .venv/bin/activate
 python scripts/check_agent_env.py          # 또는 -q (성공 시 무출력)
+python scripts/check_agent_env.py --keys --services --models   # 통합 테스트 전 선택
 python -c "import agent_bot; import agent_graph; print('import OK')"   # 모듈 스모크
 pip install -r requirements-dev.txt        # 최초 1회: pytest
-pytest tests/ -v --tb=short                # 라우터·골든 케이스 (가벼움, LLM 불필요)
+pytest tests/ -v --tb=short                # 단위(라우터·code_run state·골든 등, LLM 불필요)
+pytest tests/ -m unit -q                   # 마커만 (pyproject.toml)
+pytest tests/ -m "not external" -q         # CI와 동일: Ollama/Gemini/E2B 실호출 테스트 제외
+pytest tests/ -m external -q               # 키·서비스 준비된 환경에서만 (실패 시 skip 가능)
 ```
 
-- **`test_agent_flow.py`**: Ollama·Gemini·Chroma·E2B·LangGraph 점검. 4번 E2B는 `실행 오류`면 **FAIL**로 표시. 5a는 `print(1+1)`이 산수 하드룰로 **direct_answer** 스모크. 5b는 **code_run→executor** (문장에 `hello` 등이 들어가면 인사 하드룰로 빠지므로 피함). `ollama serve` 및 `.env` 필요.
+- **`test_agent_flow.py`** (스크립트, pytest 아님): 외부 서비스 점검. **환경이 없으면 FAIL 대신 SKIP**으로 표시. 시작 시 환경 요약 출력. 옵션: `--only ollama|gemini|chroma|e2b|graph`, `--verbose` (traceback 전체), `--quiet-graph` (5a/5b DEBUG print 억제). 종료 코드는 **FAIL이 하나라도 있을 때만 1**. E2B `실행 오류` 문자열은 FAIL. 5b에서 executor까지 갔으나 샌드박스만 실패하면 **SKIP/WARN** 처리(라우팅은 `tests/test_code_run_state.py`로 검증).
+- **`pyproject.toml`**: `pytest` 마커 `unit` / `integration` / `external` 정의.
+- **테스트 계층 (요약)**  
+  - **A · unit**: `agent_router_rules`, 골든 라우팅, `test_code_run_state`, E2B env 구성 등.  
+  - **B · integration**: `tests/test_node_contracts.py`(router/direct_answer/executor/monitor mock), `tests/test_graph_smoke.py`.  
+  - **C · external**: `tests/test_external_integration.py` — 로컬에서 키·Ollama 있을 때만 의미 있음.  
+  - **D · 수동**: `test_agent_flow.py` 스크립트(SKIP/FAIL 구분).
+- **GitHub Actions**: 저장소 루트에 `.github/workflows/ci.yml` — `mini/`에서 `check_agent_env.py -q` 후 `pytest tests/`.
 - **`batch_test_runner.py`**: LangGraph + 라우터/직접응답을 **실제 LLM**으로 돌리는 배치. API·로컬 모델 준비된 환경에서만 실행 권장.
 
 **라우터 단위 테스트 (pytest 없이):** `agent_router_rules.py`는 langchain/chromadb 없이 import 가능합니다.

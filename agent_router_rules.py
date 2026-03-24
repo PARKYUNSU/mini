@@ -298,6 +298,25 @@ def resolve_recent_tool_from_snapshot(recent: list, user_request: str) -> Option
     return None
 
 
+def _req_lower_for_ascii_greeting_scan(req_lower: str) -> str:
+    """URL 경로 속 hello/hi 등이 인사로 오인되지 않게 URL 구간을 제거."""
+    return re.sub(r"https?://\S+", " ", req_lower, flags=re.IGNORECASE)
+
+
+def _ascii_greeting_in_smalltalk(req_lower: str) -> bool:
+    """영문 인사(hi/hello)만 단어 경계·따옴표 밖에서 매칭.
+
+    `len('hello')` 처럼 문자열 리터럴 안의 hello, `this` 속의 hi 오분류를 줄입니다.
+    http(s) URL 안의 토큰은 스캔에서 제외합니다.
+    """
+    scan = _req_lower_for_ascii_greeting_scan(req_lower)
+    if re.search(r"(?<![\w'])\bhi\b(?![\w'])", scan):
+        return True
+    if re.search(r"(?<![\w'])\bhello\b(?![\w'])", scan):
+        return True
+    return False
+
+
 def is_smalltalk_or_memory_request(user_request: str, req_lower: str) -> bool:
     """A 경로 전용 하드룰: 일상 대화, 짧은 메모리 질의, 간단 산수."""
     # "print hello world 돌려봐" 등에서 hello만 보고 인사로 오분류하지 않음
@@ -305,7 +324,7 @@ def is_smalltalk_or_memory_request(user_request: str, req_lower: str) -> bool:
         k in user_request or k in req_lower for k in ("print", "돌려", "실행")
     ):
         return False
-    greetings = ("안녕", "hi", "hello", "헬로", "반가", "굿모닝", "굿나잇", "하이", "좋은 아침")
+    greetings = ("안녕", "헬로", "반가", "굿모닝", "굿나잇", "하이", "좋은 아침")
     identity_q = ("누구야", "누구니", "누구세요", "자기소개", "정체", "이름이 뭐야", "뭐하는", "윤수르")
     thanks_farewell = ("고마워", "수고했어", "잘 자", "내일 보자", "좋은 밤", "안녕히")
     comfort = ("위로", "힘들어", "피곤", "지쳤어", "격려", "응원", "배고프", "출출", "졸려", "졸리", "심심해", "심심하")
@@ -315,6 +334,8 @@ def is_smalltalk_or_memory_request(user_request: str, req_lower: str) -> bool:
     weather_smalltalk_markers = ("날씨 좋네", "날씨 좋다", "오늘 날씨 좋네", "오늘 날씨 좋다", "덥네", "춥네", "비 오네", "날씨가 좋네")
     weather_query_markers = ("알려줘", "어때", "조회", "확인", "가져와", "예보", "몇 도", "온도", "미세먼지")
 
+    if _ascii_greeting_in_smalltalk(req_lower):
+        return True
     if any(x in req_lower for x in greetings):
         return True
     if any(x in user_request for x in identity_q):

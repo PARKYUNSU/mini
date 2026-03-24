@@ -141,6 +141,30 @@ def safe_telegram_edit(bot, text: str, chat_id: str, message_id: int) -> bool:
         return False
 
 
+def cleanup_status_message(bot, chat_id: str, status_msg) -> None:
+    """진행 메시지 삭제. 실패는 무시 (이미 삭제됐거나 권한 문제)."""
+    if not bot or not status_msg:
+        return
+    try:
+        bot.delete_message(chat_id, status_msg.message_id)
+    except Exception:
+        pass
+
+
+def is_transient_network_error(e: BaseException) -> bool:
+    """Broken pipe, Connection reset 등 일시적 네트워크/소켓 오류 여부"""
+    err_str = str(e).lower()
+    if "broken pipe" in err_str or "errno 32" in err_str:
+        return True
+    if "connection" in err_str and ("reset" in err_str or "refused" in err_str or "closed" in err_str):
+        return True
+    if isinstance(e, (ConnectionError, BrokenPipeError)):
+        return True
+    if isinstance(e, OSError) and getattr(e, "errno", None) == 32:
+        return True
+    return False
+
+
 def notify_chat_error(
     bot,
     chat_id: str,

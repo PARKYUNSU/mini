@@ -8,13 +8,18 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+import pytest
+
 _ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_ROOT))
+
+pytestmark = pytest.mark.unit
 
 from agent_router_rules import (
     RouterStep1Deps,
     classify_python_pipeline_tier,
     is_explicit_python_coding_request,
+    is_smalltalk_or_memory_request,
     router_step1_hard_rules,
     skip_planner_debate_for_fast_path,
     user_wants_intentional_exec_error,
@@ -100,6 +105,13 @@ def test_trivial_coding_skips_debate_heuristic():
     assert skip_planner_debate_for_fast_path("대규모 데이터 파이프라인 코드 짜줘") is False
 
 
+def test_hello_inside_string_literal_not_greeting_smalltalk():
+    """len('hello') 등 코드 문자열 안의 hello는 인사로 보지 않음."""
+    msg = "파이썬으로 len('hello') 실행해줘"
+    low = msg.lower()
+    assert is_smalltalk_or_memory_request(msg, low) is False
+
+
 def _assert_route(msg: str, *, route: str, example: Optional[bool] = None):
     low = msg.lower()
     r = _step1(msg, low, "x")
@@ -121,6 +133,7 @@ def test_three_tier_feedback_matrix():
     for s in (
         "1부터 10까지 더하는 코드 실행해줘",
         "print hello world 돌려봐",
+        "파이썬으로 len('hello') 결과를 print하는 코드 실행해줘",
         "오타 넣어서 실행해봐",
     ):
         low = s.lower()
@@ -144,5 +157,6 @@ if __name__ == "__main__":
     test_action_keywords_does_not_bypass_three_tier()
     test_plain_python_intro_not_forced_planner()
     test_trivial_coding_skips_debate_heuristic()
+    test_hello_inside_string_literal_not_greeting_smalltalk()
     test_three_tier_feedback_matrix()
     print("OK: intentional_syntax_and_router")

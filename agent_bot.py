@@ -10,7 +10,6 @@ import os
 os.environ.setdefault("OLLAMA_HOST", "http://localhost:11434")
 
 import sqlite3
-import signal
 import subprocess
 import sys
 import time
@@ -24,11 +23,9 @@ from langgraph.types import Command
 import telebot
 from telebot.types import ReplyKeyboardRemove
 
-from agent_chroma_rag import ChromaRAGTool
+from agent_backfill_telegram import start_backfill_process, stop_backfill_process
 from agent_config import (
     BACKFILL_LOG_PATH,
-    BACKFILL_PID_PATH,
-    BACKFILL_SCRIPT_PATH,
     CHECKPOINT_DB_PATH,
     GEMINI_API_KEY,
     GEMINI_MODEL,
@@ -39,14 +36,7 @@ from agent_config import (
     ALLOWED_CHAT_ID,
 )
 from agent_graph import build_graph
-from agent_llm import get_executor_llm, get_planner_llm
-from agent_nodes import (
-    _is_execution_failure,
-    direct_answer_node,
-    router_node,
-    use_existing_tool_node,
-)
-from agent_sandbox import run_code_sandbox as _run_code_sandbox
+from agent_nodes import _is_execution_failure, _run_tool_on_host
 from agent_session import (
     AgentSkillLibrary,
     append_learning as _append_learning,
@@ -63,6 +53,8 @@ from agent_types import STREAM_FAILURE_TELEGRAM_MSG
 from agent_tool_rag import sync_tool_chroma_from_disk
 from agent_telegram import (
     CANCEL_RESTART_CMDS as _CANCEL_RESTART_CMDS,
+    cleanup_status_message as _cleanup_status_msg,
+    is_transient_network_error as _is_transient_error,
     main_keyboard as _main_keyboard,
     notify_chat_error as _notify_chat_error,
     safe_telegram_edit as _safe_telegram_edit,
@@ -70,35 +62,7 @@ from agent_telegram import (
     safe_telegram_send_and_get as _safe_telegram_send_and_get,
     strip_wake_word as _strip_wake_word,
 )
-from agent_vision import (
-    build_message_content as _build_message_content,
-    download_photo_to_base64 as _download_photo_to_base64,
-    run_vision_analysis as _run_vision_analysis,
-)
-
-
-def _cleanup_status_msg(bot, chat_id: str, status_msg) -> None:
-    """진행 메시지 삭제. 실패는 무시 (이미 삭제됐거나 권한 문제)."""
-    if not bot or not status_msg:
-        return
-    try:
-        bot.delete_message(chat_id, status_msg.message_id)
-    except Exception:
-        pass
-
-
-def _is_transient_error(e: BaseException) -> bool:
-    """Broken pipe, Connection reset 등 일시적 네트워크/소켓 오류 여부"""
-    err_str = str(e).lower()
-    if "broken pipe" in err_str or "errno 32" in err_str:
-        return True
-    if "connection" in err_str and ("reset" in err_str or "refused" in err_str or "closed" in err_str):
-        return True
-    if isinstance(e, (ConnectionError, BrokenPipeError)):
-        return True
-    if isinstance(e, OSError) and getattr(e, "errno", None) == 32:
-        return True
-    return False
+from agent_vision import download_photo_to_base64 as _download_photo_to_base64, run_vision_analysis as _run_vision_analysis
 
 
 # 텔레그램·HITL 전용 전역 (대화 세션·플랜 캐시 등은 agent_session)
@@ -106,111 +70,6 @@ _pending_approvals: dict[str, tuple[str, dict]] = {}
 _thread_version: dict[str, int] = {}
 _AGENT_BOT_LOCK_FD_HOLDER: list = []
 
-
-def _read_backfill_pid() -> Optional[int]:
-    try:
-        if not BACKFILL_PID_PATH.exists():
-            return None
-        raw = BACKFILL_PID_PATH.read_text(encoding="utf-8").strip()
-        return int(raw) if raw else None
-    except Exception:
-        return None
-
-
-def _is_process_alive(pid: int) -> bool:
-    try:
-        os.kill(pid, 0)
-        return True
-    except OSError:
-        return False
-
-
-def _get_running_backfill_pid() -> Optional[int]:
-    pid = _read_backfill_pid()
-    if pid and _is_process_alive(pid):
-        return pid
-    if BACKFILL_PID_PATH.exists():
-        try:
-            BACKFILL_PID_PATH.unlink()
-        except Exception:
-            pass
-    return None
-
-
-_BACKFILL_START_COUNT_PATH = PROJECT_ROOT / ".backfill.start_count"
-
-
-def _start_backfill_process() -> tuple[bool, str]:
-    running_pid = _get_running_backfill_pid()
-    if running_pid:
-        return False, f"이미 백필이 실행 중입니다. (pid={running_pid})"
-
-    try:
-        # 이번 세션 시작 시점 논문 수 저장 (종료 시 비교용)
-        start_count = _count_crawled_papers()
-        _BACKFILL_START_COUNT_PATH.write_text(str(start_count), encoding="utf-8")
-
-        BACKFILL_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        with open(BACKFILL_LOG_PATH, "a", encoding="utf-8") as log_file:
-            log_file.write("\n" + "=" * 60 + "\n")
-            log_file.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] [telegram] run_backfill.py 시작\n")
-            log_file.write("=" * 60 + "\n")
-            log_file.flush()
-            proc = subprocess.Popen(
-                [sys.executable, "-u", str(BACKFILL_SCRIPT_PATH)],
-                cwd=str(PROJECT_ROOT),
-                stdout=log_file,
-                stderr=subprocess.STDOUT,
-                start_new_session=True,
-                env={**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONIOENCODING": "utf-8"},
-            )
-        BACKFILL_PID_PATH.write_text(str(proc.pid), encoding="utf-8")
-        return True, f"백필을 백그라운드에서 시작했습니다. (pid={proc.pid})"
-    except Exception as e:
-        return False, f"백필 시작 실패: {str(e)[:200]}"
-
-
-def _count_crawled_papers() -> int:
-    """crawled_papers.jsonl에 저장된 논문 수 반환."""
-    raw_path = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
-    if not raw_path.exists():
-        return 0
-    try:
-        return sum(1 for line in raw_path.read_text(encoding="utf-8").strip().split("\n") if line.strip())
-    except Exception:
-        return 0
-
-
-def _stop_backfill_process() -> tuple[bool, str]:
-    pid = _get_running_backfill_pid()
-    if not pid:
-        return False, "현재 실행 중인 백필이 없습니다."
-
-    try:
-        os.killpg(pid, signal.SIGTERM)
-    except ProcessLookupError:
-        pass
-    except Exception:
-        try:
-            os.kill(pid, signal.SIGTERM)
-        except Exception as e:
-            return False, f"백필 중지 실패: {str(e)[:200]}"
-
-    try:
-        if BACKFILL_PID_PATH.exists():
-            BACKFILL_PID_PATH.unlink()
-    except Exception:
-        pass
-
-    current_count = _count_crawled_papers()
-    try:
-        start_count = int(_BACKFILL_START_COUNT_PATH.read_text(encoding="utf-8").strip()) if _BACKFILL_START_COUNT_PATH.exists() else current_count
-        _BACKFILL_START_COUNT_PATH.unlink(missing_ok=True)
-    except Exception:
-        start_count = current_count
-    crawled_this_session = max(0, current_count - start_count)
-
-    return True, f"실행 중이던 백필을 중지했습니다. (pid={pid})\n\n📚 이번 백필에서 크롤링한 논문: **{crawled_this_session:,}**편"
 
 # ============ 단일 인스턴스 (Telegram 409 getUpdates 충돌 방지) ============
 def _acquire_agent_bot_singleton_lock():
@@ -565,7 +424,7 @@ def main():
             bot.reply_to(message, "접근 권한이 없는 사용자입니다.")
             return
 
-        ok, detail = _start_backfill_process()
+        ok, detail = start_backfill_process()
         prefix = "🚀 마스터, " if ok else "⚠️ "
         bot.reply_to(
             message,
@@ -580,7 +439,7 @@ def main():
             bot.reply_to(message, "접근 권한이 없는 사용자입니다.")
             return
 
-        ok, detail = _stop_backfill_process()
+        ok, detail = stop_backfill_process()
         prefix = "🛑 " if ok else "ℹ️ "
         bot.reply_to(message, f"{prefix}{detail}", parse_mode="Markdown")
 

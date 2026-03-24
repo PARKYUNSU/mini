@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mini-agent"
+version = "0.0.0"
+description = "로컬 arXiv RAG + 텔레그램 에이전트 (mini)"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "unit: 순수 규칙·state, 네트워크·외부 API 없음",
+    "integration: 노드 mock 계약·build_graph 스모크 (LLM/E2B 호출 없음)",
+    "external: Ollama·Gemini·E2B 실호출 (없으면 skip, CI 기본 제외)",
+]
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = [".", "tests", "scripts"]
+
+[tool.ruff.lint]
+ignore = ["E501"]

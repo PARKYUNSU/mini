@@ -1,12 +1,35 @@
 """E2B 샌드박스 코드 실행"""
 
 import os
-from pathlib import Path
 
 from dotenv import load_dotenv
 from e2b_code_interpreter import Sandbox
 
-from agent_config import CODE_TIMEOUT_SEC, ERROR_LOG_MAX_CHARS, PROJECT_ROOT
+from agent_config import CODE_TIMEOUT_SEC, ERROR_LOG_MAX_CHARS
+
+
+def _e2b_sandbox_envs() -> dict[str, str]:
+    """Sandbox.run_code(..., envs=) 용. E2B_API_KEY는 클라이언트 SDK가 쓰므로 넣지 않음."""
+    load_dotenv(override=True)
+    mode = (os.getenv("E2B_SANDBOX_ENV_MODE") or "full").strip().lower()
+    if mode == "minimal":
+        env_dict: dict[str, str] = {
+            "LANG": os.environ.get("LANG") or "C.UTF-8",
+            "PYTHONUTF8": "1",
+            "PYTHONIOENCODING": os.environ.get("PYTHONIOENCODING") or "utf-8",
+        }
+        extra_raw = (os.getenv("E2B_SANDBOX_EXTRA_KEYS") or "").strip()
+        for key in (k.strip() for k in extra_raw.split(",") if k.strip()):
+            if key == "E2B_API_KEY":
+                continue
+            val = os.environ.get(key)
+            if isinstance(val, str):
+                env_dict[key] = val
+    else:
+        env_dict = {k: v for k, v in os.environ.items() if isinstance(v, str) and k != "E2B_API_KEY"}
+    if "OPENWEATHERMAP_API_KEY" in env_dict and "WEATHER_API_KEY" not in env_dict:
+        env_dict["WEATHER_API_KEY"] = env_dict["OPENWEATHERMAP_API_KEY"]
+    return env_dict
 
 
 def run_code_sandbox(code: str) -> str:
@@ -14,10 +37,7 @@ def run_code_sandbox(code: str) -> str:
     if not os.getenv("E2B_API_KEY"):
         return "실행 오류: E2B_API_KEY가 .env에 설정되지 않았습니다."
 
-    load_dotenv(override=True)
-    env_dict = {k: v for k, v in os.environ.items() if isinstance(v, str) and k != "E2B_API_KEY"}
-    if "OPENWEATHERMAP_API_KEY" in env_dict and "WEATHER_API_KEY" not in env_dict:
-        env_dict["WEATHER_API_KEY"] = env_dict["OPENWEATHERMAP_API_KEY"]
+    env_dict = _e2b_sandbox_envs()
 
     try:
         with Sandbox.create() as sandbox:

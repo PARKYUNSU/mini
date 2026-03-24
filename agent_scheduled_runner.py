@@ -28,7 +28,7 @@ def run_scheduled_job(prompt: str, chat_id: str) -> str:
     if not token:
         return "TELEGRAM_TOKEN이 설정되지 않았습니다."
 
-    from agent_bot import build_graph
+    from agent_graph import build_graph
     from agent_config import CHECKPOINT_DB_PATH
     from agent_telegram import safe_telegram_send
     from langgraph.checkpoint.sqlite import SqliteSaver

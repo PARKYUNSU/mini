@@ -31,7 +31,7 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.types import Command
 
 from agent_telegram import strip_wake_word
-from agent_bot import build_graph
+from agent_graph import build_graph
 
 USER_RAW = (
     "윤수르, 파이썬으로 1부터 10까지 더하는 코드를 짜는데, "
