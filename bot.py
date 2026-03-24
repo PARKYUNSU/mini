@@ -15,9 +15,10 @@ import chromadb
 from chromadb.config import Settings
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 from dotenv import load_dotenv
-from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
 import telebot
+
+from agent_llm import get_planner_llm
 
 load_dotenv()
 
@@ -26,8 +27,6 @@ TELEGRAM_TOKEN = os.getenv("RAG_BOT_TOKEN") or os.getenv("TELEGRAM_TOKEN")
 ALLOWED_CHAT_ID = os.getenv("ALLOWED_CHAT_ID")
 CHROMA_DB_PATH = "./chroma_db"
 COLLECTION_NAME = "arxiv_papers"
-OLLAMA_BASE_URL = "http://localhost:11434"
-OLLAMA_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b")
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K = 5  # 검색할 문서 수
 
@@ -67,11 +66,7 @@ def rag_query(question: str) -> str:
 
     context = "\n\n---\n\n".join(docs)
 
-    llm = ChatOllama(
-        model=OLLAMA_MODEL,
-        base_url=OLLAMA_BASE_URL,
-        temperature=0.1,
-    )
+    llm = get_planner_llm()
 
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),

@@ -7,13 +7,11 @@ from pathlib import Path
 
 from langchain_core.messages import HumanMessage
 
-from agent_config import ollama_kwargs
+from agent_llm import get_vision_llm
 
-# Lazy import to avoid loading Ollama at module load
+
 def _get_ollama_llm():
-    from langchain_ollama import ChatOllama
-
-    return ChatOllama(**ollama_kwargs(temperature=0.2))
+    return get_vision_llm()
 
 
 def download_photo_to_base64(bot, message) -> tuple[str, str] | None:

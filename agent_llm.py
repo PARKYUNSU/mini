@@ -1,4 +1,15 @@
-"""Ollama / Gemini LLM 팩토리 (노드·RAG에서 공통 사용)."""
+"""Ollama / Gemini LLM 팩토리 (노드·RAG에서 공통 사용).
+
+Qwen 3.x(Ollama) 샘플링은 Alibaba Qwen 3.5 권장에 맞춘다.
+
+- Router / Direct Answer / RAG·비전 보조: ``temperature``·``top_p``·반복 억제,
+  ``reasoning=False`` 로 본문에 think 태그가 섞이지 않게 한다 (LangChain → Ollama think 끔).
+- Planner(계획): ``reasoning=True`` 로 사고를 분리하고, 텔레그램은
+  ``agent_telegram.strip_thinking_tags`` 등 기존 정제를 유지.
+
+Ollama API에는 OpenAI식 ``presence_penalty`` 가 없어, 문서의 반복 억제 의도는
+``repeat_penalty`` 로 맞춘다 (일반 경로 상향, Planner 계획은 1.0).
+"""
 
 import os
 
@@ -8,19 +19,68 @@ from langchain_ollama import ChatOllama
 from agent_config import GEMINI_API_KEY, GEMINI_MODEL, ollama_kwargs
 
 
+def get_router_llm():
+    """라우터 3단계 분류: 안정적 샘플링, 사고 모드 끔."""
+    return ChatOllama(
+        **ollama_kwargs(
+            temperature=0.7,
+            top_p=0.8,
+            repeat_penalty=1.25,
+            reasoning=False,
+            num_predict=12,
+        )
+    )
+
+
 def get_planner_llm():
-    """일반 Ollama (라우터 폴백·DirectAnswer 폴백 등). 장문 응답 허용."""
-    return ChatOllama(**ollama_kwargs(temperature=0.2))
+    """Direct Answer·라우터 Ollama 폴백·세션 요약 등: 비-thinking, 반복 억제."""
+    return ChatOllama(
+        **ollama_kwargs(
+            temperature=0.7,
+            top_p=0.8,
+            repeat_penalty=1.25,
+            reasoning=False,
+        )
+    )
 
 
 def get_planner_plan_llm():
-    """Planner·PlannerDebate 전용: num_predict로 계획 장문·다단계 토큰 폭주 방지."""
-    return ChatOllama(**ollama_kwargs(temperature=0.2, num_predict=300))
+    """Planner·PlannerDebate: 코딩/기획, 반복 페널티 완화, thinking 허용."""
+    return ChatOllama(
+        **ollama_kwargs(
+            temperature=0.6,
+            top_p=0.95,
+            repeat_penalty=1.0,
+            reasoning=True,
+            num_predict=300,
+        )
+    )
 
 
-def get_router_llm():
-    """라우터 전용: 1토큰만 출력, temperature=0으로 극한 최적화"""
-    return ChatOllama(**ollama_kwargs(temperature=0, num_predict=1))
+def get_rag_query_rewrite_llm():
+    """Chroma standalone 검색어 재작성: 짧은 출력, 비-thinking."""
+    return ChatOllama(
+        **ollama_kwargs(
+            temperature=0.7,
+            top_p=0.8,
+            repeat_penalty=1.25,
+            reasoning=False,
+            num_predict=160,
+        )
+    )
+
+
+def get_vision_llm():
+    """이미지 분석: 비-thinking, 설명 길이 여유."""
+    return ChatOllama(
+        **ollama_kwargs(
+            temperature=0.7,
+            top_p=0.8,
+            repeat_penalty=1.25,
+            reasoning=False,
+            num_predict=1024,
+        )
+    )
 
 
 def get_executor_llm():

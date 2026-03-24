@@ -9,9 +9,9 @@ import chromadb
 from chromadb.config import Settings
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_ollama import ChatOllama
 
-from agent_config import CHROMA_DB_PATH, COLLECTION_NAME, EMBEDDING_MODEL, RAG_TOP_K, ollama_kwargs
+from agent_config import CHROMA_DB_PATH, COLLECTION_NAME, EMBEDDING_MODEL, RAG_TOP_K
+from agent_llm import get_rag_query_rewrite_llm
 
 _PROJECT_ROOT = Path(__file__).resolve().parent
 
@@ -52,7 +52,7 @@ class ChromaRAGTool:
         if not any(v in query for v in vague):
             return query
         try:
-            llm = ChatOllama(**ollama_kwargs(temperature=0))
+            llm = get_rag_query_rewrite_llm()
             resp = llm.invoke(
                 [
                     SystemMessage(

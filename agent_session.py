@@ -26,8 +26,8 @@ from agent_config import (
     MEMORY_BUFFER,
     MEMORY_K,
     PROJECT_ROOT,
-    ollama_kwargs,
 )
+from agent_llm import get_planner_llm
 from agent_router_rules import (
     RouterStep1Deps,
     get_search_intent,
@@ -226,7 +226,7 @@ class SessionMemory:
 
     def _get_llm(self) -> ChatOllama:
         if self._llm is None:
-            self._llm = ChatOllama(**ollama_kwargs(temperature=0.3))
+            self._llm = get_planner_llm()
         return self._llm
 
     def add_turn(self, user_msg: str, assistant_msg: str) -> None:
