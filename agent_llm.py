@@ -4,7 +4,7 @@ Qwen 3.x(Ollama) 샘플링은 Alibaba Qwen 3.5 권장에 맞춘다.
 
 - Router / Direct Answer / RAG·비전 보조: ``temperature``·``top_p``·반복 억제,
   ``reasoning=False`` 로 본문에 think 태그가 섞이지 않게 한다 (LangChain → Ollama think 끔).
-- Planner(계획): ``reasoning=True`` 로 사고를 분리하고, 텔레그램은
+- Planner(계획)·LLM 토론 스케줄러: ``reasoning=True`` 로 사고를 분리하고, 에이전트 텔레그램은
   ``agent_telegram.strip_thinking_tags`` 등 기존 정제를 유지.
 
 Ollama API에는 OpenAI식 ``presence_penalty`` 가 없어, 문서의 반복 억제 의도는
@@ -53,6 +53,19 @@ def get_planner_plan_llm():
             repeat_penalty=1.0,
             reasoning=True,
             num_predict=300,
+        )
+    )
+
+
+def get_llm_debate_scheduler_llm():
+    """llm_debate_scheduler: Planner와 동일 샘플링, 논문 Q&A 장문용 num_predict만 확대."""
+    return ChatOllama(
+        **ollama_kwargs(
+            temperature=0.6,
+            top_p=0.95,
+            repeat_penalty=1.0,
+            reasoning=True,
+            num_predict=4096,
         )
     )
 

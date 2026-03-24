@@ -2,7 +2,7 @@
 """
 통합 스케줄러 - M2 맥 미니 24시간 운영용
 - arXiv 파이프라인: 매일 06:00
-- LLM 토론 배치: 매주 토요일 02:00 (2시간)
+- LLM 토론 배치: 월~금 02:00 각 1회 (각 최대 2시간)
 - cron_engine: 1분마다 due job 체크 → LangGraph 트리거 → 텔레그램 선톡
 - 메인 봇(agent_bot.py)은 별도 프로세스로 실행
 """
@@ -23,6 +23,8 @@ load_dotenv()
 
 # 프로젝트 루트 기준
 PROJECT_ROOT = Path(__file__).resolve().parent
+# llm_debate_scheduler.DEBATE_SCHEDULE_WEEKDAYS 와 동일하게 유지
+_DEBATE_WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday")
 
 
 @with_scheduler_retry("arXiv 파이프라인")
@@ -103,10 +105,11 @@ def main() -> None:
     # Gemini 없어도 cron_engine(봇 스케줄)은 돌아야 함. 예전에는 여기서 return 해 Ollama 전용일 때 job이 영원히 안 돌았음.
     if os.getenv("GEMINI_API_KEY"):
         schedule.every().day.at("06:00").do(run_arxiv_pipeline)
-        schedule.every().saturday.at("02:00").do(run_llm_debate)
+        for _day in _DEBATE_WEEKDAYS:
+            getattr(schedule.every(), _day).at("02:00").do(run_llm_debate)
     else:
         print(
-            "⚠️ GEMINI_API_KEY 없음 — arXiv(06:00)·LLM토론(토 02:00)만 건너뜁니다.\n"
+            "⚠️ GEMINI_API_KEY 없음 — arXiv(06:00)·LLM토론(월~금 02:00)만 건너뜁니다.\n"
             "   cron_engine(등록한 매일/주간 작업)은 계속 동작합니다."
         )
 
@@ -117,7 +120,7 @@ def main() -> None:
     print("📅 통합 스케줄러 시작")
     if os.getenv("GEMINI_API_KEY"):
         print("   - arXiv 파이프라인: 매일 06:00")
-        print("   - LLM 토론: 매주 토요일 02:00")
+        print("   - LLM 토론: 월~금 02:00 (주 5회)")
     print("   - cron_engine: 1분마다 due job 체크 → 텔레그램 선톡")
     print("   - 메인 봇: 별도 터미널에서 python agent_bot.py")
     print("   Ctrl+C로 종료\n")

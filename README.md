@@ -86,7 +86,7 @@ RAG(논문 질문 답변) + Agent(코딩 실행) 통합 봇입니다.
 
 ### LLM 토론 스케줄러 (`llm_debate_scheduler.py`)
 
-- 매주 토요일 02:00에 2시간 동안 배치 실행
+- **월~금 02:00**에 각각 최대 2시간 배치 실행 (주 5회, 큐·시간에 따라 실제 저장 건수는 가변)
 - `raw_data_queue/`의 JSONL → Qwen(초안) → Gemini(비평) → Qwen(최종) → `finetune_datasets/train_data.jsonl`
 - 이미 토론 완료된 `paper_id`는 `finetune_datasets/debated_paper_ids.jsonl` 기준으로 자동 스킵
 
@@ -144,7 +144,7 @@ M2 맥 미니에서 24시간 백그라운드 운영 시, **SSH 접속이 끊겨�
 cd /path/to/mini   # 저장소 클론 경로
 source .venv/bin/activate
 
-# 스케줄러 백그라운드 실행 (매일 06:00 arXiv, 매주 토 02:00 LLM 토론)
+# 스케줄러 백그라운드 실행 (매일 06:00 arXiv, 월~금 02:00 LLM 토론)
 nohup python run_scheduler.py > scheduler.log 2>&1 &
 
 # 메인 봇 백그라운드 실행
@@ -156,7 +156,7 @@ tail -f agent.log
 ```
 
 - **arXiv 파이프라인**: 매일 06:00 실행 (수집 → RAG → raw_data_queue)
-- **LLM 토론**: 매주 토요일 02:00 실행 (2시간, raw_data_queue → finetune_datasets)
+- **LLM 토론**: 월~금 02:00 실행 (각 최대 2시간, raw_data_queue → finetune_datasets)
 - **메인 봇**: 위 nohup으로 백그라운드 실행 시 SSH 종료 후에도 유지됨
 
 ### 텔레그램으로 등록한 스케줄 (cron_engine)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 LLM 토론 기반 파인튜닝 데이터 생성 스케줄러
-- 매주 토요일 02:00에 2시간 동안 배치 실행
+- 월~금 02:00에 최대 2시간 배치 실행 (run_scheduler.py와 동일 요일)
 - Qwen(초안) → Gemini(비평) → Qwen(최종) 파이프라인
 """
 
@@ -28,6 +28,7 @@ from langchain_core.messages import HumanMessage
 
 load_dotenv()
 
+from agent_llm import get_llm_debate_scheduler_llm
 from retry_utils import retry_on_network_error
 
 # ============ 설정 ============
@@ -35,11 +36,12 @@ RAW_DATA_QUEUE = Path("./raw_data_queue")
 PROCESSED_DATA_DIR = Path("./raw_data_queue/processed")
 FINETUNE_OUTPUT = Path("./finetune_datasets/train_data.jsonl")
 DEBATE_INDEX_PATH = Path("./finetune_datasets/debated_paper_ids.jsonl")
-OLLAMA_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b")
 GEMINI_MODEL = "gemini-2.5-flash"
 EVENT_DURATION_SEC = 7200  # 2시간
 LLM_DELAY_SEC = 10
 CONTENT_MAX_CHARS = 80000  # 논문 본문 최대 길이
+# run_scheduler.py 의 LLM 토론 트리거 요일과 맞출 것
+DEBATE_SCHEDULE_WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday")
 
 
 def _configure_utf8_stdio() -> None:
@@ -437,11 +439,7 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
     # 1. Qwen 초안
     print(f"    [1/3] Qwen 초안 생성 중...")
     try:
-        llm_qwen = ChatOllama(
-            model=OLLAMA_MODEL,
-            base_url=os.getenv("OLLAMA_HOST", "http://localhost:11434"),
-            temperature=0.2,
-        )
+        llm_qwen = get_llm_debate_scheduler_llm()
         draft_prompt = f"""다음 학술 논문 본문을 읽고, 핵심 내용을 묻고 답하는 Q&A 1세트를 작성해.
 형식: 질문 1개 + 답변 1개. JSON 형태로 instruction과 output만 출력해.
 설명 문장, 머리말, 코드블록 마크다운 없이 아래 JSON 객체 1개만 출력:
@@ -537,7 +535,7 @@ def weekly_llm_debate_event(
     max_records: int | None = None,
     duration_sec: int = EVENT_DURATION_SEC,
 ) -> dict:
-    """매주 토요일 02:00에 실행, 2시간 동안 배치 처리"""
+    """스케줄러가 월~금 02:00에 호출, 최대 2시간 동안 배치 처리"""
     _configure_utf8_stdio()
     start = time.time()
     print("\n" + "=" * 60)
@@ -671,9 +669,10 @@ def main() -> None:
         )
         return
 
-    schedule.every().saturday.at("02:00").do(weekly_llm_debate_event)
+    for _day in DEBATE_SCHEDULE_WEEKDAYS:
+        getattr(schedule.every(), _day).at("02:00").do(weekly_llm_debate_event)
 
-    print("📅 LLM 토론 스케줄러 시작 (매주 토요일 02:00)")
+    print(f"📅 LLM 토론 스케줄러 시작 (월~금 02:00, {len(DEBATE_SCHEDULE_WEEKDAYS)}회/주)")
     print("   테스트: python llm_debate_scheduler.py --test --file sample.jsonl --max-records 3")
     print("   Ctrl+C로 종료\n")
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+# 외부 cron에서 호출 시: 월~금 02:00 등으로 맞추면 run_scheduler.py 의 토론 주기와 일치
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export PYTHONIOENCODING=utf-8
