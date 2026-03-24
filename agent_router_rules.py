@@ -264,6 +264,14 @@ def is_factual_lookup(user_request: str) -> bool:
     return any(p in r for p in patterns)
 
 
+def _agent_tool_py_exists(agent_tools_dir: Path, stem: str) -> bool:
+    """루트 또는 saved/ 아래에 <stem>.py 가 있는지 (langchain 없이 순수 Path)."""
+    d = agent_tools_dir
+    if (d / f"{stem}.py").is_file():
+        return True
+    return (d / "saved" / f"{stem}.py").is_file()
+
+
 def resolve_recent_tool_from_snapshot(recent: list, user_request: str) -> Optional[str]:
     """_recent_tools 스냅샷으로 '아까 그 도구' 참조 해석 (락 없음)."""
     if not recent:
@@ -523,7 +531,7 @@ def router_step1_hard_rules(
     if not deps.get_paper_mode(chat_id) and is_factual_lookup(user_request) and (d / "tavily_search_tool.py").exists():
         return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "tavily_search_tool"}
     recent_tool = deps.resolve_recent_tool(chat_id, user_request)
-    if recent_tool and (d / f"{recent_tool}.py").exists():
+    if recent_tool and _agent_tool_py_exists(d, recent_tool):
         si = get_search_intent(user_request, req_lower)
         if recent_tool != "tavily_search_tool" or si not in ("rag", "tool"):
             return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": recent_tool}

@@ -69,7 +69,11 @@ class ToolRAGStore:
         documents: list[str] = []
         metadatas: list[dict[str, Any]] = []
 
-        for p in sorted(root.glob("*.py")):
+        py_paths = sorted(root.glob("*.py"))
+        saved_dir = root / "saved"
+        if saved_dir.is_dir():
+            py_paths += sorted(saved_dir.glob("*.py"))
+        for p in py_paths:
             try:
                 content = p.read_text(encoding="utf-8")
                 doc = extract_module_docstring(content) or "(docstring 없음)"

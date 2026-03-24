@@ -94,7 +94,11 @@ class AgentSkillLibrary:
     def list_tools(self) -> list[tuple[str, str]]:
         """(파일명, 파일 내용 요약) 리스트 반환"""
         result = []
-        for p in self.tools_dir.glob("*.py"):
+        paths = sorted(self.tools_dir.glob("*.py"))
+        saved = self.tools_dir / "saved"
+        if saved.is_dir():
+            paths += sorted(saved.glob("*.py"))
+        for p in paths:
             try:
                 content = p.read_text(encoding="utf-8")
                 summary = content[:300].replace("\n", " ") + ("..." if len(content) > 300 else "")
@@ -112,16 +116,18 @@ class AgentSkillLibrary:
         return "\n".join(lines)
 
     def save_tool(self, code: str, request_hint: str = "") -> Optional[str]:
-        """성공한 코드를 .py 파일로 저장. 파일명 반환."""
+        """성공한 코드를 agent_tools/saved/*.py 로 저장. 파일명 반환."""
         try:
+            saved_dir = self.tools_dir / "saved"
+            saved_dir.mkdir(parents=True, exist_ok=True)
             safe_name = re.sub(r"[^\w가-힣]", "_", request_hint[:30]) or "tool"
             safe_name = safe_name.strip("_") or "tool"
             base = safe_name
             idx = 0
-            while (self.tools_dir / f"{base}.py").exists():
+            while (saved_dir / f"{base}.py").exists():
                 idx += 1
                 base = f"{safe_name}_{idx}"
-            path = self.tools_dir / f"{base}.py"
+            path = saved_dir / f"{base}.py"
             path.write_text(code, encoding="utf-8")
             try:
                 get_tool_rag_store().upsert_file(path)

@@ -30,6 +30,17 @@ chat_memory.db
 
 # 테스트 결과
 batch_test_results.json
+test_tavily_qwen_result.txt
+
+# Tuya / 로컬 기기 덤프 (비밀·환경별)
+devices.json
+tinytuya.json
+tuya-raw.json
+snapshot.json
+
+# 봇이 저장한 일회성 도구 (코어 스크립트는 agent_tools/*.py 루트 유지)
+agent_tools/saved/*
+!agent_tools/saved/.gitkeep
 
 # Python
 __pycache__/

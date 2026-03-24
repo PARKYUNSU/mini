@@ -187,12 +187,35 @@ source .venv/bin/activate
 python scripts/check_agent_env.py          # 또는 -q (성공 시 무출력)
 python scripts/check_agent_env.py --keys --services --models   # 통합 테스트 전 선택
 python -c "import agent_bot; import agent_graph; print('import OK')"   # 모듈 스모크
-pip install -r requirements-dev.txt        # 최초 1회: pytest
+pip install -r requirements-dev.txt        # 최초 1회: pytest, pytest-timeout(external 120초 제한)
 pytest tests/ -v --tb=short                # 단위(라우터·code_run state·골든 등, LLM 불필요)
 pytest tests/ -m unit -q                   # 마커만 (pyproject.toml)
 pytest tests/ -m "not external" -q         # CI와 동일: Ollama/Gemini/E2B 실호출 테스트 제외
 pytest tests/ -m external -q               # 키·서비스 준비된 환경에서만 (실패 시 skip 가능)
+pytest tests/ -m integration -q           # 노드 mock·그래프 스모크만
 ```
+
+**일상 치트시트 (복붙용):**
+
+| 목적 | 명령 |
+|------|------|
+| CI와 동일 | `pytest tests/ -m "not external" -q` |
+| unit만 | `pytest tests/ -m unit -q` |
+| integration만 | `pytest tests/ -m integration -q` |
+| 실연동(Ollama/Gemini/E2B) | `pytest tests/ -m external -q` |
+| 수동 통합 점검 | `python test_agent_flow.py` |
+| 그래프만·로그 줄이기 | `python test_agent_flow.py --only graph --quiet-graph` |
+
+**Git 원격 (HTTPS 인증이 번거로우면 SSH 예시):**
+
+```bash
+git remote -v
+# git remote set-url origin git@github.com:USER/REPO.git
+git pull
+git push
+```
+
+- **봇이 새로 저장하는 도구**는 `agent_tools/saved/` 아래에만 쓰며, 이 디렉터리는 `.gitignore` 처리됩니다. 레포에 포함할 **코어 도구**는 기존처럼 `agent_tools/*.py` 루트에 두면 됩니다.
 
 - **`test_agent_flow.py`** (스크립트, pytest 아님): 외부 서비스 점검. **환경이 없으면 FAIL 대신 SKIP**으로 표시. 시작 시 환경 요약 출력. 옵션: `--only ollama|gemini|chroma|e2b|graph`, `--verbose` (traceback 전체), `--quiet-graph` (5a/5b DEBUG print 억제). 종료 코드는 **FAIL이 하나라도 있을 때만 1**. E2B `실행 오류` 문자열은 FAIL. 5b에서 executor까지 갔으나 샌드박스만 실패하면 **SKIP/WARN** 처리(라우팅은 `tests/test_code_run_state.py`로 검증).
 - **`pyproject.toml`**: `pytest` 마커 `unit` / `integration` / `external` 정의.

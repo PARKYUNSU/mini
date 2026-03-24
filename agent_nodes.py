@@ -14,7 +14,14 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.types import interrupt
 
 from agent_chroma_rag import ChromaRAGTool
-from agent_config import AGENT_TOOLS_DIR, CODE_TIMEOUT_SEC, ERROR_LOG_MAX_CHARS, RAG_TOP_K, TOOL_RAG_TOP_K
+from agent_config import (
+    AGENT_TOOLS_DIR,
+    CODE_TIMEOUT_SEC,
+    ERROR_LOG_MAX_CHARS,
+    RAG_TOP_K,
+    TOOL_RAG_TOP_K,
+    resolve_agent_tool_py,
+)
 from agent_llm import (
     get_executor_llm,
     get_monitor_llm,
@@ -330,9 +337,9 @@ def _run_tool_on_host(tool_name: str, user_request: str, chat_id: str = "") -> s
     if tool_name and tool_name.startswith("schedule_") and chat_id:
         os.environ["SCHEDULE_CHAT_ID"] = chat_id
 
-    tools_dir = _MINI_ROOT / "agent_tools"
-    tool_path = tools_dir / f"{tool_name}.py"
-    if not tool_path.exists():
+    tools_dir = AGENT_TOOLS_DIR
+    tool_path = resolve_agent_tool_py(tool_name, tools_dir)
+    if tool_path is None:
         return f"도구 '{tool_name}'을 찾을 수 없습니다."
 
     try:

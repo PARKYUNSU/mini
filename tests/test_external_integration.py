@@ -17,7 +17,7 @@ import pytest
 _ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_ROOT))
 
-pytestmark = pytest.mark.external
+pytestmark = [pytest.mark.external, pytest.mark.timeout(120)]
 
 
 def _ollama_ok() -> bool:

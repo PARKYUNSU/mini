@@ -28,6 +28,8 @@ MEMORY_BUFFER = 15
 RAG_TOP_K = 3
 # cwd와 무관하게 항상 패키지 기준 (상대 경로만 쓰면 다른 디렉터리에서 실행 시 도구 미탐지)
 AGENT_TOOLS_DIR = PROJECT_ROOT / "agent_tools"
+# 봇이 새로 저장하는 일회성 도구 (gitignore 대상, 코어 도구는 AGENT_TOOLS_DIR 루트)
+AGENT_TOOLS_SAVED_DIR = AGENT_TOOLS_DIR / "saved"
 AGENT_LEARNINGS_PATH = Path("agent_learnings/ERRORS.md")
 CODE_TIMEOUT_SEC = 30
 ERROR_LOG_MAX_CHARS = 1000
@@ -40,6 +42,18 @@ BACKFILL_PID_PATH = PROJECT_ROOT / ".backfill.pid"
 CRON_JOBS_DIR = PROJECT_ROOT / ".cron"
 LLM_RETRY_MAX = 3
 LLM_RETRY_DELAY_SEC = 1.5
+
+
+def resolve_agent_tool_py(stem: str, tools_dir: Path | None = None) -> Path | None:
+    """`agent_tools/<stem>.py` 또는 `agent_tools/saved/<stem>.py`. 없으면 None."""
+    root = tools_dir if tools_dir is not None else AGENT_TOOLS_DIR
+    direct = root / f"{stem}.py"
+    if direct.is_file():
+        return direct
+    saved = root / "saved" / f"{stem}.py"
+    if saved.is_file():
+        return saved
+    return None
 
 
 def ollama_kwargs(**extra) -> dict:
