@@ -137,20 +137,53 @@ mini/
 
 ## 5. 통합 스케줄러 (24시간 운영)
 
-M2 맥 미니에서 24시간 백그라운드 운영 시, **SSH 접속이 끊겨도 무중단** 실행하려면 `nohup` 사용:
+**`run_scheduler.py`가 꺼져 있으면** 월~금 02:00 LLM 토론·매일 06:00 arXiv·텔레그램 cron_engine **전부 동작하지 않습니다.** 반드시 상시 프로세스로 띄워 두세요.
+
+### 한 번에 백그라운드 기동 (권장)
+
+저장소 루트에서:
 
 ```bash
-# 프로젝트 루트로 이동 후 가상환경 활성화
-cd /path/to/mini   # 저장소 클론 경로
+cd /path/to/mini
+./start_scheduler_daemon.sh
+```
+
+이미 떠 있으면 중복 실행하지 않고, 로그는 `scheduler.log`에 이어 붙습니다.
+
+### 수동 nohup
+
+```bash
+cd /path/to/mini
 source .venv/bin/activate
+nohup python -u run_scheduler.py >> scheduler.log 2>&1 &
+```
 
-# 스케줄러 백그라운드 실행 (매일 06:00 arXiv, 월~금 02:00 LLM 토론)
-nohup python run_scheduler.py > scheduler.log 2>&1 &
+### 재부팅 후에도 자동 실행 (macOS launchd)
 
-# 메인 봇 백그라운드 실행
-nohup python agent_bot.py > agent.log 2>&1 &
+외장 디스크(`T7 Shield` 등)에 `mini`가 있으면, plist에서 **바로 그 경로의 Python을 실행**하게 두면 `launchctl load` 시 **`Input/output error`(5)** 가 자주 납니다.  
+**런처를 `~/Library/Application Support/mini/`에 두고**, `bootstrap`으로 등록하세요.
 
-# 로그 확인
+```bash
+cd /path/to/mini
+bash scripts/install_runscheduler_launchagent.sh
+launchctl bootout gui/$(id -u)/com.mini.runscheduler 2>/dev/null || true
+launchctl bootstrap gui/$(id -u) "$HOME/Library/LaunchAgents/com.mini.runscheduler.plist"
+```
+
+- **구식 `launchctl load`는 쓰지 마세요.** 최신 macOS는 **`launchctl bootstrap gui/$(id -u) …`** 가 맞습니다.
+- 로그: **`~/Library/Logs/mini-runscheduler.log`**
+
+해제:
+
+```bash
+launchctl bootout gui/$(id -u)/com.mini.runscheduler
+rm ~/Library/LaunchAgents/com.mini.runscheduler.plist
+```
+
+### 메인 봇 (별도 프로세스)
+
+```bash
+nohup python -u agent_bot.py >> agent.log 2>&1 &
 tail -f scheduler.log
 tail -f agent.log
 ```

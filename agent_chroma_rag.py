@@ -16,6 +16,33 @@ from agent_llm import get_rag_query_rewrite_llm
 _PROJECT_ROOT = Path(__file__).resolve().parent
 
 
+def list_stored_papers_text() -> str:
+    """raw_data_queue/crawled_papers.jsonl 기준 고유 paper_id·title (Chroma/임베딩 로드 없음)."""
+    try:
+        raw_path = _PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
+        if not raw_path.exists():
+            return "저장된 논문이 없습니다."
+        seen: set[str] = set()
+        lines: list[str] = []
+        # 전체 read_text()는 수백 MB JSONL에서 메모리·지연 폭주 → 줄 단위 스트림
+        with raw_path.open(encoding="utf-8", errors="replace") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    d = json.loads(line)
+                    pid = d.get("paper_id", "")
+                    title = d.get("title", "")
+                    if pid and pid not in seen:
+                        seen.add(pid)
+                        lines.append(f"- {pid}: {title}")
+                except json.JSONDecodeError:
+                    continue
+        return "\n".join(lines) if lines else "저장된 논문이 없습니다."
+    except Exception as e:
+        return f"목록 조회 오류: {e}"
+
+
 class ChromaRAGTool:
     def __init__(self, db_path: str = CHROMA_DB_PATH, collection_name: str = COLLECTION_NAME):
         self._embedding_fn = SentenceTransformerEmbeddingFunction(
@@ -92,25 +119,5 @@ class ChromaRAGTool:
             return f"검색 오류: {e}"
 
     def list_papers(self) -> str:
-        """ChromaDB에 저장된 논문 목록(고유 paper_id, title) 반환. 논문 목록 조회용."""
-        try:
-            raw_path = _PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
-            if not raw_path.exists():
-                return "저장된 논문이 없습니다."
-            seen = set()
-            lines = []
-            for line in raw_path.read_text(encoding="utf-8").strip().split("\n"):
-                if not line.strip():
-                    continue
-                try:
-                    d = json.loads(line)
-                    pid = d.get("paper_id", "")
-                    title = d.get("title", "")
-                    if pid and pid not in seen:
-                        seen.add(pid)
-                        lines.append(f"- {pid}: {title}")
-                except json.JSONDecodeError:
-                    continue
-            return "\n".join(lines) if lines else "저장된 논문이 없습니다."
-        except Exception as e:
-            return f"목록 조회 오류: {e}"
+        """저장 큐 JSONL 기준 논문 목록(고유 paper_id, title). Chroma와 동일 출처."""
+        return list_stored_papers_text()

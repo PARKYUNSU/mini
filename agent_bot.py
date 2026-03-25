@@ -24,6 +24,7 @@ import telebot
 from telebot.types import ReplyKeyboardRemove
 
 from agent_backfill_telegram import start_backfill_process, stop_backfill_process
+from agent_chroma_rag import list_stored_papers_text
 from agent_config import (
     BACKFILL_LOG_PATH,
     CHECKPOINT_DB_PATH,
@@ -69,6 +70,45 @@ from agent_vision import download_photo_to_base64 as _download_photo_to_base64, 
 _pending_approvals: dict[str, tuple[str, dict]] = {}
 _thread_version: dict[str, int] = {}
 _AGENT_BOT_LOCK_FD_HOLDER: list = []
+
+_TELEGRAM_MSG_SOFT_LIMIT = 3800
+
+
+def _split_telegram_chunks(text: str, limit: int = _TELEGRAM_MSG_SOFT_LIMIT) -> list[str]:
+    """텔레그램 한 메시지 상한(4096) 여유를 두고 줄 단위로 분할."""
+    text = (text or "").strip()
+    if not text:
+        return ["(내용 없음)"]
+    if len(text) <= limit:
+        return [text]
+    lines = text.split("\n")
+    chunks: list[str] = []
+    cur: list[str] = []
+    cur_len = 0
+    for line in lines:
+        add_len = len(line) + (1 if cur else 0)
+        if cur and cur_len + add_len > limit:
+            chunks.append("\n".join(cur))
+            cur = [line]
+            cur_len = len(line)
+        else:
+            if cur:
+                cur_len += 1
+            cur.append(line)
+            cur_len += len(line)
+    if cur:
+        chunks.append("\n".join(cur))
+    # 한 줄이 limit 초과인 경우(극단적 긴 제목 등)
+    out: list[str] = []
+    for c in chunks:
+        if len(c) <= limit:
+            out.append(c)
+            continue
+        start = 0
+        while start < len(c):
+            out.append(c[start : start + limit])
+            start += limit
+    return out
 
 
 # ============ 단일 인스턴스 (Telegram 409 getUpdates 충돌 방지) ============
@@ -453,6 +493,37 @@ def main():
 
         result = _run_tool_on_host("schedule_list_jobs", "등록된 스케줄 보여줘", chat_id)
         bot.reply_to(message, f"📅 등록된 스케줄\n\n{result[:4000]}")
+
+    @bot.message_handler(commands=["papers", "paperlist", "논문목록"])
+    def on_papers(message):
+        """저장 큐(crawled_papers.jsonl) 기준 논문 ID·제목 목록"""
+        chat_id = str(message.chat.id)
+        if chat_id not in allowed_ids:
+            bot.reply_to(message, "접근 권한이 없는 사용자입니다.")
+            return
+        try:
+            print(f"[papers] 요청 chat_id={chat_id} 처리 시작", flush=True)
+            body = list_stored_papers_text()
+            header = "📚 저장된 논문 (raw_data_queue/crawled_papers.jsonl)\n\n"
+            full = header + body
+            chunks = _split_telegram_chunks(full)
+            total = len(chunks)
+            for i, chunk in enumerate(chunks):
+                prefix = f"({i + 1}/{total})\n" if total > 1 else ""
+                payload = prefix + chunk
+                if i == 0:
+                    bot.reply_to(message, payload)
+                else:
+                    bot.send_message(chat_id, payload)
+                if i < total - 1:
+                    time.sleep(0.35)
+            print(f"[papers] 완료 chat_id={chat_id} chunks={total}", flush=True)
+        except Exception as e:
+            print(f"[papers] 오류: {e}\n{traceback.format_exc()}", flush=True)
+            try:
+                bot.reply_to(message, f"⚠️ 목록 전송 실패: {str(e)[:500]}")
+            except Exception:
+                pass
 
     @bot.message_handler(content_types=["text", "photo"], func=lambda m: True)
     def handle(message):

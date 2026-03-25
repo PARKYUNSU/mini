@@ -10,6 +10,9 @@
 import os
 import subprocess
 import sys
+
+# cron/nohup 환경에서 부모 stdio가 닫혀 있으면 자식(main.py 등)이 exit 1·Bad file descriptor 낼 수 있음
+_SUBPROCESS_KWARGS = {"stdin": subprocess.DEVNULL}
 import threading
 import time
 from pathlib import Path
@@ -37,6 +40,7 @@ def run_arxiv_pipeline() -> None:
         [sys.executable, str(PROJECT_ROOT / "main.py")],
         cwd=PROJECT_ROOT,
         check=True,
+        **_SUBPROCESS_KWARGS,
     )
 
 
@@ -50,6 +54,7 @@ def run_llm_debate() -> None:
         [sys.executable, str(PROJECT_ROOT / "llm_debate_scheduler.py"), "--test"],
         cwd=PROJECT_ROOT,
         check=True,
+        **_SUBPROCESS_KWARGS,
     )
 
 
