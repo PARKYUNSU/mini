@@ -7,11 +7,39 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def get_gemini_api_keys() -> list[str]:
+    """
+    Gemini 키 목록 (순서대로 사용, 429 시 다음 키로 폴백).
+
+    - ``GEMINI_API_KEYS=key1,key2`` 가 비어 있지 않으면 이 목록만 사용.
+    - 그렇지 않으면 ``GEMINI_API_KEY``, ``GEMINI_API_KEY_2``, ``GEMINI_API_KEY_3`` 중
+      값이 있는 것만 순서대로 사용.
+    """
+    raw = (os.getenv("GEMINI_API_KEYS") or "").strip()
+    keys: list[str] = []
+    if raw:
+        keys = [p.strip() for p in raw.split(",") if p.strip()]
+    if not keys:
+        for name in ("GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"):
+            v = (os.getenv(name) or "").strip()
+            if v:
+                keys.append(v)
+    seen: set[str] = set()
+    out: list[str] = []
+    for k in keys:
+        if k not in seen:
+            seen.add(k)
+            out.append(k)
+    return out
+
+
 PROJECT_ROOT = Path(__file__).resolve().parent
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")  # Tavily Search (웹 검색 유일 엔진)
 ALLOWED_CHAT_ID = os.getenv("ALLOWED_CHAT_ID")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+_GEMINI_KEYS = get_gemini_api_keys()
+GEMINI_API_KEY = _GEMINI_KEYS[0] if _GEMINI_KEYS else os.getenv("GEMINI_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 CHROMA_DB_PATH = "./chroma_db"
 COLLECTION_NAME = "arxiv_papers"

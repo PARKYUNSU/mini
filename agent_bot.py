@@ -28,9 +28,9 @@ from agent_chroma_rag import list_stored_papers_text
 from agent_config import (
     BACKFILL_LOG_PATH,
     CHECKPOINT_DB_PATH,
-    GEMINI_API_KEY,
     GROQ_API_KEY,
     GEMINI_MODEL,
+    get_gemini_api_keys,
     LLM_RETRY_DELAY_SEC,
     LLM_RETRY_MAX,
     PROJECT_ROOT,
@@ -144,9 +144,10 @@ def _acquire_agent_bot_singleton_lock():
 
 # ============ 텔레그램 봇 ============
 def main():
-    if not all([TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GEMINI_API_KEY, GROQ_API_KEY]):
+    if not all([TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GROQ_API_KEY]) or not get_gemini_api_keys():
         print(
-            "❌ .env에 TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GEMINI_API_KEY, GROQ_API_KEY를 설정하세요."
+            "❌ .env에 TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GROQ_API_KEY, "
+            "그리고 Gemini 키(GEMINI_API_KEY 또는 GEMINI_API_KEYS)를 설정하세요."
             "\n   (Executor/Monitor는 Groq, 라우터·도구·Tavily 폴백은 Gemini를 사용합니다.)"
         )
         return

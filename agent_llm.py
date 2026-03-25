@@ -19,12 +19,12 @@ from typing import Any, Optional
 
 import httpx
 from langchain_core.runnables import RunnableConfig
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
-from agent_config import GEMINI_API_KEY, GEMINI_MODEL, ollama_kwargs
+from agent_config import GEMINI_MODEL, get_gemini_api_keys, ollama_kwargs
+from agent_gemini import RotatingGeminiChat
 
 # Groq 무료 한도·코딩용 기본 모델 (환경변수로 덮어쓰기 가능)
 GROQ_CODING_MODEL = os.getenv(
@@ -110,10 +110,9 @@ def get_vision_llm():
 
 
 def get_executor_llm():
-    """Gemini: 라우터 3단계 폴백, 기존 도구 LLM 선택, Tavily 요약 등 (Executor 노드 제외)."""
-    return ChatGoogleGenerativeAI(
-        model=GEMINI_MODEL, api_key=GEMINI_API_KEY or os.getenv("GEMINI_API_KEY"), temperature=0.1
-    )
+    """Gemini: 라우터 3단계 폴백, 기존 도구 LLM 선택, Tavily 요약 등 (Executor 노드 제외).
+    키가 여러 개면 429·Rate limit 시 자동으로 다음 키로 재시도."""
+    return RotatingGeminiChat(get_gemini_api_keys(), GEMINI_MODEL, 0.1)
 
 
 def _is_groq_rate_limit_error(exc: BaseException) -> bool:

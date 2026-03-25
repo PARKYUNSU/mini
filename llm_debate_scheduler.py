@@ -19,7 +19,6 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-import google.generativeai as genai
 import schedule
 import telebot
 from dotenv import load_dotenv
@@ -28,6 +27,8 @@ from langchain_core.messages import HumanMessage
 
 load_dotenv()
 
+from agent_config import GEMINI_MODEL, get_gemini_api_keys
+from agent_gemini import gemini_sdk_generate_json
 from agent_llm import get_llm_debate_scheduler_llm
 from retry_utils import retry_on_network_error
 
@@ -36,23 +37,34 @@ RAW_DATA_QUEUE = Path("./raw_data_queue")
 PROCESSED_DATA_DIR = Path("./raw_data_queue/processed")
 FINETUNE_OUTPUT = Path("./finetune_datasets/train_data.jsonl")
 DEBATE_INDEX_PATH = Path("./finetune_datasets/debated_paper_ids.jsonl")
-GEMINI_MODEL = "gemini-2.5-flash"
 EVENT_DURATION_SEC = 7200  # 2시간
 LLM_DELAY_SEC = 10
-CONTENT_MAX_CHARS = 80000  # 논문 본문 최대 길이
+# Qwen/Gemini에 넣는 논문 본문 상한(문자 수). 초과 시 앞부분만 사용 → 컨텍스트·RAM 부담 감소
+DEBATE_PAPER_BODY_MAX_CHARS = 15000
+DEBATE_BODY_TRUNCATION_NOTICE = (
+    "\n\n(논문이 길어 중략되었습니다. 위 내용을 바탕으로 핵심을 도출하세요.)"
+)
 # run_scheduler.py 의 LLM 토론 트리거 요일과 맞출 것
 DEBATE_SCHEDULE_WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday")
 
 
 def _configure_utf8_stdio() -> None:
-    """cron/launch 환경에서도 한글 로그가 깨지지 않도록 UTF-8 고정."""
+    """cron/launch 환경에서도 한글 로그가 깨지지 않도록 UTF-8 고정.
+    nohup >> log 시 블록 버퍼로 tail -f 가 멈춘 것처럼 보이지 않게 줄 단위 플러시."""
     for stream_name in ("stdout", "stderr"):
         stream = getattr(sys, stream_name, None)
         if stream and hasattr(stream, "reconfigure"):
             try:
-                stream.reconfigure(encoding="utf-8", errors="replace")
+                stream.reconfigure(
+                    encoding="utf-8",
+                    errors="replace",
+                    line_buffering=True,
+                )
             except Exception:
-                pass
+                try:
+                    stream.reconfigure(encoding="utf-8", errors="replace")
+                except Exception:
+                    pass
 
 
 def _get_telegram_targets() -> tuple[str, list[str]]:
@@ -227,10 +239,14 @@ def save_to_finetune_jsonl(record: dict) -> bool:
         return False
 
 
-def _truncate(content: str, max_len: int = CONTENT_MAX_CHARS) -> str:
-    if len(content) <= max_len:
-        return content
-    return content[:max_len] + "\n\n[... 생략 ...]"
+def _truncate_paper_body_for_debate(text: str, max_chars: int = DEBATE_PAPER_BODY_MAX_CHARS) -> str:
+    """논문 본문을 앞에서부터 max_chars자까지만 사용. 초과 시 안내 문구 부착."""
+    s = (text or "").strip()
+    if not s:
+        return s
+    if len(s) <= max_chars:
+        return s
+    return s[:max_chars] + DEBATE_BODY_TRUNCATION_NOTICE
 
 
 def _normalize_text(text: str) -> str:
@@ -425,16 +441,16 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
     Qwen(초안) → Gemini(비평) → Qwen(최종) 토론 파이프라인
     반환: {"system", "instruction", "output"} 또는 None
     """
-    content = raw_record.get("content", raw_record.get("body", ""))
-    if not content:
+    content_raw = raw_record.get("content", raw_record.get("body", ""))
+    if not (content_raw or "").strip():
         print("  ⚠️ content/body 필드 없음, 건너뜀")
         return None
 
-    content = _truncate(content)
+    paper_content = _truncate_paper_body_for_debate(content_raw)
     paper_id = raw_record.get("paper_id", "unknown")
     paper_title = raw_record.get("title", paper_id)
     abstract = raw_record.get("abstract", "")
-    source_excerpt = f"[title]\n{paper_title}\n\n[abstract]\n{abstract}\n\n[content]\n{content[:15000]}"
+    source_excerpt = f"[title]\n{paper_title}\n\n[abstract]\n{abstract}\n\n[content]\n{paper_content}"
 
     # 1. Qwen 초안
     print(f"    [1/3] Qwen 초안 생성 중...")
@@ -449,7 +465,7 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
 - 논문 본문에 명시적으로 없는 숫자, 비용, 성능 수치, 무게, 개수는 절대 추측하지 말고 쓰지 마라.
 
 논문 본문:
-{content[:40000]}
+{paper_content}
 """
         draft_resp = llm_qwen.invoke([HumanMessage(content=draft_prompt)])
         draft_qa = draft_resp.content.strip() if draft_resp.content else ""
@@ -458,29 +474,27 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
         print(f"    ❌ Qwen 초안 실패: {e}")
         return None
 
-    # 2. Gemini 비평 및 수정
+    # 2. Gemini 비평 및 수정 (429 시 GEMINI_API_KEY_2/3 또는 GEMINI_API_KEYS 순서로 폴백)
     print(f"    [2/3] Gemini 비평/수정 중...")
     try:
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        model = genai.GenerativeModel(
-            GEMINI_MODEL,
-            generation_config=genai.types.GenerationConfig(response_mime_type="application/json"),
-        )
         critique_prompt = f"""다음은 Qwen이 만든 Q&A 초안입니다.
 
 [초안 Q&A]
 {draft_qa[:6000]}
 
 [원시 논문 일부]
-{content[:15000]}
+{paper_content}
 
 초안 Q&A의 논리적 오류나 개선점을 비판하고, 더 정확하고 심층적인 Q&A로 수정해 줘.
 오직 완성된 JSON 형태만 출력: {{"instruction": "질문", "output": "답변"}}
 - 숫자, 비용, 성능 수치, 무게, 개수는 원문에 명시된 경우에만 유지하고, 불명확하면 삭제해.
 - output에는 여러 개의 Q&A를 넣지 말고 단일 답변 문단만 남겨.
 """
-        critique_resp = model.generate_content(critique_prompt)
-        critique_text = critique_resp.text.strip() if critique_resp.text else ""
+        critique_text = gemini_sdk_generate_json(
+            get_gemini_api_keys(),
+            GEMINI_MODEL,
+            critique_prompt,
+        )
         time.sleep(LLM_DELAY_SEC)
     except Exception as e:
         print(f"    ❌ Gemini 비평 실패: {e}")
@@ -535,12 +549,15 @@ def weekly_llm_debate_event(
     max_records: int | None = None,
     duration_sec: int = EVENT_DURATION_SEC,
 ) -> dict:
-    """스케줄러가 월~금 02:00에 호출, 최대 2시간 동안 배치 처리"""
+    """스케줄러가 월~금 02:00에 호출, ``duration_sec`` 동안 배치 처리 (기본 2시간)."""
     _configure_utf8_stdio()
     start = time.time()
     print("\n" + "=" * 60)
     print(f"🚀 LLM 토론 배치 시작: {datetime.now().isoformat()}")
+    print(f"⏱️ 이번 실행 시간 한도: {duration_sec}초 ({duration_sec / 3600:.2f}시간)")
     print("=" * 60)
+    sys.stdout.flush()
+    sys.stderr.flush()
 
     processed_count = 0
     error_count = 0
@@ -548,7 +565,9 @@ def weekly_llm_debate_event(
     duplicate_skipped_count = 0
     processed_files: list[str] = []
     found_any_data = False
+    print("  📇 이미 토론한 논문 ID 인덱스 로드 중...", flush=True)
     debated_paper_ids = _load_debated_paper_ids()
+    print(f"  📇 인덱스 로드 완료 ({len(debated_paper_ids)}건)", flush=True)
     seen_in_this_run: set[str] = set()
 
     while (time.time() - start) < duration_sec:
@@ -572,7 +591,7 @@ def weekly_llm_debate_event(
         success_in_file = 0
         for i, rec in enumerate(records):
             if (time.time() - start) >= duration_sec:
-                print("  ⏰ 2시간 도달, 배치 종료")
+                print(f"  ⏰ 시간 한도({duration_sec}s) 도달, 배치 종료")
                 break
 
             paper_id = str(rec.get("paper_id", "")).strip()
@@ -649,8 +668,8 @@ def weekly_llm_debate_event(
 
 def main() -> None:
     _configure_utf8_stdio()
-    if not os.getenv("GEMINI_API_KEY"):
-        print("❌ .env에 GEMINI_API_KEY를 설정하세요.")
+    if not get_gemini_api_keys():
+        print("❌ .env에 GEMINI_API_KEY(또는 GEMINI_API_KEYS / GEMINI_API_KEY_2)를 설정하세요.")
         return
 
     parser = argparse.ArgumentParser(description="LLM 토론 기반 파인튜닝 데이터 생성 배치")

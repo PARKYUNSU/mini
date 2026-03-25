@@ -26,6 +26,9 @@ load_dotenv()
 
 # 프로젝트 루트 기준
 PROJECT_ROOT = Path(__file__).resolve().parent
+
+sys.path.insert(0, str(PROJECT_ROOT))
+from agent_config import get_gemini_api_keys  # noqa: E402
 # llm_debate_scheduler.DEBATE_SCHEDULE_WEEKDAYS 와 동일하게 유지
 _DEBATE_WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday")
 
@@ -108,13 +111,13 @@ def _cron_worker_loop() -> None:
 
 def main() -> None:
     # Gemini 없어도 cron_engine(봇 스케줄)은 돌아야 함. 예전에는 여기서 return 해 Ollama 전용일 때 job이 영원히 안 돌았음.
-    if os.getenv("GEMINI_API_KEY"):
+    if get_gemini_api_keys():
         schedule.every().day.at("06:00").do(run_arxiv_pipeline)
         for _day in _DEBATE_WEEKDAYS:
             getattr(schedule.every(), _day).at("02:00").do(run_llm_debate)
     else:
         print(
-            "⚠️ GEMINI_API_KEY 없음 — arXiv(06:00)·LLM토론(월~금 02:00)만 건너뜁니다.\n"
+            "⚠️ Gemini API 키 없음 — arXiv(06:00)·LLM토론(월~금 02:00)만 건너뜁니다.\n"
             "   cron_engine(등록한 매일/주간 작업)은 계속 동작합니다."
         )
 
@@ -123,7 +126,7 @@ def main() -> None:
     cron_thread.start()
 
     print("📅 통합 스케줄러 시작")
-    if os.getenv("GEMINI_API_KEY"):
+    if get_gemini_api_keys():
         print("   - arXiv 파이프라인: 매일 06:00")
         print("   - LLM 토론: 월~금 02:00 (주 5회)")
     print("   - cron_engine: 1분마다 due job 체크 → 텔레그램 선톡")

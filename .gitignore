@@ -31,6 +31,9 @@ chat_memory.db
 # 테스트 결과
 batch_test_results.json
 test_tavily_qwen_result.txt
+# Qwen 검열·거절 프로브용 로컬 프롬프트 목록 (예시는 tests/fixtures/qwen_probe_prompts.example.json)
+tests/fixtures/qwen_probe_prompts.json
+scripts/qwen_probe_results.jsonl
 
 # Tuya / 로컬 기기 덤프 (비밀·환경별)
 devices.json
