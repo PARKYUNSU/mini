@@ -108,7 +108,7 @@ def test_executor_node_code_run_mock_llm_and_sandbox(monkeypatch):
         def invoke(self, _msgs):
             return Resp()
 
-    monkeypatch.setattr(agent_nodes, "get_executor_llm", lambda: LLM())
+    monkeypatch.setattr(agent_nodes, "get_coding_groq_llm", lambda: LLM())
     monkeypatch.setattr(agent_nodes, "_run_code_sandbox", lambda _code: "42")
 
     out = agent_nodes.executor_node(
@@ -132,7 +132,7 @@ def test_monitor_node_execution_error_sets_retry_hint(monkeypatch):
         def invoke(self, _msgs):
             return MResp()
 
-    monkeypatch.setattr(agent_nodes, "get_monitor_llm", lambda: MLLM())
+    monkeypatch.setattr(agent_nodes, "get_coding_groq_llm", lambda: MLLM())
 
     out = agent_nodes.monitor_node(
         {

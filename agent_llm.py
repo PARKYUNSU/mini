@@ -1,4 +1,7 @@
-"""Ollama / Gemini LLM 팩토리 (노드·RAG에서 공통 사용).
+"""Ollama / Gemini / Groq LLM 팩토리 (노드·RAG에서 공통 사용).
+
+- **Executor / Monitor 노드**: ``get_coding_groq_llm()`` (ChatGroq + 429 재시도).
+- **라우터 폴백·도구 선택·Tavily 요약**: ``get_executor_llm()`` (Gemini, 기존과 동일).
 
 Qwen 3.x(Ollama) 샘플링은 Alibaba Qwen 3.5 권장에 맞춘다.
 
@@ -12,11 +15,21 @@ Ollama API에는 OpenAI식 ``presence_penalty`` 가 없어, 문서의 반복 억
 """
 
 import os
+from typing import Any, Optional
 
+import httpx
+from langchain_core.runnables import RunnableConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 from agent_config import GEMINI_API_KEY, GEMINI_MODEL, ollama_kwargs
+
+# Groq 무료 한도·코딩용 기본 모델 (환경변수로 덮어쓰기 가능)
+GROQ_CODING_MODEL = os.getenv(
+    "GROQ_CODING_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct"
+)
 
 
 def get_router_llm():
@@ -58,14 +71,14 @@ def get_planner_plan_llm():
 
 
 def get_llm_debate_scheduler_llm():
-    """llm_debate_scheduler: Planner와 동일 샘플링, 논문 Q&A 장문용 num_predict만 확대."""
+    """llm_debate_scheduler: Golden Q&A용 reasoning 유지, 출력 상한은 Q&A 1세트에 맞게 보수적으로."""
     return ChatOllama(
         **ollama_kwargs(
             temperature=0.6,
             top_p=0.95,
             repeat_penalty=1.0,
             reasoning=True,
-            num_predict=4096,
+            num_predict=1500,
         )
     )
 
@@ -97,12 +110,65 @@ def get_vision_llm():
 
 
 def get_executor_llm():
+    """Gemini: 라우터 3단계 폴백, 기존 도구 LLM 선택, Tavily 요약 등 (Executor 노드 제외)."""
     return ChatGoogleGenerativeAI(
         model=GEMINI_MODEL, api_key=GEMINI_API_KEY or os.getenv("GEMINI_API_KEY"), temperature=0.1
     )
 
 
-def get_monitor_llm():
-    return ChatGoogleGenerativeAI(
-        model=GEMINI_MODEL, api_key=GEMINI_API_KEY or os.getenv("GEMINI_API_KEY"), temperature=0.1
+def _is_groq_rate_limit_error(exc: BaseException) -> bool:
+    """Groq/게이트웨이 429 및 Rate limit 계열 오류 판별."""
+    sc = getattr(exc, "status_code", None)
+    if sc == 429:
+        return True
+    response = getattr(exc, "response", None)
+    if response is not None:
+        rsc = getattr(response, "status_code", None)
+        if rsc == 429:
+            return True
+    if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code == 429:
+        return True
+    name = type(exc).__name__
+    if "RateLimit" in name or "TooManyRequests" in name:
+        return True
+    msg = str(exc).lower()
+    if "429" in msg and ("rate" in msg or "limit" in msg or "too many" in msg):
+        return True
+    return False
+
+
+class _CodingChatGroqWithRetry:
+    """Executor·Monitor 전용 ChatGroq 래퍼: 429 시 지수 백오프로 최대 3회 재시도(총 4회 시도)."""
+
+    def __init__(self) -> None:
+        key = os.getenv("GROQ_API_KEY")
+        self._llm = ChatGroq(
+            model=GROQ_CODING_MODEL,
+            api_key=key,
+            temperature=0.2,
+        )
+
+    @retry(
+        retry=retry_if_exception(_is_groq_rate_limit_error),
+        wait=wait_exponential(multiplier=1, min=2, max=45),
+        stop=stop_after_attempt(4),
+        reraise=True,
     )
+    def invoke(
+        self,
+        input: Any,
+        config: Optional[RunnableConfig] = None,
+        **kwargs: Any,
+    ):
+        return self._llm.invoke(input, config=config, **kwargs)
+
+
+_coding_groq_singleton: _CodingChatGroqWithRetry | None = None
+
+
+def get_coding_groq_llm():
+    """코드 작성(Executor)·검수(Monitor) 전용 Groq LLM. ``GROQ_API_KEY`` 필수."""
+    global _coding_groq_singleton
+    if _coding_groq_singleton is None:
+        _coding_groq_singleton = _CodingChatGroqWithRetry()
+    return _coding_groq_singleton

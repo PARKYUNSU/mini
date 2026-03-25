@@ -58,7 +58,8 @@ def _print_env_summary() -> None:
     lines = ["=== test_agent_flow 환경 요약 ==="]
     ok, why = _ollama_reachable()
     lines.append(f"  Ollama ({os.getenv('OLLAMA_HOST', 'http://localhost:11434')}): {'OK' if ok else 'SKIP 대상 — ' + why[:100]}")
-    lines.append(f"  GEMINI_API_KEY: {'설정됨' if os.getenv('GEMINI_API_KEY') else '없음 (Gemini 단계 SKIP)'}")
+    lines.append(f"  GEMINI_API_KEY: {'설정됨' if os.getenv('GEMINI_API_KEY') else '없음 (라우터 폴백·도구·Tavily SKIP)'}")
+    lines.append(f"  GROQ_API_KEY: {'설정됨' if os.getenv('GROQ_API_KEY') else '없음 (Executor/Monitor 단계 SKIP)'}")
     lines.append(f"  E2B_API_KEY: {'설정됨' if os.getenv('E2B_API_KEY') else '없음 (E2B 단계 SKIP)'}")
     lines.append(f"  TELEGRAM_TOKEN: {'설정됨' if os.getenv('TELEGRAM_TOKEN') else '없음 (봇 실행 시 필요)'}")
     lines.append("================================")
@@ -116,8 +117,27 @@ def test_ollama(*, verbose: bool) -> str:
         return "fail"
 
 
+def test_groq(*, verbose: bool) -> str:
+    print("2. Groq (Executor/Monitor 코딩 LLM) 테스트...")
+    if not (os.getenv("GROQ_API_KEY") or "").strip():
+        print("   SKIP: GROQ_API_KEY missing")
+        return "skip"
+    try:
+        from langchain_core.messages import HumanMessage
+        from langchain_groq import ChatGroq
+
+        model = os.getenv("GROQ_CODING_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct")
+        llm = ChatGroq(model=model, api_key=os.getenv("GROQ_API_KEY"), temperature=0.2)
+        r = llm.invoke([HumanMessage(content="1+1은? 숫자만")])
+        print(f"   OK: {(r.content or '')[:50]}...")
+        return "ok"
+    except Exception as e:  # noqa: BLE001
+        _summarize_exc(e, verbose=verbose)
+        return "fail"
+
+
 def test_gemini(*, verbose: bool) -> str:
-    print("2. Gemini (Executor/Monitor) 테스트...")
+    print("2b. Gemini (라우터 폴백·도구·Tavily) 스모크...")
     if not (os.getenv("GEMINI_API_KEY") or "").strip():
         print("   SKIP: GEMINI_API_KEY missing")
         return "skip"
@@ -258,9 +278,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Agent 외부 통합 점검 (SKIP/FAIL 구분)")
     parser.add_argument(
         "--only",
-        choices=("all", "ollama", "gemini", "chroma", "e2b", "graph"),
+        choices=("all", "ollama", "groq", "gemini", "chroma", "e2b", "graph"),
         default="all",
-        help="실행할 단계만 (graph = 5a+5b)",
+        help="실행할 단계만 (graph = 5a+5b). groq=Executor/Monitor, gemini=폴백·도구 경로",
     )
     parser.add_argument("--verbose", "-v", action="store_true", help="traceback 전체 출력")
     parser.add_argument(
@@ -276,6 +296,7 @@ def main() -> int:
 
     run = {
         "ollama": args.only in ("all", "ollama"),
+        "groq": args.only in ("all", "groq"),
         "gemini": args.only in ("all", "gemini"),
         "chroma": args.only in ("all", "chroma"),
         "e2b": args.only in ("all", "e2b"),
@@ -289,6 +310,8 @@ def main() -> int:
 
     if run["ollama"]:
         tally(test_ollama(verbose=args.verbose))
+    if run["groq"]:
+        tally(test_groq(verbose=args.verbose))
     if run["gemini"]:
         tally(test_gemini(verbose=args.verbose))
     if run["chroma"]:

@@ -3,9 +3,9 @@
 동일 사용자 문장으로 LangGraph를 텔레그램 없이 돌림.
 
   기본: SyntaxError 의도 요청 → code_run 경로(승인 생략) → executor/monitor + 타이밍
-  --reject: 복잡(planner) 요청 → interrupt → '거절' (Ollama만, Gemini/E2B 불필요)
+  --reject: 복잡(planner) 요청 → interrupt → '거절' (Ollama만, Groq/E2B 불필요)
 
-로컬: code_run·거절 플로우는 Ollama; 기본 완주는 GEMINI_API_KEY + E2B_API_KEY.
+로컬: code_run·거절 플로우는 Ollama; 기본 완주는 GROQ_API_KEY + E2B_API_KEY.
 """
 from __future__ import annotations
 
@@ -115,8 +115,8 @@ def run_approve_flow() -> int:
     print("=== code_run 플로우 (승인 생략 → 실행 → SyntaxError 유지) ===")
     print("요청:", text[:90], "…" if len(text) > 90 else "")
 
-    if not os.getenv("GEMINI_API_KEY"):
-        print("SKIP/FAIL: GEMINI_API_KEY 없음 (.env)")
+    if not os.getenv("GROQ_API_KEY"):
+        print("SKIP/FAIL: GROQ_API_KEY 없음 (.env)")
         return 2
     if not os.getenv("E2B_API_KEY"):
         print("SKIP/FAIL: E2B_API_KEY 없음")
@@ -189,7 +189,7 @@ def run_approve_flow() -> int:
 
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("--reject", action="store_true", help="거절만 검증 (Gemini/E2B 없이 가능)")
+    p.add_argument("--reject", action="store_true", help="거절만 검증 (Groq/E2B 없이 가능)")
     p.add_argument("--approve-only", action="store_true", help="승인 플로우만 (기본과 동일)")
     args = p.parse_args()
     if args.reject:

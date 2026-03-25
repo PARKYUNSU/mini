@@ -31,3 +31,5 @@ langgraph>=0.2.0
 langgraph-checkpoint>=0.1.0
 langgraph-checkpoint-sqlite>=2.0.0
 langchain-google-genai>=2.0.0
+# Executor/Monitor 코딩 전용 (Groq)
+langchain-groq>=0.2.0

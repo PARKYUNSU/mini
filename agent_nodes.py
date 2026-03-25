@@ -23,8 +23,8 @@ from agent_config import (
     resolve_agent_tool_py,
 )
 from agent_llm import (
+    get_coding_groq_llm,
     get_executor_llm,
-    get_monitor_llm,
     get_planner_llm,
     get_planner_plan_llm,
     get_router_llm,
@@ -705,7 +705,7 @@ def planner_debate_node(state: AgentState) -> dict:
 
 
 def executor_node(state: AgentState) -> dict:
-    """Executor: Gemini로 코드 작성 및 exec/eval 실행"""
+    """Executor: Groq(ChatGroq)로 코드 작성 및 exec/eval 실행"""
     if state.get("approval_status") != "approved":
         return {"generated_code": "", "execution_result": "승인되지 않음"}
     fe = (state.get("agent_fatal_error") or "").strip()
@@ -724,7 +724,7 @@ def executor_node(state: AgentState) -> dict:
             rag = ChromaRAGTool()
             rag_context = rag.search(state["user_request"])[:500] if state.get("user_request") else ""
 
-        llm = get_executor_llm()
+        llm = get_coding_groq_llm()
         plan_str = "\n".join(f"{i+1}. {p}" for i, p in enumerate(state.get("plan", [])))
         error_hint = state.get("error_hint", "")
         user_request = state.get("user_request", "")
@@ -779,7 +779,7 @@ def _is_result_irrelevant(user_request: str, execution_result: str) -> bool:
     if not user_request.strip() or not execution_result.strip():
         return False
     try:
-        llm = get_monitor_llm()
+        llm = get_coding_groq_llm()
         resp = llm.invoke(
             [HumanMessage(content=monitor_irrelevance_check_human(user_request, execution_result))]
         )
@@ -790,7 +790,7 @@ def _is_result_irrelevant(user_request: str, execution_result: str) -> bool:
 
 
 def monitor_node(state: AgentState) -> dict:
-    """Monitor: 실행 결과 감시 → 에러 시 error_hint와 함께 Executor로 (로그 압축).
+    """Monitor(Groq): 실행 결과 감시 → 에러 시 error_hint와 함께 Executor로 (로그 압축).
     문법 에러 없어도, 실행 결과가 user_request와 무관하면 반려(Retry)."""
     result = state.get("execution_result", "")
     retry = state.get("retry_count", 0)
@@ -808,7 +808,7 @@ def monitor_node(state: AgentState) -> dict:
     if is_error and retry < max_retry:
         truncated = _truncate_error(result)
         try:
-            llm = get_monitor_llm()
+            llm = get_coding_groq_llm()
             resp = llm.invoke(
                 [
                     HumanMessage(
@@ -832,7 +832,7 @@ def monitor_node(state: AgentState) -> dict:
         and _is_result_irrelevant(user_request, result)
     ):
         try:
-            llm = get_monitor_llm()
+            llm = get_coding_groq_llm()
             resp = llm.invoke(
                 [HumanMessage(content=monitor_content_irrelevant_retry_human(user_request, result))]
             )

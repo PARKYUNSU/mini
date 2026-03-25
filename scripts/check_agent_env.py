@@ -56,7 +56,8 @@ def _check_ollama_line() -> str:
 def _check_keys_lines() -> list[str]:
     load_dotenv()
     optional = [
-        ("GEMINI_API_KEY", "test_agent_flow 2·그래프 executor"),
+        ("GEMINI_API_KEY", "라우터 폴백·도구·Tavily 요약"),
+        ("GROQ_API_KEY", "Executor/Monitor 코딩·검수"),
         ("E2B_API_KEY", "test_agent_flow 4·코드 실행"),
         ("TELEGRAM_TOKEN", "agent_bot.py"),
         ("TAVILY_API_KEY", "웹 검색 도구"),
@@ -101,6 +102,7 @@ def main() -> int:
     checks = [
         ("langchain_ollama", "langchain-ollama"),
         ("langchain_google_genai", "langchain-google-genai"),
+        ("langchain_groq", "langchain-groq"),
         ("langchain_core", "langchain-core"),
         ("langgraph", "langgraph"),
         ("chromadb", "chromadb"),

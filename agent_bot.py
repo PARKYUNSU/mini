@@ -29,6 +29,7 @@ from agent_config import (
     BACKFILL_LOG_PATH,
     CHECKPOINT_DB_PATH,
     GEMINI_API_KEY,
+    GROQ_API_KEY,
     GEMINI_MODEL,
     LLM_RETRY_DELAY_SEC,
     LLM_RETRY_MAX,
@@ -143,8 +144,11 @@ def _acquire_agent_bot_singleton_lock():
 
 # ============ 텔레그램 봇 ============
 def main():
-    if not all([TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GEMINI_API_KEY]):
-        print("❌ .env에 TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GEMINI_API_KEY를 설정하세요.")
+    if not all([TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GEMINI_API_KEY, GROQ_API_KEY]):
+        print(
+            "❌ .env에 TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GEMINI_API_KEY, GROQ_API_KEY를 설정하세요."
+            "\n   (Executor/Monitor는 Groq, 라우터·도구·Tavily 폴백은 Gemini를 사용합니다.)"
+        )
         return
     if not os.getenv("E2B_API_KEY"):
         print("⚠️ E2B_API_KEY가 .env에 없습니다. Executor의 코드 실행이 실패합니다.")
@@ -203,7 +207,7 @@ def main():
                                 if node_name == "planner_debate" and status_msg:
                                     _safe_telegram_edit(bot, "🧠 계획을 내부 검토 중입니다...", chat_id, status_msg.message_id)
                                 elif node_name == "executor" and status_msg:
-                                    _safe_telegram_edit(bot, "💻 Gemini가 코드를 작성 중입니다...", chat_id, status_msg.message_id)
+                                    _safe_telegram_edit(bot, "💻 Groq(Llama)가 코드를 작성 중입니다...", chat_id, status_msg.message_id)
                                 elif node_name == "monitor" and status_msg:
                                     is_retry = "retry_count" in (node_state or {})
                                     txt = "🚨 에러 발생! 코드를 스스로 수정하고 재시도합니다..." if is_retry else "🔍 샌드박스에서 코드를 테스트 중입니다..."
