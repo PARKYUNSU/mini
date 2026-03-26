@@ -8,12 +8,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+# 번호형 변수: GEMINI_API_KEY + GEMINI_API_KEY_2 … _N (아래 끝 번호까지, 비어 있으면 스킵)
+_GEMINI_API_KEY_NUMBERED_MAX = 8
+
+
 def get_gemini_api_keys() -> list[str]:
     """
     Gemini 키 목록 (순서대로 사용, 429 시 다음 키로 폴백).
 
-    - ``GEMINI_API_KEYS=key1,key2`` 가 비어 있지 않으면 이 목록만 사용.
-    - 그렇지 않으면 ``GEMINI_API_KEY``, ``GEMINI_API_KEY_2``, ``GEMINI_API_KEY_3`` 중
+    - ``GEMINI_API_KEYS=key1,key2,...`` 가 비어 있지 않으면 이 목록만 사용 (개수 제한 없음).
+    - 그렇지 않으면 ``GEMINI_API_KEY``, ``GEMINI_API_KEY_2`` … ``GEMINI_API_KEY_8`` 중
       값이 있는 것만 순서대로 사용.
     """
     raw = (os.getenv("GEMINI_API_KEYS") or "").strip()
@@ -21,8 +25,11 @@ def get_gemini_api_keys() -> list[str]:
     if raw:
         keys = [p.strip() for p in raw.split(",") if p.strip()]
     if not keys:
-        for name in ("GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"):
-            v = (os.getenv(name) or "").strip()
+        primary = (os.getenv("GEMINI_API_KEY") or "").strip()
+        if primary:
+            keys.append(primary)
+        for i in range(2, _GEMINI_API_KEY_NUMBERED_MAX + 1):
+            v = (os.getenv(f"GEMINI_API_KEY_{i}") or "").strip()
             if v:
                 keys.append(v)
     seen: set[str] = set()
@@ -67,6 +74,13 @@ CHAT_MEMORY_DB_PATH = "./chat_memory.db"
 BACKFILL_SCRIPT_PATH = PROJECT_ROOT / "run_backfill.py"
 BACKFILL_LOG_PATH = PROJECT_ROOT / "backfill_2023_2026.log"
 BACKFILL_PID_PATH = PROJECT_ROOT / ".backfill.pid"
+LLM_DEBATE_SCHEDULER_PATH = PROJECT_ROOT / "llm_debate_scheduler.py"
+LLM_DEBATE_TELEGRAM_LOG_PATH = PROJECT_ROOT / "llm_debate_telegram.log"
+LLM_DEBATE_TELEGRAM_PID_PATH = PROJECT_ROOT / ".llm_debate.telegram.pid"
+try:
+    LLM_DEBATE_TELEGRAM_DURATION_SEC = int(os.getenv("LLM_DEBATE_TELEGRAM_DURATION_SEC", "14400"))
+except ValueError:
+    LLM_DEBATE_TELEGRAM_DURATION_SEC = 14400
 # cron_engine: 스케줄 작업 저장 경로 (add_job, list_jobs 등)
 CRON_JOBS_DIR = PROJECT_ROOT / ".cron"
 LLM_RETRY_MAX = 3

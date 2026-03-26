@@ -53,6 +53,13 @@ python run_backfill.py -s 2024-06-01 -e 2024-12-31 -b 20  # 20개씩 페이징
 
 **정보 오염 방지**: 오래된 논문은 구시대 지식이 될 수 있어, 최신 1~2년 치만 수집하는 것을 권장합니다.
 
+### `/papers` 숫자가 줄었을 때 (큐 보충 정책)
+
+텔레그램 `/papers`는 **`raw_data_queue/crawled_papers.jsonl`에 남아 있는 논문**만 셉니다. LLM 토론 배치가 끝나면 일부가 `raw_data_queue/processed/`로 옮겨져 숫자가 줄어드는 것이 정상입니다.
+
+- **권장**: `processed/`를 통째로 되돌리기보다 **백필(또는 매일 `main.py` 스케줄)**로 **새 논문**을 큐에 쌓습니다.
+- **빠른 보충**: 최근 N일 구간만 백필하려면 `bash scripts/refill_crawled_queue.sh` (기본 N=90, `REFILL_QUEUE_LOOKBACK_DAYS`로 변경 가능). `run_backfill.py` 인자만 쓰려면 `bash scripts/refill_crawled_queue.sh -- -s 2025-01-01 -e 2025-03-01`.
+
 ---
 
 ## 2. 환경 변수 (.env)
@@ -99,6 +106,7 @@ python llm_debate_scheduler.py --test --file sample.jsonl --max-records 3
 ### 텔레그램 운영 명령
 
 - `/reboot`: 봇 프로세스 재부팅
+- `/papers` (또는 `/paperlist`, `/논문목록`): `crawled_papers.jsonl` 큐에 있는 논문 목록
 - `/backfill_start`: 백필 시작
 - `/backfill_stop`: 실행 중인 백필 중지
 

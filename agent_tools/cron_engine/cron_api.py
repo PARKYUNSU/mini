@@ -105,11 +105,26 @@ def add_job(
 
 
 def list_jobs() -> str:
-    """등록된 스케줄 작업 목록 반환"""
+    """등록된 스케줄 작업 목록 반환. SCHEDULE_CHAT_ID 가 있으면 해당 채팅만."""
+    import os
+
     data = load_jobs()
-    jobs = data.get("jobs", {})
+    jobs: dict = dict(data.get("jobs", {}))
+    total_all = len(jobs)
+    chat_filter = (os.getenv("SCHEDULE_CHAT_ID") or "").strip()
+    if chat_filter:
+        jobs = {
+            k: v
+            for k, v in jobs.items()
+            if str(v.get("chat_id", "")).strip() == chat_filter
+        }
 
     if not jobs:
+        if chat_filter and total_all > 0:
+            return (
+                f"이 채팅({chat_filter})에 등록된 스케줄은 없습니다.\n"
+                f"(저장소 전체에는 {total_all}건이 있으나 다른 chat_id 입니다.)"
+            )
         return "등록된 스케줄 작업이 없습니다."
 
     lines = []

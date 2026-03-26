@@ -474,7 +474,7 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
         print(f"    ❌ Qwen 초안 실패: {e}")
         return None
 
-    # 2. Gemini 비평 및 수정 (429 시 GEMINI_API_KEY_2/3 또는 GEMINI_API_KEYS 순서로 폴백)
+    # 2. Gemini 비평 및 수정 (429 시 다음 키로 폴백 — get_gemini_api_keys 순서)
     print(f"    [2/3] Gemini 비평/수정 중...")
     try:
         critique_prompt = f"""다음은 Qwen이 만든 Q&A 초안입니다.
@@ -589,9 +589,13 @@ def weekly_llm_debate_event(
         print(f"  📄 처리 중: {file_path.name} ({len(records)}건)")
 
         success_in_file = 0
+        exited_by_timeout = False
+        resume_from_index = 0
         for i, rec in enumerate(records):
             if (time.time() - start) >= duration_sec:
                 print(f"  ⏰ 시간 한도({duration_sec}s) 도달, 배치 종료")
+                exited_by_timeout = True
+                resume_from_index = i
                 break
 
             paper_id = str(rec.get("paper_id", "")).strip()
@@ -620,8 +624,24 @@ def weekly_llm_debate_event(
                 print(f"    ❌ [{i+1}/{len(records)}] 오류: {e}")
                 time.sleep(5)
 
-        mark_file_processed(file_path)
-        processed_files.append(file_path.name)
+        # 시간 부족으로 중간에 끊기면, 아직 안 본 레코드는 같은 JSONL에 남겨 다음 배치가 이어서 처리하게 함.
+        # (예전에는 통째로 processed/로 옮겨 나머지 ~900편이 큐에서 사라짐)
+        if exited_by_timeout and resume_from_index < len(records):
+            remaining = records[resume_from_index:]
+            try:
+                with open(file_path, "w", encoding="utf-8") as out:
+                    for r in remaining:
+                        out.write(json.dumps(r, ensure_ascii=False) + "\n")
+                print(
+                    f"  📌 미처리 {len(remaining)}건을 `{file_path.name}`에 유지했습니다. "
+                    "다음 배치에서 이어서 처리됩니다.",
+                    flush=True,
+                )
+            except Exception as e:
+                print(f"  ⚠️ 미처리 큐 재기록 실패 ({file_path}): {e}", flush=True)
+        else:
+            mark_file_processed(file_path)
+            processed_files.append(file_path.name)
         print(f"  📊 파일 처리 완료: {success_in_file}/{len(records)}건 저장")
         if target_file:
             break
@@ -669,7 +689,7 @@ def weekly_llm_debate_event(
 def main() -> None:
     _configure_utf8_stdio()
     if not get_gemini_api_keys():
-        print("❌ .env에 GEMINI_API_KEY(또는 GEMINI_API_KEYS / GEMINI_API_KEY_2)를 설정하세요.")
+        print("❌ .env에 GEMINI_API_KEY(또는 GEMINI_API_KEYS / GEMINI_API_KEY_2…_8)를 설정하세요.")
         return
 
     parser = argparse.ArgumentParser(description="LLM 토론 기반 파인튜닝 데이터 생성 배치")

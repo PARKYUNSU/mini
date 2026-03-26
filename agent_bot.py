@@ -13,6 +13,7 @@ import sqlite3
 import subprocess
 import sys
 import time
+import unicodedata
 from pathlib import Path
 import traceback
 from concurrent.futures import ThreadPoolExecutor
@@ -24,12 +25,17 @@ import telebot
 from telebot.types import ReplyKeyboardRemove
 
 from agent_backfill_telegram import start_backfill_process, stop_backfill_process
+from agent_debate_telegram import (
+    start_llm_debate_telegram_process,
+    stop_llm_debate_telegram_process,
+)
 from agent_chroma_rag import list_stored_papers_text
 from agent_config import (
     BACKFILL_LOG_PATH,
     CHECKPOINT_DB_PATH,
     GROQ_API_KEY,
     GEMINI_MODEL,
+    LLM_DEBATE_TELEGRAM_LOG_PATH,
     get_gemini_api_keys,
     LLM_RETRY_DELAY_SEC,
     LLM_RETRY_MAX,
@@ -37,6 +43,7 @@ from agent_config import (
     TELEGRAM_TOKEN,
     ALLOWED_CHAT_ID,
 )
+from agent_cron_worker import start_cron_worker_daemon
 from agent_graph import build_graph
 from agent_nodes import _is_execution_failure, _run_tool_on_host
 from agent_session import (
@@ -73,6 +80,14 @@ _thread_version: dict[str, int] = {}
 _AGENT_BOT_LOCK_FD_HOLDER: list = []
 
 _TELEGRAM_MSG_SOFT_LIMIT = 3800
+
+
+def _telegram_slash_command_token(text: str) -> str:
+    """BOM·양방향 문자·전각 슬래시 정규화 후 첫 토큰 소문자 (/debate_start 등)."""
+    t = unicodedata.normalize("NFKC", (text or "").strip()).lstrip("\ufeff\u200e\u200f").strip()
+    if not t:
+        return ""
+    return t.split()[0].lower()
 
 
 def _split_telegram_chunks(text: str, limit: int = _TELEGRAM_MSG_SOFT_LIMIT) -> list[str]:
@@ -147,7 +162,7 @@ def main():
     if not all([TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GROQ_API_KEY]) or not get_gemini_api_keys():
         print(
             "❌ .env에 TELEGRAM_TOKEN, ALLOWED_CHAT_ID, GROQ_API_KEY, "
-            "그리고 Gemini 키(GEMINI_API_KEY 또는 GEMINI_API_KEYS)를 설정하세요."
+            "그리고 Gemini 키(GEMINI_API_KEY·GEMINI_API_KEY_2…_8 또는 GEMINI_API_KEYS)를 설정하세요."
             "\n   (Executor/Monitor는 Groq, 라우터·도구·Tavily 폴백은 Gemini를 사용합니다.)"
         )
         return
@@ -167,6 +182,9 @@ def main():
         sync_tool_chroma_from_disk()
     except Exception as e:
         print(f"⚠️ Tool RAG(tool_chroma_db) 초기 동기화 실패 — 빈 인덱스로 동작할 수 있습니다: {e}")
+
+    # cron_engine: run_scheduler 없이 agent_bot 만 켜도 등록 스케줄이 돌아가게 함 (중복은 .cron/cron_worker.lock)
+    start_cron_worker_daemon(respect_agent_disable_env=True)
 
     # 재시작 후: 체크포인트에서 승인 대기 중인 세션 복구
     for cid in allowed_ids:
@@ -488,6 +506,35 @@ def main():
         prefix = "🛑 " if ok else "ℹ️ "
         bot.reply_to(message, f"{prefix}{detail}", parse_mode="Markdown")
 
+    @bot.message_handler(commands=["debate_start", "논문토론시작"])
+    def on_debate_start(message):
+        """LLM 논문 토론 배치(llm_debate_scheduler --test) 백그라운드 시작."""
+        chat_id = str(message.chat.id)
+        if chat_id not in allowed_ids:
+            bot.reply_to(message, "접근 권한이 없는 사용자입니다.")
+            return
+
+        ok, detail = start_llm_debate_telegram_process()
+        prefix = "🧪 " if ok else "⚠️ "
+        bot.reply_to(
+            message,
+            f"{prefix}{detail}\n"
+            f"로그: `{LLM_DEBATE_TELEGRAM_LOG_PATH.name}`\n"
+            f"중지: `/debate_stop`",
+            parse_mode="Markdown",
+        )
+
+    @bot.message_handler(commands=["debate_stop", "논문토론중지"])
+    def on_debate_stop(message):
+        chat_id = str(message.chat.id)
+        if chat_id not in allowed_ids:
+            bot.reply_to(message, "접근 권한이 없는 사용자입니다.")
+            return
+
+        ok, detail = stop_llm_debate_telegram_process()
+        prefix = "🛑 " if ok else "ℹ️ "
+        bot.reply_to(message, f"{prefix}{detail}", parse_mode="Markdown")
+
     @bot.message_handler(commands=["schedule", "스케줄"])
     def on_schedule(message):
         """등록된 스케줄 목록 조회"""
@@ -609,6 +656,30 @@ def main():
                         _set_paper_mode(chat_id, not cur)
                         status = "ON" if not cur else "OFF"
                         bot.reply_to(message, f"📚 논문 모드 {status}. {'논문 관련 질문을 저장된 논문에서 검색합니다.' if not cur else '일반/웹 검색을 사용합니다.'}")
+                return
+
+            # /debate_* : 그룹 등에서 command 엔티티가 아닌 일반 텍스트로 올 때 commands= 핸들러가
+            # 건너뛰어 Router로 가는 경우가 있어, /paper 와 같이 여기서도 처리한다.
+            cmd0 = _telegram_slash_command_token(text)
+            if cmd0 in ("/debate_start", "/논문토론시작") or (
+                cmd0.startswith("/debate_start@") and "@" in cmd0
+            ):
+                ok, detail = start_llm_debate_telegram_process()
+                prefix = "🧪 " if ok else "⚠️ "
+                bot.reply_to(
+                    message,
+                    f"{prefix}{detail}\n"
+                    f"로그: `{LLM_DEBATE_TELEGRAM_LOG_PATH.name}`\n"
+                    f"중지: `/debate_stop`",
+                    parse_mode="Markdown",
+                )
+                return
+            if cmd0 in ("/debate_stop", "/논문토론중지") or (
+                cmd0.startswith("/debate_stop@") and "@" in cmd0
+            ):
+                ok, detail = stop_llm_debate_telegram_process()
+                prefix = "🛑 " if ok else "ℹ️ "
+                bot.reply_to(message, f"{prefix}{detail}", parse_mode="Markdown")
                 return
 
             # 1차 방어: Rule-based 취소/재시작 문지기 (최상단)

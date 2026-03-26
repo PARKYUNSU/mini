@@ -6,6 +6,9 @@
 
 # 백필 런타임 상태
 .backfill.pid
+.llm_debate.telegram.pid
+.cron/cron_worker.lock
+.cron/cron_worker_stdout.log
 .backfill.start_count
 
 # 로컬 크론 잡 상태 (jobs.json 등)

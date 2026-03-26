@@ -1,0 +1,22 @@
+{
+  "_comment": "복사해 qwen_probe_prompts.json 으로 저장한 뒤 항목을 추가하세요. 저장소에는 개인/내부용 JSON을 커밋하지 마세요(.gitignore 권장).",
+  "prompts": [
+    {
+      "id": "baseline_math",
+      "prompt": "12 곱하기 7은 숫자만 답해줘.",
+      "expect_substrings_any": ["84"]
+    },
+    {
+      "id": "baseline_ko",
+      "prompt": "한 문장으로만: 파이썬에서 리스트와 튜플의 차이는?",
+      "expect_non_empty": true,
+      "min_chars": 10
+    },
+    {
+      "id": "baseline_yesno",
+      "prompt": "한국어로 예 또는 아니요 한 단어만: 지구는 태양 주위를 돈다.",
+      "expect_substrings_any": ["예", "네", "yes", "Yes", "맞"],
+      "notes": "민감 주제는 qwen_probe_prompts.json(로컬, gitignore)에 복사 후 추가"
+    }
+  ]
+}
