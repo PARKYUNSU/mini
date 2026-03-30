@@ -56,11 +56,71 @@ def run_arxiv_pipeline() -> None:
     )
 
 
+def _scheduler_debate_pid_path() -> Path:
+    return PROJECT_ROOT / ".cron" / "llm_debate_batch_scheduler.pid"
+
+
+def _load_scheduler_debate_pid() -> int | None:
+    path = _scheduler_debate_pid_path()
+    try:
+        t = path.read_text(encoding="utf-8").strip()
+        return int(t) if t else None
+    except Exception:
+        return None
+
+
+def _save_scheduler_debate_pid(pid: int) -> None:
+    path = _scheduler_debate_pid_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(str(pid), encoding="utf-8")
+
+
+def _clear_scheduler_debate_pid_file() -> None:
+    try:
+        _scheduler_debate_pid_path().unlink()
+    except OSError:
+        pass
+
+
+def _is_scheduler_spawned_debate_running() -> bool:
+    """이전에 run_scheduler 가 Popen 한 llm_debate_scheduler 자식이 아직 살아 있으면 True."""
+    pid = _load_scheduler_debate_pid()
+    if pid is None:
+        return False
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        _clear_scheduler_debate_pid_file()
+        return False
+    try:
+        out = subprocess.check_output(
+            ["ps", "-p", str(pid), "-o", "command="],
+            text=True,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
+        _clear_scheduler_debate_pid_file()
+        return False
+    if "llm_debate_scheduler" not in (out or ""):
+        _clear_scheduler_debate_pid_file()
+        return False
+    return True
+
+
 def _spawn_llm_debate_batch_background(duration_sec: int) -> None:
     """
     무제한(또는 장시간) 배치는 subprocess.run으로 기다리지 않고 기동만 함.
     schedule.run_pending()·cron 1분 루프가 막히지 않도록 함.
     """
+    if _is_scheduler_spawned_debate_running():
+        old = _load_scheduler_debate_pid()
+        print(
+            f"   ⏭️ 이전 스케줄 토론 배치가 아직 실행 중(pid={old}) — 중복 기동 생략",
+            flush=True,
+        )
+        return
+
     cmd = [
         sys.executable,
         "-u",
@@ -85,8 +145,10 @@ def _spawn_llm_debate_batch_background(duration_sec: int) -> None:
         )
         logf.write(f"child_pid={proc.pid}\n")
         logf.flush()
+    _save_scheduler_debate_pid(proc.pid)
     rel = log_path.relative_to(PROJECT_ROOT)
-    print(f"   백그라운드 PID={proc.pid} (로그: {rel})", flush=True)
+    pid_rel = _scheduler_debate_pid_path().relative_to(PROJECT_ROOT)
+    print(f"   백그라운드 PID={proc.pid} (로그: {rel}, pid파일: {pid_rel})", flush=True)
 
 
 @with_scheduler_retry("LLM 토론 배치")

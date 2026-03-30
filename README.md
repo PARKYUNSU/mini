@@ -98,7 +98,7 @@ RAG(논문 질문 답변) + Agent(코딩 실행) 통합 봇입니다.
 
 ### LLM 토론 스케줄러 (`llm_debate_scheduler.py`)
 
-- **월~금 02:00** 배치는 `run_scheduler.py`가 `llm_debate_scheduler.py --test` 호출. **`LLM_DEBATE_BATCH_DURATION_SEC`** (기본 **0**): `0`이면 **시간 제한 없이 백그라운드 기동**만 하고 스케줄 메인 루프는 즉시 돌아옵니다(로그: `.cron/llm_debate_batch_stdout.log`). 양수면 그만큼 초 동안 **동기** 실행(`subprocess.run`).
+- **월~금 02:00** 배치는 `run_scheduler.py`가 `llm_debate_scheduler.py --test` 호출. **`LLM_DEBATE_BATCH_DURATION_SEC`** (기본 **0**): `0`이면 **시간 제한 없이 백그라운드 기동**만 하고 스케줄 메인 루프는 즉시 돌아옵니다(로그: `.cron/llm_debate_batch_stdout.log`, PID: `.cron/llm_debate_batch_scheduler.pid`). **이전에 스케줄이 띄운 배치가 아직 돌면 중복 기동하지 않습니다.** 양수면 그만큼 초 동안 **동기** 실행(`subprocess.run`).
 - 텔레그램 **`/debate_start`** 는 **`LLM_DEBATE_TELEGRAM_DURATION_SEC`** (기본 **0** = 무제한, 별도 프로세스).
 - `raw_data_queue/`의 JSONL → Qwen(초안) → Gemini(비평, 429 시 키 순환) → Qwen(최종) → `finetune_datasets/train_data.jsonl`
 - 이미 토론 완료된 `paper_id`는 `finetune_datasets/debated_paper_ids.jsonl` 기준으로 자동 스킵
