@@ -2,7 +2,7 @@
 """
 통합 스케줄러 - M2 맥 미니 24시간 운영용
 - arXiv 파이프라인: 매일 06:00
-- LLM 토론 배치: 월~금 02:00 각 1회 (각 최대 2시간)
+- LLM 토론 배치: 월~금 02:00 각 1회 (시간 한도는 LLM_DEBATE_BATCH_DURATION_SEC, 기본 0=무제한)
 - cron_engine: 1분마다 due job 체크 → LangGraph 트리거 → 텔레그램 선톡 (agent_bot 단독 실행 시에도 동일 worker 가 뜸, 락으로 중복 방지)
 - 메인 봇(agent_bot.py)은 별도 프로세스로 실행
 """
@@ -33,6 +33,15 @@ from agent_cron_worker import start_cron_worker_daemon  # noqa: E402
 _DEBATE_WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday")
 
 
+def _llm_debate_batch_duration_sec() -> int:
+    """0 이하 = 시간 제한 없음. 미설정 시 0."""
+    raw = (os.getenv("LLM_DEBATE_BATCH_DURATION_SEC") or "0").strip()
+    try:
+        return int(raw)
+    except ValueError:
+        return 0
+
+
 @with_scheduler_retry("arXiv 파이프라인")
 def run_arxiv_pipeline() -> None:
     """main.py 실행 (arXiv 수집 → RAG → raw_data_queue). 네트워크 에러 시 재시도 후 텔레그램 알림."""
@@ -49,12 +58,23 @@ def run_arxiv_pipeline() -> None:
 
 @with_scheduler_retry("LLM 토론 배치")
 def run_llm_debate() -> None:
-    """llm_debate_scheduler.py --test 실행 (2시간 배치). 네트워크 에러 시 재시도 후 텔레그램 알림."""
+    """llm_debate_scheduler.py --test 실행. 네트워크 에러 시 재시도 후 텔레그램 알림."""
+    d = _llm_debate_batch_duration_sec()
     print("\n" + "=" * 60)
     print("🚀 [스케줄] LLM 토론 배치 실행")
+    if d <= 0:
+        print("   (시간 제한 없음 — LLM_DEBATE_BATCH_DURATION_SEC=0 또는 미설정)")
+    else:
+        print(f"   (최대 {d}초 ≈ {d / 3600:.2f}시간)")
     print("=" * 60)
     subprocess.run(
-        [sys.executable, str(PROJECT_ROOT / "llm_debate_scheduler.py"), "--test"],
+        [
+            sys.executable,
+            str(PROJECT_ROOT / "llm_debate_scheduler.py"),
+            "--test",
+            "--duration-sec",
+            str(d),
+        ],
         cwd=PROJECT_ROOT,
         check=True,
         **_SUBPROCESS_KWARGS,
@@ -79,7 +99,9 @@ def main() -> None:
     print("📅 통합 스케줄러 시작")
     if get_gemini_api_keys():
         print("   - arXiv 파이프라인: 매일 06:00")
-        print("   - LLM 토론: 월~금 02:00 (주 5회)")
+        _bd = _llm_debate_batch_duration_sec()
+        _bmsg = "시간 제한 없음" if _bd <= 0 else f"최대 {_bd}s"
+        print(f"   - LLM 토론: 월~금 02:00 (주 5회, {_bmsg} · LLM_DEBATE_BATCH_DURATION_SEC)")
     print("   - cron_engine: 1분마다 due job 체크 → 텔레그램 선톡")
     print("   - 메인 봇: 별도 터미널에서 python agent_bot.py")
     print("   Ctrl+C로 종료\n")

@@ -93,13 +93,15 @@ RAG(논문 질문 답변) + Agent(코딩 실행) 통합 봇입니다.
 
 ### LLM 토론 스케줄러 (`llm_debate_scheduler.py`)
 
-- **월~금 02:00**에 각각 최대 2시간 배치 실행 (주 5회, 큐·시간에 따라 실제 저장 건수는 가변)
-- `raw_data_queue/`의 JSONL → Qwen(초안) → Gemini(비평) → Qwen(최종) → `finetune_datasets/train_data.jsonl`
+- **월~금 02:00** 배치는 `run_scheduler.py`가 `llm_debate_scheduler.py --test` 호출. 실행 시간 상한은 **`LLM_DEBATE_BATCH_DURATION_SEC`** (기본 **0** = 시간 제한 없음, 큐 소진까지).
+- 텔레그램 **`/debate_start`** 는 **`LLM_DEBATE_TELEGRAM_DURATION_SEC`** (기본 **0** = 무제한).
+- `raw_data_queue/`의 JSONL → Qwen(초안) → Gemini(비평, 429 시 키 순환) → Qwen(최종) → `finetune_datasets/train_data.jsonl`
 - 이미 토론 완료된 `paper_id`는 `finetune_datasets/debated_paper_ids.jsonl` 기준으로 자동 스킵
+- 상한을 두려면: `--duration-sec 7200` 또는 `.env`에 초 단위로 양수 설정
 
 ```bash
 python llm_debate_scheduler.py           # 스케줄 대기
-python llm_debate_scheduler.py --test    # 즉시 1회 테스트
+python llm_debate_scheduler.py --test    # 즉시 1회 (기본 시간 한도는 EVENT_DURATION_SEC, `--duration-sec 0` 이면 무제한)
 python llm_debate_scheduler.py --test --file sample.jsonl --max-records 3
 ```
 

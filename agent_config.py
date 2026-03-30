@@ -78,9 +78,10 @@ LLM_DEBATE_SCHEDULER_PATH = PROJECT_ROOT / "llm_debate_scheduler.py"
 LLM_DEBATE_TELEGRAM_LOG_PATH = PROJECT_ROOT / "llm_debate_telegram.log"
 LLM_DEBATE_TELEGRAM_PID_PATH = PROJECT_ROOT / ".llm_debate.telegram.pid"
 try:
-    LLM_DEBATE_TELEGRAM_DURATION_SEC = int(os.getenv("LLM_DEBATE_TELEGRAM_DURATION_SEC", "14400"))
+    # 0 이하 = 시간 제한 없음 (큐 소진 또는 /debate_stop까지)
+    LLM_DEBATE_TELEGRAM_DURATION_SEC = int(os.getenv("LLM_DEBATE_TELEGRAM_DURATION_SEC", "0"))
 except ValueError:
-    LLM_DEBATE_TELEGRAM_DURATION_SEC = 14400
+    LLM_DEBATE_TELEGRAM_DURATION_SEC = 0
 # cron_engine: 스케줄 작업 저장 경로 (add_job, list_jobs 등)
 CRON_JOBS_DIR = PROJECT_ROOT / ".cron"
 LLM_RETRY_MAX = 3

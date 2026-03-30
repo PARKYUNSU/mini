@@ -9,13 +9,28 @@ import sys
 import time
 from typing import Optional
 
+from dotenv import load_dotenv
+
 from agent_config import (
     LLM_DEBATE_SCHEDULER_PATH,
-    LLM_DEBATE_TELEGRAM_DURATION_SEC,
     LLM_DEBATE_TELEGRAM_LOG_PATH,
     LLM_DEBATE_TELEGRAM_PID_PATH,
     PROJECT_ROOT,
 )
+
+
+def _telegram_debate_duration_sec() -> int:
+    """`/debate_start` 호출마다 .env를 다시 읽음. 미설정·0 이하 = 시간 제한 없음."""
+    env_path = PROJECT_ROOT / ".env"
+    if env_path.is_file():
+        load_dotenv(env_path, override=True)
+    else:
+        load_dotenv(override=True)
+    raw = (os.getenv("LLM_DEBATE_TELEGRAM_DURATION_SEC") or "0").strip()
+    try:
+        return int(raw)
+    except ValueError:
+        return 0
 
 
 def _read_debate_pid() -> Optional[int]:
@@ -57,26 +72,28 @@ def start_llm_debate_telegram_process() -> tuple[bool, str]:
     if not LLM_DEBATE_SCHEDULER_PATH.is_file():
         return False, f"스크립트 없음: {LLM_DEBATE_SCHEDULER_PATH}"
 
-    duration = LLM_DEBATE_TELEGRAM_DURATION_SEC
+    duration = _telegram_debate_duration_sec()
     try:
         LLM_DEBATE_TELEGRAM_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
         with open(LLM_DEBATE_TELEGRAM_LOG_PATH, "a", encoding="utf-8") as log_file:
             log_file.write("\n" + "=" * 60 + "\n")
             log_file.write(
                 f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] [telegram] "
-                f"llm_debate_scheduler.py --test --duration-sec {duration}\n"
+                f"llm_debate_scheduler.py --test --duration-sec {duration} "
+                f"({'시간제한없음' if duration <= 0 else f'{duration}s'})\n"
             )
             log_file.write("=" * 60 + "\n")
             log_file.flush()
+            cmd = [
+                sys.executable,
+                "-u",
+                str(LLM_DEBATE_SCHEDULER_PATH),
+                "--test",
+                "--duration-sec",
+                str(duration),
+            ]
             proc = subprocess.Popen(
-                [
-                    sys.executable,
-                    "-u",
-                    str(LLM_DEBATE_SCHEDULER_PATH),
-                    "--test",
-                    "--duration-sec",
-                    str(duration),
-                ],
+                cmd,
                 cwd=str(PROJECT_ROOT),
                 stdout=log_file,
                 stderr=subprocess.STDOUT,
@@ -84,11 +101,12 @@ def start_llm_debate_telegram_process() -> tuple[bool, str]:
                 env={**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONIOENCODING": "utf-8"},
             )
         LLM_DEBATE_TELEGRAM_PID_PATH.write_text(str(proc.pid), encoding="utf-8")
-        h = duration / 3600
-        return (
-            True,
-            f"논문 토론 배치를 백그라운드에서 시작했습니다. (pid={proc.pid}, 최대 약 {h:.1f}시간)",
-        )
+        if duration <= 0:
+            detail = f"논문 토론 배치를 백그라운드에서 시작했습니다. (pid={proc.pid}, 시간 제한 없음 · 큐 소진 또는 `/debate_stop`)"
+        else:
+            h = duration / 3600
+            detail = f"논문 토론 배치를 백그라운드에서 시작했습니다. (pid={proc.pid}, 최대 약 {h:.1f}시간)"
+        return (True, detail)
     except Exception as e:
         return False, f"시작 실패: {str(e)[:200]}"
 

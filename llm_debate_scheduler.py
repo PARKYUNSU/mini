@@ -37,7 +37,8 @@ RAW_DATA_QUEUE = Path("./raw_data_queue")
 PROCESSED_DATA_DIR = Path("./raw_data_queue/processed")
 FINETUNE_OUTPUT = Path("./finetune_datasets/train_data.jsonl")
 DEBATE_INDEX_PATH = Path("./finetune_datasets/debated_paper_ids.jsonl")
-EVENT_DURATION_SEC = 7200  # 2시간
+# 스케줄/수동 실행 기본 시간 상한(초). 0 이하 = 무제한. (run_scheduler는 .env LLM_DEBATE_BATCH_DURATION_SEC로 덮어씀)
+EVENT_DURATION_SEC = 0
 LLM_DELAY_SEC = 10
 # Qwen/Gemini에 넣는 논문 본문 상한(문자 수). 초과 시 앞부분만 사용 → 컨텍스트·RAM 부담 감소
 DEBATE_PAPER_BODY_MAX_CHARS = 15000
@@ -543,18 +544,28 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
         return None
 
 
+def _debate_time_limit_reached(start: float, duration_sec: int) -> bool:
+    """duration_sec <= 0 이면 시간 제한 없음 (큐 소진·데이터 없음·target_file 완료까지)."""
+    if duration_sec <= 0:
+        return False
+    return (time.time() - start) >= duration_sec
+
+
 def weekly_llm_debate_event(
     *,
     target_file: str | None = None,
     max_records: int | None = None,
     duration_sec: int = EVENT_DURATION_SEC,
 ) -> dict:
-    """스케줄러가 월~금 02:00에 호출, ``duration_sec`` 동안 배치 처리 (기본 2시간)."""
+    """스케줄러가 월~금 02:00에 호출. ``duration_sec`` 초 동안 처리; 0 이하이면 시간 제한 없음."""
     _configure_utf8_stdio()
     start = time.time()
     print("\n" + "=" * 60)
     print(f"🚀 LLM 토론 배치 시작: {datetime.now().isoformat()}")
-    print(f"⏱️ 이번 실행 시간 한도: {duration_sec}초 ({duration_sec / 3600:.2f}시간)")
+    if duration_sec <= 0:
+        print("⏱️ 이번 실행 시간 한도: 없음 (큐가 비거나 Ctrl+C까지, Gemini는 요청마다 키 순환)")
+    else:
+        print(f"⏱️ 이번 실행 시간 한도: {duration_sec}초 ({duration_sec / 3600:.2f}시간)")
     print("=" * 60)
     sys.stdout.flush()
     sys.stderr.flush()
@@ -570,9 +581,13 @@ def weekly_llm_debate_event(
     print(f"  📇 인덱스 로드 완료 ({len(debated_paper_ids)}건)", flush=True)
     seen_in_this_run: set[str] = set()
 
-    while (time.time() - start) < duration_sec:
-        remaining = int(duration_sec - (time.time() - start))
-        print(f"\n⏱️ 남은 시간: {remaining}초")
+    while not _debate_time_limit_reached(start, duration_sec):
+        if duration_sec > 0:
+            remaining = int(duration_sec - (time.time() - start))
+            print(f"\n⏱️ 남은 시간: {remaining}초")
+        else:
+            elapsed = int(time.time() - start)
+            print(f"\n⏱️ 경과: {elapsed}초 (시간 제한 없음)")
 
         result = get_unprocessed_raw_data(target_file=target_file)
         if result is None:
@@ -592,7 +607,7 @@ def weekly_llm_debate_event(
         exited_by_timeout = False
         resume_from_index = 0
         for i, rec in enumerate(records):
-            if (time.time() - start) >= duration_sec:
+            if duration_sec > 0 and (time.time() - start) >= duration_sec:
                 print(f"  ⏰ 시간 한도({duration_sec}s) 도달, 배치 종료")
                 exited_by_timeout = True
                 resume_from_index = i
@@ -696,7 +711,12 @@ def main() -> None:
     parser.add_argument("--test", action="store_true", help="배치를 즉시 1회 실행")
     parser.add_argument("--file", type=str, default=None, help="처리할 특정 JSONL 파일명 또는 경로")
     parser.add_argument("--max-records", type=int, default=None, help="테스트 시 최대 처리 레코드 수")
-    parser.add_argument("--duration-sec", type=int, default=EVENT_DURATION_SEC, help="최대 실행 시간(초)")
+    parser.add_argument(
+        "--duration-sec",
+        type=int,
+        default=EVENT_DURATION_SEC,
+        help=f"최대 실행 시간(초). 0 이하면 시간 제한 없음 (기본 {EVENT_DURATION_SEC})",
+    )
     args = parser.parse_args()
 
     if args.test:
