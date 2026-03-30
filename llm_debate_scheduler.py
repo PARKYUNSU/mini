@@ -22,11 +22,8 @@ from pathlib import Path
 
 import schedule
 import telebot
-from dotenv import load_dotenv
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
-
-load_dotenv()
 
 from agent_config import GEMINI_MODEL, get_gemini_api_keys
 from agent_gemini import gemini_sdk_generate_json
@@ -456,7 +453,7 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
     source_excerpt = f"[title]\n{paper_title}\n\n[abstract]\n{abstract}\n\n[content]\n{paper_content}"
 
     # 1. Qwen 초안
-    print(f"    [1/3] Qwen 초안 생성 중...")
+    print("    [1/3] Qwen 초안 생성 중...")
     try:
         llm_qwen = get_llm_debate_scheduler_llm()
         draft_prompt = f"""다음 학술 논문 본문을 읽고, 핵심 내용을 묻고 답하는 Q&A 1세트를 작성해.
@@ -478,7 +475,7 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
         return None
 
     # 2. Gemini 비평 및 수정 (429 시 다음 키로 폴백 — get_gemini_api_keys 순서)
-    print(f"    [2/3] Gemini 비평/수정 중...")
+    print("    [2/3] Gemini 비평/수정 중...")
     try:
         critique_prompt = f"""다음은 Qwen이 만든 Q&A 초안입니다.
 
@@ -504,7 +501,7 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
         return None
 
     # 3. Qwen 최종 수정
-    print(f"    [3/3] Qwen 최종 생성 중...")
+    print("    [3/3] Qwen 최종 생성 중...")
     try:
         final_prompt = f"""다음 비평을 반영해 최종 Q&A를 완성해.
 비평/수정안: {critique_text[:3000]}

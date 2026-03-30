@@ -94,7 +94,7 @@ def send_scheduler_failure_telegram(task_name: str, error_detail: str = "") -> b
     token = os.getenv("TELEGRAM_TOKEN") or ""
     chat_ids = [c.strip() for c in (os.getenv("ALLOWED_CHAT_ID") or "").split(",") if c.strip()]
     if not token or not chat_ids:
-        print(f"⚠️ 텔레그램 알림 스킵: token/chat_id 미설정")
+        print("⚠️ 텔레그램 알림 스킵: token/chat_id 미설정")
         return False
 
     msg = (
