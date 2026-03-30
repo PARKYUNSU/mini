@@ -16,6 +16,7 @@ import re
 import shutil
 import sys
 import time
+import threading
 from datetime import datetime
 from pathlib import Path
 
@@ -31,6 +32,7 @@ from agent_config import GEMINI_MODEL, get_gemini_api_keys
 from agent_gemini import gemini_sdk_generate_json
 from agent_llm import get_llm_debate_scheduler_llm
 from retry_utils import retry_on_network_error
+from llm_debate_spawn_guard import update_debate_heartbeat
 
 # ============ 설정 ============
 RAW_DATA_QUEUE = Path("./raw_data_queue")
@@ -570,6 +572,24 @@ def weekly_llm_debate_event(
     sys.stdout.flush()
     sys.stderr.flush()
 
+    # 관측용 heartbeat: 장시간(특히 duration<=0) 실행 중 "최근 업데이트 시각"을 기록한다.
+    # heartbeat가 오래 갱신되지 않으면(기본 15분 초과) spawn 가드가 "정상 대기"가 아닌 장애로 판단할 수 있다.
+    hb_interval_sec = int(os.getenv("LLM_DEBATE_HEARTBEAT_INTERVAL_SEC", "60"))
+    hb_stop = threading.Event()
+    hb_thread: threading.Thread | None = None
+
+    if hb_interval_sec > 0:
+        pid = os.getpid()
+
+        def _heartbeat_loop() -> None:
+            while not hb_stop.wait(hb_interval_sec):
+                update_debate_heartbeat(pid=pid, status="running")
+
+        hb_thread = threading.Thread(target=_heartbeat_loop, daemon=True)
+        hb_thread.start()
+        # 시작 직후 1회 즉시 기록 (파일 생성 지연 방지)
+        update_debate_heartbeat(pid=pid, status="running")
+
     processed_count = 0
     error_count = 0
     skipped_count = 0
@@ -691,7 +711,7 @@ def weekly_llm_debate_event(
                 lines.append(f"... 외 {len(processed_files) - 5}개 파일")
         _send_telegram_notification("\n".join(lines))
 
-    return {
+    result = {
         "processed_count": processed_count,
         "skipped_count": skipped_count,
         "duplicate_skipped_count": duplicate_skipped_count,
@@ -699,6 +719,12 @@ def weekly_llm_debate_event(
         "processed_files": processed_files,
         "found_any_data": found_any_data,
     }
+
+    hb_stop.set()
+    if hb_thread is not None:
+        hb_thread.join(timeout=2)
+
+    return result
 
 
 def main() -> None:
