@@ -2,7 +2,7 @@
 
 import re
 
-from telebot.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telebot.types import KeyboardButton, ReplyKeyboardMarkup
 
 from retry_utils import retry_on_network_error
 

@@ -12,7 +12,6 @@ requires-python = ">=3.10"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-timeout_func_only = true
 markers = [
     "unit: 순수 규칙·state, 네트워크·외부 API 없음",
     "integration: 노드 mock 계약·build_graph 스모크 (LLM/E2B 호출 없음)",

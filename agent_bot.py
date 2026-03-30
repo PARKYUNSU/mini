@@ -34,7 +34,6 @@ from agent_config import (
     BACKFILL_LOG_PATH,
     CHECKPOINT_DB_PATH,
     GROQ_API_KEY,
-    GEMINI_MODEL,
     LLM_DEBATE_TELEGRAM_LOG_PATH,
     get_gemini_api_keys,
     LLM_RETRY_DELAY_SEC,

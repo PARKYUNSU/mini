@@ -7,6 +7,7 @@
 """
 
 import os
+import subprocess
 from functools import wraps
 
 from tenacity import (
@@ -58,8 +59,6 @@ retry_on_network_error = retry(
     reraise=True,
 )
 
-
-import subprocess
 
 retry_on_subprocess_error = retry(
     retry=retry_if_exception(lambda e: isinstance(e, subprocess.CalledProcessError)),

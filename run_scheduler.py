@@ -10,11 +10,11 @@
 import os
 import subprocess
 import sys
+import time
+from pathlib import Path
 
 # cron/nohup 환경에서 부모 stdio가 닫혀 있으면 자식(main.py 등)이 exit 1·Bad file descriptor 낼 수 있음
 _SUBPROCESS_KWARGS = {"stdin": subprocess.DEVNULL}
-import time
-from pathlib import Path
 
 import schedule
 from dotenv import load_dotenv
