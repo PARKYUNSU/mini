@@ -2,7 +2,7 @@
 """
 통합 스케줄러 - M2 맥 미니 24시간 운영용
 - arXiv 파이프라인: 매일 06:00
-- LLM 토론 배치: 월~금 02:00 각 1회 (시간 한도는 LLM_DEBATE_BATCH_DURATION_SEC, 기본 0=무제한)
+- LLM 토론 배치: 월~금 02:00 각 1회 (LLM_DEBATE_BATCH_DURATION_SEC: 0=무제한 시 **백그라운드 기동**으로 메인 스케줄 루프 비블로킹)
 - cron_engine: 1분마다 due job 체크 → LangGraph 트리거 → 텔레그램 선톡 (agent_bot 단독 실행 시에도 동일 worker 가 뜸, 락으로 중복 방지)
 - 메인 봇(agent_bot.py)은 별도 프로세스로 실행
 """
@@ -56,17 +56,53 @@ def run_arxiv_pipeline() -> None:
     )
 
 
+def _spawn_llm_debate_batch_background(duration_sec: int) -> None:
+    """
+    무제한(또는 장시간) 배치는 subprocess.run으로 기다리지 않고 기동만 함.
+    schedule.run_pending()·cron 1분 루프가 막히지 않도록 함.
+    """
+    cmd = [
+        sys.executable,
+        "-u",
+        str(PROJECT_ROOT / "llm_debate_scheduler.py"),
+        "--test",
+        "--duration-sec",
+        str(duration_sec),
+    ]
+    log_path = PROJECT_ROOT / ".cron" / "llm_debate_batch_stdout.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    stamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    with open(log_path, "a", encoding="utf-8") as logf:
+        logf.write(f"\n{'=' * 60}\n[{stamp}] run_scheduler → Popen: {' '.join(cmd[2:])}\n")
+        logf.flush()
+        proc = subprocess.Popen(
+            cmd,
+            cwd=PROJECT_ROOT,
+            stdin=subprocess.DEVNULL,
+            stdout=logf,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+        logf.write(f"child_pid={proc.pid}\n")
+        logf.flush()
+    rel = log_path.relative_to(PROJECT_ROOT)
+    print(f"   백그라운드 PID={proc.pid} (로그: {rel})", flush=True)
+
+
 @with_scheduler_retry("LLM 토론 배치")
 def run_llm_debate() -> None:
-    """llm_debate_scheduler.py --test 실행. 네트워크 에러 시 재시도 후 텔레그램 알림."""
+    """llm_debate_scheduler.py --test. duration>0 만 동기 대기(재시도 적용). duration<=0 은 백그라운드."""
     d = _llm_debate_batch_duration_sec()
     print("\n" + "=" * 60)
     print("🚀 [스케줄] LLM 토론 배치 실행")
     if d <= 0:
-        print("   (시간 제한 없음 — LLM_DEBATE_BATCH_DURATION_SEC=0 또는 미설정)")
+        print("   (시간 제한 없음 → 백그라운드 기동, LLM_DEBATE_BATCH_DURATION_SEC=0 또는 미설정)")
     else:
-        print(f"   (최대 {d}초 ≈ {d / 3600:.2f}시간)")
+        print(f"   (동기 실행, 최대 {d}초 ≈ {d / 3600:.2f}시간)")
     print("=" * 60)
+    if d <= 0:
+        _spawn_llm_debate_batch_background(0)
+        return
     subprocess.run(
         [
             sys.executable,
@@ -100,7 +136,11 @@ def main() -> None:
     if get_gemini_api_keys():
         print("   - arXiv 파이프라인: 매일 06:00")
         _bd = _llm_debate_batch_duration_sec()
-        _bmsg = "시간 제한 없음" if _bd <= 0 else f"최대 {_bd}s"
+        _bmsg = (
+            "시간 제한 없음(백그라운드·.cron/llm_debate_batch_stdout.log)"
+            if _bd <= 0
+            else f"동기 최대 {_bd}s"
+        )
         print(f"   - LLM 토론: 월~금 02:00 (주 5회, {_bmsg} · LLM_DEBATE_BATCH_DURATION_SEC)")
     print("   - cron_engine: 1분마다 due job 체크 → 텔레그램 선톡")
     print("   - 메인 봇: 별도 터미널에서 python agent_bot.py")

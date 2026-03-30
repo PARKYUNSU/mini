@@ -19,6 +19,10 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
 
 def _need_py(min_major: int, min_minor: int) -> None:
     if sys.version_info < (min_major, min_minor):
@@ -55,14 +59,26 @@ def _check_ollama_line() -> str:
 
 def _check_keys_lines() -> list[str]:
     load_dotenv()
+    from agent_config import get_gemini_api_keys
+
+    gkeys = get_gemini_api_keys()
+    if gkeys:
+        gemini_line = (
+            f"  Gemini API 키: {len(gkeys)}개 로드됨 "
+            "(GEMINI_API_KEYS 또는 GEMINI_API_KEY + _2…_8, agent_config 규칙과 동일)"
+        )
+    else:
+        gemini_line = (
+            "  Gemini API 키: 없음 — 라우터 폴백·도구·Tavily·LLM 토론 등에 필요"
+        )
+
     optional = [
-        ("GEMINI_API_KEY", "라우터 폴백·도구·Tavily·토론 (또는 GEMINI_API_KEYS / _2…_8)"),
-        ("GROQ_API_KEY", "Executor/Monitor 코딩·검수"),
+        ("GROQ_API_KEY", "Executor/Monitor (agent_bot 필수)"),
         ("E2B_API_KEY", "test_agent_flow 4·코드 실행"),
         ("TELEGRAM_TOKEN", "agent_bot.py"),
         ("TAVILY_API_KEY", "웹 검색 도구"),
     ]
-    lines = []
+    lines = [gemini_line]
     for key, hint in optional:
         v = os.getenv(key)
         if v and str(v).strip() and "your_" not in str(v).lower() and "here" not in str(v).lower():

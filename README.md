@@ -64,9 +64,14 @@ python run_backfill.py -s 2024-06-01 -e 2024-12-31 -b 20  # 20개씩 페이징
 
 ## 2. 환경 변수 (.env)
 
+`agent_bot.py` 기동 시 **Groq + Gemini 키(최소 1개)**·텔레그램이 모두 필요합니다. (코드: `agent_bot.py` `main()` 초기 검사)
+
 | 변수 | 용도 | 필수 |
 |------|------|------|
-| `GEMINI_API_KEY` | LLM 토론(Q&A), Agent Executor/Monitor | ✅ |
+| `GROQ_API_KEY` | Agent **Executor / Monitor** (코딩·검수) | ✅ (`agent_bot`) |
+| `GEMINI_API_KEY` | 라우터 폴백·도구·Tavily 요약·**LLM 토론(Gemini 비평)** 등 | ✅ (`agent_bot`, 키 1개 이상) |
+| `GEMINI_API_KEYS` | 쉼표 구분 다중 키 — 있으면 이 목록만 사용 (`GEMINI_API_KEY` 단독 설정 무시) | 위와 동일 |
+| `GEMINI_API_KEY_2` … `_8` | `GEMINI_API_KEYS`가 비어 있을 때 순서대로 합쳐서 사용 (429 시 순환) | 선택 |
 | `TELEGRAM_TOKEN` | 메인 봇 (`agent_bot.py`) | ✅ |
 | `ALLOWED_CHAT_ID` | 접근 허용 Chat ID (쉼표 구분) | ✅ |
 | `LOCAL_LLM_MODEL` | 로컬 LLM 모델명 (기본값: `qwen3.5:9b`) | |
@@ -93,8 +98,8 @@ RAG(논문 질문 답변) + Agent(코딩 실행) 통합 봇입니다.
 
 ### LLM 토론 스케줄러 (`llm_debate_scheduler.py`)
 
-- **월~금 02:00** 배치는 `run_scheduler.py`가 `llm_debate_scheduler.py --test` 호출. 실행 시간 상한은 **`LLM_DEBATE_BATCH_DURATION_SEC`** (기본 **0** = 시간 제한 없음, 큐 소진까지).
-- 텔레그램 **`/debate_start`** 는 **`LLM_DEBATE_TELEGRAM_DURATION_SEC`** (기본 **0** = 무제한).
+- **월~금 02:00** 배치는 `run_scheduler.py`가 `llm_debate_scheduler.py --test` 호출. **`LLM_DEBATE_BATCH_DURATION_SEC`** (기본 **0**): `0`이면 **시간 제한 없이 백그라운드 기동**만 하고 스케줄 메인 루프는 즉시 돌아옵니다(로그: `.cron/llm_debate_batch_stdout.log`). 양수면 그만큼 초 동안 **동기** 실행(`subprocess.run`).
+- 텔레그램 **`/debate_start`** 는 **`LLM_DEBATE_TELEGRAM_DURATION_SEC`** (기본 **0** = 무제한, 별도 프로세스).
 - `raw_data_queue/`의 JSONL → Qwen(초안) → Gemini(비평, 429 시 키 순환) → Qwen(최종) → `finetune_datasets/train_data.jsonl`
 - 이미 토론 완료된 `paper_id`는 `finetune_datasets/debated_paper_ids.jsonl` 기준으로 자동 스킵
 - 상한을 두려면: `--duration-sec 7200` 또는 `.env`에 초 단위로 양수 설정
@@ -109,6 +114,8 @@ python llm_debate_scheduler.py --test --file sample.jsonl --max-records 3
 
 - `/reboot`: 봇 프로세스 재부팅
 - `/papers` (또는 `/paperlist`, `/논문목록`): `crawled_papers.jsonl` 큐에 있는 논문 목록
+- `/debate_start` (또는 `/논문토론시작`): LLM 논문 토론 배치 백그라운드 시작 (`llm_debate_telegram.log`)
+- `/debate_stop` (또는 `/논문토론중지`): 위에서 시작한 토론 배치 중지
 - `/backfill_start`: 백필 시작
 - `/backfill_stop`: 실행 중인 백필 중지
 
