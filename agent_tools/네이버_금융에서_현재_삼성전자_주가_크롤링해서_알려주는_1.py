@@ -14,7 +14,7 @@ def get_samsung_stock_price():
         # 1단계: requests와 BeautifulSoup 라이브러리 사용 (상단에 import)
 
         # 2단계: 'https://finance.naver.com/sise/' URL의 정적 HTML을 requests+BeautifulSoup으로 파싱
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()  # HTTP 오류 발생 시 예외 발생
 
         soup = BeautifulSoup(response.text, 'html.parser')

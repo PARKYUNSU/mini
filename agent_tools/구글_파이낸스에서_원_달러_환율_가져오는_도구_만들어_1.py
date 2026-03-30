@@ -14,7 +14,7 @@ def get_krw_usd_exchange_rate():
     url = "https://www.google.com/finance/quote/USD-KRW?hl=en"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()  # HTTP 오류 발생 시 예외 발생
 
         soup = BeautifulSoup(response.text, 'html.parser')

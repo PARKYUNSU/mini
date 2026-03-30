@@ -25,7 +25,7 @@ def get_github_repo_stars(owner: str, repo_name: str) -> str:
     #     headers["Authorization"] = f"token {GITHUB_TOKEN}"
 
     try:
-        response = requests.get(api_url, headers=headers)
+        response = requests.get(api_url, headers=headers, timeout=10)
         response.raise_for_status()  # HTTP 오류 발생 시 예외 발생
 
         data = response.json()
