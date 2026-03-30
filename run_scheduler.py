@@ -29,6 +29,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 from agent_config import get_gemini_api_keys  # noqa: E402
 from agent_cron_worker import start_cron_worker_daemon  # noqa: E402
+from llm_debate_spawn_guard import (  # noqa: E402
+    clear_debate_child_pid_if_matches,
+    get_running_debate_scheduler_child_pid,
+    register_debate_child_pid,
+)
 # llm_debate_scheduler.DEBATE_SCHEDULE_WEEKDAYS 와 동일하게 유지
 _DEBATE_WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday")
 
@@ -56,67 +61,15 @@ def run_arxiv_pipeline() -> None:
     )
 
 
-def _scheduler_debate_pid_path() -> Path:
-    return PROJECT_ROOT / ".cron" / "llm_debate_batch_scheduler.pid"
-
-
-def _load_scheduler_debate_pid() -> int | None:
-    path = _scheduler_debate_pid_path()
-    try:
-        t = path.read_text(encoding="utf-8").strip()
-        return int(t) if t else None
-    except Exception:
-        return None
-
-
-def _save_scheduler_debate_pid(pid: int) -> None:
-    path = _scheduler_debate_pid_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(str(pid), encoding="utf-8")
-
-
-def _clear_scheduler_debate_pid_file() -> None:
-    try:
-        _scheduler_debate_pid_path().unlink()
-    except OSError:
-        pass
-
-
-def _is_scheduler_spawned_debate_running() -> bool:
-    """이전에 run_scheduler 가 Popen 한 llm_debate_scheduler 자식이 아직 살아 있으면 True."""
-    pid = _load_scheduler_debate_pid()
-    if pid is None:
-        return False
-    try:
-        os.kill(pid, 0)
-    except OSError:
-        _clear_scheduler_debate_pid_file()
-        return False
-    try:
-        out = subprocess.check_output(
-            ["ps", "-p", str(pid), "-o", "command="],
-            text=True,
-            stderr=subprocess.DEVNULL,
-            timeout=5,
-        )
-    except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
-        _clear_scheduler_debate_pid_file()
-        return False
-    if "llm_debate_scheduler" not in (out or ""):
-        _clear_scheduler_debate_pid_file()
-        return False
-    return True
-
-
 def _spawn_llm_debate_batch_background(duration_sec: int) -> None:
     """
     무제한(또는 장시간) 배치는 subprocess.run으로 기다리지 않고 기동만 함.
     schedule.run_pending()·cron 1분 루프가 막히지 않도록 함.
     """
-    if _is_scheduler_spawned_debate_running():
-        old = _load_scheduler_debate_pid()
+    running = get_running_debate_scheduler_child_pid()
+    if running is not None:
         print(
-            f"   ⏭️ 이전 스케줄 토론 배치가 아직 실행 중(pid={old}) — 중복 기동 생략",
+            f"   ⏭️ 논문 토론 배치가 이미 실행 중(pid={running}, 스케줄·텔레그램 공통) — 중복 기동 생략",
             flush=True,
         )
         return
@@ -145,10 +98,9 @@ def _spawn_llm_debate_batch_background(duration_sec: int) -> None:
         )
         logf.write(f"child_pid={proc.pid}\n")
         logf.flush()
-    _save_scheduler_debate_pid(proc.pid)
+    register_debate_child_pid(proc.pid)
     rel = log_path.relative_to(PROJECT_ROOT)
-    pid_rel = _scheduler_debate_pid_path().relative_to(PROJECT_ROOT)
-    print(f"   백그라운드 PID={proc.pid} (로그: {rel}, pid파일: {pid_rel})", flush=True)
+    print(f"   백그라운드 PID={proc.pid} (로그: {rel}, pid: .cron/llm_debate_child.pid)", flush=True)
 
 
 @with_scheduler_retry("LLM 토론 배치")
@@ -165,18 +117,29 @@ def run_llm_debate() -> None:
     if d <= 0:
         _spawn_llm_debate_batch_background(0)
         return
-    subprocess.run(
-        [
-            sys.executable,
-            str(PROJECT_ROOT / "llm_debate_scheduler.py"),
-            "--test",
-            "--duration-sec",
-            str(d),
-        ],
-        cwd=PROJECT_ROOT,
-        check=True,
-        **_SUBPROCESS_KWARGS,
-    )
+    running = get_running_debate_scheduler_child_pid()
+    if running is not None:
+        print(
+            f"   ⏭️ 논문 토론 배치가 이미 실행 중(pid={running}) — 동기 배치 생략",
+            flush=True,
+        )
+        return
+    cmd = [
+        sys.executable,
+        "-u",
+        str(PROJECT_ROOT / "llm_debate_scheduler.py"),
+        "--test",
+        "--duration-sec",
+        str(d),
+    ]
+    proc = subprocess.Popen(cmd, cwd=PROJECT_ROOT, **_SUBPROCESS_KWARGS)
+    register_debate_child_pid(proc.pid)
+    try:
+        rc = proc.wait()
+    finally:
+        clear_debate_child_pid_if_matches(proc.pid)
+    if rc != 0:
+        raise subprocess.CalledProcessError(rc, cmd)
 
 
 def main() -> None:

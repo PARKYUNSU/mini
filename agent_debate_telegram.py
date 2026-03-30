@@ -14,8 +14,12 @@ from dotenv import load_dotenv
 from agent_config import (
     LLM_DEBATE_SCHEDULER_PATH,
     LLM_DEBATE_TELEGRAM_LOG_PATH,
-    LLM_DEBATE_TELEGRAM_PID_PATH,
     PROJECT_ROOT,
+)
+from llm_debate_spawn_guard import (
+    clear_all_debate_child_pid_files,
+    get_running_debate_scheduler_child_pid,
+    register_debate_child_pid,
 )
 
 
@@ -33,41 +37,18 @@ def _telegram_debate_duration_sec() -> int:
         return 0
 
 
-def _read_debate_pid() -> Optional[int]:
-    try:
-        if not LLM_DEBATE_TELEGRAM_PID_PATH.exists():
-            return None
-        raw = LLM_DEBATE_TELEGRAM_PID_PATH.read_text(encoding="utf-8").strip()
-        return int(raw) if raw else None
-    except Exception:
-        return None
-
-
-def _is_process_alive(pid: int) -> bool:
-    try:
-        os.kill(pid, 0)
-        return True
-    except OSError:
-        return False
-
-
 def get_running_llm_debate_telegram_pid() -> Optional[int]:
-    """텔레그램으로 시작한 논문 토론 배치 PID (수동 nohup 과 별도)."""
-    pid = _read_debate_pid()
-    if pid and _is_process_alive(pid):
-        return pid
-    if LLM_DEBATE_TELEGRAM_PID_PATH.exists():
-        try:
-            LLM_DEBATE_TELEGRAM_PID_PATH.unlink()
-        except Exception:
-            pass
-    return None
+    """스케줄·텔레그램 공통 추적 PID (하위 호환 이름)."""
+    return get_running_debate_scheduler_child_pid()
 
 
 def start_llm_debate_telegram_process() -> tuple[bool, str]:
-    running = get_running_llm_debate_telegram_pid()
-    if running:
-        return False, f"이미 논문 토론 배치가 실행 중입니다. (pid={running})"
+    running = get_running_debate_scheduler_child_pid()
+    if running is not None:
+        return (
+            False,
+            f"이미 논문 토론 배치가 실행 중입니다. (pid={running}, 스케줄·텔레그램 공통)",
+        )
 
     if not LLM_DEBATE_SCHEDULER_PATH.is_file():
         return False, f"스크립트 없음: {LLM_DEBATE_SCHEDULER_PATH}"
@@ -100,7 +81,7 @@ def start_llm_debate_telegram_process() -> tuple[bool, str]:
                 start_new_session=True,
                 env={**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONIOENCODING": "utf-8"},
             )
-        LLM_DEBATE_TELEGRAM_PID_PATH.write_text(str(proc.pid), encoding="utf-8")
+        register_debate_child_pid(proc.pid)
         if duration <= 0:
             detail = f"논문 토론 배치를 백그라운드에서 시작했습니다. (pid={proc.pid}, 시간 제한 없음 · 큐 소진 또는 `/debate_stop`)"
         else:
@@ -112,9 +93,12 @@ def start_llm_debate_telegram_process() -> tuple[bool, str]:
 
 
 def stop_llm_debate_telegram_process() -> tuple[bool, str]:
-    pid = get_running_llm_debate_telegram_pid()
+    pid = get_running_debate_scheduler_child_pid()
     if not pid:
-        return False, "텔레그램으로 시작한 논문 토론 배치가 없습니다. (수동 `nohup`이면 터미널에서 종료)"
+        return (
+            False,
+            "실행 중인 논문 토론 배치가 없습니다. (스케줄·텔레그램 공통 PID 없음, 수동 nohup 이면 터미널에서 종료)",
+        )
 
     try:
         os.killpg(pid, signal.SIGTERM)
@@ -126,10 +110,5 @@ def stop_llm_debate_telegram_process() -> tuple[bool, str]:
         except Exception as e:
             return False, f"중지 실패: {str(e)[:200]}"
 
-    try:
-        if LLM_DEBATE_TELEGRAM_PID_PATH.exists():
-            LLM_DEBATE_TELEGRAM_PID_PATH.unlink()
-    except Exception:
-        pass
-
+    clear_all_debate_child_pid_files()
     return True, f"논문 토론 배치를 중지했습니다. (pid={pid})"

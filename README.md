@@ -98,8 +98,8 @@ RAG(논문 질문 답변) + Agent(코딩 실행) 통합 봇입니다.
 
 ### LLM 토론 스케줄러 (`llm_debate_scheduler.py`)
 
-- **월~금 02:00** 배치는 `run_scheduler.py`가 `llm_debate_scheduler.py --test` 호출. **`LLM_DEBATE_BATCH_DURATION_SEC`** (기본 **0**): `0`이면 **시간 제한 없이 백그라운드 기동**만 하고 스케줄 메인 루프는 즉시 돌아옵니다(로그: `.cron/llm_debate_batch_stdout.log`, PID: `.cron/llm_debate_batch_scheduler.pid`). **이전에 스케줄이 띄운 배치가 아직 돌면 중복 기동하지 않습니다.** 양수면 그만큼 초 동안 **동기** 실행(`subprocess.run`).
-- 텔레그램 **`/debate_start`** 는 **`LLM_DEBATE_TELEGRAM_DURATION_SEC`** (기본 **0** = 무제한, 별도 프로세스).
+- **월~금 02:00** 배치는 `run_scheduler.py`가 `llm_debate_scheduler.py --test` 호출. **`LLM_DEBATE_BATCH_DURATION_SEC`** (기본 **0**): `0`이면 **시간 제한 없이 백그라운드 기동**만 하고 스케줄 메인 루프는 즉시 돌아옵니다(로그: `.cron/llm_debate_batch_stdout.log`). **실행 중인 토론 배치 PID는 `.cron/llm_debate_child.pid`에 기록되고, `.llm_debate.telegram.pid`에 동일 값이 미러됩니다**(`llm_debate_spawn_guard`). 스케줄·텔레그램 어느 쪽으로 띄웠든 **이미 `llm_debate_scheduler` 자식이 살아 있으면 중복 기동하지 않습니다.** 양수면 그만큼 초 동안 **동기** 실행(기간 동안 PID 파일 유지 후 종료 시 정리).
+- 텔레그램 **`/debate_start`** 는 **`LLM_DEBATE_TELEGRAM_DURATION_SEC`** (기본 **0** = 무제한, 별도 프로세스, **위와 동일한 중복 가드**).
 - `raw_data_queue/`의 JSONL → Qwen(초안) → Gemini(비평, 429 시 키 순환) → Qwen(최종) → `finetune_datasets/train_data.jsonl`
 - 이미 토론 완료된 `paper_id`는 `finetune_datasets/debated_paper_ids.jsonl` 기준으로 자동 스킵
 - 상한을 두려면: `--duration-sec 7200` 또는 `.env`에 초 단위로 양수 설정
@@ -115,7 +115,7 @@ python llm_debate_scheduler.py --test --file sample.jsonl --max-records 3
 - `/reboot`: 봇 프로세스 재부팅
 - `/papers` (또는 `/paperlist`, `/논문목록`): `crawled_papers.jsonl` 큐에 있는 논문 목록
 - `/debate_start` (또는 `/논문토론시작`): LLM 논문 토론 배치 백그라운드 시작 (`llm_debate_telegram.log`)
-- `/debate_stop` (또는 `/논문토론중지`): 위에서 시작한 토론 배치 중지
+- `/debate_stop` (또는 `/논문토론중지`): 추적 중인 토론 배치 중지(스케줄로 띄운 배치 포함, 공통 PID 기준)
 - `/backfill_start`: 백필 시작
 - `/backfill_stop`: 실행 중인 백필 중지
 
@@ -267,7 +267,7 @@ git push
 
 - **봇이 새로 저장하는 도구**는 `agent_tools/saved/` 아래에만 쓰며, 이 디렉터리는 `.gitignore` 처리됩니다. 레포에 포함할 **코어 도구**는 기존처럼 `agent_tools/*.py` 루트에 두면 됩니다.
 
-- **`test_agent_flow.py`** (스크립트, pytest 아님): 외부 서비스 점검. **환경이 없으면 FAIL 대신 SKIP**으로 표시. 시작 시 환경 요약 출력. 옵션: `--only ollama|gemini|chroma|e2b|graph`, `--verbose` (traceback 전체), `--quiet-graph` (5a/5b DEBUG print 억제). 종료 코드는 **FAIL이 하나라도 있을 때만 1**. E2B `실행 오류` 문자열은 FAIL. 5b에서 executor까지 갔으나 샌드박스만 실패하면 **SKIP/WARN** 처리(라우팅은 `tests/test_code_run_state.py`로 검증).
+- **`test_agent_flow.py`** (스크립트, pytest 아님): 외부 서비스 점검. **환경이 없으면 FAIL 대신 SKIP**으로 표시. 시작 시 환경 요약 출력. 옵션: `--only all|ollama|groq|gemini|chroma|e2b|graph` (기본 `all`), `--verbose` (traceback 전체), `--quiet-graph` (5a/5b DEBUG print 억제). 종료 코드는 **FAIL이 하나라도 있을 때만 1**. E2B `실행 오류` 문자열은 FAIL. 5b에서 executor까지 갔으나 샌드박스만 실패하면 **SKIP/WARN** 처리(라우팅은 `tests/test_code_run_state.py`로 검증).
 - **`pyproject.toml`**: `pytest` 마커 `unit` / `integration` / `external` 정의.
 - **테스트 계층 (요약)**  
   - **A · unit**: `agent_router_rules`, 골든 라우팅, `test_code_run_state`, E2B env 구성 등.  
