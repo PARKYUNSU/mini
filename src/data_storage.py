@@ -22,6 +22,28 @@ class DataStorage:
         parent = self.output_path.parent
         if parent != Path("."):
             os.makedirs(parent, exist_ok=True)
+        self._known_paper_ids: set[str] = self._load_existing_paper_ids()
+
+    def _load_existing_paper_ids(self) -> set[str]:
+        """기존 JSONL에서 paper_id 집합을 1회 로드해 중복 저장을 방지."""
+        ids: set[str] = set()
+        if not self.output_path.exists():
+            return ids
+        try:
+            with open(self.output_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    try:
+                        item = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    paper_id = str(item.get("paper_id", "")).strip()
+                    if paper_id:
+                        ids.add(paper_id)
+        except OSError as e:
+            print(f"  ⚠️ 기존 paper_id 인덱스 로드 실패: {e}")
+        return ids
 
     def save_paper(self, data: dict[str, Any]) -> bool:
         """
@@ -34,9 +56,16 @@ class DataStorage:
             저장 성공 여부
         """
         try:
+            paper_id = str(data.get("paper_id", "")).strip()
+            if paper_id and paper_id in self._known_paper_ids:
+                print(f"  ⏭️  건너뜀 (이미 저장된 논문): {paper_id}")
+                return False
+
             line = json.dumps(data, ensure_ascii=False) + "\n"
             with open(self.output_path, "a", encoding="utf-8") as f:
                 f.write(line)
+            if paper_id:
+                self._known_paper_ids.add(paper_id)
             return True
         except (OSError, TypeError) as e:
             print(f"  ❌ 저장 실패: {e}")
