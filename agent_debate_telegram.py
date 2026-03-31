@@ -75,6 +75,9 @@ def start_llm_debate_telegram_process() -> tuple[bool, str]:
                     "--duration-sec",
                     str(duration),
                 ]
+                if duration <= 0:
+                    # 무제한 모드라도 큐를 모두 소진하면 자동 종료하도록 한다.
+                    cmd.append("--stop-on-empty")
                 proc = subprocess.Popen(
                     cmd,
                     cwd=str(PROJECT_ROOT),
@@ -85,7 +88,10 @@ def start_llm_debate_telegram_process() -> tuple[bool, str]:
                 )
             register_debate_child_pid(proc.pid)
             if duration <= 0:
-                detail = f"논문 토론 배치를 백그라운드에서 시작했습니다. (pid={proc.pid}, 시간 제한 없음 · 큐 소진 또는 `/debate_stop`)"
+                detail = (
+                    f"논문 토론 배치를 백그라운드에서 시작했습니다. "
+                    f"(pid={proc.pid}, 시간 제한 없음 · 큐 소진 시 자동 종료 또는 `/debate_stop`)"
+                )
             else:
                 h = duration / 3600
                 detail = f"논문 토론 배치를 백그라운드에서 시작했습니다. (pid={proc.pid}, 최대 약 {h:.1f}시간)"

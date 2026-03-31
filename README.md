@@ -99,7 +99,7 @@ RAG(논문 질문 답변) + Agent(코딩 실행) 통합 봇입니다.
 ### LLM 토론 스케줄러 (`llm_debate_scheduler.py`)
 
 - **월~금 02:00** 배치는 `run_scheduler.py`가 `llm_debate_scheduler.py --test` 호출. **`LLM_DEBATE_BATCH_DURATION_SEC`** (기본 **0**): `0`이면 **시간 제한 없이 백그라운드 기동**만 하고 스케줄 메인 루프는 즉시 돌아옵니다(로그: `.cron/llm_debate_batch_stdout.log`). **실행 중인 토론 배치 PID는 `.cron/llm_debate_child.pid`에 기록되고, `.llm_debate.telegram.pid`에 동일 값이 미러됩니다**(`llm_debate_spawn_guard`). 장시간 실행 중에는 `.cron/llm_debate_health.json`에 heartbeat(최근 업데이트 시각/상태)를 남기며, 설정값(`LLM_DEBATE_HEARTBEAT_MAX_STALE_SEC`)을 초과해 갱신이 없으면 가드가 장애 상태로 보고 PID 파일을 정리한 뒤 다음 기동을 허용합니다. 스케줄·텔레그램 어느 쪽으로 띄웠든 **이미 `llm_debate_scheduler` 자식이 살아 있으면 중복 기동하지 않습니다.** 양수면 그만큼 초 동안 **동기** 실행(기간 동안 PID 파일 유지 후 종료 시 정리).
-- 텔레그램 **`/debate_start`** 는 **`LLM_DEBATE_TELEGRAM_DURATION_SEC`** (기본 **0** = 무제한, 별도 프로세스, **위와 동일한 중복 가드**).
+- 텔레그램 **`/debate_start`** 는 **`LLM_DEBATE_TELEGRAM_DURATION_SEC`** (기본 **0** = 무제한, 별도 프로세스, **위와 동일한 중복 가드**). 무제한(`0`)일 때도 큐를 모두 처리하면 `--stop-on-empty`로 자동 종료하며, 완료 알림에 종료 사유(큐 소진)를 포함합니다.
 - `raw_data_queue/`의 JSONL → Qwen(초안) → Gemini(비평, 429 시 키 순환) → Qwen(최종) → `finetune_datasets/train_data.jsonl`
 - 이미 토론 완료된 `paper_id`는 `finetune_datasets/debated_paper_ids.jsonl` 기준으로 자동 스킵
 - 상한을 두려면: `--duration-sec 7200` 또는 `.env`에 초 단위로 양수 설정

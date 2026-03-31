@@ -555,6 +555,7 @@ def weekly_llm_debate_event(
     target_file: str | None = None,
     max_records: int | None = None,
     duration_sec: int = EVENT_DURATION_SEC,
+    stop_on_empty: bool = False,
 ) -> dict:
     """스케줄러가 월~금 02:00에 호출. ``duration_sec`` 초 동안 처리; 0 이하이면 시간 제한 없음."""
     _configure_utf8_stdio()
@@ -593,6 +594,7 @@ def weekly_llm_debate_event(
     duplicate_skipped_count = 0
     processed_files: list[str] = []
     found_any_data = False
+    stop_reason = ""
     print("  📇 이미 토론한 논문 ID 인덱스 로드 중...", flush=True)
     debated_paper_ids = _load_debated_paper_ids()
     print(f"  📇 인덱스 로드 완료 ({len(debated_paper_ids)}건)", flush=True)
@@ -608,6 +610,10 @@ def weekly_llm_debate_event(
 
         result = get_unprocessed_raw_data(target_file=target_file)
         if result is None:
+            if stop_on_empty and found_any_data:
+                print("  📭 처리할 원시 데이터 없음. 큐 소진으로 배치를 종료합니다.")
+                stop_reason = "queue_depleted"
+                break
             print("  📭 처리할 원시 데이터 없음. 대기 중...")
             if target_file:
                 break
@@ -702,6 +708,8 @@ def weekly_llm_debate_event(
             f"중복 논문 스킵: {duplicate_skipped_count}건",
             f"오류: {error_count}건",
         ]
+        if stop_reason == "queue_depleted":
+            lines.append("종료 사유: 큐 소진(자동 종료)")
         if processed_files:
             lines.append(f"처리 파일: {', '.join(processed_files[:5])}")
             if len(processed_files) > 5:
@@ -715,6 +723,7 @@ def weekly_llm_debate_event(
         "error_count": error_count,
         "processed_files": processed_files,
         "found_any_data": found_any_data,
+        "stop_reason": stop_reason,
     }
 
     hb_stop.set()
@@ -740,6 +749,11 @@ def main() -> None:
         default=EVENT_DURATION_SEC,
         help=f"최대 실행 시간(초). 0 이하면 시간 제한 없음 (기본 {EVENT_DURATION_SEC})",
     )
+    parser.add_argument(
+        "--stop-on-empty",
+        action="store_true",
+        help="처리 도중 큐가 소진되면 자동 종료(주로 텔레그램 /debate_start 무제한 모드용)",
+    )
     args = parser.parse_args()
 
     if args.test:
@@ -748,6 +762,7 @@ def main() -> None:
             target_file=args.file,
             max_records=args.max_records,
             duration_sec=args.duration_sec,
+            stop_on_empty=args.stop_on_empty,
         )
         return
 
