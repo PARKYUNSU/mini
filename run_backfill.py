@@ -140,6 +140,7 @@ def run_backfill(
     success_papers: list[tuple[str, str]] = []
     start_offset = 0
     pipeline_start = time.time()
+    backfill_429_retries = 0
 
     while True:
         if time_limit_sec and (time.time() - pipeline_start) >= time_limit_sec:
@@ -162,6 +163,40 @@ def run_backfill(
                 end_date=end_date,
             )
         except Exception as e:
+            # arXiv export은 burst 요청 시 429로 레이트리밋이 걸릴 수 있음.
+            # 이 경우에는 start_offset을 그대로 둔 채 잠시 대기 후 같은 페이지를 재시도한다.
+            try:
+                status_code = getattr(getattr(e, "response", None), "status_code", None)
+                if status_code == 429:
+                    backfill_429_retries += 1
+                    max_retries = int(os.getenv("ARXIV_429_MAX_RETRY", "8"))
+                    if backfill_429_retries > max_retries:
+                        print(
+                            f"❌ 429 재시도 초과({backfill_429_retries}/{max_retries}). start={start_offset}: {e}"
+                        )
+                        raise
+
+                    retry_after = None
+                    try:
+                        retry_after = getattr(getattr(e, "response", None), "headers", {}).get("Retry-After")
+                    except Exception:
+                        retry_after = None
+
+                    if retry_after and str(retry_after).strip().isdigit():
+                        wait_sec = int(str(retry_after).strip())
+                    else:
+                        wait_sec = int(os.getenv("ARXIV_429_BACKOFF_SEC", "180"))
+
+                    print(
+                        f"⚠️ arXiv export 429 레이트리밋(start={start_offset}). {wait_sec}s 대기 후 동일 offset 재시도... "
+                        f"(retry {backfill_429_retries}/{max_retries})"
+                    )
+                    time.sleep(wait_sec)
+                    continue
+            except Exception:
+                # 429 판별이 실패해도 아래의 일반 실패 처리로 흘려보낸다.
+                pass
+
             print(f"❌ 메타데이터 수집 실패 (start={start_offset}): {e}")
             _send_telegram_notification(
                 "🚨 arXiv 백필 수집 실패\n"
@@ -191,21 +226,21 @@ def run_backfill(
 
                 # PDF 다운로드
                 try:
-                    print(f"  ⬇️  PDF 다운로드 중...")
+                    print("  ⬇️  PDF 다운로드 중...")
                     if not fetcher.download_pdf(paper.pdf_url, str(pdf_path)):
-                        print(f"  ⏭️  건너뜀 (다운로드 실패)")
+                        print("  ⏭️  건너뜀 (다운로드 실패)")
                         continue
-                    print(f"  ✓ 다운로드 완료")
+                    print("  ✓ 다운로드 완료")
                 except Exception as e:
                     print(f"  ❌ 다운로드 예외: {e}")
                     continue
 
                 # PDF → 마크다운 파싱
                 try:
-                    print(f"  📝 마크다운 파싱 중...")
+                    print("  📝 마크다운 파싱 중...")
                     markdown_content = parser.to_markdown(pdf_path)
                     if not markdown_content:
-                        print(f"  ⏭️  건너뜀 (파싱 실패)")
+                        print("  ⏭️  건너뜀 (파싱 실패)")
                         continue
                     print(f"  ✓ 파싱 완료 ({len(markdown_content):,}자)")
                 except Exception as e:
@@ -228,7 +263,7 @@ def run_backfill(
                         success_papers.append((paper.paper_id, paper.title))
                         print(f"  💾 저장 완료 → {storage.output_path}")
                     else:
-                        print(f"  ⏭️  건너뜀 (저장 실패)")
+                        print("  ⏭️  건너뜀 (저장 실패)")
                         continue
                 except Exception as e:
                     print(f"  ❌ 저장 예외: {e}")
@@ -236,7 +271,7 @@ def run_backfill(
 
                 # RAG: Chroma DB 적재
                 try:
-                    print(f"  🔗 RAG 청킹 및 Chroma 적재 중...")
+                    print("  🔗 RAG 청킹 및 Chroma 적재 중...")
                     chunk_count = rag_processor.add_paper(
                         markdown_content=markdown_content,
                         title=paper.title,
@@ -266,7 +301,7 @@ def run_backfill(
         elif total_fetched < api_total:
             print("   → 수신 합 < API 총건: 시간 제한·오류·중지 등으로 중간에 끊겼을 수 있습니다.")
     if total_fetched > 0 and total_success < total_fetched:
-        print(f"   참고: 수신 대비 저장 성공이 적음 (다운로드·파싱 실패 또는 이미 저장된 중복 등)")
+        print("   참고: 수신 대비 저장 성공이 적음 (다운로드·파싱 실패 또는 이미 저장된 중복 등)")
     print("=" * 60 + "\n")
 
     stat_bits: list[str] = []

@@ -41,7 +41,10 @@ def _is_transient_network_error(exc: BaseException) -> bool:
     try:
         import requests
         if isinstance(exc, requests.exceptions.HTTPError):
-            return exc.response is not None and exc.response.status_code >= 500
+            if exc.response is None:
+                return False
+            # arXiv export은 burst 요청 시 429로 레이트리밋이 걸릴 수 있음.
+            return exc.response.status_code == 429 or exc.response.status_code >= 500
     except ImportError:
         pass
     # OSError (Broken pipe, Connection reset 등)

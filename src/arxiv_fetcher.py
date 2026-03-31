@@ -78,7 +78,10 @@ class ArxivFetcher:
     @retry_on_network_error
     def _get_with_retry(self, url: str, timeout: int = 30, stream: bool = False):
         """네트워크 재시도 적용 GET 요청"""
-        return self._session.get(url, timeout=timeout, stream=stream)
+        resp = self._session.get(url, timeout=timeout, stream=stream)
+        # HTTP 4xx(특히 429)도 예외로 승격해야 tenacity가 재시도를 수행할 수 있음.
+        resp.raise_for_status()
+        return resp
 
     def _parse_entry(self, entry: ET.Element) -> Optional[PaperMetadata]:
         """Atom XML entry 요소에서 PaperMetadata 추출"""
@@ -231,8 +234,9 @@ class ArxivFetcher:
             response = self._get_with_retry(url, timeout=30)
             response.raise_for_status()
         except requests.RequestException as e:
+            # 429 같은 레이트리밋은 run_backfill에서 재대기/복구하도록 예외로 올린다.
             print(f"❌ API 요청 실패: {e}")
-            return []
+            raise
 
         try:
             root = ET.fromstring(response.content)
