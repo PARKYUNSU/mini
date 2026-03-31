@@ -184,13 +184,14 @@ def _load_debated_paper_ids() -> set[str]:
                     for line in f:
                         if not line.strip():
                             continue
-                        try:
-                            item = json.loads(line)
-                            paper_id = str(item.get("paper_id", "")).strip()
-                            if paper_id:
-                                ids.add(paper_id)
-                        except json.JSONDecodeError:
-                            continue
+                    try:
+                        item = json.loads(line)
+                        raw_id = str(item.get("paper_id", "")).strip()
+                        paper_id = raw_id.split("v", 1)[0] if raw_id else raw_id
+                        if paper_id:
+                            ids.add(paper_id)
+                    except json.JSONDecodeError:
+                        continue
             except Exception:
                 continue
         if ids:
@@ -209,13 +210,17 @@ def _mark_paper_debated(paper_id: str, title: str = "") -> None:
     """토론 완료된 paper_id를 인덱스에 append 저장."""
     if not paper_id:
         return
+    # 버전 접미사 제거: 2401.12345v2 -> 2401.12345 기준으로 dedupe
+    base_id = paper_id.split("v", 1)[0].strip()
+    if not base_id:
+        base_id = paper_id
     try:
         DEBATE_INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
         with open(DEBATE_INDEX_PATH, "a", encoding="utf-8") as f:
             f.write(
                 json.dumps(
                     {
-                        "paper_id": paper_id,
+                        "paper_id": base_id,
                         "title": title,
                         "debated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     },
@@ -447,8 +452,9 @@ def run_debate_pipeline(raw_record: dict) -> dict | None:
         return None
 
     paper_content = _truncate_paper_body_for_debate(content_raw)
-    paper_id = raw_record.get("paper_id", "unknown")
-    paper_title = raw_record.get("title", paper_id)
+    raw_pid = str(raw_record.get("paper_id", "unknown")).strip()
+    paper_id = raw_pid.split("v", 1)[0] if raw_pid else raw_pid
+    paper_title = raw_record.get("title", paper_id or raw_pid or "unknown")
     abstract = raw_record.get("abstract", "")
     source_excerpt = f"[title]\n{paper_title}\n\n[abstract]\n{abstract}\n\n[content]\n{paper_content}"
 

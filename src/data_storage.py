@@ -9,6 +9,24 @@ import os
 from pathlib import Path
 from typing import Any, Union
 
+import fcntl
+
+
+def normalize_paper_id(raw_id: str) -> str:
+    """
+    arXiv ID에서 버전 접미사 제거: 2401.12345v2 -> 2401.12345.
+    패턴에 안 맞으면 원본을 그대로 반환.
+    """
+    s = (raw_id or "").strip()
+    if not s:
+        return s
+    # 간단히 마지막 'v숫자' 접미사만 제거 (2401.12345v2 -> 2401.12345)
+    if "v" in s:
+        base, suffix = s.rsplit("v", 1)
+        if suffix.isdigit() and base.replace(".", "").isdigit():
+            return base
+    return s
+
 
 class DataStorage:
     """파싱 결과를 JSONL 파일에 누적 저장하는 클래스"""
@@ -38,7 +56,7 @@ class DataStorage:
                         item = json.loads(line)
                     except json.JSONDecodeError:
                         continue
-                    paper_id = str(item.get("paper_id", "")).strip()
+                    paper_id = normalize_paper_id(str(item.get("paper_id", "")).strip())
                     if paper_id:
                         ids.add(paper_id)
         except OSError as e:
@@ -56,14 +74,23 @@ class DataStorage:
             저장 성공 여부
         """
         try:
-            paper_id = str(data.get("paper_id", "")).strip()
+            paper_id = normalize_paper_id(str(data.get("paper_id", "")).strip())
             if paper_id and paper_id in self._known_paper_ids:
                 print(f"  ⏭️  건너뜀 (이미 저장된 논문): {paper_id}")
                 return False
 
             line = json.dumps(data, ensure_ascii=False) + "\n"
-            with open(self.output_path, "a", encoding="utf-8") as f:
+            # 멀티 프로세스 동시 실행 대비: 파일 락으로 단일 writer 구간 보호
+            self.output_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.output_path, "a+", encoding="utf-8") as f:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                # 다른 프로세스가 먼저 쓴 내용을 반영하기 위해 인덱스 재로딩
+                self._known_paper_ids = self._load_existing_paper_ids()
+                if paper_id and paper_id in self._known_paper_ids:
+                    print(f"  ⏭️  건너뜀 (이미 저장된 논문, 락 내 재확인): {paper_id}")
+                    return False
                 f.write(line)
+                f.flush()
             if paper_id:
                 self._known_paper_ids.add(paper_id)
             return True
