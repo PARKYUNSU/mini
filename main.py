@@ -6,6 +6,7 @@ arXiv 논문 자동 수집 및 파싱 파이프라인
 """
 
 import os
+import json
 import sys
 import tempfile
 from datetime import datetime
@@ -17,7 +18,7 @@ import telebot
 from retry_utils import retry_on_network_error
 from src.arxiv_fetcher import ArxivFetcher, PaperMetadata
 from src.cleanup import cleanup_legacy_files
-from src.data_storage import DataStorage
+from src.data_storage import DataStorage, normalize_paper_id
 from src.pdf_parser import PdfParser
 from src.rag_processor import RagProcessor
 
@@ -27,6 +28,7 @@ load_dotenv()
 # 데이터 저장 경로 (폴더 자동 생성)
 RAW_DATA_DIR = Path("./raw_data_queue")
 CHROMA_DIR = Path("./chroma_db")
+DEBATE_INDEX_PATH = Path("./finetune_datasets/debated_paper_ids.jsonl")
 
 
 def _configure_utf8_stdio() -> None:
@@ -79,6 +81,28 @@ def _ensure_data_dirs() -> None:
     os.makedirs(CHROMA_DIR, exist_ok=True)
 
 
+def _load_debated_base_ids() -> set[str]:
+    """이미 토론 완료된 논문 ID(베이스 ID 기준) 집합 로드."""
+    ids: set[str] = set()
+    if not DEBATE_INDEX_PATH.exists():
+        return ids
+    try:
+        with open(DEBATE_INDEX_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    item = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                pid = normalize_paper_id(str(item.get("paper_id", "")).strip())
+                if pid:
+                    ids.add(pid)
+    except Exception as e:
+        print(f"⚠️ 토론 인덱스 로드 실패(선필터 비활성): {e}")
+    return ids
+
+
 def run_pipeline() -> None:
     """전체 파이프라인 실행"""
     _configure_utf8_stdio()
@@ -91,6 +115,7 @@ def run_pipeline() -> None:
     parser = PdfParser(table_strategy="lines_strict")
     storage = DataStorage(output_path=RAW_DATA_DIR / "crawled_papers.jsonl")
     rag_processor = RagProcessor(db_path=str(CHROMA_DIR))
+    debated_base_ids = _load_debated_base_ids()
 
     # 1. 메타데이터 수집
     print("\n" + "=" * 60)
@@ -123,6 +148,7 @@ def run_pipeline() -> None:
 
     # 2. 각 논문에 대해 PDF 다운로드 → 파싱 → raw_data_queue 저장 → RAG 적재
     success_count = 0
+    debate_dedupe_skipped = 0
     success_papers: list[tuple[str, str]] = []
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir_path = Path(tmpdir)
@@ -131,25 +157,31 @@ def run_pipeline() -> None:
             print(f"📄 [{i}/{len(papers)}] {paper.paper_id} - {paper.title[:50]}...")
             print("-" * 50)
 
+            base_paper_id = normalize_paper_id(paper.paper_id)
+            if base_paper_id and base_paper_id in debated_base_ids:
+                debate_dedupe_skipped += 1
+                print(f"  ⏭️  건너뜀 (이미 토론한 논문, 선필터): {paper.paper_id} -> {base_paper_id}")
+                continue
+
             pdf_path = tmpdir_path / f"{paper.paper_id}.pdf"
 
             # PDF 다운로드
             try:
-                print(f"  ⬇️  PDF 다운로드 중...")
+                print("  ⬇️  PDF 다운로드 중...")
                 if not fetcher.download_pdf(paper.pdf_url, str(pdf_path)):
-                    print(f"  ⏭️  건너뜀 (다운로드 실패)")
+                    print("  ⏭️  건너뜀 (다운로드 실패)")
                     continue
-                print(f"  ✓ 다운로드 완료")
+                print("  ✓ 다운로드 완료")
             except Exception as e:
                 print(f"  ❌ 다운로드 예외: {e}")
                 continue
 
             # PDF → 마크다운 파싱
             try:
-                print(f"  📝 마크다운 파싱 중...")
+                print("  📝 마크다운 파싱 중...")
                 markdown_content = parser.to_markdown(pdf_path)
                 if not markdown_content:
-                    print(f"  ⏭️  건너뜀 (파싱 실패)")
+                    print("  ⏭️  건너뜀 (파싱 실패)")
                     continue
                 print(f"  ✓ 파싱 완료 ({len(markdown_content):,}자)")
             except Exception as e:
@@ -172,7 +204,7 @@ def run_pipeline() -> None:
                     success_papers.append((paper.paper_id, paper.title))
                     print(f"  💾 저장 완료 → {storage.output_path}")
                 else:
-                    print(f"  ⏭️  건너뜀 (저장 실패)")
+                    print("  ⏭️  건너뜀 (저장 실패)")
                     continue
             except Exception as e:
                 print(f"  ❌ 저장 예외: {e}")
@@ -180,7 +212,7 @@ def run_pipeline() -> None:
 
             # RAG: Chroma DB 적재
             try:
-                print(f"  🔗 RAG 청킹 및 Chroma 적재 중...")
+                print("  🔗 RAG 청킹 및 Chroma 적재 중...")
                 chunk_count = rag_processor.add_paper(
                     markdown_content=markdown_content,
                     title=paper.title,
@@ -197,6 +229,8 @@ def run_pipeline() -> None:
 
     print("\n" + "=" * 60)
     print(f"🎉 파이프라인 완료: {success_count}/{len(papers)}개 논문 처리 성공")
+    if debate_dedupe_skipped:
+        print(f"   참고: 토론 완료 인덱스 선필터로 {debate_dedupe_skipped}건 스킵")
     print("=" * 60 + "\n")
 
     # 텔레그램 알림 (TELEGRAM_TOKEN, ALLOWED_CHAT_ID 설정 시)
@@ -206,7 +240,13 @@ def run_pipeline() -> None:
         msg = (
             "🔔 arXiv 자동 수집 알림\n"
             f"실행 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-            f"처리 결과: {success_count}개 논문 수집 및 RAG 적재 완료\n\n"
+            f"처리 결과: {success_count}개 논문 수집 및 RAG 적재 완료\n"
+            + (
+                f"토론 중복 선필터 스킵: {debate_dedupe_skipped}건\n\n"
+                if debate_dedupe_skipped
+                else "\n"
+            )
+            + "\n"
             "[신규 논문]\n"
             + "\n".join(preview_lines)
         )

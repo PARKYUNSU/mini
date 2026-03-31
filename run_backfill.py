@@ -9,6 +9,7 @@
 """
 
 import argparse
+import json
 import os
 import random
 import sys
@@ -22,7 +23,7 @@ import telebot
 
 from src.arxiv_fetcher import ArxivFetcher, PaperMetadata
 from src.cleanup import cleanup_legacy_files
-from src.data_storage import DataStorage
+from src.data_storage import DataStorage, normalize_paper_id
 from src.pdf_parser import PdfParser
 from src.rag_processor import RagProcessor
 
@@ -31,6 +32,7 @@ load_dotenv()
 # 데이터 저장 경로
 RAW_DATA_DIR = Path("./raw_data_queue")
 CHROMA_DIR = Path("./chroma_db")
+DEBATE_INDEX_PATH = Path("./finetune_datasets/debated_paper_ids.jsonl")
 
 # 기본값 (최신 1~2년 치 권장)
 DEFAULT_START_DATE = "2024-01-01"
@@ -84,6 +86,28 @@ def ensure_data_dirs() -> None:
     os.makedirs(CHROMA_DIR, exist_ok=True)
 
 
+def _load_debated_base_ids() -> set[str]:
+    """이미 토론 완료된 논문 ID(베이스 ID 기준) 집합 로드."""
+    ids: set[str] = set()
+    if not DEBATE_INDEX_PATH.exists():
+        return ids
+    try:
+        with open(DEBATE_INDEX_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    item = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                pid = normalize_paper_id(str(item.get("paper_id", "")).strip())
+                if pid:
+                    ids.add(pid)
+    except Exception as e:
+        print(f"⚠️ 토론 인덱스 로드 실패(선필터 비활성): {e}")
+    return ids
+
+
 def run_backfill(
     start_date: str = DEFAULT_START_DATE,
     end_date: str = DEFAULT_END_DATE,
@@ -118,6 +142,8 @@ def run_backfill(
     parser = PdfParser(table_strategy="lines_strict")
     storage = DataStorage(output_path=RAW_DATA_DIR / "crawled_papers.jsonl")
     rag_processor = RagProcessor(db_path=str(CHROMA_DIR))
+    debated_base_ids = _load_debated_base_ids()
+    print(f"   토론 완료 인덱스(베이스 ID) 선필터: {len(debated_base_ids):,}건")
 
     print("\n" + "=" * 60)
     print("📚 arXiv 백필 (기간 기반 과거 데이터 수집)")
@@ -137,6 +163,7 @@ def run_backfill(
 
     total_success = 0
     total_fetched = 0
+    debate_dedupe_skipped = 0
     success_papers: list[tuple[str, str]] = []
     start_offset = 0
     pipeline_start = time.time()
@@ -221,6 +248,12 @@ def run_backfill(
                 print("-" * 50)
                 print(f"📄 [{global_idx}] {paper.paper_id} - {paper.title[:50]}...")
                 print("-" * 50)
+
+                base_paper_id = normalize_paper_id(paper.paper_id)
+                if base_paper_id and base_paper_id in debated_base_ids:
+                    debate_dedupe_skipped += 1
+                    print(f"  ⏭️  건너뜀 (이미 토론한 논문, 선필터): {paper.paper_id} -> {base_paper_id}")
+                    continue
 
                 pdf_path = tmpdir_path / f"{paper.paper_id}.pdf"
 
@@ -309,6 +342,8 @@ def run_backfill(
         stat_bits.append(f"API총건: {api_total:,}")
     stat_bits.append(f"메타수신합: {total_fetched:,}")
     stat_bits.append(f"저장성공: {total_success:,}")
+    if debate_dedupe_skipped:
+        stat_bits.append(f"토론중복선필터: {debate_dedupe_skipped:,}")
     if api_total is not None:
         if total_fetched == api_total:
             stat_bits.append("페이징완주")
