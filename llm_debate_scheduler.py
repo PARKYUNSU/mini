@@ -184,14 +184,14 @@ def _load_debated_paper_ids() -> set[str]:
                     for line in f:
                         if not line.strip():
                             continue
-                    try:
-                        item = json.loads(line)
-                        raw_id = str(item.get("paper_id", "")).strip()
-                        paper_id = raw_id.split("v", 1)[0] if raw_id else raw_id
-                        if paper_id:
-                            ids.add(paper_id)
-                    except json.JSONDecodeError:
-                        continue
+                        try:
+                            item = json.loads(line)
+                            raw_id = str(item.get("paper_id", "")).strip()
+                            paper_id = raw_id.split("v", 1)[0] if raw_id else raw_id
+                            if paper_id:
+                                ids.add(paper_id)
+                        except json.JSONDecodeError:
+                            continue
             except Exception:
                 continue
         if ids:
