@@ -1,4 +1,4 @@
-"""텔레그램 /backfill_start·/backfill_stop 에서 쓰는 run_backfill.py 프로세스 제어."""
+"""텔레그램 /backfill_start·/backfill_stop 에서 쓰는 백필 프로세스 제어."""
 
 from __future__ import annotations
 
@@ -12,11 +12,44 @@ from typing import Optional
 from agent_config import (
     BACKFILL_LOG_PATH,
     BACKFILL_PID_PATH,
+    BACKFILL_QUARTERLY_SCRIPT_PATH,
     BACKFILL_SCRIPT_PATH,
     PROJECT_ROOT,
 )
 
 _BACKFILL_START_COUNT_PATH = PROJECT_ROOT / ".backfill.start_count"
+
+
+def _quarterly_backfill_cmd() -> list[str]:
+    """환경변수 기반 분기 백필 실행 커맨드 생성."""
+    year = (os.getenv("BACKFILL_YEAR") or "2024").strip()
+    category = (os.getenv("BACKFILL_CATEGORY") or "cs.AI").strip() or "cs.AI"
+    batch_size = (os.getenv("BACKFILL_BATCH_SIZE") or "15").strip()
+    time_limit = (os.getenv("BACKFILL_TIME_LIMIT_SEC") or "").strip()
+    continue_on_error = (os.getenv("BACKFILL_CONTINUE_ON_ERROR") or "1").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "y",
+        "on",
+    )
+
+    cmd = [
+        sys.executable,
+        "-u",
+        str(BACKFILL_QUARTERLY_SCRIPT_PATH),
+        "--year",
+        year,
+        "--category",
+        category,
+        "--batch-size",
+        batch_size,
+    ]
+    if time_limit.isdigit():
+        cmd += ["--time-limit", time_limit]
+    if continue_on_error:
+        cmd.append("--continue-on-error")
+    return cmd
 
 
 def _read_backfill_pid() -> Optional[int]:
@@ -68,14 +101,25 @@ def start_backfill_process() -> tuple[bool, str]:
         start_count = _count_crawled_papers()
         _BACKFILL_START_COUNT_PATH.write_text(str(start_count), encoding="utf-8")
 
+        if not BACKFILL_QUARTERLY_SCRIPT_PATH.is_file() and not BACKFILL_SCRIPT_PATH.is_file():
+            return False, f"백필 스크립트 없음: {BACKFILL_QUARTERLY_SCRIPT_PATH}"
+
         BACKFILL_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        cmd = _quarterly_backfill_cmd() if BACKFILL_QUARTERLY_SCRIPT_PATH.is_file() else [
+            sys.executable,
+            "-u",
+            str(BACKFILL_SCRIPT_PATH),
+        ]
         with open(BACKFILL_LOG_PATH, "a", encoding="utf-8") as log_file:
             log_file.write("\n" + "=" * 60 + "\n")
-            log_file.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] [telegram] run_backfill.py 시작\n")
+            log_file.write(
+                f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] [telegram] "
+                f"{' '.join(cmd[2:])} 시작\n"
+            )
             log_file.write("=" * 60 + "\n")
             log_file.flush()
             proc = subprocess.Popen(
-                [sys.executable, "-u", str(BACKFILL_SCRIPT_PATH)],
+                cmd,
                 cwd=str(PROJECT_ROOT),
                 stdout=log_file,
                 stderr=subprocess.STDOUT,
@@ -83,7 +127,8 @@ def start_backfill_process() -> tuple[bool, str]:
                 env={**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONIOENCODING": "utf-8"},
             )
         BACKFILL_PID_PATH.write_text(str(proc.pid), encoding="utf-8")
-        return True, f"백필을 백그라운드에서 시작했습니다. (pid={proc.pid})"
+        mode = "분기 자동 백필" if BACKFILL_QUARTERLY_SCRIPT_PATH.is_file() else "단일 백필"
+        return True, f"{mode}을 백그라운드에서 시작했습니다. (pid={proc.pid})"
     except Exception as e:
         return False, f"백필 시작 실패: {str(e)[:200]}"
 

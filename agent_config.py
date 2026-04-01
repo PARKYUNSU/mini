@@ -72,6 +72,7 @@ ERROR_LOG_MAX_CHARS = 1000
 CHECKPOINT_DB_PATH = "./agent_checkpoints.db"
 CHAT_MEMORY_DB_PATH = "./chat_memory.db"
 BACKFILL_SCRIPT_PATH = PROJECT_ROOT / "run_backfill.py"
+BACKFILL_QUARTERLY_SCRIPT_PATH = PROJECT_ROOT / "scripts" / "run_backfill_quarterly.py"
 BACKFILL_LOG_PATH = PROJECT_ROOT / "backfill_2023_2026.log"
 BACKFILL_PID_PATH = PROJECT_ROOT / ".backfill.pid"
 LLM_DEBATE_SCHEDULER_PATH = PROJECT_ROOT / "llm_debate_scheduler.py"
