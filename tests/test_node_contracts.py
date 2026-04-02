@@ -45,7 +45,8 @@ def test_router_node_llm_path_uses_mock_classify(monkeypatch, cfg):
         def format_router_tools_tag(self, user_request: str, k: int = 3) -> str:
             return "<tools></tools>"
 
-    monkeypatch.setattr(agent_nodes, "ChromaRAGTool", DummyRAG)
+    _dummy_rag = DummyRAG()
+    monkeypatch.setattr(agent_nodes, "get_chroma_rag_tool", lambda: _dummy_rag)
     monkeypatch.setattr(agent_nodes, "get_tool_rag_store", lambda: DummyTRS())
 
     def _fake_classify(*_a, **_kw):
@@ -247,7 +248,8 @@ def test_paper_mode_biases_knowledge_from_a_to_rag(monkeypatch, cfg):
         def search(self, *a, **k):
             return ""
 
-    monkeypatch.setattr(agent_nodes, "ChromaRAGTool", DummyRAG)
+    _dummy_rag = DummyRAG()
+    monkeypatch.setattr(agent_nodes, "get_chroma_rag_tool", lambda: _dummy_rag)
 
     class DummyTRS:
         def format_topk_block(self, *a, **k):
@@ -274,7 +276,8 @@ def test_paper_mode_allows_explicit_code_to_planner(monkeypatch, cfg):
         def search(self, *a, **k):
             return ""
 
-    monkeypatch.setattr(agent_nodes, "ChromaRAGTool", DummyRAG)
+    _dummy_rag = DummyRAG()
+    monkeypatch.setattr(agent_nodes, "get_chroma_rag_tool", lambda: _dummy_rag)
 
     class DummyTRS:
         def format_topk_block(self, *a, **k):

@@ -5,13 +5,19 @@ Multi-Agent 동적 코딩 텔레그램 봇
 - 일상/RAG: 즉시 답변. 기존 도구: 즉시 실행. 새 코드: 승인 후 실행.
 """
 
+import multiprocessing
 import os
+import sys
+
+# macOS: fork + Objective-C 런타임 충돌 방지 (Chroma/토치 등 네이티브 스택에서 세그폴트 완화)
+if sys.platform == "darwin":
+    if multiprocessing.get_start_method(allow_none=True) != "spawn":
+        multiprocessing.set_start_method("spawn", force=True)
 
 os.environ.setdefault("OLLAMA_HOST", "http://localhost:11434")
 
 import sqlite3
 import subprocess
-import sys
 import time
 import unicodedata
 from pathlib import Path
@@ -29,7 +35,7 @@ from agent_debate_telegram import (
     start_llm_debate_telegram_process,
     stop_llm_debate_telegram_process,
 )
-from agent_chroma_rag import list_stored_papers_text
+from agent_chroma_rag import list_stored_papers_text, warmup_chroma_rag
 from agent_config import (
     BACKFILL_LOG_PATH,
     CHECKPOINT_DB_PATH,
@@ -187,14 +193,23 @@ def main():
         _AGENT_BOT_LOCK_FD_HOLDER.append(_lock_fp)
     allowed_ids = [a.strip() for a in ALLOWED_CHAT_ID.split(",")]
     bot = telebot.TeleBot(TELEGRAM_TOKEN)
-    conn = sqlite3.connect(CHECKPOINT_DB_PATH, check_same_thread=False)
-    graph = build_graph(checkpointer=SqliteSaver(conn))
-    _executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="agent")
 
+    # LangGraph SqliteSaver(checkpoint)가 먼저 열리면 일부 환경에서 Chroma Rust/sqlite와 충돌해
+    # collection.query 직전 Segmentation fault가 난다. 논문 Chroma 워밍업을 그보다 먼저 둔다.
     try:
         sync_tool_chroma_from_disk()
     except Exception as e:
         print(f"⚠️ Tool RAG(tool_chroma_db) 초기 동기화 실패 — 빈 인덱스로 동작할 수 있습니다: {e}")
+
+    try:
+        warmup_chroma_rag()
+        print("✅ Chroma RAG 소유 스레드 워밍업 완료")
+    except Exception as e:
+        print(f"⚠️ Chroma RAG 워밍업 실패 — 첫 RAG 질문 시 소유 스레드에서 재시도: {e}")
+
+    conn = sqlite3.connect(CHECKPOINT_DB_PATH, check_same_thread=False)
+    graph = build_graph(checkpointer=SqliteSaver(conn))
+    _executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="agent")
 
     # cron_engine: run_scheduler 없이 agent_bot 만 켜도 등록 스케줄이 돌아가게 함 (중복은 .cron/cron_worker.lock)
     start_cron_worker_daemon(respect_agent_disable_env=True)

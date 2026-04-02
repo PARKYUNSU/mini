@@ -20,5 +20,6 @@ if t:
     print('Webhook cleared.')
 " 2>/dev/null || true
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 새 봇 시작"
-PYTHONUNBUFFERED=1 .venv/bin/python agent_bot.py
+# 세그폴트 시 stderr에 C 스택 힌트 (Python 런타임·네이티브 wheel ABI 불일치 조사용)
+PYTHONFAULTHANDLER=1 PYTHONUNBUFFERED=1 .venv/bin/python agent_bot.py
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 봇 종료 (exit=$?)"

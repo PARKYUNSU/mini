@@ -17,7 +17,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import interrupt
 
-from agent_chroma_rag import ChromaRAGTool
+from agent_chroma_rag import get_chroma_rag_tool
 from agent_config import (
     AGENT_TOOLS_DIR,
     CODE_TIMEOUT_SEC,
@@ -108,6 +108,23 @@ RAG_DIRECT_ANSWER_USER_SUFFIX = (
     "\n\n[반드시 지킬 것: 1. 핵심 주제, 2. 주요 방법론, 3. 결론 순서로 줄바꿈을 명확히 해서 요약할 것. "
     "절대 같은 문장을 두 번 반복하지 말 것.]"
 )
+
+
+def _da_trace(step: str, detail: str = "") -> None:
+    """DirectAnswer 세그폴트 위치 추적: logger.debug + print(bot.log에 항상 남김)."""
+    line = f"DirectAnswer TRACE | {step}"
+    if detail:
+        line = f"{line} | {detail}"
+    _log.debug("%s", line)
+    print(f"[DEBUG] {line}", flush=True)
+
+
+def _llm_invoke_trace(step: str, detail: str = "") -> None:
+    line = f"invoke_llm_fallback TRACE | {step}"
+    if detail:
+        line = f"{line} | {detail}"
+    _log.debug("%s", line)
+    print(f"[DEBUG] {line}", flush=True)
 
 
 def _llm_model_label(llm) -> str:
@@ -355,7 +372,7 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         # 3단계: LLM 분류
         session = get_session(chat_id)
         session_context = session.get_recent_context(max_turns=2)
-        rag = ChromaRAGTool()
+        rag = get_chroma_rag_tool()
         rag_context = rag.search(user_request)
         _trs = get_tool_rag_store()
         tools_context = _trs.format_topk_block(user_request, k=TOOL_RAG_TOP_K)
@@ -387,22 +404,29 @@ def _invoke_llm_with_fallback(
     timeout_sec: float | None = None,
 ) -> str:
     """Ollama 우선, 실패 시 Gemini 폴백. 타임아웃 시 executor는 wait=False로 블로킹 없이 정리."""
+    _llm_invoke_trace("entry", f"timeout_sec={timeout_sec!r} n_msg={len(messages) if messages else 0}")
     getters = (get_planner_llm, get_executor_llm)
     n = len(getters)
     for i, llm_getter in enumerate(getters):
         pool = None
         try:
+            _llm_invoke_trace(f"loop i={i}", f"getter={llm_getter.__name__}")
             llm = llm_getter()
             label = _llm_model_label(llm)
+            _llm_invoke_trace("after llm_getter()", f"label={label!r}")
             t0 = time.perf_counter()
             if timeout_sec and timeout_sec > 0:
                 pool = ThreadPoolExecutor(max_workers=1)
                 # submit(fn, *args)는 args를 먼저 평가해 llm.invoke 조회가 일어남 → lambda로 지연(타임아웃·테스트 목)
+                _llm_invoke_trace("before pool.submit(lambda: llm.invoke)", f"timeout={timeout_sec}")
                 fut = pool.submit(lambda: llm.invoke(messages))
                 try:
+                    _llm_invoke_trace("before fut.result(timeout)", "")
                     resp = fut.result(timeout=timeout_sec)
+                    _llm_invoke_trace("after fut.result(timeout)", "ok")
                 except FuturesTimeout:
                     elapsed = time.perf_counter() - t0
+                    _llm_invoke_trace("FuturesTimeout", f"getter={llm_getter.__name__} elapsed={elapsed:.3f}s")
                     _log.debug(
                         "LLM timeout model=%s getter=%s elapsed=%.3fs next_fallback=%s",
                         label,
@@ -413,6 +437,7 @@ def _invoke_llm_with_fallback(
                     continue
                 except Exception as e:
                     elapsed = time.perf_counter() - t0
+                    _llm_invoke_trace("invoke thread Exception", f"{type(e).__name__}: {e}")
                     _log.debug(
                         "LLM invoke failed model=%s getter=%s elapsed=%.3fs err=%s next_fallback=%s",
                         label,
@@ -423,7 +448,9 @@ def _invoke_llm_with_fallback(
                     )
                     continue
             else:
+                _llm_invoke_trace("before llm.invoke (no thread timeout)", "")
                 resp = llm.invoke(messages)
+                _llm_invoke_trace("after llm.invoke (no thread timeout)", "ok")
             elapsed = time.perf_counter() - t0
             _log.debug(
                 "LLM adopted model=%s getter=%s elapsed=%.3fs",
@@ -431,8 +458,10 @@ def _invoke_llm_with_fallback(
                 llm_getter.__name__,
                 elapsed,
             )
+            _llm_invoke_trace("returning content", f"elapsed={elapsed:.3f}s len={len((resp.content or fallback_msg).strip())}")
             return (resp.content or fallback_msg).strip()
         except Exception as e:
+            _llm_invoke_trace("outer loop Exception", f"getter={llm_getter.__name__} {type(e).__name__}: {e}")
             _log.debug(
                 "LLM getter/invoke failed getter=%s err=%s next_fallback=%s",
                 llm_getter.__name__,
@@ -442,20 +471,26 @@ def _invoke_llm_with_fallback(
         finally:
             if pool is not None:
                 pool.shutdown(wait=False, cancel_futures=True)
+    _llm_invoke_trace("all getters exhausted", "returning fallback_msg")
     _log.debug("LLM all getters exhausted; returning fallback_msg")
     return fallback_msg
 
 
 def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
     """Direct Answer: A(일상 대화) 또는 B(RAG 검색)로 즉시 답변 (승인 불필요)"""
-    print("[DEBUG] DirectAnswer: 진입")
     conf = config.get("configurable", {})
+    chat_id = str(conf.get("chat_id", ""))
     user_request = (state.get("user_request") or "").strip()
     image_base64 = state.get("image_base64")  # 직전 턴 이미지(문맥용)
-    session = get_session(str(conf.get("chat_id", "")))
+    session = get_session(chat_id)
     router_choice = state.get("router_choice", "B")
+    _da_trace(
+        "entry",
+        f"chat_id={chat_id!r} router_choice={router_choice!r} ulen={len(user_request)}",
+    )
 
     if (state.get("agent_fatal_error") or "").strip():
+        _da_trace("early_return", "agent_fatal_error set")
         return {}
 
     _da_timeout = DIRECT_ANSWER_TIMEOUT_SEC if DIRECT_ANSWER_TIMEOUT_SEC > 0 else None
@@ -463,15 +498,18 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         answer = ""
         if router_choice == "A":
             req_lower = user_request.lower()
+            _da_trace("branch", "A daily/python_example")
             if state.get("python_example_direct"):
                 session_ctx = session.get_recent_context(max_turns=2)
                 sys_pe = DIRECT_ANSWER_PYTHON_EXAMPLE_SYSTEM
                 prompt = direct_answer_python_example_user(session_ctx, user_request)
                 content = _build_message_content(prompt, image_base64)
+                _da_trace("before _invoke_llm_with_fallback", "A python_example")
                 answer = _invoke_llm_with_fallback(
                     [SystemMessage(content=sys_pe), HumanMessage(content=content)],
                     timeout_sec=_da_timeout,
                 )
+                _da_trace("after _invoke_llm_with_fallback", "A python_example")
             elif any(x in req_lower for x in ("안녕", "hello", "hi", "반가", "좋은 아침")):
                 answer = "안녕하세요. 윤수르입니다."
             elif any(x in user_request for x in ("누구야", "누구니", "누구세요", "자기소개", "정체", "이름이 뭐야", "윤수르")):
@@ -491,30 +529,42 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             elif any(x in user_request for x in ("심심해", "심심하")):
                 answer = "그러시군요. 가볍게 이야기 나누거나 바로 해볼 일 하나를 같이 정해볼까요?"
             else:
-                # A: 일상 대화 - ChromaRAGTool 절대 호출 금지, RAG/문서 관련 표현 0바이트
+                # A: 일상 대화 - Chroma 절대 호출 금지, RAG/문서 관련 표현 0바이트
                 system_prompt = DIRECT_ANSWER_DAILY_CHAT_SYSTEM
                 session_ctx = session.get_recent_context(max_turns=2)
                 prompt = direct_answer_daily_user(session_ctx, user_request)
                 content = _build_message_content(prompt, image_base64)
+                _da_trace("before _invoke_llm_with_fallback", "A daily_chat")
                 answer = _invoke_llm_with_fallback(
                     [SystemMessage(content=system_prompt), HumanMessage(content=content)],
                     timeout_sec=_da_timeout,
                 )
+                _da_trace("after _invoke_llm_with_fallback", "A daily_chat")
         else:
-            # B: RAG 검색 - 지식 베이스 기반 답변
-            rag = ChromaRAGTool()
+            # B: RAG — Chroma는 동기 API만 사용(asyncio 없음). 싱글톤+락은 agent_chroma_rag.
+            _da_trace("branch", "B RAG chroma+llm")
             req_lower = user_request.lower()
 
             depth_keywords = ("자세히", "더", "길게", "상세하게", "구체적으로")
             wants_depth = any(k in user_request for k in depth_keywords)
             top_k = RAG_TOP_K * 2 if wants_depth else RAG_TOP_K
 
-            if ("chromadb" in req_lower or "논문" in user_request) and any(w in user_request for w in ("목록", "알려줘", "뭐 있어", "조회", "검색")):
-                rag_context = rag.list_papers()
-            else:
-                rag_context = rag.search(user_request, top_k=top_k)
+            _da_trace("before get_chroma_rag_tool()", f"top_k={top_k} wants_depth={wants_depth}")
+            rag = get_chroma_rag_tool()
+            _da_trace("after get_chroma_rag_tool()", "ok")
 
+            if ("chromadb" in req_lower or "논문" in user_request) and any(w in user_request for w in ("목록", "알려줘", "뭐 있어", "조회", "검색")):
+                _da_trace("before rag.list_papers()", "sync jsonl, no chroma query")
+                rag_context = rag.list_papers()
+                _da_trace("after rag.list_papers()", f"len={len(rag_context)}")
+            else:
+                _da_trace("before rag.search()", f"top_k={top_k} (sync collection.query)")
+                rag_context = rag.search(user_request, top_k=top_k)
+                _da_trace("after rag.search()", f"len={len(rag_context)}")
+
+            _da_trace("before session.get_last_assistant_response()", "")
             last_ai = session.get_last_assistant_response()
+            _da_trace("after session.get_last_assistant_response()", f"last_ai_len={len(last_ai)}")
 
             system_prompt = DIRECT_ANSWER_RAG_SYSTEM_BASE
             if wants_depth:
@@ -529,11 +579,14 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             elif isinstance(content, list) and content and isinstance(content[0], dict):
                 t0 = str(content[0].get("text") or "")
                 content[0]["text"] = t0 + RAG_DIRECT_ANSWER_USER_SUFFIX
+            _da_trace("before _invoke_llm_with_fallback", "B RAG answer")
             answer = _invoke_llm_with_fallback(
                 [SystemMessage(content=system_prompt), HumanMessage(content=content)],
                 timeout_sec=_da_timeout,
             )
+            _da_trace("after _invoke_llm_with_fallback", "B RAG answer")
 
+        _da_trace("before telegram / structure", f"answer_len={len(answer)}")
         print(f"[DEBUG] DirectAnswer: 답변 생성 완료 ({len(answer)}자), 텔레그램 전송 시도")
         bot = conf.get("bot")
         chat_id = str(conf.get("chat_id", ""))
@@ -809,7 +862,7 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
     try:
         print("[DEBUG] Planner: RAG(논문·도구) 검색 시작...")
-        rag = ChromaRAGTool()
+        rag = get_chroma_rag_tool()
         rag_context = rag.search(state["user_request"])
         tools_context = get_tool_rag_store().format_topk_block(state["user_request"], k=TOOL_RAG_TOP_K)
         print("[DEBUG] Planner: 로컬 Ollama 계획 생성 호출 (timeout≈120s)...")
@@ -985,7 +1038,7 @@ def executor_node(state: AgentState) -> dict:
             tools_context = get_tool_rag_store().format_topk_block(
                 state.get("user_request") or "", k=TOOL_RAG_TOP_K
             )
-            rag = ChromaRAGTool()
+            rag = get_chroma_rag_tool()
             rag_context = rag.search(state["user_request"])[:500] if state.get("user_request") else ""
 
         llm = get_coding_groq_llm()
