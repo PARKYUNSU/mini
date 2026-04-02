@@ -1,5 +1,6 @@
 """텔레그램 전송·편집 유틸 (Broken pipe, ReadTimeout 방어 + tenacity 재시도)"""
 
+import html
 import re
 
 from telebot.types import KeyboardButton, ReplyKeyboardMarkup
@@ -46,6 +47,32 @@ def strip_wake_word(text: str) -> str:
     """'윤수르, ~' → 순수 목적 텍스트만"""
     cleaned = re.sub(r"^윤수르[,\.\s]*", "", text.strip()).strip()
     return cleaned if cleaned else text.strip()
+
+
+def escape_telegram_html(text: str) -> str:
+    """Telegram HTML parse_mode용 이스케이프 (& < >)."""
+    return html.escape(text or "", quote=False)
+
+
+def rag_structured_lines_to_html(body: str) -> str:
+    """
+    RAG 후처리 본문(### 제목 + - bullet)을 Telegram HTML로 변환.
+    Markdown 특수문자 파싱 오류를 피하고 줄바꿈은 그대로 유지한다.
+    """
+    out_lines: list[str] = []
+    for raw in (body or "").splitlines():
+        line = raw.rstrip()
+        if not line.strip():
+            out_lines.append("")
+            continue
+        if line.startswith("### "):
+            title = escape_telegram_html(line[4:].strip())
+            out_lines.append(f"<b>{title}</b>")
+        elif line.startswith("- "):
+            out_lines.append("• " + escape_telegram_html(line[2:].strip()))
+        else:
+            out_lines.append(escape_telegram_html(line.strip()))
+    return "\n".join(out_lines)
 
 
 @retry_on_network_error

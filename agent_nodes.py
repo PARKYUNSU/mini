@@ -92,12 +92,22 @@ from agent_session import (
 )
 from agent_tool_rag import get_tool_rag_store
 from agent_types import AgentState
-from agent_telegram import notify_chat_error as _notify_chat_error, safe_telegram_send as _safe_telegram_send
+from agent_telegram import (
+    notify_chat_error as _notify_chat_error,
+    rag_structured_lines_to_html as _rag_structured_lines_to_html,
+    safe_telegram_send as _safe_telegram_send,
+)
 from agent_vision import build_message_content as _build_message_content
 
 _MINI_ROOT = Path(__file__).resolve().parent
 
 _log = logging.getLogger(__name__)
+
+# RAG 직접 답변: 소형 LLM이 system 프롬프트를 약하게 따를 때 user 말미에 강제 (요청 스펙)
+RAG_DIRECT_ANSWER_USER_SUFFIX = (
+    "\n\n[반드시 지킬 것: 1. 핵심 주제, 2. 주요 방법론, 3. 결론 순서로 줄바꿈을 명확히 해서 요약할 것. "
+    "절대 같은 문장을 두 번 반복하지 말 것.]"
+)
 
 
 def _llm_model_label(llm) -> str:
@@ -196,13 +206,24 @@ def _enforce_rag_structure_markdown(answer: str) -> str:
     if not bullets:
         bullets = [text[:180]]
 
-    topic = bullets[:2]
-    method = bullets[2:4] if len(bullets) >= 3 else bullets[:1]
-    concl = bullets[4:6] if len(bullets) >= 5 else bullets[-1:]
+    b = _dedupe_preserve_order(bullets)
+    topic: list[str] = []
+    method: list[str] = []
+    concl: list[str] = []
+    i = 0
+    while i < len(b) and len(topic) < 2:
+        topic.append(b[i])
+        i += 1
+    while i < len(b) and len(method) < 2:
+        method.append(b[i])
+        i += 1
+    while i < len(b) and len(concl) < 2:
+        concl.append(b[i])
+        i += 1
 
-    topic = _dedupe_preserve_order(topic) or ["핵심 내용을 추출하지 못했습니다."]
-    method = _dedupe_preserve_order(method) or ["방법론 정보를 추출하지 못했습니다."]
-    concl = _dedupe_preserve_order(concl) or ["결론/의의 정보를 추출하지 못했습니다."]
+    topic = topic or ["핵심 내용을 추출하지 못했습니다."]
+    method = method or ["문서에서 방법론을 추가로 확인할 수 없습니다."]
+    concl = concl or ["문서에서 결론·의의를 추가로 확인할 수 없습니다."]
 
     return (
         "### 핵심 주제\n"
@@ -215,8 +236,11 @@ def _enforce_rag_structure_markdown(answer: str) -> str:
 
 
 def _markdown_struct_to_plain(md: str) -> str:
+    """Markdown/HTML 실패 시 폴백: 줄바꿈·섹션 구분 유지."""
     plain = (md or "").replace("### ", "").replace("**", "")
     plain = re.sub(r"^\s*-\s*", "• ", plain, flags=re.M)
+    # 연속 빈 줄 정리(과도한 공백만), 단일 \n은 유지
+    plain = re.sub(r"\n{3,}", "\n\n", plain)
     return plain.strip()
 
 
@@ -500,6 +524,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 session.get_context(), rag_context, last_ai, user_request
             )
             content = _build_message_content(prompt, image_base64)
+            if isinstance(content, str):
+                content = content + RAG_DIRECT_ANSWER_USER_SUFFIX
+            elif isinstance(content, list) and content and isinstance(content[0], dict):
+                t0 = str(content[0].get("text") or "")
+                content[0]["text"] = t0 + RAG_DIRECT_ANSWER_USER_SUFFIX
             answer = _invoke_llm_with_fallback(
                 [SystemMessage(content=system_prompt), HumanMessage(content=content)],
                 timeout_sec=_da_timeout,
@@ -513,22 +542,39 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
         if bot and chat_id:
-            # RAG 답변은 Markdown 렌더링이 핵심(볼드/글머리/줄바꿈). 실패 시 평문으로 폴백.
-            if _safe_telegram_send(bot, chat_id, answer[:4000], parse_mode="Markdown"):
-                print("[DEBUG] DirectAnswer: 텔레그램 전송 성공")
-            else:
-                plain_answer = _markdown_struct_to_plain(answer)
-                if _safe_telegram_send(bot, chat_id, plain_answer[:4000]):
-                    print("[DEBUG] DirectAnswer: 텔레그램 평문 전송 성공 (Markdown 실패 후)")
+            if router_choice == "B":
+                # HTML: 제목/불릿 이스케이프로 파싱 실패·벽돌 텍스트 폴백 최소화, \n 유지
+                html_body = _rag_structured_lines_to_html(answer)
+                if _safe_telegram_send(bot, chat_id, html_body[:4000], parse_mode="HTML"):
+                    print("[DEBUG] DirectAnswer: 텔레그램 HTML 전송 성공")
                 else:
-                    print("[DEBUG] DirectAnswer: 텔레그램 전송 실패 (일시 오류)")
-                    _notify_chat_error(
-                        bot,
-                        chat_id,
-                        headline="⚠️ 답변 전송 실패",
-                        detail="텔레그램으로 답변을 보내지 못했습니다. 네트워크·봇 토큰을 확인 후 다시 시도해 주세요.",
-                        status_message_id=None,
-                    )
+                    plain_answer = _markdown_struct_to_plain(answer)
+                    if _safe_telegram_send(bot, chat_id, plain_answer[:4000], parse_mode=None):
+                        print("[DEBUG] DirectAnswer: 텔레그램 평문 전송 성공 (HTML 실패 후, 줄바꿈 유지)")
+                    else:
+                        print("[DEBUG] DirectAnswer: 텔레그램 전송 실패 (일시 오류)")
+                        _notify_chat_error(
+                            bot,
+                            chat_id,
+                            headline="⚠️ 답변 전송 실패",
+                            detail="텔레그램으로 답변을 보내지 못했습니다. 네트워크·봇 토큰을 확인 후 다시 시도해 주세요.",
+                            status_message_id=None,
+                        )
+            else:
+                if _safe_telegram_send(bot, chat_id, answer[:4000], parse_mode="Markdown"):
+                    print("[DEBUG] DirectAnswer: 텔레그램 전송 성공")
+                else:
+                    if _safe_telegram_send(bot, chat_id, answer[:4000], parse_mode=None):
+                        print("[DEBUG] DirectAnswer: 텔레그램 평문 전송 성공 (Markdown 실패 후)")
+                    else:
+                        print("[DEBUG] DirectAnswer: 텔레그램 전송 실패 (일시 오류)")
+                        _notify_chat_error(
+                            bot,
+                            chat_id,
+                            headline="⚠️ 답변 전송 실패",
+                            detail="텔레그램으로 답변을 보내지 못했습니다. 네트워크·봇 토큰을 확인 후 다시 시도해 주세요.",
+                            status_message_id=None,
+                        )
 
         return {"direct_response": answer}
     except Exception as e:
