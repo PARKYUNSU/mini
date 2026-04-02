@@ -48,12 +48,14 @@ def router_step3_user_prompt(
     tools_context: str,
     rag_context: str,
     tool_rag_top_k: int,
+    paper_mode_hint: str = "",
 ) -> str:
     rag_snip = rag_context[:300] if rag_context != "관련 문서 없음" else "없음"
+    hint_block = f"\n[논문 모드 힌트]\n{paper_mode_hint.strip()}\n" if (paper_mode_hint or "").strip() else ""
     return f"""[최근 대화]
 {session_context if session_context else "(없음)"}
 
-도구(Top-{tool_rag_top_k} 후보만):\n{tools_context[:1200]}\nRAG:{rag_snip}\n입력:{user_request}\nA/B/C/D?"""
+도구(Top-{tool_rag_top_k} 후보만):\n{tools_context[:1200]}\nRAG:{rag_snip}{hint_block}입력:{user_request}\nA/B/C/D?"""
 
 
 # ----- Direct answer -----

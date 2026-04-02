@@ -205,6 +205,11 @@ def main():
     def _run_or_resume_body(chat_id: str, user_text: str, thread_id: Optional[str], config: Optional[dict], is_resume: bool, status_msg, image_base64: Optional[str], graph, bot):
         """run_or_resume 실제 로직. 호출 시 이미 _with_chat_lock(chat_id) 내부여야 함."""
         print(f"[DEBUG] run_or_resume: 진입 is_resume={is_resume}, image_ctx={bool(image_base64)}")
+        if status_msg and bot:
+            try:
+                bot.send_chat_action(chat_id, "typing")
+            except Exception:
+                pass
         tid = thread_id or f"tg_{chat_id}"
         if not is_resume and _thread_version.get(chat_id, 0) > 0:
             tid = f"tg_{chat_id}_{_thread_version[chat_id]}"
@@ -731,11 +736,15 @@ def main():
                 _safe_telegram_send(bot, chat_id, "이전 계획을 취소하고 새로운 요청을 처리합니다.")
                 # fall through: 아래에서 방금 입력한 text를 새 질문으로 Router부터 재실행
 
-            status_msg = _safe_telegram_send_and_get(bot, chat_id, "👀 분석 중...")
+            status_msg = _safe_telegram_send_and_get(bot, chat_id, "⏳ 처리 중… (잠시만요)")
             print("[DEBUG] Handler: 스레드로 run_or_resume 제출 (메인 스레드 즉시 반환)")
 
             def _do_run():
                 try:
+                    try:
+                        bot.send_chat_action(chat_id, "typing")
+                    except Exception:
+                        pass
                     ctx_image = take_pending_image(chat_id)
                     run_or_resume(chat_id, text, thread_id, is_resume=False, status_msg=status_msg, image_base64=ctx_image)
                 except Exception as e:

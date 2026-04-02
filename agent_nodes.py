@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+import logging
 import os
 import re
 import traceback
@@ -20,6 +21,7 @@ from agent_chroma_rag import ChromaRAGTool
 from agent_config import (
     AGENT_TOOLS_DIR,
     CODE_TIMEOUT_SEC,
+    DIRECT_ANSWER_TIMEOUT_SEC,
     ERROR_LOG_MAX_CHARS,
     RAG_TOP_K,
     TOOL_RAG_TOP_K,
@@ -68,6 +70,7 @@ from agent_prompts import (
     use_existing_tool_prompt_generic,
 )
 from agent_router_rules import (
+    is_explicit_python_coding_request,
     is_factual_lookup,
     router_step2_build_features as _router_step2_build_features,
     skip_planner_debate_for_fast_path as _skip_planner_debate_for_fast_path,
@@ -94,6 +97,54 @@ from agent_vision import build_message_content as _build_message_content
 
 _MINI_ROOT = Path(__file__).resolve().parent
 
+_log = logging.getLogger(__name__)
+
+
+def _llm_model_label(llm) -> str:
+    return str(getattr(llm, "model", None) or getattr(llm, "model_name", None) or type(llm).__name__)
+
+
+def _paper_knowledge_heuristic(user_request: str, req_lower: str) -> bool:
+    """논문 모드에서 일상(A)으로 오분류되기 쉬운 지식·설명형 질문."""
+    r = user_request or ""
+    markers = (
+        "요약",
+        "설명",
+        "정리",
+        "비교",
+        "차이",
+        "정의",
+        "무엇",
+        "뭐야",
+        "란 ",
+        "이란",
+        "what is",
+        "how does",
+    )
+    if any(m in r for m in markers):
+        code_hits = ("파이썬", "python", "코드", "실행", "크롤", "스크립트", "api 호출")
+        if not any(c in req_lower for c in code_hits):
+            return True
+    return False
+
+
+def _apply_paper_mode_router_bias(chat_id: str, user_request: str, result: dict) -> dict:
+    """
+    /paper ON: 라우터를 대체하지 않고 RAG(B)·문서(D) 선호 bias.
+    명백한 코드/실행 요청은 C(planner) 허용.
+    """
+    if not get_paper_mode(chat_id):
+        return result
+    req_lower = (user_request or "").lower().strip()
+    if is_explicit_python_coding_request(user_request, req_lower):
+        if result.get("route_type") == "direct_answer" and result.get("router_choice") == "A":
+            return {"route_type": "planner", "router_choice": "C"}
+        return result
+    if result.get("route_type") == "direct_answer" and result.get("router_choice") == "A":
+        if is_factual_lookup(user_request) or _paper_knowledge_heuristic(user_request, req_lower):
+            return {"route_type": "direct_answer", "router_choice": "B"}
+    return result
+
 
 def _is_execution_failure(result: str) -> bool:
     """
@@ -117,12 +168,28 @@ def _is_execution_failure(result: str) -> bool:
     return False
 
 def _router_step3_llm_classify(
-    user_request: str, session_context: str, rag_context: str, tools_context: str, tools_list_str: str
+    user_request: str,
+    session_context: str,
+    rag_context: str,
+    tools_context: str,
+    tools_list_str: str,
+    chat_id: str,
 ) -> dict:
     """3단계: LLM 분류. 하드룰에 걸리지 않은 경우만 호출. Ollama 실패 시 Gemini 폴백."""
     system_prompt = router_step3_system_prompt(tools_list_str, TOOL_RAG_TOP_K)
+    paper_hint = ""
+    if get_paper_mode(chat_id):
+        paper_hint = (
+            "논문 모드(/paper)가 켜져 있음. 지식·문서 설명은 D(또는 B 기존 도구), "
+            "명백한 파이썬 코드 실행·크롤링 등은 C. 순수 잡담만 A."
+        )
     prompt = router_step3_user_prompt(
-        user_request, session_context, tools_context, rag_context, TOOL_RAG_TOP_K
+        user_request,
+        session_context,
+        tools_context,
+        rag_context,
+        TOOL_RAG_TOP_K,
+        paper_mode_hint=paper_hint,
     )
 
     raw = "D"
@@ -196,7 +263,10 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         tools_context = _trs.format_topk_block(user_request, k=TOOL_RAG_TOP_K)
         tools_list_str = _trs.format_router_tools_tag(user_request, k=TOOL_RAG_TOP_K)
 
-        result = _router_step3_llm_classify(user_request, session_context, rag_context, tools_context, tools_list_str)
+        result = _router_step3_llm_classify(
+            user_request, session_context, rag_context, tools_context, tools_list_str, chat_id
+        )
+        result = _apply_paper_mode_router_bias(chat_id, user_request, result)
         print(f"[DEBUG] Router: 3단계 LLM 분류 → {result.get('route_type')} (features={features})")
         # 스케줄 작업: planner는 승인 대기로 멈추므로, direct_answer로 강제 우회
         if is_scheduled and result.get("route_type") in ("planner", "code_run"):
@@ -215,24 +285,66 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
 def _invoke_llm_with_fallback(
     messages,
-    fallback_msg: str = "죄송해요, 답변을 생성하지 못했어요.",
+    fallback_msg: str = "죄송해요, 답변을 생성하지 못했어요. 잠시 후 다시 질문해 주세요.",
     timeout_sec: float | None = None,
 ) -> str:
-    """Ollama 우선, 실패 시 Gemini 폴백"""
-    for llm_getter in (get_planner_llm, get_executor_llm):
+    """Ollama 우선, 실패 시 Gemini 폴백. 타임아웃 시 executor는 wait=False로 블로킹 없이 정리."""
+    getters = (get_planner_llm, get_executor_llm)
+    n = len(getters)
+    for i, llm_getter in enumerate(getters):
+        pool = None
         try:
             llm = llm_getter()
+            label = _llm_model_label(llm)
+            t0 = time.perf_counter()
             if timeout_sec and timeout_sec > 0:
-                with ThreadPoolExecutor(max_workers=1) as pool:
-                    fut = pool.submit(llm.invoke, messages)
+                pool = ThreadPoolExecutor(max_workers=1)
+                # submit(fn, *args)는 args를 먼저 평가해 llm.invoke 조회가 일어남 → lambda로 지연(타임아웃·테스트 목)
+                fut = pool.submit(lambda: llm.invoke(messages))
+                try:
                     resp = fut.result(timeout=timeout_sec)
+                except FuturesTimeout:
+                    elapsed = time.perf_counter() - t0
+                    _log.debug(
+                        "LLM timeout model=%s getter=%s elapsed=%.3fs next_fallback=%s",
+                        label,
+                        llm_getter.__name__,
+                        elapsed,
+                        i + 1 < n,
+                    )
+                    continue
+                except Exception as e:
+                    elapsed = time.perf_counter() - t0
+                    _log.debug(
+                        "LLM invoke failed model=%s getter=%s elapsed=%.3fs err=%s next_fallback=%s",
+                        label,
+                        llm_getter.__name__,
+                        elapsed,
+                        e,
+                        i + 1 < n,
+                    )
+                    continue
             else:
                 resp = llm.invoke(messages)
+            elapsed = time.perf_counter() - t0
+            _log.debug(
+                "LLM adopted model=%s getter=%s elapsed=%.3fs",
+                label,
+                llm_getter.__name__,
+                elapsed,
+            )
             return (resp.content or fallback_msg).strip()
-        except FuturesTimeout:
-            print(f"[DEBUG] LLM 호출 타임아웃 ({llm_getter.__name__}, {timeout_sec}s)")
         except Exception as e:
-            print(f"[DEBUG] LLM 호출 실패 ({llm_getter.__name__}), 다음 시도: {e}")
+            _log.debug(
+                "LLM getter/invoke failed getter=%s err=%s next_fallback=%s",
+                llm_getter.__name__,
+                e,
+                i + 1 < n,
+            )
+        finally:
+            if pool is not None:
+                pool.shutdown(wait=False, cancel_futures=True)
+    _log.debug("LLM all getters exhausted; returning fallback_msg")
     return fallback_msg
 
 
@@ -248,6 +360,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
     if (state.get("agent_fatal_error") or "").strip():
         return {}
 
+    _da_timeout = DIRECT_ANSWER_TIMEOUT_SEC if DIRECT_ANSWER_TIMEOUT_SEC > 0 else None
     try:
         answer = ""
         if router_choice == "A":
@@ -257,7 +370,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 sys_pe = DIRECT_ANSWER_PYTHON_EXAMPLE_SYSTEM
                 prompt = direct_answer_python_example_user(session_ctx, user_request)
                 content = _build_message_content(prompt, image_base64)
-                answer = _invoke_llm_with_fallback([SystemMessage(content=sys_pe), HumanMessage(content=content)])
+                answer = _invoke_llm_with_fallback(
+                    [SystemMessage(content=sys_pe), HumanMessage(content=content)],
+                    timeout_sec=_da_timeout,
+                )
             elif any(x in req_lower for x in ("안녕", "hello", "hi", "반가", "좋은 아침")):
                 answer = "안녕하세요. 윤수르입니다."
             elif any(x in user_request for x in ("누구야", "누구니", "누구세요", "자기소개", "정체", "이름이 뭐야", "윤수르")):
@@ -282,7 +398,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 session_ctx = session.get_recent_context(max_turns=2)
                 prompt = direct_answer_daily_user(session_ctx, user_request)
                 content = _build_message_content(prompt, image_base64)
-                answer = _invoke_llm_with_fallback([SystemMessage(content=system_prompt), HumanMessage(content=content)])
+                answer = _invoke_llm_with_fallback(
+                    [SystemMessage(content=system_prompt), HumanMessage(content=content)],
+                    timeout_sec=_da_timeout,
+                )
         else:
             # B: RAG 검색 - 지식 베이스 기반 답변
             rag = ChromaRAGTool()
@@ -309,7 +428,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             content = _build_message_content(prompt, image_base64)
             answer = _invoke_llm_with_fallback(
                 [SystemMessage(content=system_prompt), HumanMessage(content=content)],
-                timeout_sec=55,
+                timeout_sec=_da_timeout,
             )
 
         print(f"[DEBUG] DirectAnswer: 답변 생성 완료 ({len(answer)}자), 텔레그램 전송 시도")

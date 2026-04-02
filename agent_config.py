@@ -87,6 +87,11 @@ except ValueError:
 CRON_JOBS_DIR = PROJECT_ROOT / ".cron"
 LLM_RETRY_MAX = 3
 LLM_RETRY_DELAY_SEC = 1.5
+# Direct answer (A 일상 + B RAG) 공통 LLM 호출 상한(초). 0 이하 = 무제한.
+try:
+    DIRECT_ANSWER_TIMEOUT_SEC = float(os.getenv("DIRECT_ANSWER_TIMEOUT_SEC", "55"))
+except ValueError:
+    DIRECT_ANSWER_TIMEOUT_SEC = 55.0
 
 
 def resolve_agent_tool_py(stem: str, tools_dir: Path | None = None) -> Path | None:

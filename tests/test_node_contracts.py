@@ -172,3 +172,126 @@ def test_route_after_monitor_intentional_syntax_ends():
         )
         == "__end__"
     )
+
+
+def test_invoke_llm_with_fallback_timeout_then_second_succeeds(monkeypatch):
+    from concurrent.futures import TimeoutError as FuturesTimeout
+
+    class R:
+        content = "second_ok"
+
+    state = {"submit": 0}
+
+    class FakePool:
+        def submit(self, fn, *args):
+            state["submit"] += 1
+
+            class F:
+                def result(self2, timeout=None):
+                    if state["submit"] == 1:
+                        raise FuturesTimeout()
+                    return R()
+
+            return F()
+
+        def shutdown(self, *a, **k):
+            pass
+
+    monkeypatch.setattr(agent_nodes, "ThreadPoolExecutor", lambda *a, **k: FakePool())
+    monkeypatch.setattr(agent_nodes, "get_planner_llm", lambda: object())
+    monkeypatch.setattr(agent_nodes, "get_executor_llm", lambda: object())
+    out = agent_nodes._invoke_llm_with_fallback([], timeout_sec=1.0)
+    assert out == "second_ok"
+
+
+def test_invoke_llm_with_fallback_all_timeout_returns_fallback(monkeypatch):
+    from concurrent.futures import TimeoutError as FuturesTimeout
+
+    class FakePool:
+        def submit(self, fn, *args):
+            class F:
+                def result(self2, timeout=None):
+                    raise FuturesTimeout()
+
+            return F()
+
+        def shutdown(self, *a, **k):
+            pass
+
+    monkeypatch.setattr(agent_nodes, "ThreadPoolExecutor", lambda *a, **k: FakePool())
+    monkeypatch.setattr(agent_nodes, "get_planner_llm", lambda: object())
+    monkeypatch.setattr(agent_nodes, "get_executor_llm", lambda: object())
+    out = agent_nodes._invoke_llm_with_fallback([], fallback_msg="fallback_xyz", timeout_sec=1.0)
+    assert out == "fallback_xyz"
+
+
+def test_direct_answer_a_path_passes_timeout_to_invoke(monkeypatch, cfg):
+    captured = []
+
+    def _cap(*_a, timeout_sec=None, **_k):
+        captured.append(timeout_sec)
+        return "ok"
+
+    monkeypatch.setattr(agent_nodes, "_invoke_llm_with_fallback", _cap)
+    monkeypatch.setattr(agent_nodes, "DIRECT_ANSWER_TIMEOUT_SEC", 33.0)
+    unique = "q9f2k_node_contract_timeout_pass_only"
+    agent_nodes.direct_answer_node({"user_request": unique, "router_choice": "A"}, config=cfg)
+    assert captured == [33.0]
+
+
+def test_paper_mode_biases_knowledge_from_a_to_rag(monkeypatch, cfg):
+    monkeypatch.setattr(agent_nodes, "get_paper_mode", lambda _cid: True)
+    monkeypatch.setattr(agent_nodes, "router_step1_hard_rules", lambda *a, **k: None)
+
+    class DummyRAG:
+        def search(self, *a, **k):
+            return ""
+
+    monkeypatch.setattr(agent_nodes, "ChromaRAGTool", DummyRAG)
+
+    class DummyTRS:
+        def format_topk_block(self, *a, **k):
+            return ""
+
+        def format_router_tools_tag(self, *a, **k):
+            return "<tools></tools>"
+
+    monkeypatch.setattr(agent_nodes, "get_tool_rag_store", lambda: DummyTRS())
+    monkeypatch.setattr(
+        agent_nodes,
+        "_router_step3_llm_classify",
+        lambda *a, **k: {"route_type": "direct_answer", "router_choice": "A"},
+    )
+    out = agent_nodes.router_node({"user_request": "양자 얽힘이 뭐야?"}, config=cfg)
+    assert out.get("router_choice") == "B"
+
+
+def test_paper_mode_allows_explicit_code_to_planner(monkeypatch, cfg):
+    monkeypatch.setattr(agent_nodes, "get_paper_mode", lambda _cid: True)
+    monkeypatch.setattr(agent_nodes, "router_step1_hard_rules", lambda *a, **k: None)
+
+    class DummyRAG:
+        def search(self, *a, **k):
+            return ""
+
+    monkeypatch.setattr(agent_nodes, "ChromaRAGTool", DummyRAG)
+
+    class DummyTRS:
+        def format_topk_block(self, *a, **k):
+            return ""
+
+        def format_router_tools_tag(self, *a, **k):
+            return "<tools></tools>"
+
+    monkeypatch.setattr(agent_nodes, "get_tool_rag_store", lambda: DummyTRS())
+    monkeypatch.setattr(
+        agent_nodes,
+        "_router_step3_llm_classify",
+        lambda *a, **k: {"route_type": "direct_answer", "router_choice": "A"},
+    )
+    out = agent_nodes.router_node(
+        {"user_request": "파이썬으로 피보나치 수열 코드 실행해줘"},
+        config=cfg,
+    )
+    assert out.get("router_choice") == "C"
+    assert out.get("route_type") == "planner"
