@@ -203,9 +203,9 @@ def main():
 
     try:
         warmup_chroma_rag()
-        print("✅ Chroma RAG 소유 스레드 워밍업 완료")
+        print("✅ Chroma RAG 워밍업 완료 (macOS: spawn 자식 프로세스 / 그 외: owner 스레드)")
     except Exception as e:
-        print(f"⚠️ Chroma RAG 워밍업 실패 — 첫 RAG 질문 시 소유 스레드에서 재시도: {e}")
+        print(f"⚠️ Chroma RAG 워밍업 실패 — 첫 RAG 질문 시 재시도: {e}")
 
     conn = sqlite3.connect(CHECKPOINT_DB_PATH, check_same_thread=False)
     graph = build_graph(checkpointer=SqliteSaver(conn))

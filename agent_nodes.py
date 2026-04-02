@@ -541,7 +541,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 )
                 _da_trace("after _invoke_llm_with_fallback", "A daily_chat")
         else:
-            # B: RAG — Chroma는 동기 API만 사용(asyncio 없음). 싱글톤+락은 agent_chroma_rag.
+            # B: RAG — rag.search()는 agent_chroma_rag에서 owner 스레드로 직렬화되며,
+            # ChromaRAGTool 내부에서 collection.query는 _db_lock으로 동시 진입을 막는다(async 미사용).
             _da_trace("branch", "B RAG chroma+llm")
             req_lower = user_request.lower()
 
