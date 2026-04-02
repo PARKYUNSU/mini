@@ -7,6 +7,8 @@ import os
 import re
 import traceback
 import time
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeout
 from pathlib import Path
 from typing import Literal
 
@@ -211,12 +213,24 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         }
 
 
-def _invoke_llm_with_fallback(messages, fallback_msg: str = "죄송해요, 답변을 생성하지 못했어요.") -> str:
+def _invoke_llm_with_fallback(
+    messages,
+    fallback_msg: str = "죄송해요, 답변을 생성하지 못했어요.",
+    timeout_sec: float | None = None,
+) -> str:
     """Ollama 우선, 실패 시 Gemini 폴백"""
     for llm_getter in (get_planner_llm, get_executor_llm):
         try:
-            resp = llm_getter().invoke(messages)
+            llm = llm_getter()
+            if timeout_sec and timeout_sec > 0:
+                with ThreadPoolExecutor(max_workers=1) as pool:
+                    fut = pool.submit(llm.invoke, messages)
+                    resp = fut.result(timeout=timeout_sec)
+            else:
+                resp = llm.invoke(messages)
             return (resp.content or fallback_msg).strip()
+        except FuturesTimeout:
+            print(f"[DEBUG] LLM 호출 타임아웃 ({llm_getter.__name__}, {timeout_sec}s)")
         except Exception as e:
             print(f"[DEBUG] LLM 호출 실패 ({llm_getter.__name__}), 다음 시도: {e}")
     return fallback_msg
@@ -293,7 +307,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 session.get_context(), rag_context, last_ai, user_request
             )
             content = _build_message_content(prompt, image_base64)
-            answer = _invoke_llm_with_fallback([SystemMessage(content=system_prompt), HumanMessage(content=content)])
+            answer = _invoke_llm_with_fallback(
+                [SystemMessage(content=system_prompt), HumanMessage(content=content)],
+                timeout_sec=55,
+            )
 
         print(f"[DEBUG] DirectAnswer: 답변 생성 완료 ({len(answer)}자), 텔레그램 전송 시도")
         bot = conf.get("bot")
