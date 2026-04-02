@@ -81,6 +81,20 @@ _AGENT_BOT_LOCK_FD_HOLDER: list = []
 _TELEGRAM_MSG_SOFT_LIMIT = 3800
 
 
+def _should_notify_auto_cancel(new_text: str) -> bool:
+    """
+    승인 대기 중 새 입력이 들어와 자동 취소될 때의 사용자 알림 여부.
+    기본은 조용히 재라우팅하고, 아주 짧은 혼란 표현일 때만 안내를 보낸다.
+    """
+    t = (new_text or "").strip()
+    if not t:
+        return False
+    compact = t.replace(" ", "")
+    if len(compact) <= 6 and any(k in compact for k in ("?", "왜", "뭐", "어")):
+        return True
+    return False
+
+
 def _telegram_slash_command_token(text: str) -> str:
     """BOM·양방향 문자·전각 슬래시 정규화 후 첫 토큰 소문자 (/debate_start 등)."""
     t = unicodedata.normalize("NFKC", (text or "").strip()).lstrip("\ufeff\u200e\u200f").strip()
@@ -733,7 +747,8 @@ def main():
                 with _with_chat_lock(chat_id):
                     del _pending_approvals[chat_id]
                     _thread_version[chat_id] = int(time.time() * 1000)
-                _safe_telegram_send(bot, chat_id, "이전 계획을 취소하고 새로운 요청을 처리합니다.")
+                if _should_notify_auto_cancel(text):
+                    _safe_telegram_send(bot, chat_id, "이전 계획을 정리하고 새 요청을 처리합니다.")
                 # fall through: 아래에서 방금 입력한 text를 새 질문으로 Router부터 재실행
 
             status_msg = _safe_telegram_send_and_get(bot, chat_id, "⏳ 처리 중… (잠시만요)")

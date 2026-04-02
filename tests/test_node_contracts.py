@@ -295,3 +295,21 @@ def test_paper_mode_allows_explicit_code_to_planner(monkeypatch, cfg):
     )
     assert out.get("router_choice") == "C"
     assert out.get("route_type") == "planner"
+
+
+def test_enforce_rag_structure_markdown_has_three_sections():
+    raw = "이 논문은 멀티모달 모델의 효율을 개선합니다. 제안 방법은 저랭크 어댑터를 활용합니다. 실험에서 기존 대비 성능이 향상됩니다."
+    out = agent_nodes._enforce_rag_structure_markdown(raw)
+    assert "### 핵심 주제" in out
+    assert "### 주요 방법론" in out
+    assert "### 결론 및 의의" in out
+    assert out.count("### ") == 3
+
+
+def test_markdown_struct_to_plain_preserves_structure():
+    md = "### 핵심 주제\n- A\n\n### 주요 방법론\n- B\n\n### 결론 및 의의\n- C"
+    plain = agent_nodes._markdown_struct_to_plain(md)
+    assert "핵심 주제" in plain
+    assert "주요 방법론" in plain
+    assert "결론 및 의의" in plain
+    assert "• A" in plain

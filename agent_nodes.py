@@ -146,6 +146,80 @@ def _apply_paper_mode_router_bias(chat_id: str, user_request: str, result: dict)
     return result
 
 
+def _dedupe_preserve_order(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for item in items:
+        key = (item or "").strip()
+        if not key:
+            continue
+        norm = re.sub(r"\s+", " ", key).lower()
+        if norm in seen:
+            continue
+        seen.add(norm)
+        out.append(key)
+    return out
+
+
+def _extract_bullets(text: str) -> list[str]:
+    lines = []
+    for raw in (text or "").splitlines():
+        s = raw.strip()
+        if not s:
+            continue
+        s = re.sub(r"^[-*]\s*", "", s)
+        s = re.sub(r"^\d+[.)]\s*", "", s)
+        if len(s) >= 6:
+            lines.append(s)
+    return _dedupe_preserve_order(lines)
+
+
+def _enforce_rag_structure_markdown(answer: str) -> str:
+    """
+    RAG 답변의 최소 구조를 강제.
+    - 3개 섹션(핵심 주제/주요 방법론/결론 및 의의) 보장
+    - 중복 문장 억제
+    """
+    text = (answer or "").strip()
+    if not text:
+        return (
+            "### 핵심 주제\n- 문서에서 핵심 주제를 확인할 수 없습니다.\n\n"
+            "### 주요 방법론\n- 문서에서 방법론을 확인할 수 없습니다.\n\n"
+            "### 결론 및 의의\n- 문서에서 결론/의의를 확인할 수 없습니다."
+        )
+
+    bullets = _extract_bullets(text)
+    if not bullets:
+        # bullet이 전혀 없는 장문이면 문장 단위로 분해
+        parts = re.split(r"(?<=[.!?다요])\s+", re.sub(r"\s+", " ", text))
+        bullets = _dedupe_preserve_order([p.strip() for p in parts if len(p.strip()) >= 8])
+    if not bullets:
+        bullets = [text[:180]]
+
+    topic = bullets[:2]
+    method = bullets[2:4] if len(bullets) >= 3 else bullets[:1]
+    concl = bullets[4:6] if len(bullets) >= 5 else bullets[-1:]
+
+    topic = _dedupe_preserve_order(topic) or ["핵심 내용을 추출하지 못했습니다."]
+    method = _dedupe_preserve_order(method) or ["방법론 정보를 추출하지 못했습니다."]
+    concl = _dedupe_preserve_order(concl) or ["결론/의의 정보를 추출하지 못했습니다."]
+
+    return (
+        "### 핵심 주제\n"
+        + "\n".join(f"- {x}" for x in topic)
+        + "\n\n### 주요 방법론\n"
+        + "\n".join(f"- {x}" for x in method)
+        + "\n\n### 결론 및 의의\n"
+        + "\n".join(f"- {x}" for x in concl)
+    )
+
+
+def _markdown_struct_to_plain(md: str) -> str:
+    plain = (md or "").replace("### ", "").replace("**", "")
+    plain = re.sub(r"^\s*-\s*", "• ", plain, flags=re.M)
+    return plain.strip()
+
+
 def _is_execution_failure(result: str) -> bool:
     """
     실행 결과가 실패인지 판정. 문자열 부분 매칭 대신 명시적 실패 지표만 사용.
@@ -434,6 +508,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         print(f"[DEBUG] DirectAnswer: 답변 생성 완료 ({len(answer)}자), 텔레그램 전송 시도")
         bot = conf.get("bot")
         chat_id = str(conf.get("chat_id", ""))
+        if router_choice == "B":
+            answer = _enforce_rag_structure_markdown(answer)
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
         if bot and chat_id:
@@ -441,7 +517,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             if _safe_telegram_send(bot, chat_id, answer[:4000], parse_mode="Markdown"):
                 print("[DEBUG] DirectAnswer: 텔레그램 전송 성공")
             else:
-                if _safe_telegram_send(bot, chat_id, answer[:4000]):
+                plain_answer = _markdown_struct_to_plain(answer)
+                if _safe_telegram_send(bot, chat_id, plain_answer[:4000]):
                     print("[DEBUG] DirectAnswer: 텔레그램 평문 전송 성공 (Markdown 실패 후)")
                 else:
                     print("[DEBUG] DirectAnswer: 텔레그램 전송 실패 (일시 오류)")
