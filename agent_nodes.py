@@ -301,17 +301,21 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
         if bot and chat_id:
-            if _safe_telegram_send(bot, chat_id, answer[:4000]):
+            # RAG 답변은 Markdown 렌더링이 핵심(볼드/글머리/줄바꿈). 실패 시 평문으로 폴백.
+            if _safe_telegram_send(bot, chat_id, answer[:4000], parse_mode="Markdown"):
                 print("[DEBUG] DirectAnswer: 텔레그램 전송 성공")
             else:
-                print("[DEBUG] DirectAnswer: 텔레그램 전송 실패 (일시 오류)")
-                _notify_chat_error(
-                    bot,
-                    chat_id,
-                    headline="⚠️ 답변 전송 실패",
-                    detail="텔레그램으로 답변을 보내지 못했습니다. 네트워크·봇 토큰을 확인 후 다시 시도해 주세요.",
-                    status_message_id=None,
-                )
+                if _safe_telegram_send(bot, chat_id, answer[:4000]):
+                    print("[DEBUG] DirectAnswer: 텔레그램 평문 전송 성공 (Markdown 실패 후)")
+                else:
+                    print("[DEBUG] DirectAnswer: 텔레그램 전송 실패 (일시 오류)")
+                    _notify_chat_error(
+                        bot,
+                        chat_id,
+                        headline="⚠️ 답변 전송 실패",
+                        detail="텔레그램으로 답변을 보내지 못했습니다. 네트워크·봇 토큰을 확인 후 다시 시도해 주세요.",
+                        status_message_id=None,
+                    )
 
         return {"direct_response": answer}
     except Exception as e:
