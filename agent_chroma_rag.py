@@ -96,6 +96,56 @@ def _rewrite_rag_query(query: str, session_context: str) -> str:
         return query
 
 
+def _fallback_rag_from_jsonl_tail(*, max_papers: int = 4, max_chars: int = 14000) -> str:
+    """Chroma 실패 시 벡터 검색 없이 저장 큐 JSONL 끝에서 최근 논문 몇 편의 텍스트만 사용."""
+    raw_path = _PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
+    if not raw_path.exists():
+        return ""
+    try:
+        with raw_path.open(encoding="utf-8", errors="replace") as f:
+            lines = f.readlines()
+    except OSError:
+        return ""
+    blocks: list[str] = []
+    for line in reversed(lines):
+        if len(blocks) >= max_papers:
+            break
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            d = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        pid = str(d.get("paper_id", "") or "")
+        title = str(d.get("title", "") or "")
+        abstract = str(d.get("abstract", "") or d.get("summary", "") or "")
+        body = str(d.get("text", "") or d.get("content", "") or "")
+        chunk = body if len(body) > len(abstract) else abstract
+        if not chunk and not title:
+            continue
+        head = f"[{pid}] {title}\n".strip() if (pid or title) else ""
+        piece = (head + (chunk[:6000] if chunk else "")).strip()
+        if piece:
+            blocks.append(piece)
+    if not blocks:
+        return ""
+    text = "\n\n---\n\n".join(reversed(blocks))
+    if len(text) > max_chars:
+        text = text[:max_chars] + "\n\n...(이하 잘림)"
+    return (
+        "[시스템: Chroma 벡터 검색에 실패해 raw_data_queue/crawled_papers.jsonl에서 "
+        "최근 저장된 논문 텍스트만 불러왔습니다. 아래만 근거로 요약하세요.]\n\n" + text
+    )
+
+
+def _invalidate_spawn_runner_safely() -> None:
+    """자식 세그폴트 후 큐가 불안정할 수 있어 싱글톤을 비워 다음 요청에서 재생성."""
+    global _spawn_runner
+    with _spawn_runner_lock:
+        _spawn_runner = None
+
+
 def _format_chroma_hits(docs: list[str], metas: list[dict[str, str]]) -> str:
     if not docs:
         return "관련 문서 없음"
@@ -116,6 +166,18 @@ def _chroma_spawn_worker(
     embedding_model: str,
 ) -> None:
     """spawn 자식 전용: Chroma·임베딩·query만 로드 (부모와 네이티브 스택 분리)."""
+    import os as _os
+
+    for _k, _v in (
+        ("OMP_NUM_THREADS", "1"),
+        ("MKL_NUM_THREADS", "1"),
+        ("OPENBLAS_NUM_THREADS", "1"),
+        ("VECLIB_MAXIMUM_THREADS", "1"),
+        ("NUMEXPR_NUM_THREADS", "1"),
+        ("TOKENIZERS_PARALLELISM", "false"),
+    ):
+        _os.environ.setdefault(_k, _v)
+
     import chromadb as _chromadb
     from chromadb.config import Settings as _Settings
     from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction as _STEF
@@ -191,37 +253,35 @@ class _SpawnChromaRunner:
                 break
 
     def _request(self, op: str, payload: Any, *, timeout: float = _SEARCH_TIMEOUT_SEC) -> Any:
+        """단일 시도. 재시도·새 큐는 `_spawn_request_with_retries`에서 싱글톤 교체로 처리."""
         with self._plock:
-            for attempt in range(2):
-                self._drain_stale_results()
-                self._start_proc()
-                assert self._proc is not None
-                self._seq += 1
-                rid = self._seq
-                self._task_q.put((rid, op, payload))
-                deadline = time.monotonic() + timeout
-                while True:
-                    if not self._proc.is_alive():
-                        self._proc = None
-                        if attempt == 0:
-                            break
-                        raise RuntimeError(
-                            "Chroma spawn 프로세스가 응답 중 종료되었습니다(세그폴트 가능). 봇을 재시작하거나 CHROMA_SUBPROCESS=0으로 시도해 보세요."
-                        )
-                    remaining = deadline - time.monotonic()
-                    if remaining <= 0:
-                        raise TimeoutError("Chroma subprocess")
-                    try:
-                        got = self._result_q.get(timeout=min(remaining, 5.0))
-                    except queue.Empty:
-                        continue
-                    gr, status, data = got
-                    if gr != rid:
-                        continue
-                    if status == "err":
-                        raise RuntimeError(data)
-                    return data
-            raise RuntimeError("Chroma spawn 자식을 시작하지 못했습니다.")
+            self._drain_stale_results()
+            self._start_proc()
+            assert self._proc is not None
+            self._seq += 1
+            rid = self._seq
+            self._task_q.put((rid, op, payload))
+            deadline = time.monotonic() + timeout
+            while True:
+                if not self._proc.is_alive():
+                    self._proc = None
+                    raise RuntimeError(
+                        "Chroma spawn 프로세스가 응답 중 종료되었습니다(세그폴트 가능). "
+                        "외장 디스크·DB 손상·Chroma 버전을 점검하거나 CHROMA_SUBPROCESS=0으로 시도해 보세요."
+                    )
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("Chroma subprocess")
+                try:
+                    got = self._result_q.get(timeout=min(remaining, 5.0))
+                except queue.Empty:
+                    continue
+                gr, status, data = got
+                if gr != rid:
+                    continue
+                if status == "err":
+                    raise RuntimeError(data)
+                return data
 
     def ping(self) -> None:
         self._request("ping", None, timeout=_SEARCH_TIMEOUT_SEC)
@@ -242,6 +302,23 @@ def _get_spawn_runner() -> _SpawnChromaRunner:
         return _spawn_runner
 
 
+def _spawn_query_raw_with_retries(search_query: str, top_k: int) -> dict[str, Any]:
+    """자식 세그폴트 후 Queue 불능 대비: 실패 시 싱글톤을 버리고 새 runner(새 큐)로 최대 5회."""
+    last_err: BaseException | None = None
+    for i in range(5):
+        runner = _get_spawn_runner()
+        try:
+            return runner.query_raw(search_query, top_k)
+        except (RuntimeError, TimeoutError, OSError, BrokenPipeError, EOFError) as e:
+            last_err = e
+            _log.warning("chroma spawn query attempt %s failed: %s", i + 1, e)
+            print(f"[ChromaRAG TRACE] spawn query failed attempt {i + 1}: {e}", flush=True)
+            _invalidate_spawn_runner_safely()
+            time.sleep(0.25 + 0.2 * i)
+    assert last_err is not None
+    raise last_err
+
+
 def _search_via_subprocess(query: str, top_k: int, session_context: str) -> str:
     if session_context:
         _log.debug("ChromaRAG subprocess path: _rewrite_rag_query (parent LLM)")
@@ -256,12 +333,17 @@ def _search_via_subprocess(query: str, top_k: int, session_context: str) -> str:
         flush=True,
     )
     try:
-        raw = _get_spawn_runner().query_raw(search_query, top_k)
+        raw = _spawn_query_raw_with_retries(search_query, top_k)
         docs = raw.get("documents") or []
         metas = raw.get("metadatas") or []
         return _format_chroma_hits(docs, metas)
     except Exception as e:
-        _log.debug("subprocess search failed: %s", e)
+        _log.warning("chroma subprocess search exhausted retries: %s", e)
+        print("[ChromaRAG TRACE] subprocess failed, jsonl fallback", flush=True)
+        _invalidate_spawn_runner_safely()
+        fb = _fallback_rag_from_jsonl_tail()
+        if fb.strip():
+            return fb
         return f"검색 오류: {e}"
 
 
@@ -349,7 +431,11 @@ def warmup_chroma_rag() -> None:
     """부팅 시 1회: spawn 자식에 Chroma 로드 또는 owner 스레드에 in-process 로드."""
     if _use_subprocess_chroma():
         print("[ChromaRAG TRACE] warmup: spawn child ping", flush=True)
-        _get_spawn_runner().ping()
+        try:
+            _get_spawn_runner().ping()
+        except Exception:
+            _invalidate_spawn_runner_safely()
+            raise
         print("[ChromaRAG TRACE] warmup: spawn child OK", flush=True)
         return
     _owner.warmup()
