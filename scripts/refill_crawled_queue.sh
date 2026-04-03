@@ -20,9 +20,11 @@ if [[ ! -x "$PY" ]]; then
   exit 1
 fi
 
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}${MINI_ROOT}"
+
 if [[ "${1:-}" == "--" ]]; then
   shift
-  exec "$PY" -u "${MINI_ROOT}/run_backfill.py" "$@"
+  exec "$PY" -u -m apps.backfill.run_backfill "$@"
 fi
 
 lookback="${REFILL_QUEUE_LOOKBACK_DAYS:-90}"
@@ -39,4 +41,4 @@ end_date=$(date +%Y-%m-%d)
 echo "백필 구간: $start_date ~ $end_date (cs.AI, lookback=${lookback}일)"
 echo "기간을 바꾸려면: REFILL_QUEUE_LOOKBACK_DAYS=180 bash $0"
 echo "또는: bash $0 -- -s 2024-01-01 -e 2024-12-31"
-exec "$PY" -u "${MINI_ROOT}/run_backfill.py" -s "$start_date" -e "$end_date"
+exec "$PY" -u -m apps.backfill.run_backfill -s "$start_date" -e "$end_date"

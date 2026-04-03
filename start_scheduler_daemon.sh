@@ -14,15 +14,16 @@ if [[ ! -x "$PY" ]]; then
   exit 1
 fi
 
-# 자기 자신·grep 제외하고 run_scheduler.py 프로세스만 검사
-if pgrep -qf "$ROOT/run_scheduler.py"; then
-  echo "ℹ️ run_scheduler.py 가 이미 실행 중입니다."
-  pgrep -fl -f "run_scheduler.py" 2>/dev/null || true
+# 자기 자신·grep 제외하고 스케줄러 모듈 프로세스만 검사
+if pgrep -qf "apps.scheduler.run_scheduler" || pgrep -qf "$ROOT/apps/scheduler/run_scheduler.py"; then
+  echo "ℹ️ apps.scheduler.run_scheduler 가 이미 실행 중입니다."
+  pgrep -fl -f "run_scheduler" 2>/dev/null || true
   exit 0
 fi
 
 export PYTHONUNBUFFERED="${PYTHONUNBUFFERED:-1}"
 export PYTHONIOENCODING="${PYTHONIOENCODING:-utf-8}"
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$ROOT"
 
-nohup "$PY" -u "$ROOT/run_scheduler.py" >>"$LOG" 2>&1 &
-echo "✅ run_scheduler.py 기동 (pid=$!, 로그: $LOG)"
+nohup "$PY" -u -m apps.scheduler.run_scheduler >>"$LOG" 2>&1 &
+echo "✅ apps.scheduler.run_scheduler 기동 (pid=$!, 로그: $LOG)"

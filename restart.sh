@@ -6,9 +6,15 @@ echo "Stopping existing processes..."
 pkill -9 -f "telegram_receiver.py" 2>/dev/null
 pkill -9 -f "ai_worker.py" 2>/dev/null
 pkill -9 -f "agent_bot.py" 2>/dev/null
+pkill -9 -f "apps.telegram_bot.telegram_receiver" 2>/dev/null
+pkill -9 -f "apps.telegram_bot.ai_worker" 2>/dev/null
+pkill -9 -f "apps.telegram_bot.main" 2>/dev/null
 while pgrep -f "telegram_receiver.py" >/dev/null 2>&1; do sleep 1; done
 while pgrep -f "ai_worker.py" >/dev/null 2>&1; do sleep 1; done
 while pgrep -f "agent_bot.py" >/dev/null 2>&1; do sleep 1; done
+while pgrep -f "apps.telegram_bot.telegram_receiver" >/dev/null 2>&1; do sleep 1; done
+while pgrep -f "apps.telegram_bot.ai_worker" >/dev/null 2>&1; do sleep 1; done
+while pgrep -f "apps.telegram_bot.main" >/dev/null 2>&1; do sleep 1; done
 echo "Waiting 15s for Telegram to release connection..."
 sleep 15
 # Reset webhook on Telegram side (helps clear 409)
@@ -26,15 +32,16 @@ if t:
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 새 봇 시작"
 export PYTHONFAULTHANDLER=1
 export PYTHONUNBUFFERED=1
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$(pwd)"
 if [ "${AGENT_MONOLITH:-0}" = "1" ]; then
-  echo "모드: 단일 프로세스 (agent_bot.py)"
-  .venv/bin/python agent_bot.py
+  echo "모드: 단일 프로세스 (python -m apps.telegram_bot.main)"
+  .venv/bin/python -m apps.telegram_bot.main
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] 봇 종료 (exit=$?)"
 else
-  echo "모드: 분리 (telegram_receiver.py + ai_worker.py)"
-  nohup .venv/bin/python telegram_receiver.py >> bot_receiver.log 2>&1 &
+  echo "모드: 분리 (telegram_receiver + ai_worker 모듈)"
+  nohup .venv/bin/python -m apps.telegram_bot.telegram_receiver >> bot_receiver.log 2>&1 &
   echo $! > .telegram_receiver.pid
-  nohup .venv/bin/python ai_worker.py >> bot_ai_worker.log 2>&1 &
+  nohup .venv/bin/python -m apps.telegram_bot.ai_worker >> bot_ai_worker.log 2>&1 &
   echo $! > .ai_worker.pid
   echo "receiver PID $(cat .telegram_receiver.pid), worker PID $(cat .ai_worker.pid)"
   echo "로그: bot_receiver.log, bot_ai_worker.log"

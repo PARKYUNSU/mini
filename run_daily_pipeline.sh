@@ -9,7 +9,8 @@ cd "/Volumes/T7 Shield/mini" || exit 1
 {
 echo ""
 echo "============================================================"
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] [cron] main.py 시작"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] [cron] pipelines.ingest.main 시작"
 echo "============================================================"
-exec "/Volumes/T7 Shield/mini/.venv/bin/python" "/Volumes/T7 Shield/mini/main.py"
+export PYTHONPATH="/Volumes/T7 Shield/mini${PYTHONPATH:+:$PYTHONPATH}"
+exec "/Volumes/T7 Shield/mini/.venv/bin/python" -m pipelines.ingest.main
 } >> "$LOG_FILE" 2>&1

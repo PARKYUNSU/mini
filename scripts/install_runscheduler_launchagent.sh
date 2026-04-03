@@ -20,10 +20,11 @@ mkdir -p "$LAUNCHER_DIR" "${HOME}/Library/LaunchAgents" "${HOME}/Library/Logs"
     'mkdir -p "$(dirname "$LOG")"' \
     'log() { echo "[$(date '\''+%Y-%m-%d %H:%M:%S'\'')] $*" >>"$LOG"; }' \
     'for _ in $(seq 1 120); do' \
-    '  if [[ -x "$MINI_ROOT/.venv/bin/python" && -f "$MINI_ROOT/run_scheduler.py" ]]; then' \
+    '  if [[ -x "$MINI_ROOT/.venv/bin/python" && -f "$MINI_ROOT/apps/scheduler/run_scheduler.py" ]]; then' \
     '    log "run_scheduler 시작: $MINI_ROOT"' \
     '    cd "$MINI_ROOT"' \
-    '    exec "$MINI_ROOT/.venv/bin/python" -u "$MINI_ROOT/run_scheduler.py" >>"$LOG" 2>&1' \
+    '    export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$MINI_ROOT"' \
+    '    exec "$MINI_ROOT/.venv/bin/python" -u -m apps.scheduler.run_scheduler >>"$LOG" 2>&1' \
     '  fi' \
     '  sleep 5' \
     'done' \

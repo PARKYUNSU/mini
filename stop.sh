@@ -1,9 +1,10 @@
 #!/bin/bash
 # Kill all agent_bot processes - run this first if you get 409 Conflict
-echo "Stopping all agent_bot processes..."
+echo "Stopping all main bot processes..."
 pkill -9 -f "agent_bot.py" 2>/dev/null
+pkill -9 -f "apps.telegram_bot.main" 2>/dev/null
 count=0
-while pgrep -f "agent_bot.py" >/dev/null 2>&1; do
+while pgrep -f "agent_bot.py" >/dev/null 2>&1 || pgrep -f "apps.telegram_bot.main" >/dev/null 2>&1; do
   echo "  Waiting for processes to exit... ($count s)"
   sleep 1
   count=$((count + 1))

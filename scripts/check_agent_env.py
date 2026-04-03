@@ -59,7 +59,7 @@ def _check_ollama_line() -> str:
 
 def _check_keys_lines() -> list[str]:
     load_dotenv()
-    from agent_config import get_gemini_api_keys
+    from core.config.agent_config import get_gemini_api_keys
 
     gkeys = get_gemini_api_keys()
     if gkeys:
