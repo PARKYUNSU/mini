@@ -8,6 +8,8 @@ macOS(Apple Silicon) 등에서 부모 프로세스의 torch/LangGraph·Chroma Ru
 
 - ``CHROMA_SUBPROCESS=1`` : 강제 spawn 경로
 - ``CHROMA_SUBPROCESS=0`` : 기존처럼 owner 스레드 + in-process Chroma (Linux 등)
+- ``CHROMA_VECTOR_DISABLED=1`` : 부팅부터 벡터 query 없이 JSONL 폴백만
+- ``CHROMA_SPAWN_QUERY_ATTEMPTS`` : spawn 재시도 횟수 (기본 2)
 
 그 외: **chroma-rag-owner** 스레드 직렬화 + ``ChromaRAGTool._db_lock``.
 """
@@ -40,6 +42,10 @@ _log = logging.getLogger(__name__)
 
 _CHROMA_SHUTDOWN = object()
 _SEARCH_TIMEOUT_SEC = 600.0
+
+# 한 번 Chroma query가 프로세스 단위로 반복 실패(세그폴트)하면, 봇 재시작 전까지 벡터 검색 생략
+_vector_search_disabled: bool = False
+_vector_search_disabled_lock = threading.Lock()
 
 
 def _use_subprocess_chroma() -> bool:
@@ -96,7 +102,29 @@ def _rewrite_rag_query(query: str, session_context: str) -> str:
         return query
 
 
-def _fallback_rag_from_jsonl_tail(*, max_papers: int = 4, max_chars: int = 14000) -> str:
+def _env_chroma_vector_force_disabled() -> bool:
+    return os.environ.get("CHROMA_VECTOR_DISABLED", "").strip().lower() in ("1", "true", "yes", "on")
+
+
+def _vector_search_effective_disabled() -> bool:
+    if _env_chroma_vector_force_disabled():
+        return True
+    with _vector_search_disabled_lock:
+        return _vector_search_disabled
+
+
+def _set_vector_search_disabled_for_process() -> None:
+    global _vector_search_disabled
+    with _vector_search_disabled_lock:
+        _vector_search_disabled = True
+    print(
+        "[ChromaRAG TRACE] 이 프로세스에서는 Chroma 벡터 query를 더 이상 시도하지 않고 JSONL 폴백만 사용합니다. "
+        "복구하려면 봇을 재시작하거나 chroma_db를 내장 디스크로 옮기세요.",
+        flush=True,
+    )
+
+
+def _fallback_rag_from_jsonl_tail(*, max_papers: int = 2, max_chars: int = 6500) -> str:
     """Chroma 실패 시 벡터 검색 없이 저장 큐 JSONL 끝에서 최근 논문 몇 편의 텍스트만 사용."""
     raw_path = _PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
     if not raw_path.exists():
@@ -125,7 +153,7 @@ def _fallback_rag_from_jsonl_tail(*, max_papers: int = 4, max_chars: int = 14000
         if not chunk and not title:
             continue
         head = f"[{pid}] {title}\n".strip() if (pid or title) else ""
-        piece = (head + (chunk[:6000] if chunk else "")).strip()
+        piece = (head + (chunk[:2800] if chunk else "")).strip()
         if piece:
             blocks.append(piece)
     if not blocks:
@@ -303,9 +331,11 @@ def _get_spawn_runner() -> _SpawnChromaRunner:
 
 
 def _spawn_query_raw_with_retries(search_query: str, top_k: int) -> dict[str, Any]:
-    """자식 세그폴트 후 Queue 불능 대비: 실패 시 싱글톤을 버리고 새 runner(새 큐)로 최대 5회."""
+    """자식 세그폴트 후 Queue 불능 대비: 실패 시 싱글톤을 버리고 새 runner로 재시도(기본 2회, 매번 임베딩 로드 비용 큼)."""
     last_err: BaseException | None = None
-    for i in range(5):
+    attempts = int(os.environ.get("CHROMA_SPAWN_QUERY_ATTEMPTS", "2") or "2")
+    attempts = max(1, min(attempts, 8))
+    for i in range(attempts):
         runner = _get_spawn_runner()
         try:
             return runner.query_raw(search_query, top_k)
@@ -328,6 +358,12 @@ def _search_via_subprocess(query: str, top_k: int, session_context: str) -> str:
     if not query.strip():
         return "관련 문서 없음"
     search_query = _extract_paper_title_text(query)
+
+    if _vector_search_effective_disabled():
+        print("[ChromaRAG TRACE] vector search skipped (disabled), jsonl only", flush=True)
+        fb = _fallback_rag_from_jsonl_tail()
+        return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
+
     print(
         f"[ChromaRAG TRACE] subprocess query (spawn child) top_k={top_k} qlen={len(search_query)}",
         flush=True,
@@ -341,6 +377,7 @@ def _search_via_subprocess(query: str, top_k: int, session_context: str) -> str:
         _log.warning("chroma subprocess search exhausted retries: %s", e)
         print("[ChromaRAG TRACE] subprocess failed, jsonl fallback", flush=True)
         _invalidate_spawn_runner_safely()
+        _set_vector_search_disabled_for_process()
         fb = _fallback_rag_from_jsonl_tail()
         if fb.strip():
             return fb
@@ -430,6 +467,9 @@ def get_chroma_rag_tool() -> ChromaRAGPublic:
 def warmup_chroma_rag() -> None:
     """부팅 시 1회: spawn 자식에 Chroma 로드 또는 owner 스레드에 in-process 로드."""
     if _use_subprocess_chroma():
+        if _env_chroma_vector_force_disabled():
+            print("[ChromaRAG TRACE] warmup: CHROMA_VECTOR_DISABLED → spawn ping 생략", flush=True)
+            return
         print("[ChromaRAG TRACE] warmup: spawn child ping", flush=True)
         try:
             _get_spawn_runner().ping()
