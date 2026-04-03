@@ -17,6 +17,13 @@
 # agent_bot 단일 인스턴스 flock (내용은 PID, 잠금은 FD로만 유효)
 .agent_bot_singleton.lock
 
+# 분리 모드 (telegram_receiver + ai_worker) 런타임
+.telegram_receiver.lock
+.telegram_receiver.pid
+.ai_worker.lock
+.ai_worker.pid
+.bridge/
+
 # 출력 데이터
 raw_data_queue/
 finetune_datasets/
