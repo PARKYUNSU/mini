@@ -129,7 +129,7 @@ python pipelines/debate/llm_debate_scheduler.py --test --file sample.jsonl --max
 - `/papers` (또는 `/paperlist`, `/논문목록`): `crawled_papers.jsonl` 큐에 있는 논문 목록
 - `/debate_start` (또는 `/논문토론시작`): LLM 논문 토론 배치 백그라운드 시작 (`llm_debate_telegram.log`)
 - `/debate_stop` (또는 `/논문토론중지`): 추적 중인 토론 배치 중지(스케줄로 띄운 배치 포함, 공통 PID 기준)
-- `/backfill_start`: 분기 단위 백필 시작(`scripts/run_backfill_quarterly.py`, 기본 `BACKFILL_YEAR=2024`)
+- `/backfill_start`: 분기 단위 백필 시작(`apps/backfill/run_backfill_quarterly.py`, 기본 `BACKFILL_YEAR=2024`)
 - `/backfill_stop`: 실행 중인 백필 중지
 
 ---

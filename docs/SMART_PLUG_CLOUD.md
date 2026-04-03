@@ -28,7 +28,8 @@ TUYA_CLOUD_DP_CODE=switch_1
 
 ```bash
 cd "/Volumes/T7 Shield/mini"
-.venv/bin/python -c "from agent_tools.smart_plug import run; print(run('스마트 플러그 켜줘'))"
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$(pwd)"
+.venv/bin/python -c "from tools.runtime.agent_tools.agent_tools.smart_plug import run; print(run('스마트 플러그 켜줘'))"
 ```
 
 ## 로컬 vs 클라우드

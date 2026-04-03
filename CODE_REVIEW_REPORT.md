@@ -40,7 +40,7 @@
 
 | 항목 | 상태 | 근거 |
 |------|------|------|
-| 성공 시 agent_tools/ 저장 | ✅ | `run_or_resume` 내 `AgentSkillLibrary().save_tool(code, request)` |
+| 성공 시 `tools/runtime/agent_tools/agent_tools/` 저장 | ✅ | `run_or_resume` 내 `AgentSkillLibrary().save_tool(code, request)` |
 | Planner가 기존 도구 참고 | ✅ | `skill_lib.get_tools_context()` → 프롬프트에 `[기존 도구 라이브러리]` 포함 |
 
 ---
