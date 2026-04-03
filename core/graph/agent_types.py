@@ -26,3 +26,4 @@ class AgentState(TypedDict, total=False):
     error_hint: str  # Monitor → Executor 재시도 시 힌트
     content_irrelevant: bool  # Monitor: 실행 결과가 user_request와 무관함(엉뚱한 결과)
     used_tool_name: str  # 선택 또는 기억에서 복구한 기존 도구명
+    rag_context: str  # 라우터에서 가져온 RAG 검색 결과 (이중 검색 방지)

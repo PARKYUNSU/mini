@@ -44,14 +44,32 @@ def main() -> int:
         action="store_true",
         help="한 분기 실패해도 다음 분기 계속 실행",
     )
+    parser.add_argument(
+        "--quarters",
+        type=str,
+        default="",
+        help="실행할 분기만 콤마로 지정 (예: Q1,Q2). 비우면 Q1~Q4 전체",
+    )
     args = parser.parse_args()
 
     if not RUN_BACKFILL.is_file():
         print(f"❌ run_backfill.py 없음: {RUN_BACKFILL}")
         return 2
 
+    wanted: set[str] | None = None
+    raw_q = (args.quarters or "").strip()
+    if raw_q:
+        wanted = {part.strip().upper() for part in raw_q.split(",") if part.strip()}
+        unknown = wanted - {"Q1", "Q2", "Q3", "Q4"}
+        if unknown:
+            print(f"❌ --quarters에 알 수 없는 값: {sorted(unknown)} (Q1~Q4만 허용)")
+            return 2
+        print(f"📌 분기 필터: {', '.join(sorted(wanted))}")
+
     failed: list[str] = []
     for start_date, end_date, label in _quarter_ranges(args.year):
+        if wanted is not None and label not in wanted:
+            continue
         print("\n" + "=" * 72)
         print(f"🚀 분기 백필 시작: {args.year} {label} ({start_date} ~ {end_date})")
         print("=" * 72)

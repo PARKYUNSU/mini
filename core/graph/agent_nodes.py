@@ -131,8 +131,11 @@ def _prefer_single_hit_rag_context(user_request: str, *, wants_depth: bool) -> b
     )
     if any(k in u for k in vague_markers):
         return True
-    if any(x in u for x in ("비교", "차이", "여러", "두 편", "두편", "세 편", "목록")):
+    multi_markers = ("비교", "차이", "여러", "두 편", "두편", "세 편", "목록", "서베이", "survey")
+    if any(x in u for x in multi_markers):
         return False
+    if wants_depth:
+        return True
     if len(u) <= 44 and ("요약" in u or "알려줘" in u or "설명해" in u):
         return True
     return False
@@ -429,7 +432,7 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         session = get_session(chat_id)
         session_context = session.get_recent_context(max_turns=2)
         rag = get_chroma_rag_tool()
-        rag_context = rag.search(user_request)
+        rag_context = rag.search(user_request, session_context=session_context)
         _trs = get_tool_rag_store()
         tools_context = _trs.format_topk_block(user_request, k=TOOL_RAG_TOP_K)
         tools_list_str = _trs.format_router_tools_tag(user_request, k=TOOL_RAG_TOP_K)
@@ -444,6 +447,7 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
             result = {"route_type": "direct_answer", "router_choice": "B"}
             print("[DEBUG] Router: 스케줄 작업 → planner/code_run 차단, direct_answer로 우회")
         result = _maybe_override_rag_route(chat_id, user_request, result)
+        result["rag_context"] = rag_context
         return result
     except Exception as e:
         print(f"❌ Router 노드 오류: {e}\n{traceback.format_exc()}")
@@ -625,9 +629,15 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 rag_context = rag.list_papers()
                 _da_trace("after rag.list_papers()", f"len={len(rag_context)}")
             else:
-                _da_trace("before rag.search()", f"top_k={top_k} (sync collection.query)")
-                rag_context = rag.search(user_request, top_k=top_k)
-                _da_trace("after rag.search()", f"len={len(rag_context)}")
+                cached_rag = (state.get("rag_context") or "").strip()
+                if cached_rag and cached_rag != "관련 문서 없음":
+                    rag_context = cached_rag
+                    _da_trace("rag_context reused from router", f"len={len(rag_context)}")
+                else:
+                    session_ctx = session.get_recent_context(max_turns=2)
+                    _da_trace("before rag.search()", f"top_k={top_k} (sync collection.query)")
+                    rag_context = rag.search(user_request, top_k=top_k, session_context=session_ctx)
+                    _da_trace("after rag.search()", f"len={len(rag_context)}")
                 if prefer_single_hit:
                     rag_context = _rag_context_first_hit_only(rag_context)
                     _da_trace("rag_context top-1 only", f"len={len(rag_context)}")
@@ -945,12 +955,13 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
     try:
         print("[DEBUG] Planner: RAG(논문·도구) 검색 시작...")
         rag = get_chroma_rag_tool()
-        rag_context = rag.search(state["user_request"])
+        session = get_session(chat_id)
+        planner_session_ctx = session.get_recent_context(max_turns=2)
+        rag_context = rag.search(state["user_request"], session_context=planner_session_ctx)
         tools_context = get_tool_rag_store().format_topk_block(state["user_request"], k=TOOL_RAG_TOP_K)
         print("[DEBUG] Planner: 로컬 Ollama 계획 생성 호출 (timeout≈120s)...")
 
         llm = get_planner_plan_llm()
-        session = get_session(chat_id)
 
         system_prompt = PLANNER_SYSTEM_BASE
         learnings = load_learnings()
@@ -1125,7 +1136,7 @@ def executor_node(state: AgentState) -> dict:
                 state.get("user_request") or "", k=TOOL_RAG_TOP_K
             )
             rag = get_chroma_rag_tool()
-            rag_context = rag.search(state["user_request"])[:500] if state.get("user_request") else ""
+            rag_context = rag.search(state["user_request"], session_context="")[:500] if state.get("user_request") else ""
 
         llm = get_coding_groq_llm()
         plan_str = "\n".join(f"{i+1}. {p}" for i, p in enumerate(state.get("plan", [])))

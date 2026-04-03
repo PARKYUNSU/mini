@@ -35,7 +35,7 @@ def test_router_node_llm_path_uses_mock_classify(monkeypatch, cfg):
     msg = "q9f2k_node_contract_only_no_hard_rule_match_xyz"
 
     class DummyRAG:
-        def search(self, _q: str) -> str:
+        def search(self, _q: str, **_kw) -> str:
             return ""
 
     class DummyTRS:

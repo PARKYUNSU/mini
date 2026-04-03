@@ -9,6 +9,7 @@
 """
 
 import argparse
+import gc
 import json
 import os
 import random
@@ -255,6 +256,11 @@ def run_backfill(
                     print(f"  ⏭️  건너뜀 (이미 토론한 논문, 선필터): {paper.paper_id} -> {base_paper_id}")
                     continue
 
+                # 이미 JSONL에 저장된 논문이면 전체 파이프라인 스킵 (재시작 시 이어받기)
+                if base_paper_id and base_paper_id in storage._known_paper_ids:
+                    print(f"  ⏭️  건너뜀 (이미 저장된 논문, 이어받기): {paper.paper_id} -> {base_paper_id}")
+                    continue
+
                 pdf_path = tmpdir_path / f"{paper.paper_id}.pdf"
 
                 # PDF 다운로드
@@ -317,6 +323,16 @@ def run_backfill(
                     print(f"  ❌ RAG 예외 (건너뜀): {e}")
 
                 DataStorage.remove_temp_pdf(pdf_path)
+
+                # 메모리 강제 해제 및 짧은 휴식 (OOM/세그폴트 완화)
+                for name in ("markdown_content", "record", "chunk_count"):
+                    if name in locals():
+                        try:
+                            del locals()[name]
+                        except Exception:
+                            pass
+                gc.collect()
+                time.sleep(1.0)
 
         total_fetched += len(papers)
         start_offset += batch_size

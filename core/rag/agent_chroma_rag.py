@@ -237,32 +237,49 @@ def _rerank_jsonl_candidates(query: str, candidates: list[dict], *, top_n: int) 
     return [d for _, _, d in top]
 
 
+def _reverse_readline(fpath: Path, buf_size: int = 8192):
+    """파일 끝에서 역방향으로 한 줄씩 yield (전체 메모리 로드 없음)."""
+    with fpath.open("rb") as f:
+        f.seek(0, 2)
+        remaining = f.tell()
+        leftover = b""
+        while remaining > 0:
+            read_size = min(buf_size, remaining)
+            remaining -= read_size
+            f.seek(remaining)
+            chunk = f.read(read_size) + leftover
+            lines = chunk.split(b"\n")
+            leftover = lines[0]
+            for line in reversed(lines[1:]):
+                yield line.decode("utf-8", errors="replace")
+        if leftover:
+            yield leftover.decode("utf-8", errors="replace")
+
+
 def _fallback_rag_from_jsonl_tail(*, query: str, max_papers: int = 2, max_chars: int = 6500) -> str:
-    """Chroma 실패 시 JSONL 후보를 토큰 겹침 기반으로 재정렬 후 상위 문서 텍스트만 사용."""
+    """Chroma 실패 시 JSONL 후보를 역순 tail로 수집, 토큰 겹침 재정렬 후 상위 문서만 사용."""
     raw_path = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
     if not raw_path.exists():
         return ""
-    try:
-        with raw_path.open(encoding="utf-8", errors="replace") as f:
-            lines = f.readlines()
-    except OSError:
-        return ""
     candidate_pool_size = max(20, max_papers * 4)
     candidates: list[dict] = []
-    for line in reversed(lines):
-        if len(candidates) >= candidate_pool_size:
-            break
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            d = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        block = _render_jsonl_block_for_record(d)
-        if not block:
-            continue
-        candidates.append(d)
+    try:
+        for line in _reverse_readline(raw_path):
+            if len(candidates) >= candidate_pool_size:
+                break
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                d = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            block = _render_jsonl_block_for_record(d)
+            if not block:
+                continue
+            candidates.append(d)
+    except OSError:
+        return ""
     if not candidates:
         return ""
 
@@ -282,11 +299,37 @@ def _fallback_rag_from_jsonl_tail(*, query: str, max_papers: int = 2, max_chars:
     )
 
 
+def _dedupe_hits_by_paper(
+    docs: list[str], metas: list[dict[str, str]]
+) -> list[tuple[str, dict[str, str]]]:
+    """
+    동일 paper_id 청크가 상위에 몰리는 편향 완화.
+    논문별로 첫 번째(최고 관련도) 청크만 우선 배치하고,
+    같은 논문의 추가 청크는 뒤에 붙인다.
+    paper_id가 없는 청크는 고유한 것으로 취급.
+    """
+    first_per_paper: list[tuple[str, dict[str, str]]] = []
+    extra: list[tuple[str, dict[str, str]]] = []
+    seen_pids: set[str] = set()
+    for doc, meta in zip(docs, metas):
+        pid = (meta.get("paper_id") or "").strip()
+        if not pid:
+            first_per_paper.append((doc, meta))
+            continue
+        if pid not in seen_pids:
+            seen_pids.add(pid)
+            first_per_paper.append((doc, meta))
+        else:
+            extra.append((doc, meta))
+    return first_per_paper + extra
+
+
 def _format_chroma_hits(docs: list[str], metas: list[dict[str, str]]) -> str:
     if not docs:
         return "관련 문서 없음"
+    deduped = _dedupe_hits_by_paper(docs, metas)
     parts: list[str] = []
-    for doc, meta in zip(docs, metas):
+    for doc, meta in deduped:
         pub = _published_line_from_record(meta)
         pid = meta.get("paper_id", "")
         title = meta.get("title", "")
