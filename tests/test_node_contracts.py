@@ -303,10 +303,21 @@ def test_paper_mode_allows_explicit_code_to_planner(monkeypatch, cfg):
 def test_enforce_rag_structure_markdown_has_three_sections():
     raw = "이 논문은 멀티모달 모델의 효율을 개선합니다. 제안 방법은 저랭크 어댑터를 활용합니다. 실험에서 기존 대비 성능이 향상됩니다."
     out = agent_nodes._enforce_rag_structure_markdown(raw)
-    assert "### 핵심 주제" in out
-    assert "### 주요 방법론" in out
-    assert "### 결론 및 의의" in out
-    assert out.count("### ") == 3
+    assert "1. 핵심 주제" in out
+    assert "2. 주요 방법론" in out
+    assert "3. 결론 및 의의" in out
+
+
+def test_strip_thinking_tags_removes_redacted_block():
+    from agent_telegram import strip_thinking_tags
+
+    raw = (
+        "<redacted_thinking>\nstep A\n</redacted_thinking>\n\n"
+        "1. 핵심 주제\n- 본문입니다."
+    )
+    out = strip_thinking_tags(raw)
+    assert "redacted_thinking" not in out.lower()
+    assert "본문입니다" in out
 
 
 def test_markdown_struct_to_plain_preserves_structure():

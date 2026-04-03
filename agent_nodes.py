@@ -96,6 +96,7 @@ from agent_telegram import (
     notify_chat_error as _notify_chat_error,
     rag_structured_lines_to_html as _rag_structured_lines_to_html,
     safe_telegram_send as _safe_telegram_send,
+    strip_thinking_tags as _strip_thinking_tags,
 )
 from agent_vision import build_message_content as _build_message_content
 
@@ -103,11 +104,57 @@ _MINI_ROOT = Path(__file__).resolve().parent
 
 _log = logging.getLogger(__name__)
 
-# RAG 직접 답변: 소형 LLM이 system 프롬프트를 약하게 따를 때 user 말미에 강제 (요청 스펙)
+# RAG 직접 답변: user 말미 단일 지시 (7B 모델용 최소 문구)
 RAG_DIRECT_ANSWER_USER_SUFFIX = (
-    "\n\n[반드시 지킬 것: 1. 핵심 주제, 2. 주요 방법론, 3. 결론 순서로 줄바꿈을 명확히 해서 요약할 것. "
-    "절대 같은 문장을 두 번 반복하지 말 것.]"
+    "\n\n[지시사항: 주어진 문서 1개만 사용하여 아래 3가지 항목으로만 깔끔하게 요약할 것. "
+    "(1. 핵심 주제, 2. 주요 방법론, 3. 결론 및 의의)]"
 )
+
+_RAG_HIT_SEP = "\n\n---\n\n"
+
+
+def _prefer_single_hit_rag_context(user_request: str, *, wants_depth: bool) -> bool:
+    """단일 문서 요약 의도일 때 Chroma 컨텍스트를 Top-1로 제한 (논문 짬뽕 완화)."""
+    if wants_depth:
+        return False
+    u = (user_request or "").strip()
+    vague_markers = (
+        "아무거나",
+        "하나만",
+        "한 편만",
+        "한편만",
+        "랜덤",
+        "상관없",
+        "아무 논문",
+        "아무것이나",
+        "뭐든",
+        "아무나",
+        "아무거나 하나",
+        "하나 요약",
+        "한 개만",
+        "한개만",
+        "편 하나",
+    )
+    if any(k in u for k in vague_markers):
+        return True
+    if any(x in u for x in ("비교", "차이", "여러", "두 편", "두편", "세 편", "목록")):
+        return False
+    if len(u) <= 44 and ("요약" in u or "알려줘" in u or "설명해" in u):
+        return True
+    return False
+
+
+def _rag_context_first_hit_only(rag_context: str, *, max_chars: int = 5500) -> str:
+    """Chroma `_format_chroma_hits` 구분선 기준 가장 상위(관련도 1위) 블록만 잘라 LLM에 전달."""
+    s = (rag_context or "").strip()
+    if not s or s == "관련 문서 없음":
+        return rag_context
+    if _RAG_HIT_SEP not in s:
+        return s[:max_chars] + ("...(이하 잘림)" if len(s) > max_chars else "")
+    first = s.split(_RAG_HIT_SEP, 1)[0].strip()
+    if len(first) > max_chars:
+        first = first[:max_chars].rstrip() + "\n\n...(이하 잘림)"
+    return first
 
 
 def _da_trace(step: str, detail: str = "") -> None:
@@ -210,9 +257,9 @@ def _enforce_rag_structure_markdown(answer: str) -> str:
     text = (answer or "").strip()
     if not text:
         return (
-            "### 핵심 주제\n- 문서에서 핵심 주제를 확인할 수 없습니다.\n\n"
-            "### 주요 방법론\n- 문서에서 방법론을 확인할 수 없습니다.\n\n"
-            "### 결론 및 의의\n- 문서에서 결론/의의를 확인할 수 없습니다."
+            "1. 핵심 주제\n- 문서에서 핵심 주제를 확인할 수 없습니다.\n\n"
+            "2. 주요 방법론\n- 문서에서 방법론을 확인할 수 없습니다.\n\n"
+            "3. 결론 및 의의\n- 문서에서 결론/의의를 확인할 수 없습니다."
         )
 
     bullets = _extract_bullets(text)
@@ -243,11 +290,11 @@ def _enforce_rag_structure_markdown(answer: str) -> str:
     concl = concl or ["문서에서 결론·의의를 추가로 확인할 수 없습니다."]
 
     return (
-        "### 핵심 주제\n"
+        "1. 핵심 주제\n"
         + "\n".join(f"- {x}" for x in topic)
-        + "\n\n### 주요 방법론\n"
+        + "\n\n2. 주요 방법론\n"
         + "\n".join(f"- {x}" for x in method)
-        + "\n\n### 결론 및 의의\n"
+        + "\n\n3. 결론 및 의의\n"
         + "\n".join(f"- {x}" for x in concl)
     )
 
@@ -562,6 +609,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 _da_trace("before rag.search()", f"top_k={top_k} (sync collection.query)")
                 rag_context = rag.search(user_request, top_k=top_k)
                 _da_trace("after rag.search()", f"len={len(rag_context)}")
+                if _prefer_single_hit_rag_context(user_request, wants_depth=wants_depth):
+                    rag_context = _rag_context_first_hit_only(rag_context)
+                    _da_trace("rag_context top-1 only", f"len={len(rag_context)}")
 
             _da_trace("before session.get_last_assistant_response()", "")
             last_ai = session.get_last_assistant_response()
@@ -592,6 +642,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         bot = conf.get("bot")
         chat_id = str(conf.get("chat_id", ""))
         if router_choice == "B":
+            answer = _strip_thinking_tags(answer)
             answer = _enforce_rag_structure_markdown(answer)
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"

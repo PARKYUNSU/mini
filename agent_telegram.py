@@ -23,6 +23,10 @@ def _telegram_api_err_str(exc: BaseException) -> str:
 CANCEL_RESTART_CMDS = ("/cancel", "취소", "취소해", "재시작", "/restart", "🔄 재시작", "❌ 취소")
 
 # <think>, <thinking> 등 Chain-of-Thought 태그 제거 (출력 정제)
+_REDACTED_THINKING_PATTERN = re.compile(
+    r"<redacted_thinking\b[^>]*>.*?</redacted_thinking>",
+    re.DOTALL | re.IGNORECASE,
+)
 _THINKING_PATTERN = re.compile(
     r"</?(?:think|thinking|scratchpad)[^>]*>.*?</(?:think|thinking|scratchpad)>",
     re.DOTALL | re.IGNORECASE,
@@ -33,7 +37,8 @@ def strip_thinking_tags(text: str) -> str:
     """<think>...</think>, <thinking>...</thinking> 등 사고 과정 블록 제거"""
     if not text or not isinstance(text, str):
         return text
-    cleaned = _THINKING_PATTERN.sub("", text).strip()
+    cleaned = _REDACTED_THINKING_PATTERN.sub("", text)
+    cleaned = _THINKING_PATTERN.sub("", cleaned).strip()
     return cleaned if cleaned else "(답변을 생성하지 못했습니다)"
 
 
@@ -56,7 +61,7 @@ def escape_telegram_html(text: str) -> str:
 
 def rag_structured_lines_to_html(body: str) -> str:
     """
-    RAG 후처리 본문(### 제목 + - bullet)을 Telegram HTML로 변환.
+    RAG 후처리 본문(### 제목 또는 '1. 핵심 주제' 같은 번호 제목 + - bullet)을 Telegram HTML로 변환.
     Markdown 특수문자 파싱 오류를 피하고 줄바꿈은 그대로 유지한다.
     """
     out_lines: list[str] = []
@@ -67,6 +72,10 @@ def rag_structured_lines_to_html(body: str) -> str:
             continue
         if line.startswith("### "):
             title = escape_telegram_html(line[4:].strip())
+            out_lines.append(f"<b>{title}</b>")
+        elif re.match(r"^\d+\.\s+\S", line):
+            # "1. 핵심 주제" 형식 (RAG 단순 섹션)
+            title = escape_telegram_html(line.strip())
             out_lines.append(f"<b>{title}</b>")
         elif line.startswith("- "):
             out_lines.append("• " + escape_telegram_html(line[2:].strip()))
