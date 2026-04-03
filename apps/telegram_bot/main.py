@@ -63,6 +63,7 @@ from core.rag.agent_tool_rag import sync_tool_chroma_from_disk
 from apps.telegram_bot.agent_telegram import (
     CANCEL_RESTART_CMDS as _CANCEL_RESTART_CMDS,
     main_keyboard as _main_keyboard,
+    notify_chat_error as _notify_chat_error,
     safe_telegram_edit as _safe_telegram_edit,
     safe_telegram_send as _safe_telegram_send,
     safe_telegram_send_and_get as _safe_telegram_send_and_get,

@@ -39,6 +39,8 @@ from core.llm.agent_prompts import (
     DIRECT_ANSWER_PYTHON_EXAMPLE_SYSTEM,
     DIRECT_ANSWER_RAG_DEPTH_SUFFIX,
     DIRECT_ANSWER_RAG_SYSTEM_BASE,
+    RAG_OUTPUT_TEMPLATE_MULTI_STRICT,
+    RAG_OUTPUT_TEMPLATE_SINGLE_STRICT,
     EXECUTOR_INTENTIONAL_SYNTAX_BLOCK,
     EXECUTOR_SYSTEM_CODE_RUN,
     EXECUTOR_SYSTEM_FULL,
@@ -109,8 +111,6 @@ _RAG_HIT_SEP = "\n\n---\n\n"
 
 def _prefer_single_hit_rag_context(user_request: str, *, wants_depth: bool) -> bool:
     """단일 문서 요약 의도일 때 Chroma 컨텍스트를 Top-1로 제한 (논문 짬뽕 완화)."""
-    if wants_depth:
-        return False
     u = (user_request or "").strip()
     vague_markers = (
         "아무거나",
@@ -149,6 +149,21 @@ def _rag_context_first_hit_only(rag_context: str, *, max_chars: int = 5500) -> s
     if len(first) > max_chars:
         first = first[:max_chars].rstrip() + "\n\n...(이하 잘림)"
     return first
+
+
+def _rag_context_top_n_hits(rag_context: str, *, n: int = 5) -> str:
+    """
+    Chroma `_format_chroma_hits` 구분선 기준 상위 N개 블록만 잘라 LLM에 전달.
+    (Chroma query 결과가 relevance 정렬 순서라는 전제)
+    """
+    s = (rag_context or "").strip()
+    if not s or s == "관련 문서 없음":
+        return rag_context
+    if _RAG_HIT_SEP not in s:
+        return s
+    blocks = [b.strip() for b in s.split(_RAG_HIT_SEP) if b.strip()]
+    blocks = blocks[:n]
+    return _RAG_HIT_SEP.join(blocks)
 
 
 def _da_trace(step: str, detail: str = "") -> None:
@@ -589,13 +604,23 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
             depth_keywords = ("자세히", "더", "길게", "상세하게", "구체적으로")
             wants_depth = any(k in user_request for k in depth_keywords)
-            top_k = RAG_TOP_K * 2 if wants_depth else RAG_TOP_K
+            prefer_single_hit = _prefer_single_hit_rag_context(user_request, wants_depth=wants_depth)
+            # 단일은 Top-1, 다중은 Top-5로 LLM 컨텍스트를 제한하기 때문에
+            # Chroma query는 넉넉히 가져와도 되고, 최종 전달은 뒤에서 잘라냄
+            top_k = (RAG_TOP_K * 2 if wants_depth else RAG_TOP_K) if prefer_single_hit else max(RAG_TOP_K * 4, 10)
 
-            _da_trace("before get_chroma_rag_tool()", f"top_k={top_k} wants_depth={wants_depth}")
+            _da_trace(
+                "before get_chroma_rag_tool()",
+                f"top_k={top_k} wants_depth={wants_depth} prefer_single_hit={prefer_single_hit}",
+            )
             rag = get_chroma_rag_tool()
             _da_trace("after get_chroma_rag_tool()", "ok")
 
-            if ("chromadb" in req_lower or "논문" in user_request) and any(w in user_request for w in ("목록", "알려줘", "뭐 있어", "조회", "검색")):
+            if (
+                prefer_single_hit
+                and ("chromadb" in req_lower or "논문" in user_request)
+                and any(w in user_request for w in ("목록", "알려줘", "뭐 있어", "조회", "검색"))
+            ):
                 _da_trace("before rag.list_papers()", "sync jsonl, no chroma query")
                 rag_context = rag.list_papers()
                 _da_trace("after rag.list_papers()", f"len={len(rag_context)}")
@@ -603,20 +628,31 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 _da_trace("before rag.search()", f"top_k={top_k} (sync collection.query)")
                 rag_context = rag.search(user_request, top_k=top_k)
                 _da_trace("after rag.search()", f"len={len(rag_context)}")
-                if _prefer_single_hit_rag_context(user_request, wants_depth=wants_depth):
+                if prefer_single_hit:
                     rag_context = _rag_context_first_hit_only(rag_context)
                     _da_trace("rag_context top-1 only", f"len={len(rag_context)}")
+                else:
+                    rag_context = _rag_context_top_n_hits(rag_context, n=5)
+                    _da_trace("rag_context top-5 only", f"len={len(rag_context)}")
 
             _da_trace("before session.get_last_assistant_response()", "")
             last_ai = session.get_last_assistant_response()
             _da_trace("after session.get_last_assistant_response()", f"last_ai_len={len(last_ai)}")
 
             system_prompt = DIRECT_ANSWER_RAG_SYSTEM_BASE
-            if wants_depth:
+            if wants_depth and prefer_single_hit:
                 system_prompt += DIRECT_ANSWER_RAG_DEPTH_SUFFIX
 
+            output_template = RAG_OUTPUT_TEMPLATE_SINGLE_STRICT if prefer_single_hit else RAG_OUTPUT_TEMPLATE_MULTI_STRICT
+            rag_max_chars = 5000 if prefer_single_hit else 8000
+
             prompt = direct_answer_rag_user(
-                session.get_context(), rag_context, last_ai, user_request
+                session.get_context(),
+                rag_context,
+                last_ai,
+                user_request,
+                output_template_strict=output_template,
+                rag_max_chars=rag_max_chars,
             )
             content = _build_message_content(prompt, image_base64)
             _da_trace("before _invoke_llm_with_fallback", "B RAG answer")
