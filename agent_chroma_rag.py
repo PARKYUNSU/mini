@@ -2,31 +2,24 @@
 
 동기(sync)만 사용(asyncio 미사용).
 
-macOS(Apple Silicon) 등에서 부모 프로세스의 torch/LangGraph·Chroma Rust가 한 프로세스에 있으면
-`collection.query`에서 Segmentation fault가 날 수 있다. 이 경우 **기본(darwin)** 으로
-`multiprocessing` **spawn** 자식 프로세스만 Chroma+임베딩을 로드하고 `query`를 수행한다.
+macOS(Apple Silicon)에서 ``multiprocessing`` spawn 자식 + Chroma Rust 조합은
+반복적으로 Segmentation fault가 나므로 **사용하지 않는다.**
 
-- ``CHROMA_SUBPROCESS=1`` : 강제 spawn 경로
-- ``CHROMA_SUBPROCESS=0`` : 기존처럼 owner 스레드 + in-process Chroma (Linux 등)
+**전략:** 메인 프로세스에서 ``ChromaRAGTool`` 싱글톤 1개만 두고,
+``threading.Lock``(``_chroma_singleton_lock`` + ``ChromaRAGTool._db_lock``)으로
+``collection.query()`` 호출을 직렬화한다.
+
 - ``CHROMA_VECTOR_DISABLED=1`` : 부팅부터 벡터 query 없이 JSONL 폴백만
-- ``CHROMA_SPAWN_QUERY_ATTEMPTS`` : spawn 재시도 횟수 (기본 2)
-
-그 외: **chroma-rag-owner** 스레드 직렬화 + ``ChromaRAGTool._db_lock``.
+- (레거시) ``CHROMA_SUBPROCESS`` 는 더 이상 사용하지 않으며, import 시 ``0``으로 고정한다.
 """
 
 from __future__ import annotations
 
 import json
 import logging
-import multiprocessing as mp
 import os
-import queue
-import sys
 import threading
-import time
-from concurrent.futures import Future
 from pathlib import Path
-from typing import Any
 
 import chromadb
 from chromadb.config import Settings
@@ -36,32 +29,21 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from agent_config import CHROMA_DB_PATH, COLLECTION_NAME, EMBEDDING_MODEL, PROJECT_ROOT, RAG_TOP_K
 from agent_llm import get_rag_query_rewrite_llm
 
+# 레거시·문서 혼동 방지: subprocess(spawn) Chroma 경로는 비활성화
+os.environ["CHROMA_SUBPROCESS"] = "0"
+
 _PROJECT_ROOT = Path(__file__).resolve().parent
 
 _log = logging.getLogger(__name__)
 
-_CHROMA_SHUTDOWN = object()
 _SEARCH_TIMEOUT_SEC = 600.0
 
-# 한 번 Chroma query가 프로세스 단위로 반복 실패(세그폴트)하면, 봇 재시작 전까지 벡터 검색 생략
+# 한 번 Chroma query가 프로세스 단위로 반복 실패하면, 봇 재시작 전까지 벡터 검색 생략
 _vector_search_disabled: bool = False
 _vector_search_disabled_lock = threading.Lock()
 
-
-def _use_subprocess_chroma() -> bool:
-    v = (os.environ.get("CHROMA_SUBPROCESS") or "").strip().lower()
-    if v in ("0", "false", "no", "off"):
-        return False
-    if v in ("1", "true", "yes", "on"):
-        return True
-    return sys.platform == "darwin"
-
-
-def _abs_chroma_db_path() -> str:
-    p = Path(CHROMA_DB_PATH)
-    if p.is_absolute():
-        return str(p.resolve())
-    return str((PROJECT_ROOT / p).resolve())
+_chroma_singleton: ChromaRAGTool | None = None
+_chroma_singleton_lock = threading.Lock()
 
 
 def _strip_urls_text(query: str) -> str:
@@ -167,13 +149,6 @@ def _fallback_rag_from_jsonl_tail(*, max_papers: int = 2, max_chars: int = 6500)
     )
 
 
-def _invalidate_spawn_runner_safely() -> None:
-    """자식 세그폴트 후 큐가 불안정할 수 있어 싱글톤을 비워 다음 요청에서 재생성."""
-    global _spawn_runner
-    with _spawn_runner_lock:
-        _spawn_runner = None
-
-
 def _format_chroma_hits(docs: list[str], metas: list[dict[str, str]]) -> str:
     if not docs:
         return "관련 문서 없음"
@@ -186,272 +161,24 @@ def _format_chroma_hits(docs: list[str], metas: list[dict[str, str]]) -> str:
     return "\n\n---\n\n".join(p for p in parts if p.strip())
 
 
-def _chroma_spawn_worker(
-    task_q: Any,
-    result_q: Any,
-    db_path: str,
-    collection_name: str,
-    embedding_model: str,
-) -> None:
-    """spawn 자식 전용: Chroma·임베딩·query만 로드 (부모와 네이티브 스택 분리)."""
-    import os as _os
-
-    for _k, _v in (
-        ("OMP_NUM_THREADS", "1"),
-        ("MKL_NUM_THREADS", "1"),
-        ("OPENBLAS_NUM_THREADS", "1"),
-        ("VECLIB_MAXIMUM_THREADS", "1"),
-        ("NUMEXPR_NUM_THREADS", "1"),
-        ("TOKENIZERS_PARALLELISM", "false"),
-    ):
-        _os.environ.setdefault(_k, _v)
-
-    import chromadb as _chromadb
-    from chromadb.config import Settings as _Settings
-    from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction as _STEF
-
-    print("[ChromaRAG TRACE] spawn child: loading embedding + PersistentClient...", flush=True)
-    ef = _STEF(model_name=embedding_model, device="cpu", normalize_embeddings=True)
-    client = _chromadb.PersistentClient(path=db_path, settings=_Settings(anonymized_telemetry=False))
-    col = client.get_collection(name=collection_name, embedding_function=ef)
-    print("[ChromaRAG TRACE] spawn child: ready for query", flush=True)
-
-    while True:
-        msg = task_q.get()
-        if msg is None:
-            break
-        rid: int
-        op: str
-        payload: Any
-        rid, op, payload = msg
-        if op == "ping":
-            result_q.put((rid, "ok", None))
-            continue
-        if op == "query":
-            sq, top_k = payload
-            try:
-                res = col.query(
-                    query_texts=[sq], n_results=top_k, include=["documents", "metadatas"]
-                )
-                docs = res["documents"][0] if res["documents"] else []
-                metas_raw = res["metadatas"][0] if res.get("metadatas") else []
-                docs_out = [d if isinstance(d, str) else str(d) for d in docs]
-                safe_metas: list[dict[str, str]] = []
-                for m in metas_raw:
-                    d = m if isinstance(m, dict) else {}
-                    safe_metas.append({str(k): ("" if v is None else str(v)) for k, v in d.items()})
-                result_q.put((rid, "ok", {"documents": docs_out, "metadatas": safe_metas}))
-            except Exception as e:
-                result_q.put((rid, "err", str(e)))
-
-
-class _SpawnChromaRunner:
-    """부모 쪽: 요청 직렬화 + spawn 자식 1개 유지(죽으면 한 번 재기동 시도)."""
-
-    def __init__(self) -> None:
-        self._ctx = mp.get_context("spawn")
-        self._task_q: Any = self._ctx.Queue()
-        self._result_q: Any = self._ctx.Queue()
-        self._proc: mp.Process | None = None
-        self._plock = threading.Lock()
-        self._seq = 0
-
-    def _start_proc(self) -> None:
-        if self._proc is not None and self._proc.is_alive():
-            return
-        print("[ChromaRAG TRACE] spawning chroma-rag child (spawn)...", flush=True)
-        self._proc = self._ctx.Process(
-            target=_chroma_spawn_worker,
-            args=(self._task_q, self._result_q, _abs_chroma_db_path(), COLLECTION_NAME, EMBEDDING_MODEL),
-            name="chroma-rag-spawn",
-            daemon=True,
-        )
-        self._proc.start()
-        time.sleep(0.4)
-        if not self._proc.is_alive():
-            code = self._proc.exitcode
-            self._proc = None
-            raise RuntimeError(f"Chroma spawn 자식이 즉시 종료됨 (exit={code})")
-
-    def _drain_stale_results(self) -> None:
-        while True:
-            try:
-                self._result_q.get_nowait()
-            except queue.Empty:
-                break
-
-    def _request(self, op: str, payload: Any, *, timeout: float = _SEARCH_TIMEOUT_SEC) -> Any:
-        """단일 시도. 재시도·새 큐는 `_spawn_request_with_retries`에서 싱글톤 교체로 처리."""
-        with self._plock:
-            self._drain_stale_results()
-            self._start_proc()
-            assert self._proc is not None
-            self._seq += 1
-            rid = self._seq
-            self._task_q.put((rid, op, payload))
-            deadline = time.monotonic() + timeout
-            while True:
-                if not self._proc.is_alive():
-                    self._proc = None
-                    raise RuntimeError(
-                        "Chroma spawn 프로세스가 응답 중 종료되었습니다(세그폴트 가능). "
-                        "외장 디스크·DB 손상·Chroma 버전을 점검하거나 CHROMA_SUBPROCESS=0으로 시도해 보세요."
-                    )
-                remaining = deadline - time.monotonic()
-                if remaining <= 0:
-                    raise TimeoutError("Chroma subprocess")
-                try:
-                    got = self._result_q.get(timeout=min(remaining, 5.0))
-                except queue.Empty:
-                    continue
-                gr, status, data = got
-                if gr != rid:
-                    continue
-                if status == "err":
-                    raise RuntimeError(data)
-                return data
-
-    def ping(self) -> None:
-        self._request("ping", None, timeout=_SEARCH_TIMEOUT_SEC)
-
-    def query_raw(self, search_query: str, top_k: int) -> dict[str, Any]:
-        return self._request("query", (search_query, top_k), timeout=_SEARCH_TIMEOUT_SEC)
-
-
-_spawn_runner: _SpawnChromaRunner | None = None
-_spawn_runner_lock = threading.Lock()
-
-
-def _get_spawn_runner() -> _SpawnChromaRunner:
-    global _spawn_runner
-    with _spawn_runner_lock:
-        if _spawn_runner is None:
-            _spawn_runner = _SpawnChromaRunner()
-        return _spawn_runner
-
-
-def _spawn_query_raw_with_retries(search_query: str, top_k: int) -> dict[str, Any]:
-    """자식 세그폴트 후 Queue 불능 대비: 실패 시 싱글톤을 버리고 새 runner로 재시도(기본 2회, 매번 임베딩 로드 비용 큼)."""
-    last_err: BaseException | None = None
-    attempts = int(os.environ.get("CHROMA_SPAWN_QUERY_ATTEMPTS", "2") or "2")
-    attempts = max(1, min(attempts, 8))
-    for i in range(attempts):
-        runner = _get_spawn_runner()
-        try:
-            return runner.query_raw(search_query, top_k)
-        except (RuntimeError, TimeoutError, OSError, BrokenPipeError, EOFError) as e:
-            last_err = e
-            _log.warning("chroma spawn query attempt %s failed: %s", i + 1, e)
-            print(f"[ChromaRAG TRACE] spawn query failed attempt {i + 1}: {e}", flush=True)
-            _invalidate_spawn_runner_safely()
-            time.sleep(0.25 + 0.2 * i)
-    assert last_err is not None
-    raise last_err
-
-
-def _search_via_subprocess(query: str, top_k: int, session_context: str) -> str:
-    if session_context:
-        _log.debug("ChromaRAG subprocess path: _rewrite_rag_query (parent LLM)")
-        print("[ChromaRAG TRACE] search rewrite_query branch (parent thread)", flush=True)
-        query = _rewrite_rag_query(query, session_context)
-    query = _strip_urls_text(query)
-    if not query.strip():
-        return "관련 문서 없음"
-    search_query = _extract_paper_title_text(query)
-
-    if _vector_search_effective_disabled():
-        print("[ChromaRAG TRACE] vector search skipped (disabled), jsonl only", flush=True)
-        fb = _fallback_rag_from_jsonl_tail()
-        return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
-
-    print(
-        f"[ChromaRAG TRACE] subprocess query (spawn child) top_k={top_k} qlen={len(search_query)}",
-        flush=True,
-    )
-    try:
-        raw = _spawn_query_raw_with_retries(search_query, top_k)
-        docs = raw.get("documents") or []
-        metas = raw.get("metadatas") or []
-        return _format_chroma_hits(docs, metas)
-    except Exception as e:
-        _log.warning("chroma subprocess search exhausted retries: %s", e)
-        print("[ChromaRAG TRACE] subprocess failed, jsonl fallback", flush=True)
-        _invalidate_spawn_runner_safely()
-        _set_vector_search_disabled_for_process()
-        fb = _fallback_rag_from_jsonl_tail()
-        if fb.strip():
-            return fb
-        return f"검색 오류: {e}"
-
-
-class _ChromaOwnerLoop:
-    """ChromaRAGTool 인스턴스를 이 스레드에서만 생성·쿼리한다 (CHROMA_SUBPROCESS=0 시)."""
-
-    def __init__(self) -> None:
-        self._q: queue.Queue = queue.Queue()
-        self._thr: threading.Thread | None = None
-        self._start_lock = threading.Lock()
-
-    def _loop(self) -> None:
-        tool: ChromaRAGTool | None = None
-        while True:
-            item = self._q.get()
-            if item is _CHROMA_SHUTDOWN:
-                break
-            fut: Future
-            op: str
-            args: tuple
-            kwargs: dict
-            fut, op, args, kwargs = item
-            try:
-                if op == "_init":
-                    if tool is None:
-                        _log.debug("chroma owner thread: constructing ChromaRAGTool")
-                        print("[ChromaRAG TRACE] owner thread: constructing ChromaRAGTool", flush=True)
-                        tool = ChromaRAGTool()
-                    fut.set_result(None)
-                elif op == "search":
-                    if tool is None:
-                        tool = ChromaRAGTool()
-                    fut.set_result(tool.search(*args, **kwargs))
-                else:
-                    fut.set_exception(RuntimeError(f"unknown chroma op: {op}"))
-            except BaseException as e:
-                if not fut.done():
-                    fut.set_exception(e)
-            finally:
-                self._q.task_done()
-
-    def _ensure_started(self) -> None:
-        with self._start_lock:
-            if self._thr is None or not self._thr.is_alive():
-                self._thr = threading.Thread(
-                    target=self._loop, name="chroma-rag-owner", daemon=False
-                )
-                self._thr.start()
-
-    def submit(self, op: str, *args, **kwargs) -> Future:
-        self._ensure_started()
-        fut: Future = Future()
-        self._q.put((fut, op, args, kwargs))
-        return fut
-
-    def warmup(self) -> None:
-        self.submit("_init").result(timeout=_SEARCH_TIMEOUT_SEC)
-
-
-_owner = _ChromaOwnerLoop()
+def _get_chroma_singleton() -> ChromaRAGTool:
+    global _chroma_singleton
+    with _chroma_singleton_lock:
+        if _chroma_singleton is None:
+            print("[ChromaRAG TRACE] lazy init ChromaRAGTool (in-process singleton)", flush=True)
+            _chroma_singleton = ChromaRAGTool()
+        return _chroma_singleton
 
 
 class ChromaRAGPublic:
-    """어떤 스레드에서든 동일 인터페이스. darwin 기본은 spawn 자식에서 Chroma query."""
+    """어떤 스레드에서든 동일 인터페이스. Chroma는 싱글톤 + Lock으로 직렬화."""
 
     def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "") -> str:
-        if _use_subprocess_chroma():
-            return _search_via_subprocess(query, top_k, session_context)
-        return _owner.submit("search", query, top_k=top_k, session_context=session_context).result(
-            timeout=_SEARCH_TIMEOUT_SEC
-        )
+        if _vector_search_effective_disabled():
+            print("[ChromaRAG TRACE] vector search skipped (disabled), jsonl only", flush=True)
+            fb = _fallback_rag_from_jsonl_tail()
+            return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
+        return _get_chroma_singleton().search(query, top_k=top_k, session_context=session_context)
 
     def list_papers(self) -> str:
         return list_stored_papers_text()
@@ -465,25 +192,20 @@ def get_chroma_rag_tool() -> ChromaRAGPublic:
 
 
 def warmup_chroma_rag() -> None:
-    """부팅 시 1회: spawn 자식에 Chroma 로드 또는 owner 스레드에 in-process 로드."""
-    if _use_subprocess_chroma():
-        if _env_chroma_vector_force_disabled():
-            print("[ChromaRAG TRACE] warmup: CHROMA_VECTOR_DISABLED → spawn ping 생략", flush=True)
-            return
-        print("[ChromaRAG TRACE] warmup: spawn child ping", flush=True)
-        try:
-            _get_spawn_runner().ping()
-        except Exception:
-            _invalidate_spawn_runner_safely()
-            raise
-        print("[ChromaRAG TRACE] warmup: spawn child OK", flush=True)
+    """부팅 시 1회: in-process 싱글톤 로드(임베딩·PersistentClient)."""
+    if _env_chroma_vector_force_disabled():
+        print("[ChromaRAG TRACE] warmup: CHROMA_VECTOR_DISABLED → Chroma 로드 생략", flush=True)
         return
-    _owner.warmup()
+    print("[ChromaRAG TRACE] warmup: in-process Chroma singleton", flush=True)
+    _get_chroma_singleton()
+    print("[ChromaRAG TRACE] warmup: Chroma singleton OK", flush=True)
 
 
 def reset_chroma_rag_singleton_for_tests() -> None:
     """pytest 등에서만 확장."""
-    pass
+    global _chroma_singleton
+    with _chroma_singleton_lock:
+        _chroma_singleton = None
 
 
 def list_stored_papers_text() -> str:
@@ -513,7 +235,7 @@ def list_stored_papers_text() -> str:
 
 
 class ChromaRAGTool:
-    """in-process Chroma (CHROMA_SUBPROCESS=0 또는 직접 인스턴스화 시). owner 스레드에서만 쓸 것."""
+    """in-process Chroma. ``_db_lock``으로 ``collection.query`` 직렬화."""
 
     def __init__(self, db_path: str = CHROMA_DB_PATH, collection_name: str = COLLECTION_NAME):
         path = db_path if Path(db_path).is_absolute() else str((PROJECT_ROOT / Path(db_path)).resolve())
@@ -543,8 +265,9 @@ class ChromaRAGTool:
         return _rewrite_rag_query(query, session_context)
 
     def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "") -> str:
-        if _use_subprocess_chroma():
-            return _search_via_subprocess(query, top_k, session_context)
+        if _vector_search_effective_disabled():
+            fb = _fallback_rag_from_jsonl_tail()
+            return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
         if session_context:
             _log.debug("ChromaRAGTool.search: _rewrite_query (sync LLM) may run")
             print("[ChromaRAG TRACE] search rewrite_query branch", flush=True)
@@ -560,7 +283,7 @@ class ChromaRAGTool:
                 search_query[:160],
             )
             print(
-                f"[ChromaRAG TRACE] search BEFORE query (sync) top_k={top_k} qlen={len(search_query)}",
+                f"[ChromaRAG TRACE] search BEFORE query (sync, _db_lock) top_k={top_k} qlen={len(search_query)}",
                 flush=True,
             )
             with self._db_lock:
@@ -580,7 +303,12 @@ class ChromaRAGTool:
                 ],
             )
         except Exception as e:
-            _log.debug("ChromaRAGTool.search: exception %s", e)
+            _log.warning("ChromaRAGTool.search failed: %s", e)
+            print(f"[ChromaRAG TRACE] search exception, jsonl fallback: {e}", flush=True)
+            _set_vector_search_disabled_for_process()
+            fb = _fallback_rag_from_jsonl_tail()
+            if fb.strip():
+                return fb
             return f"검색 오류: {e}"
 
     def list_papers(self) -> str:

@@ -203,7 +203,7 @@ def main():
 
     try:
         warmup_chroma_rag()
-        print("✅ Chroma RAG 워밍업 완료 (macOS: spawn 자식 프로세스 / 그 외: owner 스레드)")
+        print("✅ Chroma RAG 워밍업 완료 (in-process 싱글톤 + threading.Lock 직렬화)")
     except Exception as e:
         print(f"⚠️ Chroma RAG 워밍업 실패 — 첫 RAG 질문 시 재시도: {e}")
 
