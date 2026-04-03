@@ -27,7 +27,6 @@ from core.session.agent_session import (
     append_learning,
     get_session,
     remember_tool,
-    with_chat_lock,
 )
 from core.graph.agent_types import STREAM_FAILURE_TELEGRAM_MSG
 
@@ -245,7 +244,10 @@ def execute_graph_turn(
         direct_resp = values.get("direct_response", "")
         if route_type == "direct_answer" and direct_resp:
             if bridge_job_id is not None:
-                complete_job(bridge_job_id, result_text=direct_resp, result_parse_mode=None)
+                rchoice = values.get("router_choice", "")
+                # B=RAG는 direct_answer 노드가 Telegram HTML로 통일 저장. A=일상 등은 Markdown 시도.
+                _pm = "HTML" if rchoice == "B" else "Markdown"
+                complete_job(bridge_job_id, result_text=direct_resp, result_parse_mode=_pm)
             else:
                 _cleanup_status_msg(bot, chat_id, status_msg)
             session.recent_messages[-1] = (session.recent_messages[-1][0], direct_resp[:500])

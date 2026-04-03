@@ -30,3 +30,13 @@ def test_rag_structured_lines_to_html_markdown_bold_section():
     assert "<b>1. 핵심 주제</b>" in h
     assert "<b>2. 주요 방법론</b>" in h
     assert "내용 A" in h
+
+
+def test_rag_structured_lines_to_html_preserves_html_bold():
+    md = "<b>📄 논문 제목:</b> A & B <x>\n- 후속 <b>강조</b> 끝"
+    h = agent_telegram.rag_structured_lines_to_html(md)
+    assert "<b>📄 논문 제목:</b>" in h
+    assert "A &amp; B" in h
+    assert "&lt;x&gt;" in h
+    assert "<b>강조</b>" in h
+    assert "• 후속 " in h

@@ -333,7 +333,8 @@ def is_smalltalk_or_memory_request(user_request: str, req_lower: str) -> bool:
     ):
         return False
     greetings = ("안녕", "헬로", "반가", "굿모닝", "굿나잇", "하이", "좋은 아침")
-    identity_q = ("누구야", "누구니", "누구세요", "자기소개", "정체", "이름이 뭐야", "뭐하는", "윤수르")
+    # "윤수르"는 호칭(윤수르, …)에 항상 들어가 오분류되므로 제외. "윤수르 누구야" 등은 다른 키워드로 잡힘.
+    identity_q = ("누구야", "누구니", "누구세요", "자기소개", "정체", "이름이 뭐야", "뭐하는")
     thanks_farewell = ("고마워", "수고했어", "잘 자", "내일 보자", "좋은 밤", "안녕히")
     comfort = ("위로", "힘들어", "피곤", "지쳤어", "격려", "응원", "배고프", "출출", "졸려", "졸리", "심심해", "심심하")
     memory_q = ("아까", "방금", "기억", "말했었지", "말했지", "좋아하는 분야", "기억해 둬")
@@ -468,8 +469,12 @@ def match_whitelisted_tool(user_request: str, req_lower: str, agent_tools_dir: P
         if tool.exists():
             return "schedule_add_job"
 
-    if ("chromadb" in req_lower or "논문" in user_request or "db에" in req_lower or "db 목록" in req_lower) and any(
-        w in req_lower for w in ("목록", "뭐 있어", "뭐있어", "조회", "알려줘", "보여")
+    # 주제 검색(찾아/검색 등)은 RAG — '목록+알려줘'만으로 인벤토리 화이트리스트에 걸리지 않게 함.
+    _paper_topic_search = any(w in req_lower for w in ("검색", "요약", "설명", "찾아"))
+    if (
+        not _paper_topic_search
+        and ("chromadb" in req_lower or "논문" in user_request or "db에" in req_lower or "db 목록" in req_lower)
+        and any(w in req_lower for w in ("목록", "뭐 있어", "뭐있어", "조회", "알려줘", "보여"))
     ):
         tool = agent_tools_dir / "chromadb_db_inventory.py"
         if tool.exists():
@@ -528,7 +533,12 @@ def router_step1_hard_rules(
         if whitelisted_tool == "tavily_search_tool":
             out["search_intent"] = "web"
         return out
-    if not deps.get_paper_mode(chat_id) and is_factual_lookup(user_request) and (d / "tavily_search_tool.py").exists():
+    if (
+        not deps.get_paper_mode(chat_id)
+        and is_factual_lookup(user_request)
+        and get_search_intent(user_request, req_lower) != "rag"
+        and (d / "tavily_search_tool.py").exists()
+    ):
         return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "tavily_search_tool"}
     recent_tool = deps.resolve_recent_tool(chat_id, user_request)
     if recent_tool and _agent_tool_py_exists(d, recent_tool):
@@ -599,14 +609,14 @@ def router_step1_hard_rules(
     schedule_keywords = ("매일", "매주", "매월", "정기적으로", "스케줄", "예약", "알람", "리마인더")
     if any(kw in user_request for kw in schedule_keywords) and (d / "schedule_add_job.py").exists():
         return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "schedule_add_job"}
+    # 주제·조건이 있는 논문 찾기/검색은 RAG(B) — '목록으로 알려줘'만 있는 문장이 인벤토리보다 먼저 걸리지 않게 순서 우선.
+    if ("chromadb" in req_lower or "논문" in user_request) and any(w in req_lower for w in ("검색", "요약", "설명", "찾아")):
+        return {"route_type": "direct_answer", "router_choice": "B"}
     paper_list_actions = ("목록", "알려줘", "뭐 있어", "뭐있어", "조회", "보여")
     if ("chromadb" in req_lower or "논문" in user_request) and any(w in req_lower for w in paper_list_actions):
         tool = d / "chromadb_db_inventory.py"
         if tool.exists():
             return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "chromadb_db_inventory"}
-        return {"route_type": "direct_answer", "router_choice": "B"}
-
-    if ("chromadb" in req_lower or "논문" in user_request) and any(w in req_lower for w in ("검색", "요약", "설명", "찾아")):
         return {"route_type": "direct_answer", "router_choice": "B"}
     knowledge_verbs = ("요약해 줘", "설명해 줘", "알려 줘", "번역해 줘", "자세히 설명", "요약해줘", "설명해줘")
     code_blockers = ("코드", "크롤링", "스크래핑", "API", "파이썬", "스크립트", "짜줘", "만들어 줘")

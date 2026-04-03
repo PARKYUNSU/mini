@@ -553,7 +553,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 _da_trace("after _invoke_llm_with_fallback", "A python_example")
             elif any(x in req_lower for x in ("안녕", "hello", "hi", "반가", "좋은 아침")):
                 answer = "안녕하세요. 윤수르입니다."
-            elif any(x in user_request for x in ("누구야", "누구니", "누구세요", "자기소개", "정체", "이름이 뭐야", "윤수르")):
+            elif any(x in user_request for x in ("누구야", "누구니", "누구세요", "자기소개", "정체", "이름이 뭐야")):
                 answer = "윤수르입니다."
             elif any(x in user_request for x in ("기분이 어때", "기분은 어때", "기분이 어떠니", "기분은 어떠니", "기분이 어떠냐고")) or re.search(r"(너|넌|너는).*(어때|어떠니|어떠냐)", user_request):
                 answer = "감정을 느끼지는 않지만, 지금처럼 편하게 대화 도와드릴 준비는 되어 있습니다."
@@ -635,11 +635,16 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
+
+        # B(RAG): 브리지(ai_worker) 큐에도 전송과 동일한 Telegram HTML 문자열을 넣어 parse_mode=HTML과 맞춘다.
+        direct_response_out = (
+            _rag_structured_lines_to_html(answer) if router_choice == "B" else answer
+        )
+
         if bot and chat_id:
             if router_choice == "B":
                 # HTML: 제목/불릿 이스케이프로 파싱 실패·벽돌 텍스트 폴백 최소화, \n 유지
-                html_body = _rag_structured_lines_to_html(answer)
-                if _safe_telegram_send(bot, chat_id, html_body[:4000], parse_mode="HTML"):
+                if _safe_telegram_send(bot, chat_id, direct_response_out[:4000], parse_mode="HTML"):
                     print("[DEBUG] DirectAnswer: 텔레그램 HTML 전송 성공")
                 else:
                     plain_answer = _markdown_struct_to_plain(answer)
@@ -670,7 +675,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                             status_message_id=None,
                         )
 
-        return {"direct_response": answer}
+        return {"direct_response": direct_response_out}
     except Exception as e:
         print(f"❌ DirectAnswer 노드 오류: {e}\n{traceback.format_exc()}")
         err_text = f"Error: DirectAnswer: {type(e).__name__}: {e}"

@@ -63,3 +63,25 @@ def test_code_run_with_url_planner_not_smalltalk():
     r = router_step1_hard_rules(msg, low, "x", _DEPS)
     assert r is not None
     assert r.get("route_type") == "planner"
+
+
+def test_paper_find_topic_list_goes_rag_not_chroma_inventory():
+    """'찾아서 … 목록으로'는 주제 검색 → RAG(B). chromadb_db_inventory(전체 목록만)보다 앞선 규칙."""
+    msg = "윤수르, 네 지식 베이스에서 환각(Hallucination) 현상을 다룬 논문 여러 개 찾아서 목록으로 알려줘."
+    low = msg.lower()
+    r = router_step1_hard_rules(msg, low, "x", _DEPS)
+    assert r == {"route_type": "direct_answer", "router_choice": "B"}
+
+
+def test_wake_word_yunsur_rag_query_not_smalltalk():
+    """호칭 '윤수르,'만으로 일상(A) 하드룰에 걸리지 않음 (지식베이스·논문 질의)."""
+    msg = (
+        "윤수르, 네 지식 베이스에서 환각(Hallucination) 현상을 다룬 논문 여러 개 찾아서 목록으로 알려줘."
+    )
+    low = msg.lower()
+    assert is_smalltalk_or_memory_request(msg, low) is False
+    r = router_step1_hard_rules(msg, low, "x", _DEPS)
+    assert r is not None
+    # 논문+목록이면 chromadb_db_inventory 등으로 잡힐 수 있음. 금지: direct_answer (A)만.
+    if r.get("route_type") == "direct_answer":
+        assert r.get("router_choice") == "B"

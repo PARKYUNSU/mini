@@ -48,9 +48,7 @@ from core.config.agent_config import (
 from apps.telegram_bot.agent_telegram import (
     CANCEL_RESTART_CMDS,
     main_keyboard,
-    notify_chat_error,
     safe_telegram_send,
-    safe_telegram_send_and_get,
     strip_wake_word,
 )
 from apps.telegram_bot.paper_list_light import list_stored_papers_text as papers_list_stdlib

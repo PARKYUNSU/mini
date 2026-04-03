@@ -41,8 +41,6 @@ from core.config.agent_config import (
     GROQ_API_KEY,
     LLM_DEBATE_TELEGRAM_LOG_PATH,
     get_gemini_api_keys,
-    LLM_RETRY_DELAY_SEC,
-    LLM_RETRY_MAX,
     PROJECT_ROOT,
     TELEGRAM_TOKEN,
     ALLOWED_CHAT_ID,
@@ -56,7 +54,6 @@ from core.session.agent_session import (
     clear_session,
     get_paper_mode as _get_paper_mode,
     get_session,
-    remember_tool as _remember_tool,
     set_paper_mode as _set_paper_mode,
     stash_pending_image,
     take_pending_image,
@@ -65,10 +62,7 @@ from core.session.agent_session import (
 from core.rag.agent_tool_rag import sync_tool_chroma_from_disk
 from apps.telegram_bot.agent_telegram import (
     CANCEL_RESTART_CMDS as _CANCEL_RESTART_CMDS,
-    cleanup_status_message as _cleanup_status_msg,
-    is_transient_network_error as _is_transient_error,
     main_keyboard as _main_keyboard,
-    notify_chat_error as _notify_chat_error,
     safe_telegram_edit as _safe_telegram_edit,
     safe_telegram_send as _safe_telegram_send,
     safe_telegram_send_and_get as _safe_telegram_send_and_get,

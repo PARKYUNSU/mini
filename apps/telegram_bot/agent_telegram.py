@@ -59,6 +59,34 @@ def escape_telegram_html(text: str) -> str:
     return html.escape(text or "", quote=False)
 
 
+def _effective_parse_mode(text: str, parse_mode: str | None) -> str | None:
+    """명시된 parse_mode가 있으면 그대로. 없으면 <b>...</b>가 있을 때 첫 전송에 HTML을 쓴다."""
+    if parse_mode is not None:
+        return parse_mode
+    t = text or ""
+    if "<b>" in t and "</b>" in t:
+        return "HTML"
+    return None
+
+
+_BOLD_PAIR_PATTERN = re.compile(r"<b>(.*?)</b>", re.DOTALL | re.IGNORECASE)
+
+
+def _line_preserve_telegram_bold(line: str) -> str:
+    """줄 안의 <b>...</b>는 유지하고, 태그 밖 텍스트만 이스케이프한다."""
+    if not line:
+        return ""
+    parts: list[str] = []
+    last = 0
+    for m in _BOLD_PAIR_PATTERN.finditer(line):
+        parts.append(escape_telegram_html(line[last : m.start()]))
+        inner = escape_telegram_html(m.group(1))
+        parts.append(f"<b>{inner}</b>")
+        last = m.end()
+    parts.append(escape_telegram_html(line[last:]))
+    return "".join(parts)
+
+
 def rag_structured_lines_to_html(body: str) -> str:
     """
     RAG 후처리 본문(### 제목 또는 '1. 핵심 주제' 같은 번호 제목 + - bullet)을 Telegram HTML로 변환.
@@ -76,12 +104,18 @@ def rag_structured_lines_to_html(body: str) -> str:
         elif re.fullmatch(r"\*\*.+\*\*", line.strip()):
             inner = line.strip()[2:-2].strip()
             out_lines.append(f"<b>{escape_telegram_html(inner)}</b>")
+        elif line.startswith("- "):
+            rest = line[2:].strip()
+            if "<b>" in rest and "</b>" in rest:
+                out_lines.append("• " + _line_preserve_telegram_bold(rest))
+            else:
+                out_lines.append("• " + escape_telegram_html(rest))
+        elif "<b>" in line and "</b>" in line:
+            out_lines.append(_line_preserve_telegram_bold(line.strip()))
         elif re.match(r"^\d+\.\s+\S", line):
             # "1. 핵심 주제" 형식 (RAG 단순 섹션)
             title = escape_telegram_html(line.strip())
             out_lines.append(f"<b>{title}</b>")
-        elif line.startswith("- "):
-            out_lines.append("• " + escape_telegram_html(line[2:].strip()))
         else:
             out_lines.append(escape_telegram_html(line.strip()))
     return "\n".join(out_lines)
@@ -91,7 +125,8 @@ def rag_structured_lines_to_html(body: str) -> str:
 def _telegram_send_impl(bot, chat_id: str, text: str, parse_mode=None, **kwargs) -> None:
     """네트워크 재시도 적용 전송 (일시적 에러만 1분→3분→5분 재시도)"""
     text = strip_thinking_tags(text)
-    bot.send_message(chat_id, text, parse_mode=parse_mode, **kwargs)
+    pm = _effective_parse_mode(text, parse_mode)
+    bot.send_message(chat_id, text, parse_mode=pm, **kwargs)
 
 
 def safe_telegram_send(bot, chat_id: str, text: str, parse_mode=None, **kwargs) -> bool:
@@ -122,6 +157,8 @@ def safe_telegram_send(bot, chat_id: str, text: str, parse_mode=None, **kwargs) 
 @retry_on_network_error
 def _telegram_send_and_get_impl(bot, chat_id: str, text: str, **kwargs):
     text = strip_thinking_tags(text)
+    parse_mode = kwargs.pop("parse_mode", None)
+    kwargs["parse_mode"] = _effective_parse_mode(text, parse_mode)
     return bot.send_message(chat_id, text, **kwargs)
 
 
@@ -150,14 +187,15 @@ def safe_telegram_send_and_get(bot, chat_id: str, text: str, **kwargs):
 
 
 @retry_on_network_error
-def _telegram_edit_impl(bot, text: str, chat_id: str, message_id: int) -> None:
+def _telegram_edit_impl(bot, text: str, chat_id: str, message_id: int, parse_mode=None) -> None:
     text = strip_thinking_tags(text)
-    bot.edit_message_text(text, chat_id, message_id)
+    pm = _effective_parse_mode(text, parse_mode)
+    bot.edit_message_text(text, chat_id, message_id, parse_mode=pm)
 
 
-def safe_telegram_edit(bot, text: str, chat_id: str, message_id: int) -> bool:
+def safe_telegram_edit(bot, text: str, chat_id: str, message_id: int, parse_mode=None) -> bool:
     try:
-        _telegram_edit_impl(bot, text, chat_id, message_id)
+        _telegram_edit_impl(bot, text, chat_id, message_id, parse_mode=parse_mode)
         return True
     except (ConnectionError, BrokenPipeError) as e:
         print(f"[DEBUG] 텔레그램 수정 일시 오류 (무시): {e}")

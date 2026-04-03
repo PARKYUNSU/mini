@@ -104,6 +104,28 @@ def _set_vector_search_disabled_for_process() -> None:
     )
 
 
+def _published_line_from_record(meta_or_doc: dict) -> str:
+    """
+    Chroma 메타데이터 또는 JSONL 레코드에서 발행일을 찾아 [발행일: YYYY-MM-DD] 한 줄로 반환.
+    없거나 파싱 불가면 빈 문자열.
+    """
+    for key in ("published_date", "published", "date"):
+        v = meta_or_doc.get(key)
+        if v is None:
+            continue
+        s = str(v).strip()
+        if not s:
+            continue
+        s = s.replace("Z", "").replace("z", "")
+        if len(s) >= 10 and s[4] == "-" and s[7] == "-":
+            return f"[발행일: {s[:10]}]"
+        if "T" in s and len(s) >= 10 and s[4] == "-" and s[7] == "-":
+            return f"[발행일: {s[:10]}]"
+        # 짧은 비표준 값도 컨텍스트에 남김
+        return f"[발행일: {s[:32]}]"
+    return ""
+
+
 def _fallback_rag_from_jsonl_tail(*, max_papers: int = 2, max_chars: int = 6500) -> str:
     """Chroma 실패 시 벡터 검색 없이 저장 큐 JSONL 끝에서 최근 논문 몇 편의 텍스트만 사용."""
     raw_path = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
@@ -133,7 +155,9 @@ def _fallback_rag_from_jsonl_tail(*, max_papers: int = 2, max_chars: int = 6500)
         if not chunk and not title:
             continue
         head = f"[{pid}] {title}\n".strip() if (pid or title) else ""
-        piece = (head + (chunk[:2800] if chunk else "")).strip()
+        pub = _published_line_from_record(d)
+        prefix = f"{pub}\n" if pub else ""
+        piece = (prefix + head + (chunk[:2800] if chunk else "")).strip()
         if piece:
             blocks.append(piece)
     if not blocks:
@@ -152,10 +176,15 @@ def _format_chroma_hits(docs: list[str], metas: list[dict[str, str]]) -> str:
         return "관련 문서 없음"
     parts: list[str] = []
     for doc, meta in zip(docs, metas):
+        pub = _published_line_from_record(meta)
         pid = meta.get("paper_id", "")
         title = meta.get("title", "")
         header = f"[{pid}] {title}\n" if (pid or title) else ""
-        parts.append(f"{header}{doc[:800]}" if doc else header)
+        body = doc[:1200] if doc else ""
+        prefix = f"{pub}\n" if pub else ""
+        block = f"{prefix}{header}{body}".strip() if body else f"{prefix}{header}".strip()
+        if block:
+            parts.append(block)
     return "\n\n---\n\n".join(p for p in parts if p.strip())
 
 
