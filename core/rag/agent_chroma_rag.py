@@ -18,7 +18,9 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import threading
+import time
 from pathlib import Path
 
 import chromadb
@@ -37,7 +39,9 @@ _log = logging.getLogger(__name__)
 _SEARCH_TIMEOUT_SEC = 600.0
 
 # 한 번 Chroma query가 프로세스 단위로 반복 실패하면, 봇 재시작 전까지 벡터 검색 생략
-_vector_search_disabled: bool = False
+_VECTOR_CIRCUIT_COOLDOWN_SEC: float = 600.0
+_vector_search_disabled_until: float = 0.0
+_vector_search_retry_used: bool = False
 _vector_search_disabled_lock = threading.Lock()
 
 _chroma_singleton: ChromaRAGTool | None = None
@@ -87,19 +91,51 @@ def _env_chroma_vector_force_disabled() -> bool:
 
 
 def _vector_search_effective_disabled() -> bool:
+    """
+    벡터 검색 쿨다운 서킷 브레이커:
+    - now < disabled_until: disallow (JSONL 폴백)
+    - now >= disabled_until:
+        - retry 1회 미사용이면 allow 1회(retry_used=True)
+        - retry 1회 사용 이후엔 다시 disallow (다음 disable_until 갱신 전까지 vector search 미시도)
+    """
     if _env_chroma_vector_force_disabled():
         return True
+    global _vector_search_retry_used
+    now = time.time()
     with _vector_search_disabled_lock:
-        return _vector_search_disabled
+        if _vector_search_disabled_until <= 0:
+            return False
+        if now < _vector_search_disabled_until:
+            return True
+        # 쿨다운 종료. retry 1회 allow.
+        if not _vector_search_retry_used:
+            _vector_search_retry_used = True
+            print(
+                f"[ChromaRAG TRACE] circuit breaker: cooldown ended, allow 1 retry "
+                f"(disabled_until={_vector_search_disabled_until:.0f})",
+                flush=True,
+            )
+            return False
+        # retry 이미 사용됨 → disallow
+        return True
+
+
+def _clear_vector_search_disabled() -> None:
+    global _vector_search_disabled_until, _vector_search_retry_used
+    with _vector_search_disabled_lock:
+        _vector_search_disabled_until = 0.0
+        _vector_search_retry_used = False
+        print("[ChromaRAG TRACE] circuit breaker: vector search restored (no cooldown)", flush=True)
 
 
 def _set_vector_search_disabled_for_process() -> None:
-    global _vector_search_disabled
+    global _vector_search_disabled_until, _vector_search_retry_used
     with _vector_search_disabled_lock:
-        _vector_search_disabled = True
+        _vector_search_disabled_until = time.time() + _VECTOR_CIRCUIT_COOLDOWN_SEC
+        _vector_search_retry_used = False
     print(
-        "[ChromaRAG TRACE] 이 프로세스에서는 Chroma 벡터 query를 더 이상 시도하지 않고 JSONL 폴백만 사용합니다. "
-        "복구하려면 봇을 재시작하거나 chroma_db를 내장 디스크로 옮기세요.",
+        "[ChromaRAG TRACE] circuit breaker: vector search disabled for 600s. "
+        "쿨다운 종료 후 자동 재시도 1회 진행합니다.",
         flush=True,
     )
 
@@ -126,8 +162,83 @@ def _published_line_from_record(meta_or_doc: dict) -> str:
     return ""
 
 
-def _fallback_rag_from_jsonl_tail(*, max_papers: int = 2, max_chars: int = 6500) -> str:
-    """Chroma 실패 시 벡터 검색 없이 저장 큐 JSONL 끝에서 최근 논문 몇 편의 텍스트만 사용."""
+_TOKEN_SPLIT_RE = re.compile(r"[^0-9A-Za-z가-힣]+")
+
+
+def _tokenize_for_overlap(text: str) -> set[str]:
+    """
+    query 토큰 vs candidate 텍스트 토큰 겹침을 위한 간단 토크나이저.
+    """
+    s = (text or "").lower().strip()
+    if not s:
+        return set()
+    parts = [p for p in _TOKEN_SPLIT_RE.split(s) if p]
+    return {p for p in parts if len(p) >= 2}
+
+
+def _overlap_score(query_tokens: set[str], title_tokens: set[str], abstract_tokens: set[str], body_tokens: set[str]) -> float:
+    if not query_tokens:
+        return 0.0
+    # title/abstract/body 순으로 더 중요하다고 가정해 가중치 부여
+    t = len(query_tokens & title_tokens) * 3.0
+    a = len(query_tokens & abstract_tokens) * 2.0
+    b = len(query_tokens & body_tokens) * 1.0
+    return t + a + b
+
+
+def _render_jsonl_block_for_record(d: dict) -> str:
+    """JSONL 레코드 1개를 LLM 컨텍스트용 블록 문자열로 렌더링."""
+    pid = str(d.get("paper_id", "") or "")
+    title = str(d.get("title", "") or "")
+    abstract = str(d.get("abstract", "") or d.get("summary", "") or "")
+    body = str(d.get("text", "") or d.get("content", "") or "")
+    chunk = body if len(body) > len(abstract) else abstract
+    if not chunk and not title:
+        return ""
+    head = f"[{pid}] {title}\n".strip() if (pid or title) else ""
+    pub = _published_line_from_record(d)
+    prefix = f"{pub}\n" if pub else ""
+    body_snip = (chunk[:2800] if chunk else "") if chunk else ""
+    return f"{prefix}{head}{body_snip}".strip() if body_snip else f"{prefix}{head}".strip()
+
+
+def _rerank_jsonl_candidates(query: str, candidates: list[dict], *, top_n: int) -> list[dict]:
+    """
+    JSONL 후보 레코드를 토큰 겹침 + 메타 보너스로 재정렬 후 top_n만 반환.
+    candidates는 이미 "최근 tail 기반 풀"로 잘라온 상태를 가정.
+    """
+    query_tokens = _tokenize_for_overlap(query)
+    scored: list[tuple[float, int, dict]] = []
+    for rec_idx, d in enumerate(candidates):
+        title = str(d.get("title", "") or "")
+        abstract = str(d.get("abstract", "") or d.get("summary", "") or "")
+        body = str(d.get("text", "") or d.get("content", "") or "")
+        body_snip = body[:2000] if body else ""
+
+        title_tokens = _tokenize_for_overlap(title)
+        abstract_tokens = _tokenize_for_overlap(abstract)
+        body_tokens = _tokenize_for_overlap(body_snip)
+
+        base = _overlap_score(query_tokens, title_tokens, abstract_tokens, body_tokens)
+
+        # 발행일/제목 메타 보너스
+        bonus = 0.0
+        if title.strip():
+            bonus += 2.0
+        if d.get("published_date") or d.get("published") or d.get("date"):
+            bonus += 1.0
+
+        score = base + bonus
+        # rec_idx가 작을수록 더 최근이므로 동점이면 더 최근 우선
+        scored.append((score, rec_idx, d))
+
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    top = scored[: max(1, top_n)]
+    return [d for _, _, d in top]
+
+
+def _fallback_rag_from_jsonl_tail(*, query: str, max_papers: int = 2, max_chars: int = 6500) -> str:
+    """Chroma 실패 시 JSONL 후보를 토큰 겹침 기반으로 재정렬 후 상위 문서 텍스트만 사용."""
     raw_path = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
     if not raw_path.exists():
         return ""
@@ -136,9 +247,10 @@ def _fallback_rag_from_jsonl_tail(*, max_papers: int = 2, max_chars: int = 6500)
             lines = f.readlines()
     except OSError:
         return ""
-    blocks: list[str] = []
+    candidate_pool_size = max(20, max_papers * 4)
+    candidates: list[dict] = []
     for line in reversed(lines):
-        if len(blocks) >= max_papers:
+        if len(candidates) >= candidate_pool_size:
             break
         line = line.strip()
         if not line:
@@ -147,27 +259,26 @@ def _fallback_rag_from_jsonl_tail(*, max_papers: int = 2, max_chars: int = 6500)
             d = json.loads(line)
         except json.JSONDecodeError:
             continue
-        pid = str(d.get("paper_id", "") or "")
-        title = str(d.get("title", "") or "")
-        abstract = str(d.get("abstract", "") or d.get("summary", "") or "")
-        body = str(d.get("text", "") or d.get("content", "") or "")
-        chunk = body if len(body) > len(abstract) else abstract
-        if not chunk and not title:
+        block = _render_jsonl_block_for_record(d)
+        if not block:
             continue
-        head = f"[{pid}] {title}\n".strip() if (pid or title) else ""
-        pub = _published_line_from_record(d)
-        prefix = f"{pub}\n" if pub else ""
-        piece = (prefix + head + (chunk[:2800] if chunk else "")).strip()
-        if piece:
-            blocks.append(piece)
-    if not blocks:
+        candidates.append(d)
+    if not candidates:
         return ""
-    text = "\n\n---\n\n".join(reversed(blocks))
+
+    selected = _rerank_jsonl_candidates(query, candidates, top_n=max_papers)
+    selected_blocks: list[str] = []
+    for d in selected:
+        block = _render_jsonl_block_for_record(d)
+        if block:
+            selected_blocks.append(block)
+    text = "\n\n---\n\n".join(selected_blocks)
     if len(text) > max_chars:
         text = text[:max_chars] + "\n\n...(이하 잘림)"
     return (
-        "[시스템: Chroma 벡터 검색에 실패해 raw_data_queue/crawled_papers.jsonl에서 "
-        "최근 저장된 논문 텍스트만 불러왔습니다. 아래만 근거로 요약하세요.]\n\n" + text
+        "[시스템: Chroma 벡터 검색에 실패해 raw_data_queue/crawled_papers.jsonl의 최근 후보를 "
+        "질문 토큰 겹침 기준으로 재정렬 후 상위 문서 텍스트만 불러왔습니다. 아래만 근거로 요약하세요.]\n\n"
+        + text
     )
 
 
@@ -203,7 +314,7 @@ class ChromaRAGPublic:
     def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "") -> str:
         if _vector_search_effective_disabled():
             print("[ChromaRAG TRACE] vector search skipped (disabled), jsonl only", flush=True)
-            fb = _fallback_rag_from_jsonl_tail()
+            fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
             return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
         return _get_chroma_singleton().search(query, top_k=top_k, session_context=session_context)
 
@@ -293,7 +404,7 @@ class ChromaRAGTool:
 
     def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "") -> str:
         if _vector_search_effective_disabled():
-            fb = _fallback_rag_from_jsonl_tail()
+            fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
             return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
         if session_context:
             _log.debug("ChromaRAGTool.search: _rewrite_query (sync LLM) may run")
@@ -302,6 +413,7 @@ class ChromaRAGTool:
         query = self._strip_urls(query)
         if not query.strip():
             return "관련 문서 없음"
+        query_for_rerank = query
         search_query = self._extract_paper_title(query)
         try:
             _log.debug(
@@ -320,7 +432,7 @@ class ChromaRAGTool:
             print("[ChromaRAG TRACE] search AFTER query", flush=True)
             docs = results["documents"][0] if results["documents"] else []
             metas = results["metadatas"][0] if results.get("metadatas") else [{}] * len(docs)
-            return _format_chroma_hits(
+            hits = _format_chroma_hits(
                 [d if isinstance(d, str) else str(d) for d in docs],
                 [
                     {str(k): ("" if v is None else str(v)) for k, v in (m or {}).items()}
@@ -329,11 +441,13 @@ class ChromaRAGTool:
                     for m in metas
                 ],
             )
+            _clear_vector_search_disabled()
+            return hits
         except Exception as e:
             _log.warning("ChromaRAGTool.search failed: %s", e)
             print(f"[ChromaRAG TRACE] search exception, jsonl fallback: {e}", flush=True)
             _set_vector_search_disabled_for_process()
-            fb = _fallback_rag_from_jsonl_tail()
+            fb = _fallback_rag_from_jsonl_tail(query=query_for_rerank, max_papers=max(1, top_k))
             if fb.strip():
                 return fb
             return f"검색 오류: {e}"
