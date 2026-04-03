@@ -32,8 +32,6 @@ from core.llm.agent_llm import get_rag_query_rewrite_llm
 # 레거시·문서 혼동 방지: subprocess(spawn) Chroma 경로는 비활성화
 os.environ["CHROMA_SUBPROCESS"] = "0"
 
-_PROJECT_ROOT = Path(__file__).resolve().parent
-
 _log = logging.getLogger(__name__)
 
 _SEARCH_TIMEOUT_SEC = 600.0
@@ -108,7 +106,7 @@ def _set_vector_search_disabled_for_process() -> None:
 
 def _fallback_rag_from_jsonl_tail(*, max_papers: int = 2, max_chars: int = 6500) -> str:
     """Chroma 실패 시 벡터 검색 없이 저장 큐 JSONL 끝에서 최근 논문 몇 편의 텍스트만 사용."""
-    raw_path = _PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
+    raw_path = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
     if not raw_path.exists():
         return ""
     try:
@@ -211,7 +209,7 @@ def reset_chroma_rag_singleton_for_tests() -> None:
 def list_stored_papers_text() -> str:
     """raw_data_queue/crawled_papers.jsonl 기준 고유 paper_id·title (Chroma/임베딩 로드 없음)."""
     try:
-        raw_path = _PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
+        raw_path = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
         if not raw_path.exists():
             return "저장된 논문이 없습니다."
         seen: set[str] = set()
