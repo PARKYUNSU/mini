@@ -978,6 +978,10 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
             "실행할까요? **승인** 또는 **거절** 로 답장해 주세요."
         )
 
+        sink = conf.get("bridge_plan_sink")
+        if isinstance(sink, dict) and not bot:
+            sink["last_plan_markdown"] = msg
+
         print(f"[DEBUG] Planner: 계획 {len(plan_lines)}단계 생성 완료, 텔레그램 전송 시도")
         if bot and chat_id:
             if _safe_telegram_send(bot, chat_id, msg, parse_mode="Markdown"):

@@ -5,4 +5,4 @@ LOG="bot.log"
 echo "봇을 백그라운드로 시작합니다. 로그: $LOG"
 nohup bash restart.sh >> "$LOG" 2>&1 &
 echo "PID: $!"
-echo "종료하려면: pkill -f agent_bot.py"
+echo "종료하려면: pkill -f telegram_receiver.py; pkill -f ai_worker.py"

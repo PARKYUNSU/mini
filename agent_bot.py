@@ -26,7 +26,6 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Optional
 
 from langgraph.checkpoint.sqlite import SqliteSaver
-from langgraph.types import Command
 import telebot
 from telebot.types import ReplyKeyboardRemove
 
@@ -50,10 +49,10 @@ from agent_config import (
 )
 from agent_cron_worker import start_cron_worker_daemon
 from agent_graph import build_graph
-from agent_nodes import _is_execution_failure, _run_tool_on_host
+from agent_hitl_state import pending_approvals as _pending_approvals, thread_version as _thread_version
+from agent_nodes import _run_tool_on_host
+from agent_worker_runner import execute_graph_turn
 from agent_session import (
-    AgentSkillLibrary,
-    append_learning as _append_learning,
     clear_session,
     get_paper_mode as _get_paper_mode,
     get_session,
@@ -63,7 +62,6 @@ from agent_session import (
     take_pending_image,
     with_chat_lock as _with_chat_lock,
 )
-from agent_types import STREAM_FAILURE_TELEGRAM_MSG
 from agent_tool_rag import sync_tool_chroma_from_disk
 from agent_telegram import (
     CANCEL_RESTART_CMDS as _CANCEL_RESTART_CMDS,
@@ -79,9 +77,7 @@ from agent_telegram import (
 from agent_vision import download_photo_to_base64 as _download_photo_to_base64, run_vision_analysis as _run_vision_analysis
 
 
-# 텔레그램·HITL 전용 전역 (대화 세션·플랜 캐시 등은 agent_session)
-_pending_approvals: dict[str, tuple[str, dict]] = {}
-_thread_version: dict[str, int] = {}
+# HITL 전역은 agent_hitl_state (단일 프로세스 모드)
 _AGENT_BOT_LOCK_FD_HOLDER: list = []
 
 _TELEGRAM_MSG_SOFT_LIMIT = 3800
@@ -165,8 +161,8 @@ def _acquire_agent_bot_singleton_lock():
         fp.close()
         print(
             "❌ agent_bot.py 가 이미 실행 중입니다. (중복 실행 시 Telegram 409: getUpdates 충돌)\n"
-            "   확인: ps aux | grep agent_bot\n"
-            "   종료: pkill -f 'python.*agent_bot.py'  또는  kill <PID>"
+            "   분리 모드는 telegram_receiver / ai_worker 만 단일 실행하면 됩니다.\n"
+            "   종료: pkill -f telegram_receiver  또는  pkill -f ai_worker"
         )
         sys.exit(1)
     fp.seek(0)
@@ -243,235 +239,18 @@ def main():
         if not is_resume and _thread_version.get(chat_id, 0) > 0:
             tid = f"tg_{chat_id}_{_thread_version[chat_id]}"
         cfg = config if config else {"configurable": {"thread_id": tid, "chat_id": chat_id, "bot": bot}}
-        stream_user_notified = False
-        try:
-            for attempt in range(LLM_RETRY_MAX):
-                try:
-                    print(f"[DEBUG] run_or_resume: graph.stream 시작 (시도 {attempt+1}/{LLM_RETRY_MAX})")
-                    if is_resume:
-                        for event in graph.stream(Command(resume=user_text), cfg, stream_mode="updates"):
-                            if status_msg:
-                                try:
-                                    bot.send_chat_action(chat_id, "typing")
-                                except Exception:
-                                    pass
-                            for node_name, node_state in event.items():
-                                if node_name == "planner_debate" and status_msg:
-                                    _safe_telegram_edit(bot, "🧠 계획을 내부 검토 중입니다...", chat_id, status_msg.message_id)
-                                elif node_name == "executor" and status_msg:
-                                    _safe_telegram_edit(bot, "💻 Groq(Llama)가 코드를 작성 중입니다...", chat_id, status_msg.message_id)
-                                elif node_name == "monitor" and status_msg:
-                                    is_retry = "retry_count" in (node_state or {})
-                                    txt = "🚨 에러 발생! 코드를 스스로 수정하고 재시도합니다..." if is_retry else "🔍 샌드박스에서 코드를 테스트 중입니다..."
-                                    _safe_telegram_edit(bot, txt, chat_id, status_msg.message_id)
-                    else:
-                        init_state = {
-                            "user_request": user_text,
-                            "route_type": "",
-                            "direct_response": "",
-                            "plan": [],
-                            "approval_status": "pending",
-                            "generated_code": "",
-                            "execution_result": "",
-                            "retry_count": 0,
-                            "error_hint": "",
-                        }
-                        if image_base64:
-                            init_state["image_base64"] = image_base64
-                        for event in graph.stream(init_state, cfg, stream_mode="updates"):
-                            if not status_msg:
-                                continue
-                            # router 이후에도 문구가 그대로면 '멈춤'으로 보이므로 노드별로 갱신
-                            if "router" in event:
-                                # 라우터는 이미 끝난 시점이다. 다음 단계 안내를 바로 바꿔야
-                                # '분류 중'에 멈춰 보이는 현상(Planner는 interrupt 전까지 stream 이벤트 없음)을 막는다.
-                                rpatch = event.get("router") or {}
-                                rt = rpatch.get("route_type") if isinstance(rpatch, dict) else None
-                                if rt == "planner":
-                                    _safe_telegram_edit(
-                                        bot,
-                                        "📋 실행 계획 수립 중... (논문·도구 RAG + 로컬 LLM, 최대 ~2분)\n"
-                                        "승인 전까지 화면이 그대로여도 정상입니다.",
-                                        chat_id,
-                                        status_msg.message_id,
-                                    )
-                                elif rt == "direct_answer":
-                                    _safe_telegram_edit(bot, "✍️ 답변을 작성하는 중입니다...", chat_id, status_msg.message_id)
-                                elif rt == "code_run":
-                                    _safe_telegram_edit(
-                                        bot,
-                                        "💻 코드 작성·실행 중... (승인 생략, RAG·계획 단계 생략)",
-                                        chat_id,
-                                        status_msg.message_id,
-                                    )
-                                elif rt == "use_existing_tool":
-                                    _safe_telegram_edit(bot, "🔧 저장된 도구를 실행하는 중입니다...", chat_id, status_msg.message_id)
-                                else:
-                                    _safe_telegram_edit(bot, "🔍 요청 분류 중...", chat_id, status_msg.message_id)
-                            elif "direct_answer" in event:
-                                _safe_telegram_edit(bot, "✍️ 답변을 작성하는 중입니다...", chat_id, status_msg.message_id)
-                            elif "use_existing_tool" in event:
-                                _safe_telegram_edit(bot, "🔧 저장된 도구를 실행하는 중입니다...", chat_id, status_msg.message_id)
-                            elif "planner" in event:
-                                _safe_telegram_edit(
-                                    bot,
-                                    "📋 실행 계획을 세우는 중입니다... (RAG·LLM, 최대 1~2분)",
-                                    chat_id,
-                                    status_msg.message_id,
-                                )
-                            elif "planner_debate" in event:
-                                _safe_telegram_edit(bot, "🧠 계획을 내부 검토 중입니다...", chat_id, status_msg.message_id)
-                            elif "executor" in event:
-                                _safe_telegram_edit(bot, "💻 코드를 작성·실행하는 중입니다...", chat_id, status_msg.message_id)
-                            elif "monitor" in event:
-                                is_retry = "retry_count" in (event.get("monitor") or {})
-                                txt = "🚨 오류 분석 후 재시도 중입니다..." if is_retry else "🔍 실행 결과를 검증하는 중입니다..."
-                                _safe_telegram_edit(bot, txt, chat_id, status_msg.message_id)
-
-                    print("[DEBUG] run_or_resume: graph.stream 완료")
-                    break
-                except Exception as e:
-                    if _is_transient_error(e) and attempt < LLM_RETRY_MAX - 1:
-                        print(f"[DEBUG] 일시적 오류 재시도 ({attempt+1}/{LLM_RETRY_MAX}): {e}")
-                        time.sleep(LLM_RETRY_DELAY_SEC)
-                    else:
-                        stream_user_notified = True
-                        if status_msg and bot:
-                            _safe_telegram_edit(bot, STREAM_FAILURE_TELEGRAM_MSG, chat_id, status_msg.message_id)
-                        elif bot:
-                            _safe_telegram_send(bot, chat_id, STREAM_FAILURE_TELEGRAM_MSG)
-                        raise
-            state = graph.get_state(cfg)
-            values = state.values if hasattr(state, "values") else {}
-            if state.next:
-                print("[DEBUG] run_or_resume: interrupt(승인대기) → _pending_approvals 등록")
-                _pending_approvals[chat_id] = (cfg["configurable"]["thread_id"], cfg)
-                if status_msg and bot:
-                    _safe_telegram_edit(
-                        bot,
-                        "⏳ 실행 계획이 준비되었습니다. 승인 또는 거절을 눌러 주세요.",
-                        chat_id,
-                        status_msg.message_id,
-                    )
-                return
-
-            if chat_id in _pending_approvals:
-                del _pending_approvals[chat_id]
-
-            session = get_session(chat_id)
-            user_msg_for_memory = values.get("user_request", user_text) if is_resume else user_text
-            session.add_turn(user_msg_for_memory, "")
-
-            fatal = (values.get("agent_fatal_error") or "").strip()
-            if fatal:
-                _cleanup_status_msg(bot, chat_id, status_msg)
-                mid = getattr(status_msg, "message_id", None) if status_msg else None
-                if not _notify_chat_error(
-                    bot, chat_id, headline="🚨 처리 중 오류", detail=fatal[:900], status_message_id=mid
-                ):
-                    _notify_chat_error(
-                        bot, chat_id, headline="🚨 처리 중 오류", detail=fatal[:900], status_message_id=None
-                    )
-                session.recent_messages[-1] = (session.recent_messages[-1][0], fatal[:500])
-                session.save()
-                return
-
-            # Direct Answer 또는 Use Existing Tool 경로: 메시지는 이미 전송됨, 메모리만 업데이트
-            route_type = values.get("route_type", "")
-            direct_resp = values.get("direct_response", "")
-            if route_type == "direct_answer" and direct_resp:
-                _cleanup_status_msg(bot, chat_id, status_msg)
-                session.recent_messages[-1] = (session.recent_messages[-1][0], direct_resp[:500])
-                session.maybe_compress()
-                session.save()
-                return
-            if route_type == "use_existing_tool":
-                _cleanup_status_msg(bot, chat_id, status_msg)
-                result = values.get("execution_result", "")
-                used_tool_name = values.get("used_tool_name", "")
-                if used_tool_name:
-                    _remember_tool(chat_id, used_tool_name, user_msg_for_memory)
-                session.recent_messages[-1] = (session.recent_messages[-1][0], result[:500])
-                session.maybe_compress()
-                session.save()
-                return
-
-            if values.get("approval_status") == "rejected":
-                _cleanup_status_msg(bot, chat_id, status_msg)
-                _safe_telegram_send(bot, chat_id, "❌ 거절되었습니다. 계획이 취소되었습니다.")
-                session.recent_messages[-1] = (session.recent_messages[-1][0], "거절되었습니다.")
-                session.save()
-                return
-
-            code = values.get("generated_code", "")
-            result = values.get("execution_result", "")
-            request = values.get("user_request", "")
-
-            saved_tool = None
-            retry_count = values.get("retry_count", 0)
-            error_hint = values.get("error_hint", "")
-            if code and not _is_execution_failure(result) and not values.get("skip_tool_save"):
-                saved_tool = AgentSkillLibrary().save_tool(code, request)
-                if saved_tool:
-                    _remember_tool(chat_id, Path(saved_tool).stem, request)
-                    if retry_count > 0 and error_hint:
-                        _append_learning(request, error_hint, saved_tool)
-
-            if status_msg:
-                try:
-                    bot.delete_message(chat_id, status_msg.message_id)
-                except Exception:
-                    pass
-            out = f"✅ **실행 완료**\n\n```\n{result[:3500]}\n```"
-            if saved_tool:
-                out += f"\n\n📦 도구 저장됨: `agent_tools/{saved_tool}`"
-            if code:
-                out += f"\n\n📝 **생성된 코드**\n```python\n{code[:1500]}\n```"
-            if not _safe_telegram_send(bot, chat_id, out, parse_mode="Markdown"):
-                _safe_telegram_send(bot, chat_id, f"실행 완료\n\n{result[:4000]}")
-
-            session.recent_messages[-1] = (session.recent_messages[-1][0], result[:500])
-            session.maybe_compress()
-            session.save()
-
-        except Exception as e:
-            err_detail = str(e).strip()
-            tb = traceback.format_exc()
-            print(f"❌ 그래프 오류: {e}\n{tb}")
-            if not stream_user_notified:
-                mid = getattr(status_msg, "message_id", None) if status_msg else None
-                headline = "🚨 처리 중 오류가 발생했습니다."
-                detail = (err_detail or type(e).__name__)[:900]
-                el = err_detail.lower()
-                if "11434" in err_detail or "connectionerror" in el or "ollama" in el:
-                    headline = "⚠️ Ollama 연결 오류"
-                    detail = "Ollama 서버에 연결할 수 없습니다. `ollama serve` 실행 후 다시 시도해 주세요."
-                elif _is_transient_error(e):
-                    headline = "⚠️ 일시적 연결 오류"
-                    detail = "네트워크 또는 API 일시 오류입니다. 잠시 후 다시 말씀해 주세요."
-                elif "e2b" in el or "sandbox" in el:
-                    headline = "⚠️ 코드 샌드박스(E2B) 오류"
-                elif "409" in err_detail or ("conflict" in el and "getupdates" in el):
-                    headline = "⚠️ 텔레그램 봇 충돌(409)"
-                    detail = (
-                        "동일 봇 토큰으로 프로세스가 둘 이상 떠 있을 때 발생합니다. "
-                        "agent_bot.py 인스턴스를 하나만 남기고 다시 시도해 주세요."
-                    )
-                ok = _notify_chat_error(
-                    bot,
-                    chat_id,
-                    headline=headline,
-                    detail=detail,
-                    status_message_id=mid,
-                )
-                if not ok:
-                    _notify_chat_error(
-                        bot,
-                        chat_id,
-                        headline=headline,
-                        detail=detail,
-                        status_message_id=None,
-                    )
+        execute_graph_turn(
+            graph,
+            chat_id=chat_id,
+            user_text=user_text,
+            thread_id=str(cfg["configurable"].get("thread_id") or tid),
+            bot=bot,
+            status_msg=status_msg,
+            image_base64=image_base64,
+            is_resume=is_resume,
+            config=cfg,
+            bridge_job_id=None,
+        )
 
     @bot.message_handler(commands=["start"])
     def on_start(message):
