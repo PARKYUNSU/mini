@@ -73,6 +73,9 @@ def rag_structured_lines_to_html(body: str) -> str:
         if line.startswith("### "):
             title = escape_telegram_html(line[4:].strip())
             out_lines.append(f"<b>{title}</b>")
+        elif re.fullmatch(r"\*\*.+\*\*", line.strip()):
+            inner = line.strip()[2:-2].strip()
+            out_lines.append(f"<b>{escape_telegram_html(inner)}</b>")
         elif re.match(r"^\d+\.\s+\S", line):
             # "1. 핵심 주제" 형식 (RAG 단순 섹션)
             title = escape_telegram_html(line.strip())

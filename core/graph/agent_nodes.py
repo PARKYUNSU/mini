@@ -104,12 +104,6 @@ _MINI_ROOT = Path(__file__).resolve().parent
 
 _log = logging.getLogger(__name__)
 
-# RAG 직접 답변: user 말미 단일 지시 (7B 모델용 최소 문구)
-RAG_DIRECT_ANSWER_USER_SUFFIX = (
-    "\n\n[지시사항: 주어진 문서 1개만 사용하여 아래 3가지 항목으로만 깔끔하게 요약할 것. "
-    "(1. 핵심 주제, 2. 주요 방법론, 3. 결론 및 의의)]"
-)
-
 _RAG_HIT_SEP = "\n\n---\n\n"
 
 
@@ -625,11 +619,6 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 session.get_context(), rag_context, last_ai, user_request
             )
             content = _build_message_content(prompt, image_base64)
-            if isinstance(content, str):
-                content = content + RAG_DIRECT_ANSWER_USER_SUFFIX
-            elif isinstance(content, list) and content and isinstance(content[0], dict):
-                t0 = str(content[0].get("text") or "")
-                content[0]["text"] = t0 + RAG_DIRECT_ANSWER_USER_SUFFIX
             _da_trace("before _invoke_llm_with_fallback", "B RAG answer")
             answer = _invoke_llm_with_fallback(
                 [SystemMessage(content=system_prompt), HumanMessage(content=content)],
@@ -643,7 +632,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         chat_id = str(conf.get("chat_id", ""))
         if router_choice == "B":
             answer = _strip_thinking_tags(answer)
-            answer = _enforce_rag_structure_markdown(answer)
+            # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
         if bot and chat_id:
