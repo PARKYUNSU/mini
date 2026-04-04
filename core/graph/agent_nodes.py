@@ -72,6 +72,7 @@ from core.llm.agent_prompts import (
     use_existing_tool_prompt_generic,
 )
 from core.graph.agent_router_rules import (
+    _is_followup_vague_query,
     is_explicit_python_coding_request,
     is_factual_lookup,
     router_step2_build_features as _router_step2_build_features,
@@ -423,10 +424,14 @@ def _maybe_override_rag_route(chat_id: str, user_request: str, result: dict) -> 
     """
     RAG 경로(direct_answer B)인데 논문 모드 OFF + 논문 키워드 없음 → 오버라이드.
     사실 조회(X 알아?)면 Tavily, 아니면 일상(A)으로.
+    단, 후속 질의(그거/더 자세히)는 이전 대화 맥락에서 논문을 참조하므로 오버라이드하지 않음.
     """
     if result.get("route_type") != "direct_answer" or result.get("router_choice") != "B":
         return result
     if is_rag_allowed(chat_id, user_request):
+        return result
+    if _is_followup_vague_query(user_request):
+        print("[DEBUG] Router: 후속 질의 → RAG(B) 유지 (오버라이드 스킵)")
         return result
     # RAG 불가: 사실 조회면 Tavily, 아니면 일상
     if is_factual_lookup(user_request) and (AGENT_TOOLS_DIR / "tavily_search_tool.py").exists():
