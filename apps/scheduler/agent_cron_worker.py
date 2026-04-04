@@ -78,20 +78,35 @@ def _cron_worker_loop_impl() -> None:
                         evt["error"] = error[:200]
                     append_job_run(evt)
 
-                if not prompt or not chat_id:
-                    mark_job_run(job_id)
-                    _log_run("skipped", message_preview="prompt/chat_id 없음")
-                    continue
-                print(f"[cron] 실행: {job_id} → {prompt[:40]}... (chat={chat_id})", flush=True)
-                result = run_scheduled_job(prompt, chat_id)
-                if result == "ok":
-                    mark_job_run(job_id)
-                    _log_run("succeeded", message_preview=prompt[:80])
-                else:
-                    _log_run("failed", error=str(result)[:200], message_preview=prompt[:80])
-                    print(f"[cron] 실행 실패 (next_run 유지): {result}", flush=True)
+                try:
+                    if not prompt or not chat_id:
+                        mark_job_run(job_id)
+                        _log_run("skipped", message_preview="prompt/chat_id 없음")
+                        continue
+                    print(f"[cron] 실행: {job_id} → {prompt[:40]}... (chat={chat_id})", flush=True)
+                    result = run_scheduled_job(prompt, chat_id)
+                    if result == "ok":
+                        mark_job_run(job_id)
+                        _log_run("succeeded", message_preview=prompt[:80])
+                    else:
+                        _log_run("failed", error=str(result)[:200], message_preview=prompt[:80])
+                        print(f"[cron] 실행 실패 (next_run 유지): {result}", flush=True)
+                except Exception as job_exc:
+                    import traceback
+
+                    tb = traceback.format_exc()
+                    err_msg = f"{type(job_exc).__name__}: {job_exc!r}"
+                    print(f"[cron] job 예외 {job_id}: {err_msg}\n{tb}", flush=True)
+                    _log_run("failed", error=err_msg[:200], message_preview=(prompt or "")[:80])
+                    print(
+                        f"[cron] 실행 실패 (next_run 유지, 예외): {job_id} — {err_msg}",
+                        flush=True,
+                    )
         except Exception as e:
-            print(f"[cron] worker 예외: {e}", flush=True)
+            import traceback
+
+            print(f"[cron] worker 예외: {type(e).__name__}: {e!r}", flush=True)
+            traceback.print_exc()
         time.sleep(60)
 
 

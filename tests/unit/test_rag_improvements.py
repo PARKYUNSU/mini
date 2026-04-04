@@ -219,6 +219,63 @@ def test_same_paper_all_chunks_respects_max_chars():
     assert len(merged) <= 5020  # max_chars + truncation message
 
 
+# ─── reference chunk detection / demotion ───
+
+
+def test_is_reference_chunk_detects_doi():
+    from core.rag.agent_chroma_rag import _is_reference_chunk
+
+    ref = (
+        "- [124] Ziwei Ji, Nayeon Lee, Rita Frieske. 2023. "
+        "Survey of Hallucination. _ACM Comput. Surv._ doi: 10.1145/3571730"
+    )
+    assert _is_reference_chunk(ref) is True
+
+
+def test_is_reference_chunk_detects_issn():
+    from core.rag.agent_chroma_rag import _is_reference_chunk
+
+    ref = (
+        "- Ziwei Ji, Nayeon Lee. Survey of hallucination. "
+        "_ACM Comput. Surv._ , 55(12). ISSN 0360-0300. doi: 10.1145/3571730"
+    )
+    assert _is_reference_chunk(ref) is True
+
+
+def test_is_reference_chunk_body_text_not_flagged():
+    from core.rag.agent_chroma_rag import _is_reference_chunk
+
+    body = (
+        "This section redefines judgement criteria of these hallucination types "
+        "to clarify their concepts. We propose PFME, a modular approach."
+    )
+    assert _is_reference_chunk(body) is False
+
+
+def test_is_reference_chunk_inline_citation_not_flagged():
+    from core.rag.agent_chroma_rag import _is_reference_chunk
+
+    body = (
+        ". Hallucination evaluation and detection (Li et al., 2023b; Wang et al., 2023b), "
+        "and hallucination mitigation (Yin et al., 2024) have also been explored."
+    )
+    assert _is_reference_chunk(body) is False
+
+
+def test_demote_reference_chunks_moves_refs_to_end():
+    from core.rag.agent_chroma_rag import _demote_reference_chunks
+
+    docs = [
+        "- [1] Author A. Title. _Journal_ doi: 10.1/x",
+        "Body text discussing hallucination in detail.",
+        "- [2] Author B. Survey. _ACM_ ISSN 1234 doi: 10.2/y",
+    ]
+    metas = [{"paper_id": "A"}, {"paper_id": "B"}, {"paper_id": "C"}]
+    new_docs, new_metas = _demote_reference_chunks(docs, metas)
+    assert new_metas[0]["paper_id"] == "B"
+    assert new_docs[0] == "Body text discussing hallucination in detail."
+
+
 # ─── M3: rag_context in AgentState ───
 
 

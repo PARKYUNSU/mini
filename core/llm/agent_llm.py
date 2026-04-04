@@ -53,6 +53,7 @@ def get_planner_llm():
             top_p=0.8,
             repeat_penalty=1.25,
             reasoning=False,
+            num_predict=1500,
         )
     )
 

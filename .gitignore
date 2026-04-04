@@ -29,7 +29,11 @@
 raw_data_queue/
 finetune_datasets/
 chroma_db/
+chroma_db_backup_*/
 tool_chroma_db/
+check_chroma.py
+test_chroma_minimal.py
+test_chroma_query.py
 agent_checkpoints.db
 agent_checkpoints.db-shm
 agent_checkpoints.db-wal

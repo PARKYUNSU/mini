@@ -71,6 +71,8 @@ CODE_TIMEOUT_SEC = 30
 ERROR_LOG_MAX_CHARS = 1000
 CHECKPOINT_DB_PATH = "./agent_checkpoints.db"
 CHAT_MEMORY_DB_PATH = "./chat_memory.db"
+CHROMA_WRITE_LOCK_PATH = PROJECT_ROOT / ".chroma_write.lock"
+
 BACKFILL_SCRIPT_PATH = PROJECT_ROOT / "apps" / "backfill" / "run_backfill.py"
 BACKFILL_QUARTERLY_SCRIPT_PATH = PROJECT_ROOT / "apps" / "backfill" / "run_backfill_quarterly.py"
 BACKFILL_LOG_PATH = PROJECT_ROOT / "backfill_2023_2026.log"

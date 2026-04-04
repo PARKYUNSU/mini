@@ -22,16 +22,20 @@ def run_scheduled_job(prompt: str, chat_id: str) -> str:
     Returns: "ok" 또는 에러 메시지
     """
     from dotenv import load_dotenv
+
     load_dotenv()
 
     token = os.getenv("TELEGRAM_TOKEN")
     if not token:
         return "TELEGRAM_TOKEN이 설정되지 않았습니다."
 
-    from core.graph.agent_graph import build_graph
-    from core.config.agent_config import CHECKPOINT_DB_PATH
-    from apps.telegram_bot.agent_telegram import safe_telegram_send
-    from langgraph.checkpoint.sqlite import SqliteSaver
+    try:
+        from core.graph.agent_graph import build_graph
+        from core.config.agent_config import CHECKPOINT_DB_PATH
+        from apps.telegram_bot.agent_telegram import safe_telegram_send
+        from langgraph.checkpoint.sqlite import SqliteSaver
+    except Exception as e:
+        return f"import 오류: {e!r}"
 
     try:
         conn = sqlite3.connect(CHECKPOINT_DB_PATH, check_same_thread=False)

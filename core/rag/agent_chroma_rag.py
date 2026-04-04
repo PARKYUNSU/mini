@@ -29,6 +29,7 @@ from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunct
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from core.config.agent_config import CHROMA_DB_PATH, COLLECTION_NAME, EMBEDDING_MODEL, PROJECT_ROOT, RAG_TOP_K
+from core.config.chroma_lock import is_chroma_write_locked
 from core.llm.agent_llm import get_rag_query_rewrite_llm
 
 # 레거시·문서 혼동 방지: subprocess(spawn) Chroma 경로는 비활성화
@@ -309,6 +310,180 @@ def _fallback_rag_from_jsonl_tail(*, query: str, max_papers: int = 2, max_chars:
     )
 
 
+def _keyword_supplement_from_jsonl(
+    query: str, existing_pids: set[str], *, max_extra: int = 5
+) -> list[tuple[str, dict[str, str]]]:
+    """Chroma 벡터 검색으로 놓친 논문을 JSONL에서 키워드 매칭으로 보충.
+
+    title/abstract에 쿼리 핵심 키워드가 포함된 논문 중
+    이미 Chroma 결과에 있는 paper_id를 제외한 것만 반환한다.
+    """
+    raw_path = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
+    if not raw_path.exists():
+        return []
+    q_lower = (query or "").lower()
+    keywords: list[str] = []
+    for token in _TOKEN_SPLIT_RE.split(q_lower):
+        token = token.strip()
+        if len(token) >= 3:
+            keywords.append(token)
+    if not keywords:
+        return []
+    matches: list[tuple[str, dict[str, str]]] = []
+    try:
+        with raw_path.open(encoding="utf-8", errors="replace") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    d = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                pid = str(d.get("paper_id", "") or "")
+                if pid in existing_pids:
+                    continue
+                title = str(d.get("title", "") or "").lower()
+                abstract = str(
+                    d.get("abstract", "") or d.get("summary", "") or ""
+                ).lower()[:500]
+                combined = title + " " + abstract
+                if any(kw in combined for kw in keywords):
+                    pub = _published_line_from_record(d)
+                    title_str = d.get("title", "") or ""
+                    body = str(
+                        d.get("abstract", "")
+                        or d.get("summary", "")
+                        or d.get("text", "")
+                        or ""
+                    )
+                    header = (
+                        f"[{pid}] {title_str}\n" if (pid or title_str) else ""
+                    )
+                    prefix = f"{pub}\n" if pub else ""
+                    block = f"{prefix}{header}{body[:1200]}".strip()
+                    meta: dict[str, str] = {
+                        "paper_id": pid,
+                        "title": title_str,
+                    }
+                    for key in ("published_date", "published", "date"):
+                        v = d.get(key)
+                        if v:
+                            meta[key] = str(v)
+                            break
+                    if block:
+                        matches.append((block, meta))
+                        existing_pids.add(pid)
+                    if len(matches) >= max_extra:
+                        break
+    except OSError:
+        pass
+    if matches:
+        print(
+            f"[ChromaRAG TRACE] keyword_supplement: "
+            f"{len(matches)} papers added from JSONL",
+            flush=True,
+        )
+    return matches
+
+
+_ALIAS_MAP: dict[str, str] = {
+    "transformer": "Attention Is All You Need",
+    "bert": "BERT Pre-training of Deep Bidirectional Transformers",
+    "gpt-3": "Language Models are Few-Shot Learners",
+    "gpt-4": "GPT-4 Technical Report",
+    "gpt-4o": "GPT-4o System Card",
+    "resnet": "Deep Residual Learning for Image Recognition",
+    "gan": "Generative Adversarial Networks",
+    "vit": "An Image is Worth 16x16 Words",
+    "clip": "Learning Transferable Visual Models From Natural Language Supervision",
+    "diffusion": "Denoising Diffusion Probabilistic Models",
+    "rlhf": "Training language models to follow instructions with human feedback",
+    "alphago": "Mastering the game of Go with deep neural networks and tree search",
+    "word2vec": "Efficient Estimation of Word Representations in Vector Space",
+    "adam": "Adam: A Method for Stochastic Optimization",
+    "dropout": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
+    "batch normalization": "Batch Normalization: Accelerating Deep Network Training",
+    "batchnorm": "Batch Normalization: Accelerating Deep Network Training",
+    "llama": "LLaMA: Open and Efficient Foundation Language Models",
+}
+
+_title_index: list[tuple[str, str]] | None = None
+_title_index_lock = threading.Lock()
+
+
+def _load_title_index() -> list[tuple[str, str]]:
+    """JSONL에서 (paper_id, title) 인덱스를 한 번만 로드."""
+    global _title_index
+    if _title_index is not None:
+        return _title_index
+    with _title_index_lock:
+        if _title_index is not None:
+            return _title_index
+        idx: list[tuple[str, str]] = []
+        raw_path = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
+        if raw_path.exists():
+            try:
+                with raw_path.open(encoding="utf-8", errors="replace") as fh:
+                    for line in fh:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            d = json.loads(line)
+                            pid = d.get("paper_id", "")
+                            title = d.get("title", "")
+                            if pid and title:
+                                idx.append((pid, title))
+                        except json.JSONDecodeError:
+                            continue
+            except Exception:
+                pass
+        _title_index = idx
+    return _title_index
+
+
+def _find_paper_by_title(search_query: str, threshold: float = 0.6) -> str | None:
+    """쿼리와 제목 토큰 겹침이 threshold 이상인 paper_id 반환.
+
+    별명(alias)도 지원: 'Transformer' → 'Attention Is All You Need' 등.
+    """
+    effective_query = search_query
+    q_lower = search_query.lower().strip()
+    for alias, canonical in _ALIAS_MAP.items():
+        if alias in q_lower:
+            effective_query = canonical
+            print(
+                f"[ChromaRAG TRACE] alias resolved: '{alias}' -> '{canonical}'",
+                flush=True,
+            )
+            break
+
+    q_tokens = _tokenize_for_overlap(effective_query)
+    if len(q_tokens) < 2:
+        return None
+    idx = _load_title_index()
+    best_pid: str | None = None
+    best_score = 0.0
+    for pid, title in idx:
+        t_tokens = _tokenize_for_overlap(title)
+        if not t_tokens:
+            continue
+        overlap = q_tokens & t_tokens
+        fwd = len(overlap) / len(q_tokens)
+        rev = len(overlap) / len(t_tokens)
+        score = max(fwd, rev)
+        if score > best_score:
+            best_score = score
+            best_pid = pid
+    if best_score >= threshold:
+        print(
+            f"[ChromaRAG TRACE] title_index match: pid={best_pid} score={best_score:.2f}",
+            flush=True,
+        )
+        return best_pid
+    return None
+
+
 def _title_match_rerank(
     docs: list[str], metas: list[dict[str, str]], search_query: str
 ) -> tuple[list[str], list[dict[str, str]]]:
@@ -347,6 +522,61 @@ def _title_match_rerank(
         docs = [docs[best_idx]] + docs[:best_idx] + docs[best_idx + 1 :]
         metas = [metas[best_idx]] + metas[:best_idx] + metas[best_idx + 1 :]
     return docs, metas
+
+
+_ITALIC_JOURNAL_RE = re.compile(r"_[A-Z][A-Za-z].*?_")
+
+
+def _is_reference_chunk(text: str) -> bool:
+    """청크가 논문 참고문헌(bibliography) 항목인지 판별.
+
+    벡터 검색에서 키워드가 참고문헌 인용에 나타나면 의미 없는 청크가 상위로 올라온다.
+    DOI/ISSN/이탤릭 저널명/[번호] 패턴의 조합으로 참고문헌 여부를 추정한다.
+    """
+    s = (text or "").strip()
+    if len(s) < 30:
+        return False
+    sample = s[:600]
+    lower = sample.lower()
+    indicators = 0
+    if "doi:" in lower or "doi.org/" in lower:
+        indicators += 2
+    if "issn" in lower or "isbn" in lower:
+        indicators += 2
+    if _ITALIC_JOURNAL_RE.search(sample):
+        indicators += 1
+    if "https://doi.org/" in sample:
+        indicators += 1
+    bracket_refs = len(re.findall(r"\[\d{1,4}\]", sample))
+    indicators += bracket_refs
+    if re.match(r"\s*[-–•*]?\s*\[?\d*\]?\s*[A-Z][a-z]+\s+[A-Z]", s):
+        indicators += 1
+    return indicators >= 3
+
+
+def _demote_reference_chunks(
+    docs: list[str], metas: list[dict[str, str]]
+) -> tuple[list[str], list[dict[str, str]]]:
+    """참고문헌 청크를 결과 뒤쪽으로 밀어내어 본문 청크가 우선 노출되도록 재정렬."""
+    content_docs: list[str] = []
+    content_metas: list[dict[str, str]] = []
+    ref_docs: list[str] = []
+    ref_metas: list[dict[str, str]] = []
+    demoted = 0
+    for doc, meta in zip(docs, metas):
+        if _is_reference_chunk(doc):
+            ref_docs.append(doc)
+            ref_metas.append(meta)
+            demoted += 1
+        else:
+            content_docs.append(doc)
+            content_metas.append(meta)
+    if demoted:
+        print(
+            f"[ChromaRAG TRACE] demote_reference_chunks: {demoted}/{len(docs)} demoted",
+            flush=True,
+        )
+    return content_docs + ref_docs, content_metas + ref_metas
 
 
 def _dedupe_hits_by_paper(
@@ -539,15 +769,29 @@ class ChromaRAGTool:
         if _vector_search_effective_disabled():
             fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
             return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
+        if is_chroma_write_locked():
+            print("[ChromaRAG TRACE] chroma_write_lock active → JSONL fallback", flush=True)
+            fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
+            return fb if fb.strip() else "관련 문서 없음 (백필 진행 중, 잠시 후 재시도)"
+        original_query = query
         if session_context:
             _log.debug("ChromaRAGTool.search: _rewrite_query (sync LLM) may run")
             print("[ChromaRAG TRACE] search rewrite_query branch", flush=True)
-            query = self._rewrite_query(query, session_context)
+            rewritten = self._rewrite_query(query, session_context)
+            if rewritten and len(rewritten) >= 4 and not rewritten.strip().startswith("<"):
+                query = rewritten
+            else:
+                print(
+                    f"[ChromaRAG TRACE] rewrite rejected (garbage): {rewritten!r:.40}, keeping original",
+                    flush=True,
+                )
         query = self._strip_urls(query)
         if not query.strip():
             return "관련 문서 없음"
         query_for_rerank = query
         search_query = self._extract_paper_title(query)
+        search_query = re.sub(r"[()（）]", " ", search_query).strip()
+        search_query = re.sub(r"\s{2,}", " ", search_query)
         try:
             _log.debug(
                 "ChromaRAGTool.search: before collection.query top_k=%s q_preview=%r",
@@ -573,6 +817,32 @@ class ChromaRAGTool:
                 for m in metas
             ]
             docs_clean, metas_clean = _title_match_rerank(docs_clean, metas_clean, search_query)
+            docs_clean, metas_clean = _demote_reference_chunks(docs_clean, metas_clean)
+
+            # Title-first inject: 원본 쿼리와 search_query 모두로 제목 매칭 시도
+            title_pid = _find_paper_by_title(original_query) or _find_paper_by_title(search_query)
+            if title_pid:
+                existing_pids = {(m.get("paper_id") or "").strip() for m in metas_clean}
+                if title_pid not in existing_pids:
+                    print(
+                        f"[ChromaRAG TRACE] title-first inject: {title_pid} not in vector results, fetching by metadata",
+                        flush=True,
+                    )
+                    inject_docs, inject_metas = self._fetch_depth_chunks(title_pid)
+                    if inject_docs:
+                        docs_clean = inject_docs + docs_clean
+                        metas_clean = inject_metas + metas_clean
+                elif (metas_clean[0].get("paper_id") or "").strip() != title_pid:
+                    # 결과에 있지만 #0이 아니면 승격
+                    for idx_t, m_t in enumerate(metas_clean):
+                        if (m_t.get("paper_id") or "").strip() == title_pid:
+                            print(
+                                f"[ChromaRAG TRACE] title-first promote: #{idx_t} -> #0",
+                                flush=True,
+                            )
+                            docs_clean = [docs_clean[idx_t]] + docs_clean[:idx_t] + docs_clean[idx_t + 1:]
+                            metas_clean = [metas_clean[idx_t]] + metas_clean[:idx_t] + metas_clean[idx_t + 1:]
+                            break
 
             if wants_depth and docs_clean and metas_clean:
                 top_pid = (metas_clean[0].get("paper_id") or "").strip()
@@ -584,6 +854,19 @@ class ChromaRAGTool:
                             if dd[:80] not in existing_texts:
                                 docs_clean.append(dd)
                                 metas_clean.append(dm)
+
+            if not wants_depth:
+                chroma_pids = {
+                    (m.get("paper_id") or "").strip()
+                    for m in metas_clean
+                    if (m.get("paper_id") or "").strip()
+                }
+                supplements = _keyword_supplement_from_jsonl(
+                    query_for_rerank, chroma_pids, max_extra=5
+                )
+                for sdoc, smeta in supplements:
+                    docs_clean.append(sdoc)
+                    metas_clean.append(smeta)
 
             hits = _format_chroma_hits(docs_clean, metas_clean)
             _clear_vector_search_disabled()

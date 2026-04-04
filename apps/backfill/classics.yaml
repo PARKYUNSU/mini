@@ -1,0 +1,106 @@
+# AI/ML 고전·핵심 논문 큐레이션 목록
+# ingest_classics.py가 이 파일을 읽어 순서대로 처리합니다.
+#
+# 추가 방법: 아래 형식으로 항목을 넣으면 됩니다.
+#   - id: "arXiv ID (버전 포함 가능)"
+#     note: "한줄 설명 (로그용, 선택)"
+#
+# arXiv에 없는 논문은 pdf_url을 직접 지정:
+#   - id: "custom-gpt2"
+#     title: "Language Models are Unsupervised Multitask Learners"
+#     pdf_url: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf"
+#     published: "2019-02-14"
+#     authors: ["Alec Radford", "Jeffrey Wu", "Rewon Child", "David Luan", "Dario Amodei", "Ilya Sutskever"]
+
+classics:
+  # ── Transformer / Attention ──
+  - id: "1706.03762"
+    note: "Attention Is All You Need (Transformer)"
+
+  - id: "1810.04805"
+    note: "BERT: Pre-training of Deep Bidirectional Transformers"
+
+  # ── GPT 계열 ──
+  - id: "2005.14165"
+    note: "GPT-3: Language Models are Few-Shot Learners"
+
+  - id: "2303.08774"
+    note: "GPT-4 Technical Report"
+
+  # ── Alignment / RLHF / DPO ──
+  - id: "2203.02155"
+    note: "InstructGPT (Training language models to follow instructions with RLHF)"
+
+  - id: "2305.18290"
+    note: "DPO: Direct Preference Optimization"
+
+  - id: "1706.01427"
+    note: "Deep Reinforcement Learning from Human Preferences"
+
+  # ── Open LLMs ──
+  - id: "2302.13971"
+    note: "LLaMA: Open and Efficient Foundation Language Models"
+
+  - id: "2307.09288"
+    note: "Llama 2: Open Foundation and Fine-Tuned Chat Models"
+
+  - id: "2310.06825"
+    note: "Mistral 7B"
+
+  - id: "2401.04088"
+    note: "Mixtral of Experts"
+
+  - id: "2403.08295"
+    note: "Gemma: Open Models Based on Gemini"
+
+  # ── Efficient Fine-tuning ──
+  - id: "2106.09685"
+    note: "LoRA: Low-Rank Adaptation of Large Language Models"
+
+  - id: "2305.14314"
+    note: "QLoRA: Efficient Finetuning of Quantized Language Models"
+
+  # ── Prompting / Reasoning ──
+  - id: "2201.11903"
+    note: "Chain-of-Thought Prompting"
+
+  - id: "2210.03629"
+    note: "ReAct: Synergizing Reasoning and Acting in Language Models"
+
+  - id: "2305.10601"
+    note: "Tree of Thoughts: Deliberate Problem Solving with LLMs"
+
+  # ── RAG / Retrieval ──
+  - id: "2005.11401"
+    note: "RAG: Retrieval-Augmented Generation for Knowledge-Intensive NLP"
+
+  - id: "2312.10997"
+    note: "Retrieval-Augmented Generation for Large Language Models: A Survey"
+
+  # ── Scaling / Training ──
+  - id: "2001.08361"
+    note: "Scaling Laws for Neural Language Models"
+
+  - id: "2203.15556"
+    note: "Chinchilla: Training Compute-Optimal Large Language Models"
+
+  # ── Vision-Language ──
+  - id: "2304.08485"
+    note: "LLaVA: Visual Instruction Tuning"
+
+  - id: "2010.11929"
+    note: "ViT: An Image is Worth 16x16 Words"
+
+  # ── Diffusion / Generative ──
+  - id: "2006.11239"
+    note: "DDPM: Denoising Diffusion Probabilistic Models"
+
+  - id: "2112.10752"
+    note: "Stable Diffusion: High-Resolution Image Synthesis with Latent Diffusion"
+
+  # ── Agent / Tool Use ──
+  - id: "2303.17580"
+    note: "HuggingGPT: Solving AI Tasks with ChatGPT and its Friends"
+
+  - id: "2308.12950"
+    note: "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation"

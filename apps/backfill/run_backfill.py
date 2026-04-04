@@ -22,11 +22,16 @@ from pathlib import Path
 from dotenv import load_dotenv
 import telebot
 
-from pipelines.ingest.arxiv_fetcher import ArxivFetcher, PaperMetadata
-from pipelines.ingest.cleanup import cleanup_legacy_files
-from pipelines.ingest.data_storage import DataStorage, normalize_paper_id
-from pipelines.ingest.pdf_parser import PdfParser
-from pipelines.ingest.rag_processor import RagProcessor
+_ROOT = Path(__file__).resolve().parents[2]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
+from pipelines.ingest.arxiv_fetcher import ArxivFetcher, PaperMetadata  # noqa: E402
+from pipelines.ingest.cleanup import cleanup_legacy_files  # noqa: E402
+from pipelines.ingest.data_storage import DataStorage, normalize_paper_id  # noqa: E402
+from pipelines.ingest.pdf_parser import PdfParser  # noqa: E402
+from pipelines.ingest.rag_processor import RagProcessor  # noqa: E402
+from core.config.chroma_lock import chroma_write_lock  # noqa: E402
 
 load_dotenv()
 
@@ -308,16 +313,17 @@ def run_backfill(
                     print(f"  ❌ 저장 예외: {e}")
                     continue
 
-                # RAG: Chroma DB 적재
+                # RAG: Chroma DB 적재 (파일 락으로 동시 접근 방지)
                 try:
                     print("  🔗 RAG 청킹 및 Chroma 적재 중...")
-                    chunk_count = rag_processor.add_paper(
-                        markdown_content=markdown_content,
-                        title=paper.title,
-                        published=paper.published,
-                        pdf_url=paper.pdf_url,
-                        paper_id=paper.paper_id,
-                    )
+                    with chroma_write_lock():
+                        chunk_count = rag_processor.add_paper(
+                            markdown_content=markdown_content,
+                            title=paper.title,
+                            published=paper.published,
+                            pdf_url=paper.pdf_url,
+                            paper_id=paper.paper_id,
+                        )
                     print(f"  ✓ RAG 완료 ({chunk_count}개 청크)")
                 except Exception as e:
                     print(f"  ❌ RAG 예외 (건너뜀): {e}")

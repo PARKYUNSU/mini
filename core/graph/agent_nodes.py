@@ -710,10 +710,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 rag_max_chars=rag_max_chars,
             )
             content = _build_message_content(prompt, image_base64)
-            _da_trace("before _invoke_llm_with_fallback", "B RAG answer")
+            rag_timeout = _da_timeout if prefer_single_hit else max(_da_timeout, 90.0)
+            _da_trace("before _invoke_llm_with_fallback", f"B RAG answer timeout={rag_timeout}")
             answer = _invoke_llm_with_fallback(
                 [SystemMessage(content=system_prompt), HumanMessage(content=content)],
-                timeout_sec=_da_timeout,
+                timeout_sec=rag_timeout,
             )
             _da_trace("after _invoke_llm_with_fallback", "B RAG answer")
 
