@@ -253,10 +253,21 @@ def router_python_three_tier(user_request: str, req_lower: str) -> Optional[dict
     return {"route_type": "planner", "router_choice": "C"}
 
 
+def _is_followup_vague_query(user_request: str) -> bool:
+    """이전 대화 맥락을 참조하는 후속/모호한 질의 (Tavily 부적합, RAG 적합)."""
+    u = (user_request or "").strip()
+    if len(u) > 60:
+        return False
+    vague = ("그거", "그게", "그것", "그건", "이거", "저거", "이게", "저게", "더 자세히", "자세히", "아까 그", "방금 그")
+    return any(v in u for v in vague)
+
+
 def is_factual_lookup(user_request: str) -> bool:
-    """사실 조회 질문 (Tavily 적합)."""
+    """사실 조회 질문 (Tavily 적합). 후속/맥락 참조 질의는 제외."""
     r = (user_request or "").lower().strip()
     if len(r) < 5:
+        return False
+    if _is_followup_vague_query(user_request):
         return False
     if any(k in r for k in ("도구", "스케줄", "예약", "job", "chromadb", "논문 목록")):
         return False
@@ -618,7 +629,9 @@ def router_step1_hard_rules(
         if tool.exists():
             return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "chromadb_db_inventory"}
         return {"route_type": "direct_answer", "router_choice": "B"}
-    knowledge_verbs = ("요약해 줘", "설명해 줘", "알려 줘", "번역해 줘", "자세히 설명", "요약해줘", "설명해줘")
+    if _is_followup_vague_query(user_request):
+        return {"route_type": "direct_answer", "router_choice": "B"}
+    knowledge_verbs = ("요약해 줘", "설명해 줘", "알려 줘", "번역해 줘", "자세히 설명", "요약해줘", "설명해줘", "알려줘")
     code_blockers = ("코드", "크롤링", "스크래핑", "API", "파이썬", "스크립트", "짜줘", "만들어 줘")
     if any(k in user_request for k in knowledge_verbs) and not any(c in user_request for c in code_blockers):
         return {"route_type": "direct_answer", "router_choice": "B"}

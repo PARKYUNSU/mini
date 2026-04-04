@@ -299,6 +299,46 @@ def _fallback_rag_from_jsonl_tail(*, query: str, max_papers: int = 2, max_chars:
     )
 
 
+def _title_match_rerank(
+    docs: list[str], metas: list[dict[str, str]], search_query: str
+) -> tuple[list[str], list[dict[str, str]]]:
+    """
+    Chroma 벡터 검색 결과를 제목 일치도로 재정렬.
+    쿼리 토큰의 60%+ 가 논문 title에 존재하면 해당 논문을 최상위로 올린다.
+    벡터 검색은 의미적 유사도만 보므로 정확한 제목 검색에서 오분류가 발생한다.
+    """
+    if not docs or not search_query or len(docs) <= 1:
+        return docs, metas
+    q_tokens = _tokenize_for_overlap(search_query)
+    if len(q_tokens) < 2:
+        return docs, metas
+
+    best_idx = -1
+    best_score = 0.0
+    for i, meta in enumerate(metas):
+        title = (meta.get("title") or "").strip()
+        if not title:
+            continue
+        t_tokens = _tokenize_for_overlap(title)
+        if not t_tokens:
+            continue
+        overlap = q_tokens & t_tokens
+        score = len(overlap) / len(q_tokens)
+        if score > best_score:
+            best_score = score
+            best_idx = i
+
+    if best_idx > 0 and best_score >= 0.6:
+        print(
+            f"[ChromaRAG TRACE] title_match_rerank: promoting #{best_idx} "
+            f"(score={best_score:.2f}) to #0",
+            flush=True,
+        )
+        docs = [docs[best_idx]] + docs[:best_idx] + docs[best_idx + 1 :]
+        metas = [metas[best_idx]] + metas[:best_idx] + metas[best_idx + 1 :]
+    return docs, metas
+
+
 def _dedupe_hits_by_paper(
     docs: list[str], metas: list[dict[str, str]]
 ) -> list[tuple[str, dict[str, str]]]:
@@ -354,12 +394,12 @@ def _get_chroma_singleton() -> ChromaRAGTool:
 class ChromaRAGPublic:
     """어떤 스레드에서든 동일 인터페이스. Chroma는 싱글톤 + Lock으로 직렬화."""
 
-    def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "") -> str:
+    def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "", wants_depth: bool = False) -> str:
         if _vector_search_effective_disabled():
             print("[ChromaRAG TRACE] vector search skipped (disabled), jsonl only", flush=True)
             fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
             return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
-        return _get_chroma_singleton().search(query, top_k=top_k, session_context=session_context)
+        return _get_chroma_singleton().search(query, top_k=top_k, session_context=session_context, wants_depth=wants_depth)
 
     def list_papers(self) -> str:
         return list_stored_papers_text()
@@ -445,7 +485,47 @@ class ChromaRAGTool:
     def _rewrite_query(self, query: str, session_context: str) -> str:
         return _rewrite_rag_query(query, session_context)
 
-    def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "") -> str:
+    def _fetch_depth_chunks(
+        self, paper_id: str, *, max_chunks: int = 15, max_chars: int = 6000
+    ) -> tuple[list[str], list[dict[str, str]]]:
+        """paper_id로 Chroma에서 핵심 청크를 추가 조회 (wants_depth용)."""
+        try:
+            with self._db_lock:
+                extra = self._collection.get(
+                    where={"paper_id": paper_id},
+                    include=["documents", "metadatas"],
+                )
+            e_docs = extra.get("documents") or []
+            e_metas = extra.get("metadatas") or []
+            kept_docs: list[str] = []
+            kept_metas: list[dict[str, str]] = []
+            total = 0
+            skip_patterns = ("Table ", "---|", "picture", "intentionally omitted")
+            for doc, meta in zip(e_docs, e_metas):
+                d = doc if isinstance(doc, str) else str(doc)
+                if len(d) < 30 or any(p in d[:60] for p in skip_patterns):
+                    continue
+                if total + len(d) > max_chars:
+                    break
+                kept_docs.append(d)
+                kept_metas.append(
+                    {str(k): ("" if v is None else str(v)) for k, v in (meta or {}).items()}
+                    if isinstance(meta, dict)
+                    else {}
+                )
+                total += len(d)
+                if len(kept_docs) >= max_chunks:
+                    break
+            print(
+                f"[ChromaRAG TRACE] depth chunks: pid={paper_id} fetched={len(e_docs)} kept={len(kept_docs)} chars={total}",
+                flush=True,
+            )
+            return kept_docs, kept_metas
+        except Exception as exc:
+            print(f"[ChromaRAG TRACE] depth chunks fetch failed: {exc}", flush=True)
+            return [], []
+
+    def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "", wants_depth: bool = False) -> str:
         if _vector_search_effective_disabled():
             fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
             return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
@@ -475,15 +555,27 @@ class ChromaRAGTool:
             print("[ChromaRAG TRACE] search AFTER query", flush=True)
             docs = results["documents"][0] if results["documents"] else []
             metas = results["metadatas"][0] if results.get("metadatas") else [{}] * len(docs)
-            hits = _format_chroma_hits(
-                [d if isinstance(d, str) else str(d) for d in docs],
-                [
-                    {str(k): ("" if v is None else str(v)) for k, v in (m or {}).items()}
-                    if isinstance(m, dict)
-                    else {}
-                    for m in metas
-                ],
-            )
+            docs_clean = [d if isinstance(d, str) else str(d) for d in docs]
+            metas_clean = [
+                {str(k): ("" if v is None else str(v)) for k, v in (m or {}).items()}
+                if isinstance(m, dict)
+                else {}
+                for m in metas
+            ]
+            docs_clean, metas_clean = _title_match_rerank(docs_clean, metas_clean, search_query)
+
+            if wants_depth and docs_clean and metas_clean:
+                top_pid = (metas_clean[0].get("paper_id") or "").strip()
+                if top_pid:
+                    depth_docs, depth_metas = self._fetch_depth_chunks(top_pid)
+                    if depth_docs:
+                        existing_texts = set(d[:80] for d in docs_clean)
+                        for dd, dm in zip(depth_docs, depth_metas):
+                            if dd[:80] not in existing_texts:
+                                docs_clean.append(dd)
+                                metas_clean.append(dm)
+
+            hits = _format_chroma_hits(docs_clean, metas_clean)
             _clear_vector_search_disabled()
             return hits
         except Exception as e:

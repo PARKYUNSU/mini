@@ -15,7 +15,9 @@ pytestmark = pytest.mark.unit
 from core.graph.agent_router_rules import (  # noqa: E402
     RouterStep1Deps,
     _ascii_greeting_in_smalltalk,
+    _is_followup_vague_query,
     _req_lower_for_ascii_greeting_scan,
+    is_factual_lookup,
     is_smalltalk_or_memory_request,
     router_step1_hard_rules,
 )
@@ -85,3 +87,28 @@ def test_wake_word_yunsur_rag_query_not_smalltalk():
     # 논문+목록이면 chromadb_db_inventory 등으로 잡힐 수 있음. 금지: direct_answer (A)만.
     if r.get("route_type") == "direct_answer":
         assert r.get("router_choice") == "B"
+
+
+def test_followup_vague_not_tavily():
+    """'그거 더 자세히 알려줘' 같은 후속 질의는 Tavily로 빠지면 안 됨."""
+    assert _is_followup_vague_query("그거 더 자세히 알려줘") is True
+    assert _is_followup_vague_query("그게 뭐야") is True
+    assert _is_followup_vague_query("이거 설명해줘") is True
+    assert is_factual_lookup("그거 더 자세히 알려줘") is False
+    assert is_factual_lookup("그게 뭐야") is False
+
+
+def test_followup_routes_to_rag_not_tavily():
+    """후속 질의 '그거 더 자세히 알려줘'는 RAG(B)로 라우팅."""
+    msg = "그거 더 자세히 알려줘"
+    low = msg.lower()
+    r = router_step1_hard_rules(msg, low, "x", _DEPS)
+    assert r is not None
+    assert r.get("route_type") == "direct_answer"
+    assert r.get("router_choice") == "B"
+
+
+def test_normal_factual_lookup_still_works():
+    """일반 사실 조회('비트코인 뭐야?')는 여전히 factual_lookup으로 분류."""
+    assert is_factual_lookup("비트코인 뭐야?") is True
+    assert _is_followup_vague_query("비트코인 뭐야?") is False

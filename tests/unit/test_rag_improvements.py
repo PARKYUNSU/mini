@@ -141,6 +141,84 @@ def test_prefer_single_no_depth_long_no_keyword():
     assert _prefer_single_hit_rag_context(long_q, wants_depth=False) is False
 
 
+# ─── title_match_rerank ───
+
+
+def test_title_match_rerank_promotes_exact_title():
+    from core.rag.agent_chroma_rag import _title_match_rerank
+
+    docs = ["body_wrong", "body_also_wrong", "body_correct"]
+    metas = [
+        {"title": "When Right Meets Wrong: GRPO something", "paper_id": "A"},
+        {"title": "Molecular Facts: Decontextualization", "paper_id": "B"},
+        {"title": "Dialectical Alignment: Resolving the Tension of 3H", "paper_id": "C"},
+    ]
+    new_docs, new_metas = _title_match_rerank(docs, metas, "Dialectical Alignment")
+    assert new_metas[0]["paper_id"] == "C", f"Expected C at #0 but got {new_metas[0]}"
+    assert new_docs[0] == "body_correct"
+
+
+def test_title_match_rerank_no_change_when_already_top():
+    from core.rag.agent_chroma_rag import _title_match_rerank
+
+    docs = ["d1", "d2"]
+    metas = [{"title": "GPT-4o Technical Report"}, {"title": "Other Paper"}]
+    new_docs, new_metas = _title_match_rerank(docs, metas, "GPT-4o Technical Report")
+    assert new_docs[0] == "d1"
+
+
+def test_title_match_rerank_no_change_on_low_overlap():
+    from core.rag.agent_chroma_rag import _title_match_rerank
+
+    docs = ["d1", "d2"]
+    metas = [{"title": "Alpha Beta"}, {"title": "Gamma Delta"}]
+    new_docs, _ = _title_match_rerank(docs, metas, "totally unrelated query words")
+    assert new_docs == ["d1", "d2"]
+
+
+# ─── depth: _rag_context_same_paper_all_chunks ───
+
+
+def test_same_paper_all_chunks_merges_by_pid():
+    from core.graph.agent_nodes import _rag_context_same_paper_all_chunks
+
+    blocks = [
+        "[2404.00486v1] Dialectical Alignment\nchunk1 body",
+        "[2603.13134v1] When Right Meets Wrong\nother paper body",
+        "[2404.00486v1] Dialectical Alignment\nchunk2 body with more details",
+    ]
+    ctx = "\n\n---\n\n".join(blocks)
+    merged = _rag_context_same_paper_all_chunks(ctx)
+    assert "chunk1 body" in merged
+    assert "chunk2 body" in merged
+    assert "When Right Meets Wrong" not in merged
+
+
+def test_same_paper_all_chunks_single_block():
+    from core.graph.agent_nodes import _rag_context_same_paper_all_chunks
+
+    ctx = "[2404.00486v1] Dialectical Alignment\nonly one chunk"
+    merged = _rag_context_same_paper_all_chunks(ctx)
+    assert "only one chunk" in merged
+
+
+def test_same_paper_all_chunks_no_pid():
+    from core.graph.agent_nodes import _rag_context_same_paper_all_chunks
+
+    ctx = "Some text without paper_id markers"
+    merged = _rag_context_same_paper_all_chunks(ctx)
+    assert "Some text" in merged
+
+
+def test_same_paper_all_chunks_respects_max_chars():
+    from core.graph.agent_nodes import _rag_context_same_paper_all_chunks
+
+    blocks = [f"[PID] Title\n{'x' * 3000}" for _ in range(5)]
+    ctx = "\n\n---\n\n".join(blocks)
+    merged = _rag_context_same_paper_all_chunks(ctx, max_chars=5000)
+    assert len(merged) <= 5020  # max_chars + truncation message
+
+
 # ─── M3: rag_context in AgentState ───
 
 

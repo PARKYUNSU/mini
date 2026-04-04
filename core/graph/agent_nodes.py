@@ -154,6 +154,40 @@ def _rag_context_first_hit_only(rag_context: str, *, max_chars: int = 5500) -> s
     return first
 
 
+def _rag_context_same_paper_all_chunks(rag_context: str, *, max_chars: int = 8000) -> str:
+    """첫 번째(최고 관련도) 논문의 paper_id와 동일한 모든 청크를 병합.
+
+    wants_depth=True일 때 단일 청크 대신 같은 논문의 여러 청크를 합쳐서
+    LLM이 방법론·결론·수치 등 더 풍부한 정보를 추출하도록 한다.
+    """
+    s = (rag_context or "").strip()
+    if not s or s == "관련 문서 없음":
+        return rag_context
+    if _RAG_HIT_SEP not in s:
+        return s[:max_chars] + ("...(이하 잘림)" if len(s) > max_chars else "")
+    blocks = [b.strip() for b in s.split(_RAG_HIT_SEP) if b.strip()]
+    if not blocks:
+        return rag_context
+
+    pid_re = re.compile(r"^\[([^\]]+)\]")
+    first_pid = ""
+    m = pid_re.search(blocks[0])
+    if m:
+        first_pid = m.group(1).strip()
+
+    if not first_pid:
+        merged = blocks[0][:max_chars]
+        if len(blocks[0]) > max_chars:
+            merged += "\n\n...(이하 잘림)"
+        return merged
+
+    same = [b for b in blocks if f"[{first_pid}]" in b]
+    merged = _RAG_HIT_SEP.join(same)
+    if len(merged) > max_chars:
+        merged = merged[:max_chars].rstrip() + "\n\n...(이하 잘림)"
+    return merged
+
+
 def _rag_context_top_n_hits(rag_context: str, *, n: int = 5) -> str:
     """
     Chroma `_format_chroma_hits` 구분선 기준 상위 N개 블록만 잘라 LLM에 전달.
@@ -611,7 +645,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             prefer_single_hit = _prefer_single_hit_rag_context(user_request, wants_depth=wants_depth)
             # 단일은 Top-1, 다중은 Top-5로 LLM 컨텍스트를 제한하기 때문에
             # Chroma query는 넉넉히 가져와도 되고, 최종 전달은 뒤에서 잘라냄
-            top_k = (RAG_TOP_K * 2 if wants_depth else RAG_TOP_K) if prefer_single_hit else max(RAG_TOP_K * 4, 10)
+            if prefer_single_hit:
+                top_k = max(RAG_TOP_K * 4, 10) if wants_depth else RAG_TOP_K
+            else:
+                top_k = max(RAG_TOP_K * 4, 10)
 
             _da_trace(
                 "before get_chroma_rag_tool()",
@@ -635,10 +672,13 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     _da_trace("rag_context reused from router", f"len={len(rag_context)}")
                 else:
                     session_ctx = session.get_recent_context(max_turns=2)
-                    _da_trace("before rag.search()", f"top_k={top_k} (sync collection.query)")
-                    rag_context = rag.search(user_request, top_k=top_k, session_context=session_ctx)
+                    _da_trace("before rag.search()", f"top_k={top_k} wants_depth={wants_depth} (sync collection.query)")
+                    rag_context = rag.search(user_request, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth)
                     _da_trace("after rag.search()", f"len={len(rag_context)}")
-                if prefer_single_hit:
+                if prefer_single_hit and wants_depth:
+                    rag_context = _rag_context_same_paper_all_chunks(rag_context)
+                    _da_trace("rag_context same-paper merged (depth)", f"len={len(rag_context)}")
+                elif prefer_single_hit:
                     rag_context = _rag_context_first_hit_only(rag_context)
                     _da_trace("rag_context top-1 only", f"len={len(rag_context)}")
                 else:
@@ -654,7 +694,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 system_prompt += DIRECT_ANSWER_RAG_DEPTH_SUFFIX
 
             output_template = RAG_OUTPUT_TEMPLATE_SINGLE_STRICT if prefer_single_hit else RAG_OUTPUT_TEMPLATE_MULTI_STRICT
-            rag_max_chars = 5000 if prefer_single_hit else 8000
+            rag_max_chars = 8000 if (prefer_single_hit and wants_depth) else (5000 if prefer_single_hit else 8000)
 
             prompt = direct_answer_rag_user(
                 session.get_context(),

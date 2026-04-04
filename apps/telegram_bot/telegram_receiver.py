@@ -220,68 +220,58 @@ def main() -> None:
         chat_id = str(message.chat.id)
         if chat_id not in allowed_ids:
             return
-        subprocess.Popen(
-            [
-                sys.executable,
-                "-c",
-                "from apps.backfill.agent_backfill_telegram import start_backfill_process; start_backfill_process()",
-            ],
-            cwd=str(PROJECT_ROOT),
-            start_new_session=True,
-        )
-        bot.reply_to(message, f"백필 기동 요청. 로그: `{BACKFILL_LOG_PATH.name}`", parse_mode="Markdown")
+        try:
+            from apps.backfill.agent_backfill_telegram import start_backfill_process
+            ok, msg = start_backfill_process()
+            if ok:
+                bot.reply_to(message, f"✅ {msg}\n로그: `{BACKFILL_LOG_PATH.name}`", parse_mode="Markdown")
+            else:
+                bot.reply_to(message, f"⚠️ {msg}")
+        except Exception as e:
+            bot.reply_to(message, f"❌ 백필 시작 오류: {e}")
 
     @bot.message_handler(commands=["backfill_stop"])
     def on_backfill_stop(message):
         chat_id = str(message.chat.id)
         if chat_id not in allowed_ids:
             return
-        subprocess.run(
-            [
-                sys.executable,
-                "-c",
-                "from apps.backfill.agent_backfill_telegram import stop_backfill_process; stop_backfill_process()",
-            ],
-            cwd=str(PROJECT_ROOT),
-            timeout=120,
-        )
-        bot.reply_to(message, "백필 중지 요청 완료")
+        try:
+            from apps.backfill.agent_backfill_telegram import stop_backfill_process
+            ok, msg = stop_backfill_process()
+            bot.reply_to(message, f"{'✅' if ok else '⚠️'} {msg}", parse_mode="Markdown")
+        except Exception as e:
+            bot.reply_to(message, f"❌ 백필 중지 오류: {e}")
 
     @bot.message_handler(commands=["debate_start", "논문토론시작"])
     def on_debate_start(message):
         chat_id = str(message.chat.id)
         if chat_id not in allowed_ids:
             return
-        subprocess.Popen(
-            [
-                sys.executable,
-                "-c",
-                "from apps.telegram_bot.agent_debate_telegram import start_llm_debate_telegram_process; start_llm_debate_telegram_process()",
-            ],
-            cwd=str(PROJECT_ROOT),
-            start_new_session=True,
-        )
-        bot.reply_to(
-            message,
-            f"🧪 토론 기동 요청.\n로그: `{LLM_DEBATE_TELEGRAM_LOG_PATH.name}`",
-            parse_mode="Markdown",
-        )
+        try:
+            from apps.telegram_bot.agent_debate_telegram import start_llm_debate_telegram_process
+            ok, msg = start_llm_debate_telegram_process()
+            if ok:
+                bot.reply_to(
+                    message,
+                    f"✅ {msg}\n로그: `{LLM_DEBATE_TELEGRAM_LOG_PATH.name}`",
+                    parse_mode="Markdown",
+                )
+            else:
+                bot.reply_to(message, f"⚠️ {msg}")
+        except Exception as e:
+            bot.reply_to(message, f"❌ 토론 시작 오류: {e}")
 
     @bot.message_handler(commands=["debate_stop", "논문토론중지"])
     def on_debate_stop(message):
         chat_id = str(message.chat.id)
         if chat_id not in allowed_ids:
             return
-        subprocess.run(
-            [
-                sys.executable,
-                "-c",
-                "from apps.telegram_bot.agent_debate_telegram import stop_llm_debate_telegram_process; stop_llm_debate_telegram_process()",
-            ],
-            cwd=str(PROJECT_ROOT),
-            timeout=120,
-        )
-        bot.reply_to(message, "🛑 토론 중지 요청")
+        try:
+            from apps.telegram_bot.agent_debate_telegram import stop_llm_debate_telegram_process
+            ok, msg = stop_llm_debate_telegram_process()
+            bot.reply_to(message, f"{'🛑' if ok else '⚠️'} {msg}", parse_mode="Markdown")
+        except Exception as e:
+            bot.reply_to(message, f"❌ 토론 중지 오류: {e}")
 
     @bot.message_handler(commands=["schedule", "스케줄"])
     def on_schedule(message):
