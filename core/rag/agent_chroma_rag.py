@@ -67,7 +67,8 @@ def _extract_paper_title_text(query: str) -> str:
 def _rewrite_rag_query(query: str, session_context: str) -> str:
     if not session_context or len(query) > 50:
         return query
-    vague = ("그거", "그게", "그것", "그건", "이거", "저거", "이게", "저게", "더 자세히", "자세히 설명")
+    vague = ("그거", "그게", "그것", "그건", "이거", "저거", "이게", "저게",
+             "더 자세히", "자세히 설명", "더 자세하게", "자세하게")
     if not any(v in query for v in vague):
         return query
     try:
@@ -75,13 +76,22 @@ def _rewrite_rag_query(query: str, session_context: str) -> str:
         resp = llm.invoke(
             [
                 SystemMessage(
-                    content="대화 맥락을 보고 사용자가 '그거', '더 자세히' 등으로 물어본 대상의 구체적 검색어를 1문장으로만 출력. 검색어만. 사고 과정 출력 금지."
+                    content=(
+                        "사용자가 '그거', '더 자세히' 등으로 참조하는 대상의 **논문 제목 또는 핵심 키워드**를 "
+                        "10단어 이내로 출력하세요. 설명·사고과정·문장 금지. 키워드만."
+                    )
                 ),
-                HumanMessage(content=f"[대화]\n{session_context[:800]}\n\n[현재 질문]\n{query}\n\n검색어:"),
+                HumanMessage(content=f"[대화]\n{session_context[:600]}\n\n[질문]\n{query}\n\n키워드:"),
             ]
         )
-        rewritten = (resp.content or query).strip()
-        return rewritten[:200] if rewritten else query
+        raw = (resp.content or "").strip()
+        # <think>...</think> 태그 제거
+        cleaned = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+        # 첫 줄만 사용 (설명 문장 방지)
+        first_line = cleaned.split("\n")[0].strip()
+        rewritten = first_line[:80] if first_line else query
+        print(f"[ChromaRAG TRACE] rewrite: '{query}' → '{rewritten}'", flush=True)
+        return rewritten if rewritten else query
     except Exception:
         return query
 
