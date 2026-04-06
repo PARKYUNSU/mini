@@ -499,7 +499,7 @@ def match_whitelisted_tool(user_request: str, req_lower: str, agent_tools_dir: P
 
     weather_tool = agent_tools_dir / "서울_지금_현재_날씨_알려줘.py"
     if weather_tool.exists():
-        if "서울" in user_request and "날씨" in user_request and "미세먼지" not in user_request:
+        if "서울" in user_request and "날씨" in user_request:
             return "서울_지금_현재_날씨_알려줘"
 
     smart_plug_tool = agent_tools_dir / "smart_plug.py"
