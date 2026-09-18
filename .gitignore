@@ -23,11 +23,15 @@
 .telegram_receiver.pid
 .ai_worker.lock
 .ai_worker.pid
+.phase3_telegram_bot.pid
+idea_vault.sqlite
 .bridge/
 
 # 출력 데이터
 raw_data_queue/
-finetune_datasets/
+finetune_datasets/*
+!finetune_datasets/v4/
+finetune_datasets/v4/raw/
 chroma_db/
 chroma_db_backup_*/
 tool_chroma_db/
@@ -39,6 +43,7 @@ agent_checkpoints.db-shm
 agent_checkpoints.db-wal
 chat_memory.db
 *.log
+morning_cache.json
 
 # macOS
 .DS_Store
@@ -64,3 +69,6 @@ agent_tools/saved/*
 __pycache__/
 *.py[cod]
 *.egg-info/
+yunsur_v4_adapter/
+yunsur_v4_adapter.tgz
+*.gguf

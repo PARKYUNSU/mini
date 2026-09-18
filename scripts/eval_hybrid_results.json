@@ -1,0 +1,765 @@
+{
+  "primary_k": 5,
+  "top_k_list": [
+    5,
+    8,
+    10,
+    15
+  ],
+  "baseline_by_k": {
+    "5": {
+      "recall": 0.28,
+      "precision1": 0.24,
+      "mrr": 0.25
+    },
+    "8": {
+      "recall": 0.36,
+      "precision1": 0.24,
+      "mrr": 0.2614285714285714
+    },
+    "10": {
+      "recall": 0.4,
+      "precision1": 0.24,
+      "mrr": 0.26587301587301587
+    },
+    "15": {
+      "recall": 0.48,
+      "precision1": 0.24,
+      "mrr": 0.27284271284271283
+    }
+  },
+  "legacy_by_k": {
+    "5": {
+      "recall": 0.64,
+      "precision1": 0.48,
+      "mrr": 0.5366666666666666
+    },
+    "8": {
+      "recall": 0.68,
+      "precision1": 0.48,
+      "mrr": 0.5416666666666666
+    },
+    "10": {
+      "recall": 0.68,
+      "precision1": 0.48,
+      "mrr": 0.5416666666666666
+    },
+    "15": {
+      "recall": 0.76,
+      "precision1": 0.48,
+      "mrr": 0.5478571428571428
+    }
+  },
+  "production_by_k": {
+    "5": {
+      "recall": 0.44,
+      "precision1": 0.2,
+      "mrr": 0.26733333333333337
+    },
+    "8": {
+      "recall": 0.52,
+      "precision1": 0.2,
+      "mrr": 0.2780476190476191
+    },
+    "10": {
+      "recall": 0.56,
+      "precision1": 0.2,
+      "mrr": 0.28204761904761905
+    },
+    "15": {
+      "recall": 0.64,
+      "precision1": 0.2,
+      "mrr": 0.28876090576090574
+    }
+  },
+  "baseline": {
+    "recall": 0.28,
+    "precision1": 0.24,
+    "mrr": 0.25
+  },
+  "hybrid_legacy": {
+    "recall": 0.64,
+    "precision1": 0.48,
+    "mrr": 0.5366666666666666
+  },
+  "production_hybrid": {
+    "recall": 0.44,
+    "precision1": 0.2,
+    "mrr": 0.26733333333333337
+  },
+  "hybrid_rerank": {
+    "recall": 0.4,
+    "precision1": 0.2,
+    "mrr": 0.256
+  },
+  "legacy_vs_production_gap": [
+    {
+      "query": "retrieval augmented generation survey",
+      "paper_id": "2408.08921",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #15 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 15
+    },
+    {
+      "query": "retrieval augmented generation survey",
+      "paper_id": "2504.08748",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #14 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 14
+    },
+    {
+      "query": "RAG retrieval accuracy improvement",
+      "paper_id": "2501.02702",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #42 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 42
+    },
+    {
+      "query": "RAG retrieval accuracy improvement",
+      "paper_id": "2504.08758",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #9 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 9
+    },
+    {
+      "query": "RAG retrieval accuracy improvement",
+      "paper_id": "2506.00527",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #49 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 49
+    },
+    {
+      "query": "RAG retrieval accuracy improvement",
+      "paper_id": "2603.03541",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #28 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 28
+    },
+    {
+      "query": "RAG retrieval accuracy improvement",
+      "paper_id": "2603.26668",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #25 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 25
+    },
+    {
+      "query": "hallucination mitigation in RAG systems",
+      "paper_id": "2409.20550",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #9 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 9
+    },
+    {
+      "query": "hallucination mitigation in RAG systems",
+      "paper_id": "2507.04480",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #47 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 47
+    },
+    {
+      "query": "hallucination mitigation in RAG systems",
+      "paper_id": "2512.08892",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #11 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 11
+    },
+    {
+      "query": "RAG evaluation benchmark",
+      "paper_id": "2409.15763",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #25 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 25
+    },
+    {
+      "query": "RAG evaluation benchmark",
+      "paper_id": "2411.02832",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #27 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 27
+    },
+    {
+      "query": "RAG evaluation benchmark",
+      "paper_id": "2504.17137",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #21 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 21
+    },
+    {
+      "query": "RAG evaluation benchmark",
+      "paper_id": "2602.21553",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #7 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 7
+    },
+    {
+      "query": "retrieval augmented generation for question answering",
+      "paper_id": "2309.16035",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #13 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 13
+    },
+    {
+      "query": "retrieval augmented generation for question answering",
+      "paper_id": "2410.22353",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #26 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 26
+    },
+    {
+      "query": "retrieval augmented generation for question answering",
+      "paper_id": "2504.04915",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #24 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 24
+    },
+    {
+      "query": "retrieval augmented generation for question answering",
+      "paper_id": "2506.21098",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #41 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 41
+    },
+    {
+      "query": "retrieval augmented generation for question answering",
+      "paper_id": "2509.09713",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #11 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 11
+    },
+    {
+      "query": "discourse aware retrieval augmented generation",
+      "paper_id": "2401.13256",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #8 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 8
+    },
+    {
+      "query": "discourse aware retrieval augmented generation",
+      "paper_id": "2406.05794",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #28 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 28
+    },
+    {
+      "query": "discourse aware retrieval augmented generation",
+      "paper_id": "2502.13847",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #7 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 7
+    },
+    {
+      "query": "discourse aware retrieval augmented generation",
+      "paper_id": "2509.21371",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #14 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 14
+    },
+    {
+      "query": "RAG playground evaluation framework",
+      "paper_id": "2405.07437",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #13 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 13
+    },
+    {
+      "query": "RAG playground evaluation framework",
+      "paper_id": "2511.04696",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #30 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 30
+    },
+    {
+      "query": "enterprise RAG optimization content design",
+      "paper_id": "2410.12812",
+      "relevant_label": true,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #18 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 18
+    },
+    {
+      "query": "enterprise RAG optimization content design",
+      "paper_id": "2502.20854",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #7 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 7
+    },
+    {
+      "query": "enterprise RAG optimization content design",
+      "paper_id": "2602.03652",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #17 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 17
+    },
+    {
+      "query": "enterprise RAG optimization content design",
+      "paper_id": "2602.23374",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #23 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 23
+    },
+    {
+      "query": "medical RAG benchmarking",
+      "paper_id": "2402.13178",
+      "relevant_label": true,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #13 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 13
+    },
+    {
+      "query": "medical RAG benchmarking",
+      "paper_id": "2407.11005",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #6 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 6
+    },
+    {
+      "query": "medical RAG benchmarking",
+      "paper_id": "2411.02832",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #37 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 37
+    },
+    {
+      "query": "medical RAG benchmarking",
+      "paper_id": "2411.09213",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #16 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 16
+    },
+    {
+      "query": "knowledge oriented retrieval augmented generation",
+      "paper_id": "2405.13084",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #59 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 59
+    },
+    {
+      "query": "knowledge oriented retrieval augmented generation",
+      "paper_id": "2409.13694",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #20 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 20
+    },
+    {
+      "query": "knowledge oriented retrieval augmented generation",
+      "paper_id": "2506.11555",
+      "relevant_label": false,
+      "reason": "not_in_production_top_80",
+      "detail": "후보 풀·BM25 union·논문집계 이전 단계에서 누락 가능",
+      "prod_rank_in_80": null
+    },
+    {
+      "query": "knowledge oriented retrieval augmented generation",
+      "paper_id": "2603.20299",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #58 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 58
+    },
+    {
+      "query": "transformer self attention mechanism neural network",
+      "paper_id": "1706.03762",
+      "relevant_label": true,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #10 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 10
+    },
+    {
+      "query": "transformer self attention mechanism neural network",
+      "paper_id": "2412.12227",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #23 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 23
+    },
+    {
+      "query": "transformer self attention mechanism neural network",
+      "paper_id": "2412.18288",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #27 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 27
+    },
+    {
+      "query": "transformer self attention mechanism neural network",
+      "paper_id": "2501.00619",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #22 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 22
+    },
+    {
+      "query": "anomalous attention distribution in transformers",
+      "paper_id": "2412.18288",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #29 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 29
+    },
+    {
+      "query": "anomalous attention distribution in transformers",
+      "paper_id": "2412.18778",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #19 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 19
+    },
+    {
+      "query": "vision transformer image classification",
+      "paper_id": "2412.09311",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #39 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 39
+    },
+    {
+      "query": "vision transformer image classification",
+      "paper_id": "2412.16446",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #6 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 6
+    },
+    {
+      "query": "large language model autonomous agents survey",
+      "paper_id": "2407.01603",
+      "relevant_label": true,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #26 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 26
+    },
+    {
+      "query": "large language model autonomous agents survey",
+      "paper_id": "2503.22458",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #30 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 30
+    },
+    {
+      "query": "large language model autonomous agents survey",
+      "paper_id": "2603.07670",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #19 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 19
+    },
+    {
+      "query": "foundation agents brain inspired AI",
+      "paper_id": "2503.21419",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #26 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 26
+    },
+    {
+      "query": "foundation agents brain inspired AI",
+      "paper_id": "2509.23040",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #49 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 49
+    },
+    {
+      "query": "foundation agents brain inspired AI",
+      "paper_id": "2603.14147",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #46 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 46
+    },
+    {
+      "query": "foundation agents brain inspired AI",
+      "paper_id": "2603.15371",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #12 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 12
+    },
+    {
+      "query": "fairness bias in large language models",
+      "paper_id": "2508.03970",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #12 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 12
+    },
+    {
+      "query": "CRAG corrective retrieval augmented generation",
+      "paper_id": "2508.06401",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #19 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 19
+    },
+    {
+      "query": "CRAG corrective retrieval augmented generation",
+      "paper_id": "2511.19969",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #43 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 43
+    },
+    {
+      "query": "CRAG corrective retrieval augmented generation",
+      "paper_id": "2602.23374",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #38 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 38
+    },
+    {
+      "query": "CRAG corrective retrieval augmented generation",
+      "paper_id": "2603.15712",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #48 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 48
+    },
+    {
+      "query": "chunking optimization for retrieval systems",
+      "paper_id": "2506.06339",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #35 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 35
+    },
+    {
+      "query": "chunking optimization for retrieval systems",
+      "paper_id": "2603.25333",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #6 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 6
+    },
+    {
+      "query": "reranking cross encoder in retrieval pipeline",
+      "paper_id": "2508.17527",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #36 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 36
+    },
+    {
+      "query": "reranking cross encoder in retrieval pipeline",
+      "paper_id": "2601.15457",
+      "relevant_label": true,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #35 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 35
+    },
+    {
+      "query": "reranking cross encoder in retrieval pipeline",
+      "paper_id": "2602.03652",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #17 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 17
+    },
+    {
+      "query": "reranking cross encoder in retrieval pipeline",
+      "paper_id": "2604.07274",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #6 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 6
+    },
+    {
+      "query": "speculative decoding draft verification parallel language model inference",
+      "paper_id": "2601.01513",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #23 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 23
+    },
+    {
+      "query": "speculative decoding draft verification parallel language model inference",
+      "paper_id": "2604.02047",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #6 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 6
+    },
+    {
+      "query": "ontology and knowledge graph grounded retrieval question answering",
+      "paper_id": "2504.00389",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #45 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 45
+    },
+    {
+      "query": "ontology and knowledge graph grounded retrieval question answering",
+      "paper_id": "2604.04359",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #10 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 10
+    },
+    {
+      "query": "query decomposition hybrid retrieval BM25",
+      "paper_id": "2501.13958",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #22 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 22
+    },
+    {
+      "query": "query decomposition hybrid retrieval BM25",
+      "paper_id": "2505.07917",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #18 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 18
+    },
+    {
+      "query": "query decomposition hybrid retrieval BM25",
+      "paper_id": "2601.04531",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #29 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 29
+    },
+    {
+      "query": "query decomposition hybrid retrieval BM25",
+      "paper_id": "2603.18034",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #39 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 39
+    },
+    {
+      "query": "ontology grounded RAG knowledge graph",
+      "paper_id": "2410.02721",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #11 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 11
+    },
+    {
+      "query": "ontology grounded RAG knowledge graph",
+      "paper_id": "2505.17058",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #13 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 13
+    },
+    {
+      "query": "accelerating retrieval augmented generation inference",
+      "paper_id": "2312.13303",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #40 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 40
+    },
+    {
+      "query": "accelerating retrieval augmented generation inference",
+      "paper_id": "2404.03514",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #7 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 7
+    },
+    {
+      "query": "accelerating retrieval augmented generation inference",
+      "paper_id": "2410.20142",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #47 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 47
+    },
+    {
+      "query": "accelerating retrieval augmented generation inference",
+      "paper_id": "2412.15246",
+      "relevant_label": true,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #11 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 11
+    },
+    {
+      "query": "accelerating retrieval augmented generation inference",
+      "paper_id": "2501.16075",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #14 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 14
+    },
+    {
+      "query": "seven failure points RAG engineering",
+      "paper_id": "2411.19463",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #18 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 18
+    },
+    {
+      "query": "seven failure points RAG engineering",
+      "paper_id": "2505.08445",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #36 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 36
+    },
+    {
+      "query": "seven failure points RAG engineering",
+      "paper_id": "2601.19827",
+      "relevant_label": false,
+      "reason": "ranking_drop",
+      "detail": "Production 확장 순위 #28 (RRF·논문집계·제목보정으로 상위 밀림)",
+      "prod_rank_in_80": 28
+    }
+  ],
+  "query_difficulty_production": {
+    "generic": {
+      "hit": 8,
+      "miss": 12
+    },
+    "specific": {
+      "hit": 3,
+      "miss": 2
+    }
+  },
+  "config": {
+    "legacy_grid_vector_weight": 0.5,
+    "legacy_grid_bm25_weight": 0.5,
+    "production_rrf_vector_weight": 0.5,
+    "production_rrf_bm25_weight": 0.5,
+    "bm25_union_top_m": 120,
+    "fetch_n": 300,
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "note": "production_hybrid matches agent_chroma_rag (CE off); multi-query off recommended"
+  }
+}

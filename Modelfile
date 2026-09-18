@@ -1,0 +1,31 @@
+# yunsur-v2 — Qwen 3.5 merged GGUF (맥 미니에서 ollama create 시 GGUF 경로를 동일하게 두거나 FROM 줄만 맥 미니 경로로 수정)
+FROM "/Volumes/T7 Shield/qwen35-merged-q4_k_m.gguf"
+
+PARAMETER repeat_penalty 1.2
+PARAMETER presence_penalty 0.5
+
+# ChatML (Qwen 계열) — LangChain/Ollama 멀티턴과 단일 Prompt 모두 대응
+TEMPLATE """{{- if .Messages }}
+{{- range $index, $_ := .Messages }}
+{{- if eq .Role "system" }}<|im_start|>system
+{{ .Content }}<|im_end|>
+{{- else if eq .Role "user" }}<|im_start|>user
+{{ .Content }}<|im_end|>
+{{- else if eq .Role "assistant" }}<|im_start|>assistant
+{{ .Content }}<|im_end|>
+{{- end }}
+{{- end }}
+{{- else }}
+{{- if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{- end }}<|im_start|>user
+{{ .Prompt }}<|im_end|>
+{{- end }}<|im_start|>assistant
+"""
+
+# 특수 토큰·다음 턴 유출 방지 (텔레그램 노출 최소화)
+PARAMETER stop "<|im_end|>"
+PARAMETER stop "<|endoftext|>"
+PARAMETER stop "<|im_start|>user"
+PARAMETER stop "<|im_start|>system"
+PARAMETER stop "<|im_start|>assistant"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-텔레그램 전용 얇은 프로세스: getUpdates 폴링만 수행하고 SQLite 브리지에 작업을 넣고,
-완료된 결과를 읽어 사용자에게 전송합니다. (torch/chromadb/langgraph 미사용)
+텔레그램 전용 프로세스: getUpdates 폴링 + SQLite 브리지(ai_worker) + 아웃바운드 폴링.
+일반 대화는 브리지·그래프로, 명시적 ``/rag 질문`` 은 Phase 3.0 ``rag_engine``(Chroma+Ollama) 백그라운드 워커로 처리합니다.
 """
 
 from __future__ import annotations
@@ -51,6 +51,7 @@ from apps.telegram_bot.agent_telegram import (
     safe_telegram_send,
     strip_wake_word,
 )
+from apps.telegram_bot import rag_engine
 from apps.telegram_bot.paper_list_light import list_stored_papers_text as papers_list_stdlib
 
 
@@ -135,6 +136,12 @@ def _clear_session_subprocess(chat_id: str) -> None:
 
 def _outbound_poller(bot: telebot.TeleBot, allowed_ids: list[str]) -> None:
     init_bridge_db()
+    gap = 0.12
+    try:
+        gap = float((os.environ.get("BRIDGE_OUTBOUND_MESSAGE_GAP_SEC") or "0.12").strip())
+    except ValueError:
+        gap = 0.12
+    gap = max(0.0, min(gap, 5.0))
     while True:
         try:
             rows = fetch_outbound_for_receiver(30)
@@ -152,12 +159,16 @@ def _outbound_poller(bot: telebot.TeleBot, allowed_ids: list[str]) -> None:
                         safe_telegram_send(bot, chat_id, plan[:4000], parse_mode="Markdown") or safe_telegram_send(
                             bot, chat_id, plan.replace("**", "")[:4000], parse_mode=None
                         )
+                        if gap:
+                            time.sleep(gap)
                     mark_approval_sent(jid)
                     continue
                 if st == "failed":
                     err = (row["error_text"] or "오류")[:4000]
                     safe_telegram_send(bot, chat_id, f"⚠️ {err}", parse_mode=None)
                     mark_delivered(jid)
+                    if gap:
+                        time.sleep(gap)
                     continue
                 if st == "completed":
                     body = row["result_text"] or ""
@@ -165,12 +176,18 @@ def _outbound_poller(bot: telebot.TeleBot, allowed_ids: list[str]) -> None:
                     if pm == "Markdown":
                         if not safe_telegram_send(bot, chat_id, body[:4000], parse_mode="Markdown"):
                             safe_telegram_send(bot, chat_id, body[:4000], parse_mode=None)
+                        if gap:
+                            time.sleep(gap)
                     elif pm == "HTML":
                         if not safe_telegram_send(bot, chat_id, body[:4000], parse_mode="HTML"):
                             safe_telegram_send(bot, chat_id, body[:4000], parse_mode=None)
+                        if gap:
+                            time.sleep(gap)
                     else:
                         for part in _split_telegram_chunks(body, 4000):
                             safe_telegram_send(bot, chat_id, part, parse_mode=None)
+                            if gap:
+                                time.sleep(gap)
                     mark_delivered(jid)
         except Exception as e:
             print(f"[outbound_poller] {e}\n{traceback.format_exc()}")
@@ -191,6 +208,8 @@ def main() -> None:
     poller = threading.Thread(target=_outbound_poller, args=(bot, allowed_ids), name="outbound-poller", daemon=True)
     poller.start()
 
+    rag_engine.ensure_rag_worker_started(TELEGRAM_TOKEN)
+
     @bot.message_handler(commands=["start"])
     def on_start(message):
         chat_id = str(message.chat.id)
@@ -199,7 +218,8 @@ def main() -> None:
             return
         bot.reply_to(
             message,
-            "🤖 **AI 에이전트 봇** (분리 모드: 수신기+워커)\n\n질문을 보내 주세요.",
+            "🤖 **AI 에이전트 봇** (분리 모드: 수신기+워커)\n\n질문을 보내 주세요.\n"
+            "📚 논문 창고만 깊게: `/rag 질문` (예: `/rag Agentic RAG 환각 완화`)",
             parse_mode="Markdown",
             reply_markup=main_keyboard(),
         )
@@ -347,6 +367,21 @@ def main() -> None:
             bot.reply_to(message, "메시지를 입력해 주세요.")
             return
 
+        # --- Phase 3.0: /rag 논문 창고 RAG (브리지·그래프와 분리, 백그라운드 워커 처리) ---
+        rag_body = rag_engine.try_parse_rag_command(text)
+        if rag_body is not None:
+            if not rag_body:
+                bot.reply_to(
+                    message,
+                    "📚 논문 창고 RAG 사용법\n\n/rag 뒤에 질문을 적어 주세요.\n"
+                    "예: /rag Agentic RAG 와 환각 완화 방법",
+                    parse_mode=None,
+                )
+                return
+            bot.reply_to(message, rag_engine.RAG_LOADING_MESSAGE, parse_mode=None)
+            rag_engine.submit_rag_job(chat_id, rag_body)
+            return
+
         cmd = text.strip().split()[0].lower() if text else ""
         if cmd == "/paper" or cmd.startswith("/paper@"):
             subprocess.run(
@@ -408,6 +443,15 @@ def main() -> None:
             clear_approval_session(chat_id)
             if _should_notify_auto_cancel(text):
                 safe_telegram_send(bot, chat_id, "이전 계획을 정리하고 새 요청을 처리합니다.")
+
+        # 승인 대기 세션이 없는데 "승인"/"거절"만 오면 (계획이 아직 안 나온 시점 등)
+        # 새 질문으로 흘려보내지 않는다 — 같은 스레드에 새 턴이 들어가면 곧 나올 계획의 인터럽트를 덮어쓴다.
+        if text.strip().strip("!.。 ") in ("승인", "거절", "approve", "reject"):
+            bot.reply_to(
+                message,
+                "ℹ️ 지금 승인 대기 중인 계획이 없어요. 계획 메시지(📋)가 온 뒤에 승인/거절해 주세요.",
+            )
+            return
 
         tid = effective_graph_thread_id(chat_id)
         enqueue_job(

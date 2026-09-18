@@ -1,0 +1,30 @@
+{"id": "chat_01", "slot": "chat", "timeout_sec": 55, "text": "주말에 할 가벼운 일 3가지만 짧게 추천해줘."}
+{"id": "chat_02", "slot": "chat", "timeout_sec": 55, "text": "회의록 마크다운 템플릿을 만들어줘. 제목, 참석자, 안건, 액션아이템 칸만."}
+{"id": "chat_03", "slot": "chat", "timeout_sec": 55, "text": "일정 조율을 부탁하는 짧은 한국어 이메일 초안 하나만 써줘."}
+{"id": "chat_04", "slot": "chat", "timeout_sec": 55, "text": "집중이 안 될 때 점검할 체크리스트 5개만 적어줘."}
+{"id": "chat_05", "slot": "chat", "timeout_sec": 55, "text": "오늘 읽은 논문을 팀원에게 공유하는 슬랙 메시지 초안을 써줘. 제목은 비워도 됨."}
+{"id": "chat_06", "slot": "chat", "timeout_sec": 55, "text": "비서 톤으로 자기소개 문장 3개만 한국어로 써줘."}
+{"id": "chat_07", "slot": "chat", "timeout_sec": 55, "text": "할 일 우선순위를 매기는 방법을 4줄로만 설명해줘."}
+{"id": "chat_08", "slot": "chat", "timeout_sec": 55, "text": "짧은 감사 인사 문구 2가지만 만들어줘."}
+{"id": "rag_01", "slot": "rag", "timeout_sec": 300, "text": "RAG에서 출처 기반 환각이 생기는 이유를 참고 문서 기준으로 설명해줘."}
+{"id": "rag_02", "slot": "rag", "timeout_sec": 300, "text": "Agentic RAG의 비용 폭증 문제를 다룬 접근을 참고 문서 기준으로 요약해줘."}
+{"id": "rag_03", "slot": "rag", "timeout_sec": 300, "text": "Graph RAG와 일반 RAG 차이를 참고 문서 근거로 비교해줘."}
+{"id": "rag_04", "slot": "rag", "timeout_sec": 300, "text": "멀티모달 LLM의 시각적 환각을 줄이는 방법을 참고 문서 기준으로 설명해줘."}
+{"id": "rag_05", "slot": "rag", "timeout_sec": 300, "text": "하이브리드 검색(BM25+벡터)이 RAG에 쓰이는 이유를 참고 문서 기준으로 정리해줘."}
+{"id": "rag_06", "slot": "rag", "timeout_sec": 300, "text": "LLM 환각을 줄이는 검색 증강 전략을 참고 문서 기준으로 정리해줘."}
+{"id": "rag_07", "slot": "rag", "timeout_sec": 300, "text": "지식 그래프를 RAG에 결합하는 이유를 참고 문서 기준으로 설명해줘."}
+{"id": "rag_08", "slot": "rag", "timeout_sec": 300, "text": "취약 계층 분석이나 레이어 개입이 환각과 어떻게 연결되는지 참고 문서 기준으로 알려줘."}
+{"id": "planner_01", "slot": "planner", "timeout_sec": 120, "text": "파이썬으로 mysql 데이터베이스에 연결해서 테이블 목록만 조회하는 스크립트 작성해줘."}
+{"id": "planner_02", "slot": "planner", "timeout_sec": 120, "text": "CSV 파일을 읽어서 결측치를 채우고 요약 통계를 출력하는 파이썬 작업 계획을 세워줘."}
+{"id": "planner_03", "slot": "planner", "timeout_sec": 120, "text": "https://example.com/docs 의 정적 HTML에서 제목만 뽑는 크롤러 계획을 세워줘."}
+{"id": "planner_04", "slot": "planner", "timeout_sec": 120, "text": "로컬 폴더의 txt 파일들을 합쳐 하나의 마크다운으로 만드는 계획을 세워줘."}
+{"id": "planner_05", "slot": "planner", "timeout_sec": 120, "text": "SQLite에서 users 테이블 row 수를 세는 스크립트 계획을 세워줘."}
+{"id": "planner_06", "slot": "planner", "timeout_sec": 120, "text": "Tavily로 Qwen 3.5를 검색한 뒤 상위 3개 제목을 출력하는 계획을 세워줘."}
+{"id": "planner_07", "slot": "planner", "timeout_sec": 120, "text": "pandas로 두 CSV를 key 컬럼 기준으로 조인하는 계획을 세워줘."}
+{"id": "planner_08", "slot": "planner", "timeout_sec": 120, "text": "FastAPI로 /health 엔드포인트만 있는 서버를 만드는 계획을 세워줘."}
+{"id": "coding_01", "slot": "coding", "timeout_sec": 120, "text": "파이썬으로 1부터 10까지 합을 구해 print 해줘."}
+{"id": "coding_02", "slot": "coding", "timeout_sec": 120, "text": "리스트 [3, 1, 2]를 정렬해서 출력하는 파이썬 코드를 짜줘."}
+{"id": "coding_03", "slot": "coding", "timeout_sec": 120, "text": "문자열 hello의 길이를 출력하는 파이썬 코드를 짜줘."}
+{"id": "coding_04", "slot": "coding", "timeout_sec": 120, "text": "1부터 20까지 짝수만 출력하는 파이썬 코드를 짜줘."}
+{"id": "coding_05", "slot": "coding", "timeout_sec": 120, "text": "딕셔너리 {'a': 1, 'b': 2}의 값 합을 출력하는 파이썬 코드를 짜줘."}
+{"id": "coding_06", "slot": "coding", "timeout_sec": 120, "text": "피보나치 수열 앞 10개를 리스트로 만들어 print 하는 파이썬 코드를 짜줘."}

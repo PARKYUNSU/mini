@@ -1,0 +1,6 @@
+# yunsur_v4 — 베이스 qwen3.5:9b (Ollama 공식, q4_k_m) 위에 v4 LoRA 어댑터를 런타임 적용.
+# 베이스 가중치·템플릿(think 제어 포함)이 qwen3.5:9b 와 100% 동일 → "학습 데이터 효과"만 분리해 비교 가능.
+# 어댑터: finetune_datasets/v4/yunsur_v4_unsloth_finetune.ipynb → convert_lora_to_gguf.py (scripts/convert_v4_gguf.sh 4단계)
+# (주의) /Volumes/T7 Shield/llm/Qwen3.5-9B.BF16.gguf 는 이름과 달리 v3 머지본(general.name=Yunsur_V3_Model) — 베이스로 쓰면 안 됨.
+FROM qwen3.5:9b
+ADAPTER "/Volumes/T7 Shield/yunsur_v4_lora.gguf"

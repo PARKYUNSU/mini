@@ -1,0 +1,391 @@
+{
+  "baseline": {
+    "recall": 0.4,
+    "precision1": 0.32,
+    "mrr": 0.348,
+    "details": [
+      {
+        "query": "retrieval augmented generation survey",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2508.06401",
+        "top1_dist": 0.0791635513305664
+      },
+      {
+        "query": "RAG retrieval accuracy improvement",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2603.26668",
+        "top1_dist": 0.09337073564529419
+      },
+      {
+        "query": "hallucination mitigation in RAG systems",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2507.17442",
+        "top1_dist": 0.11839818954467773
+      },
+      {
+        "query": "RAG evaluation benchmark",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2407.11005",
+        "top1_dist": 0.10410386323928833
+      },
+      {
+        "query": "retrieval augmented generation for question answering",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2410.21943",
+        "top1_dist": 0.1092873215675354
+      },
+      {
+        "query": "discourse aware retrieval augmented generation",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2601.04377",
+        "top1_dist": 0.12714987993240356
+      },
+      {
+        "query": "RAG playground evaluation framework",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2412.12322",
+        "top1_dist": 0.1642192006111145
+      },
+      {
+        "query": "enterprise RAG optimization content design",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2410.12812",
+        "top1_dist": 0.16118478775024414
+      },
+      {
+        "query": "medical RAG benchmarking",
+        "hit": true,
+        "precision1": false,
+        "rr": 0.2,
+        "top1_pid": "2603.03292",
+        "top1_dist": 0.13814938068389893
+      },
+      {
+        "query": "knowledge oriented retrieval augmented generation",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2503.10677",
+        "top1_dist": 0.11771982908248901
+      },
+      {
+        "query": "transformer self attention mechanism neural network",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2407.01601",
+        "top1_dist": 0.14361602067947388
+      },
+      {
+        "query": "anomalous attention distribution in transformers",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2407.01601",
+        "top1_dist": 0.09182816743850708
+      },
+      {
+        "query": "vision transformer image classification",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2412.09311",
+        "top1_dist": 0.12385213375091553
+      },
+      {
+        "query": "large language model autonomous agents survey",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2506.20869",
+        "top1_dist": 0.12774187326431274
+      },
+      {
+        "query": "foundation agents brain inspired AI",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2504.01990",
+        "top1_dist": 0.15655136108398438
+      },
+      {
+        "query": "fairness bias in large language models",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2404.01349",
+        "top1_dist": 0.08980506658554077
+      },
+      {
+        "query": "CRAG corrective retrieval augmented generation",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2603.15712",
+        "top1_dist": 0.09777802228927612
+      },
+      {
+        "query": "chunking optimization for retrieval systems",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2501.13993",
+        "top1_dist": 0.12037622928619385
+      },
+      {
+        "query": "reranking cross encoder in retrieval pipeline",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2510.02967",
+        "top1_dist": 0.11457592248916626
+      },
+      {
+        "query": "self RAG reflection token generation",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2407.08223",
+        "top1_dist": 0.1512724757194519
+      },
+      {
+        "query": "dense passage retrieval bi-encoder training",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2511.01386",
+        "top1_dist": 0.1404934525489807
+      },
+      {
+        "query": "query decomposition hybrid retrieval BM25",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2408.04259",
+        "top1_dist": 0.17035508155822754
+      },
+      {
+        "query": "ontology grounded RAG knowledge graph",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2604.04359",
+        "top1_dist": 0.1294236183166504
+      },
+      {
+        "query": "accelerating retrieval augmented generation inference",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2312.10466",
+        "top1_dist": 0.1220054030418396
+      },
+      {
+        "query": "seven failure points RAG engineering",
+        "hit": true,
+        "precision1": false,
+        "rr": 0.5,
+        "top1_pid": "2411.19463",
+        "top1_dist": 0.19393986463546753
+      }
+    ]
+  },
+  "with_rerank": {
+    "recall": 0.48,
+    "precision1": 0.24,
+    "mrr": 0.314,
+    "details": [
+      {
+        "query": "retrieval augmented generation survey",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2503.10677"
+      },
+      {
+        "query": "RAG retrieval accuracy improvement",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2506.16035"
+      },
+      {
+        "query": "hallucination mitigation in RAG systems",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2510.24476"
+      },
+      {
+        "query": "RAG evaluation benchmark",
+        "hit": true,
+        "precision1": false,
+        "rr": 0.5,
+        "top1_pid": "2312.10997"
+      },
+      {
+        "query": "retrieval augmented generation for question answering",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2509.09713"
+      },
+      {
+        "query": "discourse aware retrieval augmented generation",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2601.04377"
+      },
+      {
+        "query": "RAG playground evaluation framework",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2412.12322"
+      },
+      {
+        "query": "enterprise RAG optimization content design",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2410.12812"
+      },
+      {
+        "query": "medical RAG benchmarking",
+        "hit": true,
+        "precision1": false,
+        "rr": 0.2,
+        "top1_pid": "2603.21925"
+      },
+      {
+        "query": "knowledge oriented retrieval augmented generation",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2503.10677"
+      },
+      {
+        "query": "transformer self attention mechanism neural network",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2504.01025"
+      },
+      {
+        "query": "anomalous attention distribution in transformers",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2407.01601"
+      },
+      {
+        "query": "vision transformer image classification",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2412.16446"
+      },
+      {
+        "query": "large language model autonomous agents survey",
+        "hit": true,
+        "precision1": false,
+        "rr": 0.2,
+        "top1_pid": "2412.08587"
+      },
+      {
+        "query": "foundation agents brain inspired AI",
+        "hit": true,
+        "precision1": true,
+        "rr": 1.0,
+        "top1_pid": "2504.01990"
+      },
+      {
+        "query": "fairness bias in large language models",
+        "hit": true,
+        "precision1": false,
+        "rr": 0.2,
+        "top1_pid": "2603.07368"
+      },
+      {
+        "query": "CRAG corrective retrieval augmented generation",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2603.16169"
+      },
+      {
+        "query": "chunking optimization for retrieval systems",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2501.13993"
+      },
+      {
+        "query": "reranking cross encoder in retrieval pipeline",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2510.02967"
+      },
+      {
+        "query": "self RAG reflection token generation",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2602.00083"
+      },
+      {
+        "query": "dense passage retrieval bi-encoder training",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2511.01386"
+      },
+      {
+        "query": "query decomposition hybrid retrieval BM25",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2602.09552"
+      },
+      {
+        "query": "ontology grounded RAG knowledge graph",
+        "hit": false,
+        "precision1": false,
+        "rr": 0.0,
+        "top1_pid": "2604.04359"
+      },
+      {
+        "query": "accelerating retrieval augmented generation inference",
+        "hit": true,
+        "precision1": false,
+        "rr": 0.25,
+        "top1_pid": "2510.20878"
+      },
+      {
+        "query": "seven failure points RAG engineering",
+        "hit": true,
+        "precision1": false,
+        "rr": 0.5,
+        "top1_pid": "2506.20869"
+      }
+    ]
+  }
+}

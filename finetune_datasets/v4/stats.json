@@ -1,0 +1,61 @@
+{
+  "targets": {
+    "rag": 400,
+    "chat": 350,
+    "planner": 250,
+    "coding": 100
+  },
+  "slots": {
+    "chat": {
+      "generated_ok": 350,
+      "unique": 350,
+      "used": 350
+    },
+    "planner": {
+      "generated_ok": 249,
+      "unique": 249,
+      "used": 249
+    },
+    "coding": {
+      "generated_ok": 100,
+      "unique": 100,
+      "used": 100
+    },
+    "rag": {
+      "generated_ok": 400,
+      "unique": 400,
+      "used": 400
+    }
+  },
+  "rejected_total": 88,
+  "rejected_by_slot_reason": {
+    "chat": {
+      "english_mix": 5,
+      "cjk_leak": 6
+    },
+    "planner": {
+      "plan_n:0": 17,
+      "english_mix": 15,
+      "plan_n:1": 4,
+      "cjk_leak": 9,
+      "plan_only_warn": 1
+    },
+    "coding": {
+      "runtime_timeout": 9,
+      "format_drift:fence_multi": 1,
+      "runtime": 4,
+      "no_output": 1,
+      "uses_input": 13,
+      "syntax": 2,
+      "format_drift:fence_open": 1
+    },
+    "amplify": {}
+  },
+  "final_total": 1099,
+  "final_by_slot": {
+    "chat": 350,
+    "planner": 249,
+    "coding": 100,
+    "rag": 400
+  }
+}

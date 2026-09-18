@@ -7,8 +7,9 @@ Qwen 3.x(Ollama) 샘플링은 Alibaba Qwen 3.5 권장에 맞춘다.
 
 - Router / Direct Answer / RAG·비전 보조: ``temperature``·``top_p``·반복 억제,
   ``reasoning=False`` 로 본문에 think 태그가 섞이지 않게 한다 (LangChain → Ollama think 끔).
-- Planner(계획)·LLM 토론 스케줄러: ``reasoning=True`` 로 사고를 분리하고, 에이전트 텔레그램은
-  ``agent_telegram.strip_thinking_tags`` 등 기존 정제를 유지.
+- Planner(계획)·LLM 토론 스케줄러: ``ollama_planner_reasoning_enabled()`` 가 True일 때만
+  ``reasoning=True`` (thinking 미지원 모델은 ``OLLAMA_PLANNER_REASONING`` 또는 모델명으로 끔).
+  에이전트 텔레그램은 ``agent_telegram.strip_thinking_tags`` 등 기존 정제를 유지.
 
 Ollama API에는 OpenAI식 ``presence_penalty`` 가 없어, 문서의 반복 억제 의도는
 ``repeat_penalty`` 로 맞춘다 (일반 경로 상향, Planner 계획은 1.0).
@@ -23,22 +24,68 @@ from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
-from core.config.agent_config import GEMINI_MODEL, get_gemini_api_keys, ollama_kwargs
+from core.config.agent_config import (
+    GEMINI_MODEL,
+    OLLAMA_DIRECT_NUM_PREDICT,
+    get_gemini_api_keys,
+    ollama_kwargs,
+    ollama_planner_reasoning_enabled,
+)
 from core.llm.agent_gemini import RotatingGeminiChat
 
 # Groq 무료 한도·코딩용 기본 모델 (환경변수로 덮어쓰기 가능)
 GROQ_CODING_MODEL = os.getenv(
-    "GROQ_CODING_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct"
+    "GROQ_CODING_MODEL", "openai/gpt-oss-120b"
 )
+
+
+def normalize_ai_message_content(resp: Any) -> str:
+    """
+    LangChain ``AIMessage`` 등: ``content``가 str 또는 멀티모달 블록 list일 수 있음
+    (예: Gemini가 텍스트 블록 리스트 반환). 후처리용 단일 문자열로 정규화.
+    """
+    if resp is None:
+        return ""
+    raw = getattr(resp, "content", None)
+    if raw is None:
+        tx = getattr(resp, "text", None)
+        if isinstance(tx, str):
+            return tx
+        if tx is not None:
+            return str(tx)
+        return ""
+    if isinstance(raw, str):
+        return raw
+    if isinstance(raw, list):
+        parts: list[str] = []
+        for block in raw:
+            if isinstance(block, str):
+                parts.append(block)
+            elif isinstance(block, dict):
+                t = block.get("text")
+                if isinstance(t, str):
+                    parts.append(t)
+                elif isinstance(block.get("content"), str):
+                    parts.append(block["content"])
+                else:
+                    parts.append(str(block))
+            else:
+                bt = getattr(block, "text", None)
+                if isinstance(bt, str):
+                    parts.append(bt)
+                else:
+                    parts.append(str(block))
+        return "\n".join(parts) if parts else ""
+    return str(raw)
 
 
 def get_router_llm():
     """라우터 3단계 분류: 안정적 샘플링, 사고 모드 끔."""
     return ChatOllama(
         **ollama_kwargs(
-            temperature=0.7,
+            temperature=0.2,
             top_p=0.8,
-            repeat_penalty=1.25,
+            repeat_penalty=1.18,
             reasoning=False,
             num_predict=12,
         )
@@ -46,39 +93,42 @@ def get_router_llm():
 
 
 def get_planner_llm():
-    """Direct Answer·라우터 Ollama 폴백·세션 요약 등: 비-thinking, 반복 억제."""
+    """Direct Answer·라우터 Ollama 폴백·세션 요약 등: 비-thinking, 반복 억제.
+
+    ``num_predict``는 ``OLLAMA_DIRECT_NUM_PREDICT``(기본 4096, .env로 조정)로 긴 RAG 답변 한 번에 완결.
+    """
     return ChatOllama(
         **ollama_kwargs(
-            temperature=0.7,
+            temperature=0.2,
             top_p=0.8,
-            repeat_penalty=1.25,
+            repeat_penalty=1.18,
             reasoning=False,
-            num_predict=1500,
+            num_predict=OLLAMA_DIRECT_NUM_PREDICT,
         )
     )
 
 
 def get_planner_plan_llm():
-    """Planner·PlannerDebate: 코딩/기획, 반복 페널티 완화, thinking 허용."""
+    """Planner·PlannerDebate: 코딩/기획, 반복 페널티 완화, thinking은 모델 지원 시에만."""
     return ChatOllama(
         **ollama_kwargs(
-            temperature=0.6,
+            temperature=0.25,
             top_p=0.95,
-            repeat_penalty=1.0,
-            reasoning=True,
+            repeat_penalty=1.18,
+            reasoning=ollama_planner_reasoning_enabled(),
             num_predict=300,
         )
     )
 
 
 def get_llm_debate_scheduler_llm():
-    """llm_debate_scheduler: Golden Q&A용 reasoning 유지, 출력 상한은 Q&A 1세트에 맞게 보수적으로."""
+    """llm_debate_scheduler: Golden Q&A용 reasoning은 모델 지원 시에만."""
     return ChatOllama(
         **ollama_kwargs(
-            temperature=0.6,
+            temperature=0.25,
             top_p=0.95,
-            repeat_penalty=1.0,
-            reasoning=True,
+            repeat_penalty=1.18,
+            reasoning=ollama_planner_reasoning_enabled(),
             num_predict=1500,
         )
     )
@@ -88,9 +138,9 @@ def get_rag_query_rewrite_llm():
     """Chroma standalone 검색어 재작성: 짧은 출력, 비-thinking."""
     return ChatOllama(
         **ollama_kwargs(
-            temperature=0.7,
+            temperature=0.2,
             top_p=0.8,
-            repeat_penalty=1.25,
+            repeat_penalty=1.18,
             reasoning=False,
             num_predict=160,
         )
@@ -101,9 +151,9 @@ def get_vision_llm():
     """이미지 분석: 비-thinking, 설명 길이 여유."""
     return ChatOllama(
         **ollama_kwargs(
-            temperature=0.7,
+            temperature=0.2,
             top_p=0.8,
-            repeat_penalty=1.25,
+            repeat_penalty=1.18,
             reasoning=False,
             num_predict=1024,
         )

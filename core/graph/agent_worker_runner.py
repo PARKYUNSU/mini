@@ -303,7 +303,9 @@ def execute_graph_turn(
             except Exception:
                 pass
 
-        out = f"✅ **실행 완료**\n\n```\n{result[:3500]}\n```"
+        failed = _is_execution_failure(result)
+        headline = "❌ **실행 실패**" if failed else "✅ **실행 완료**"
+        out = f"{headline}\n\n```\n{result[:3500]}\n```"
         if saved_tool:
             out += f"\n\n📦 도구 저장됨: `agent_tools/{saved_tool}`"
         if code:
@@ -313,7 +315,7 @@ def execute_graph_turn(
             complete_job(bridge_job_id, result_text=out, result_parse_mode="Markdown")
         else:
             if not _safe_telegram_send(bot, chat_id, out, parse_mode="Markdown"):
-                _safe_telegram_send(bot, chat_id, f"실행 완료\n\n{result[:4000]}")
+                _safe_telegram_send(bot, chat_id, f"{'실행 실패' if failed else '실행 완료'}\n\n{result[:4000]}")
 
         session.recent_messages[-1] = (session.recent_messages[-1][0], result[:500])
         session.maybe_compress()

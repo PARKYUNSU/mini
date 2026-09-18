@@ -1,0 +1,71 @@
+[
+  {
+    "model": "all-MiniLM-L6-v2 (현재)",
+    "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+    "dim": 384,
+    "accuracy": 1.0,
+    "avg_pos_sim": 0.6511814812819163,
+    "avg_neg_sim": 0.13742144629359246,
+    "avg_margin": 0.5137600349883239,
+    "min_margin": 0.19222473353147507,
+    "load_time": 3.307086706161499,
+    "encode_time": 0.1454181671142578,
+    "failures": 0
+  },
+  {
+    "model": "bge-base-en-v1.5",
+    "model_id": "BAAI/bge-base-en-v1.5",
+    "dim": 768,
+    "accuracy": 1.0,
+    "avg_pos_sim": 0.8367518464724223,
+    "avg_neg_sim": 0.5874271869659424,
+    "avg_margin": 0.2493246595064799,
+    "min_margin": 0.12069088220596313,
+    "load_time": 3.4168879985809326,
+    "encode_time": 0.15390491485595703,
+    "failures": 0
+  },
+  {
+    "model": "bge-small-en-v1.5",
+    "model_id": "BAAI/bge-small-en-v1.5",
+    "dim": 384,
+    "accuracy": 1.0,
+    "avg_pos_sim": 0.8638987024625142,
+    "avg_neg_sim": 0.6376968701680501,
+    "avg_margin": 0.2262018322944641,
+    "min_margin": 0.11166584491729736,
+    "load_time": 3.320511817932129,
+    "encode_time": 0.06156587600708008,
+    "failures": 0
+  },
+  {
+    "model": "gte-base-en-v1.5",
+    "error": "index 7453010313431162915 is out of bounds: 0, range 0 to 12"
+  },
+  {
+    "model": "all-mpnet-base-v2",
+    "model_id": "sentence-transformers/all-mpnet-base-v2",
+    "dim": 768,
+    "accuracy": 1.0,
+    "avg_pos_sim": 0.605483599503835,
+    "avg_neg_sim": 0.1706268312719961,
+    "avg_margin": 0.43485676823183894,
+    "min_margin": 0.0986558049917221,
+    "load_time": 22.951266050338745,
+    "encode_time": 1.1892969608306885,
+    "failures": 0
+  },
+  {
+    "model": "e5-base-v2",
+    "model_id": "intfloat/e5-base-v2",
+    "dim": 768,
+    "accuracy": 1.0,
+    "avg_pos_sim": 0.8921330451965332,
+    "avg_neg_sim": 0.7661394993464152,
+    "avg_margin": 0.125993545850118,
+    "min_margin": 0.035119056701660156,
+    "load_time": 18.192612171173096,
+    "encode_time": 0.11236190795898438,
+    "failures": 0
+  }
+]

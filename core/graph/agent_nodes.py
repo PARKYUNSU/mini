@@ -13,7 +13,7 @@ from concurrent.futures import TimeoutError as FuturesTimeout
 from pathlib import Path
 from typing import Literal
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import interrupt
 
@@ -22,18 +22,28 @@ from core.config.agent_config import (
     AGENT_TOOLS_DIR,
     CODE_TIMEOUT_SEC,
     DIRECT_ANSWER_TIMEOUT_SEC,
+    RAG_OLLAMA_TIMEOUT_SEC,
     ERROR_LOG_MAX_CHARS,
     RAG_TOP_K,
     TOOL_RAG_TOP_K,
     resolve_agent_tool_py,
+)
+from core.llm.code_extract import extract_python_code
+from core.llm.lang_guard import (
+    KOREAN_RETRY_NUDGE,
+    needs_korean_retry,
+    strip_english_meta_sections,
 )
 from core.llm.agent_llm import (
     get_coding_groq_llm,
     get_executor_llm,
     get_planner_llm,
     get_planner_plan_llm,
+    get_rag_query_rewrite_llm,
     get_router_llm,
+    normalize_ai_message_content,
 )
+from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
     DIRECT_ANSWER_PYTHON_EXAMPLE_SYSTEM,
@@ -67,6 +77,7 @@ from core.llm.agent_prompts import (
     planner_user_prompt,
     router_step3_system_prompt,
     router_step3_user_prompt,
+    TAVILY_SUMMARY_SYSTEM_KO,
     tavily_summarize_human,
     use_existing_tool_prompt_form_fill,
     use_existing_tool_prompt_generic,
@@ -75,6 +86,8 @@ from core.graph.agent_router_rules import (
     _is_followup_vague_query,
     is_explicit_python_coding_request,
     is_factual_lookup,
+    is_meta_bot_availability_query,
+    is_trivial_unit_conversion_query,
     router_step2_build_features as _router_step2_build_features,
     skip_planner_debate_for_fast_path as _skip_planner_debate_for_fast_path,
     user_wants_intentional_exec_error as _user_wants_intentional_exec_error,
@@ -108,6 +121,43 @@ _MINI_ROOT = Path(__file__).resolve().parent
 _log = logging.getLogger(__name__)
 
 _RAG_HIT_SEP = "\n\n---\n\n"
+
+# LLM이 예전 템플릿의 괄호 안내를 그대로 출력한 경우 치환·로그 (검색 로직과 무관)
+_RAG_PLACEHOLDER_PATTERNS: tuple[tuple[str, str, str], ...] = (
+    (r"\(논문 제목\)", "제목 정보 없음", "literal_(논문 제목)"),
+    (r"\(여기에 논문 제목 작성\)", "제목 정보 없음", "literal_(여기에 논문 제목 작성)"),
+    (r"\(여기에 발행일 작성[^)]*\)", "미상", "literal_(여기에 발행일…)"),
+    (r"\(여기에 출처[^)]*\)", "미상", "literal_(여기에 출처…)"),
+    (r"\(날짜\)", "미상", "literal_(날짜)"),
+    (r"\(출처\)", "미상", "literal_(출처)"),
+    (r"\[문서 근거 요약\]", "문서에 해당 정보 없음", "bracket_[문서 근거 요약]"),
+    (r"\[참고 문서의 제목 또는: 제목 정보 없음\]", "제목 정보 없음", "bracket_title_hint"),
+)
+
+
+def _sanitize_rag_answer_placeholders(text: str) -> str:
+    """RAG 답변에 남은 플레이스홀더를 치환하고, 조치 사유를 로그로 남김."""
+    if not (text or "").strip():
+        return text
+    out = text
+    notes: list[str] = []
+    for pat, repl, tag in _RAG_PLACEHOLDER_PATTERNS:
+        if re.search(pat, out):
+            out = re.sub(pat, repl, out)
+            notes.append(tag)
+    # 구 템플릿: 불릿 뒤 괄호만 있는 안내 문장 한 줄
+    _bad_bullet = re.compile(
+        r"^(\s*-\s*)\((?:기존의 어떤|어떤 아키텍처|성능이 얼마나|이 논문이)[^)]{8,220}\)\s*$",
+        re.MULTILINE,
+    )
+    if _bad_bullet.search(out):
+        out = _bad_bullet.sub(r"\1문서에 해당 정보 없음", out)
+        notes.append("paren_instruction_bullet")
+    if notes:
+        msg = "[RAG output] placeholder_sanitized: " + ", ".join(dict.fromkeys(notes))
+        _log.warning(msg)
+        print(msg, flush=True)
+    return out
 
 
 def _prefer_single_hit_rag_context(user_request: str, *, wants_depth: bool) -> bool:
@@ -155,6 +205,23 @@ def _rag_context_first_hit_only(rag_context: str, *, max_chars: int = 5500) -> s
     return first
 
 
+def _first_paper_id_from_rag_block(block: str) -> str:
+    """
+    `_format_chroma_hits` 블록은 `[Distance:…]`, `[발행일:…]` 다음에 `[paper_id] 제목` 줄이 올 수 있다.
+    블록 첫 줄만 보면 Distance로 오인하므로, `[태그] 제목` 형태에서 paper_id 줄만 고른다.
+    """
+    for line in (block or "").splitlines():
+        line = line.strip()
+        m = re.match(r"^\[([^\]]+)\]\s+(.+)", line)
+        if not m:
+            continue
+        inner = m.group(1).strip()
+        if inner.startswith("Distance") or inner.startswith("발행일"):
+            continue
+        return inner
+    return ""
+
+
 def _rag_context_same_paper_all_chunks(rag_context: str, *, max_chars: int = 8000) -> str:
     """첫 번째(최고 관련도) 논문의 paper_id와 동일한 모든 청크를 병합.
 
@@ -170,11 +237,7 @@ def _rag_context_same_paper_all_chunks(rag_context: str, *, max_chars: int = 800
     if not blocks:
         return rag_context
 
-    pid_re = re.compile(r"^\[([^\]]+)\]")
-    first_pid = ""
-    m = pid_re.search(blocks[0])
-    if m:
-        first_pid = m.group(1).strip()
+    first_pid = _first_paper_id_from_rag_block(blocks[0])
 
     if not first_pid:
         merged = blocks[0][:max_chars]
@@ -225,6 +288,55 @@ def _llm_model_label(llm) -> str:
     return str(getattr(llm, "model", None) or getattr(llm, "model_name", None) or type(llm).__name__)
 
 
+def _extract_english_rag_query(user_request: str, session_context: str = "") -> str:
+    """
+    Chroma 검색 직전: 질문을 3~5개 영어 핵심 키워드로 압축.
+    LLM 출력이 비정상이면 원문을 그대로 반환(안전 폴백).
+    """
+    req = (user_request or "").strip()
+    if not req:
+        return req
+    prompt = f"""Extract 3-5 core English search keywords for academic RAG retrieval.
+Return ONLY one comma-separated line in English.
+No Korean, no explanations, no numbering.
+
+User question:
+{req}
+
+Recent context:
+{session_context[:500] if session_context else "(none)"}
+"""
+    raw = ""
+    for llm_getter in (get_rag_query_rewrite_llm, get_executor_llm):
+        try:
+            resp = llm_getter().invoke([HumanMessage(content=prompt)])
+            raw = (normalize_ai_message_content(resp) or "").strip()
+            if raw:
+                break
+        except Exception:
+            continue
+    if not raw:
+        return req
+    cleaned = re.sub(r"[^A-Za-z0-9,\-\s]", " ", raw)
+    tokens = re.split(r"[,/\n]+", cleaned)
+    out: list[str] = []
+    for t in tokens:
+        k = re.sub(r"\s+", " ", t).strip().lower()
+        if not k:
+            continue
+        if len(k) < 3:
+            continue
+        if len(k.split()) > 5:
+            continue
+        if k not in out:
+            out.append(k)
+        if len(out) >= 5:
+            break
+    if len(out) < 3:
+        return req
+    return ", ".join(out[:5])
+
+
 def _paper_knowledge_heuristic(user_request: str, req_lower: str) -> bool:
     """논문 모드에서 일상(A)으로 오분류되기 쉬운 지식·설명형 질문."""
     r = user_request or ""
@@ -257,6 +369,10 @@ def _apply_paper_mode_router_bias(chat_id: str, user_request: str, result: dict)
     if not get_paper_mode(chat_id):
         return result
     req_lower = (user_request or "").lower().strip()
+    if is_trivial_unit_conversion_query(user_request, req_lower):
+        return result
+    if is_meta_bot_availability_query(user_request, req_lower):
+        return result
     if is_explicit_python_coding_request(user_request, req_lower):
         if result.get("route_type") == "direct_answer" and result.get("router_choice") == "A":
             return {"route_type": "planner", "router_choice": "C"}
@@ -453,7 +569,7 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         print(f"[DEBUG] Router: user_request={user_request[:80]}...")
 
         # 1단계: 명백한 하드룰
-        result = router_step1_hard_rules(user_request, req_lower, chat_id)
+        result = router_step1_hard_rules(user_request, req_lower, chat_id, is_scheduled=is_scheduled)
         if result:
             rule_name = result.get("route_type", "")
             choice = result.get("router_choice", "")
@@ -471,7 +587,8 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         session = get_session(chat_id)
         session_context = session.get_recent_context(max_turns=2)
         rag = get_chroma_rag_tool()
-        rag_context = rag.search(user_request, session_context=session_context)
+        rag_query = _extract_english_rag_query(user_request, session_context=session_context)
+        rag_context = rag.search(rag_query, session_context=session_context)
         _trs = get_tool_rag_store()
         tools_context = _trs.format_topk_block(user_request, k=TOOL_RAG_TOP_K)
         tools_list_str = _trs.format_router_tools_tag(user_request, k=TOOL_RAG_TOP_K)
@@ -557,8 +674,32 @@ def _invoke_llm_with_fallback(
                 llm_getter.__name__,
                 elapsed,
             )
-            _llm_invoke_trace("returning content", f"elapsed={elapsed:.3f}s len={len((resp.content or fallback_msg).strip())}")
-            return (resp.content or fallback_msg).strip()
+            try:
+                text_out = normalize_ai_message_content(resp)
+            except Exception as norm_exc:
+                raw_c = getattr(resp, "content", None)
+                _llm_invoke_trace(
+                    "normalize_ai_message_content failed",
+                    f"type(content)={type(raw_c).__name__} err={norm_exc!r}",
+                )
+                _log.warning(
+                    "normalize_ai_message_content failed getter=%s content_type=%s: %s",
+                    llm_getter.__name__,
+                    type(raw_c).__name__,
+                    norm_exc,
+                )
+                text_out = fallback_msg
+            if not text_out.strip():
+                text_out = fallback_msg
+            else:
+                raw_c = getattr(resp, "content", None)
+                if isinstance(raw_c, list):
+                    _llm_invoke_trace(
+                        "normalized list content",
+                        f"getter={llm_getter.__name__} blocks={len(raw_c)}",
+                    )
+            _llm_invoke_trace("returning content", f"elapsed={elapsed:.3f}s len={len(text_out.strip())}")
+            return text_out.strip()
         except Exception as e:
             _llm_invoke_trace("outer loop Exception", f"getter={llm_getter.__name__} {type(e).__name__}: {e}")
             _log.debug(
@@ -639,6 +780,21 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     timeout_sec=_da_timeout,
                 )
                 _da_trace("after _invoke_llm_with_fallback", "A daily_chat")
+                # 로컬 9B가 '### Reasoning' 류 영어 메타 섹션을 붙이거나 답 전체를 영어로 쓰는 경우(평가 v2: 잡담 실패 6건 중 5건).
+                # 메타 섹션은 잘라내고, 그래도 영어가 지배적이면 한국어로 한 번만 재생성.
+                answer = strip_english_meta_sections(answer)
+                if needs_korean_retry(answer):
+                    print("[DEBUG] DirectAnswer: 영어 답변 감지 → 한국어 재생성 1회", flush=True)
+                    retry_msgs = [
+                        SystemMessage(content=system_prompt),
+                        HumanMessage(content=content),
+                        AIMessage(content=answer),
+                        HumanMessage(content=KOREAN_RETRY_NUDGE),
+                    ]
+                    retried = _invoke_llm_with_fallback(retry_msgs, timeout_sec=_da_timeout)
+                    retried = strip_english_meta_sections(retried)
+                    if retried and not needs_korean_retry(retried):
+                        answer = retried
         else:
             # B: RAG — rag.search()는 agent_chroma_rag에서 owner 스레드로 직렬화되며,
             # ChromaRAGTool 내부에서 collection.query는 _db_lock으로 동시 진입을 막는다(async 미사용).
@@ -650,10 +806,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             prefer_single_hit = _prefer_single_hit_rag_context(user_request, wants_depth=wants_depth)
             # 단일은 Top-1, 다중은 Top-5로 LLM 컨텍스트를 제한하기 때문에
             # Chroma query는 넉넉히 가져와도 되고, 최종 전달은 뒤에서 잘라냄
+            rag_query = _extract_english_rag_query(user_request, session_context=session.get_recent_context(max_turns=2))
             if prefer_single_hit:
                 top_k = max(RAG_TOP_K * 4, 10) if wants_depth else RAG_TOP_K
             else:
-                top_k = max(RAG_TOP_K * 4, 10)
+                top_k = 15
 
             _da_trace(
                 "before get_chroma_rag_tool()",
@@ -678,7 +835,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 else:
                     session_ctx = session.get_recent_context(max_turns=2)
                     _da_trace("before rag.search()", f"top_k={top_k} wants_depth={wants_depth} (sync collection.query)")
-                    rag_context = rag.search(user_request, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth)
+                    rag_context = rag.search(rag_query, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth)
                     _da_trace("after rag.search()", f"len={len(rag_context)}")
                 if prefer_single_hit and wants_depth:
                     rag_context = _rag_context_same_paper_all_chunks(rag_context)
@@ -710,7 +867,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 rag_max_chars=rag_max_chars,
             )
             content = _build_message_content(prompt, image_base64)
-            rag_timeout = _da_timeout if prefer_single_hit else max(_da_timeout, 90.0)
+            # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
+            if _da_timeout is None:
+                rag_timeout = None
+            else:
+                rag_timeout = max(_da_timeout, RAG_OLLAMA_TIMEOUT_SEC)
             _da_trace("before _invoke_llm_with_fallback", f"B RAG answer timeout={rag_timeout}")
             answer = _invoke_llm_with_fallback(
                 [SystemMessage(content=system_prompt), HumanMessage(content=content)],
@@ -724,6 +885,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         chat_id = str(conf.get("chat_id", ""))
         if router_choice == "B":
             answer = _strip_thinking_tags(answer)
+            answer = _sanitize_rag_answer_placeholders(answer)
             # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
@@ -901,13 +1063,44 @@ def use_existing_tool_node(state: AgentState, *, config: RunnableConfig) -> dict
         if used_tool_name == "tavily_search_tool" and result and not result.startswith(("실행 오류", "도구 실행 오류", "TAVILY_API_KEY", "검색어를 입력")):
             try:
                 print("[DEBUG] Tavily 요약: get_executor_llm(Gemini) 호출")
-                resp = get_executor_llm().invoke([
-                    HumanMessage(content=tavily_summarize_human(result[:6000])),
-                ])
-                summary = (resp.content or "").strip()
+                is_scheduled = bool(conf.get("is_scheduled"))
+                human_summ = tavily_summarize_human(result[:6000], scheduled_delivery=is_scheduled)
+                resp = get_executor_llm().invoke(
+                    [
+                        SystemMessage(content=TAVILY_SUMMARY_SYSTEM_KO),
+                        HumanMessage(content=human_summ),
+                    ]
+                )
+                summary = sanitize_llm_news_like_blob(
+                    normalize_ai_message_content(resp).strip()
+                )
                 if summary and len(summary) > 50:
                     result = summary
                     is_summarized = True
+                    # 영어 편향 시 한 번 더 정제 (크론·긴 답변에서 특히)
+                    hangul_n = sum(1 for c in result if "\uac00" <= c <= "\ud7a3")
+                    latin_letters = sum(1 for c in result if c.isalpha() and ord(c) < 128)
+                    if hangul_n < 50 and latin_letters > 180 and len(result) > 200:
+                        try:
+                            resp2 = get_executor_llm().invoke(
+                                [
+                                    SystemMessage(content=TAVILY_SUMMARY_SYSTEM_KO),
+                                    HumanMessage(
+                                        content=(
+                                            "아래 텍스트는 영어 비중이 너무 높습니다. 사실은 유지하고 "
+                                            "**표현만 전부 한국어**로 바꾼 최종 브리핑만 출력하세요.\n\n---\n"
+                                            f"{result[:6500]}"
+                                        )
+                                    ),
+                                ]
+                            )
+                            summary2 = sanitize_llm_news_like_blob(
+                                normalize_ai_message_content(resp2).strip()
+                            )
+                            if summary2 and sum(1 for c in summary2 if "\uac00" <= c <= "\ud7a3") >= hangul_n:
+                                result = summary2
+                        except Exception as ex2:
+                            print(f"[DEBUG] Tavily 한글 재정제 스킵: {ex2}")
             except Exception as ex:
                 print(f"[DEBUG] Tavily 요약 실패, 원문 전달: {ex}")
 
@@ -1003,7 +1196,8 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
         rag = get_chroma_rag_tool()
         session = get_session(chat_id)
         planner_session_ctx = session.get_recent_context(max_turns=2)
-        rag_context = rag.search(state["user_request"], session_context=planner_session_ctx)
+        rag_query = _extract_english_rag_query(state["user_request"], session_context=planner_session_ctx)
+        rag_context = rag.search(rag_query, session_context=planner_session_ctx)
         tools_context = get_tool_rag_store().format_topk_block(state["user_request"], k=TOOL_RAG_TOP_K)
         print("[DEBUG] Planner: 로컬 Ollama 계획 생성 호출 (timeout≈120s)...")
 
@@ -1036,7 +1230,23 @@ def planner_node(state: AgentState, *, config: RunnableConfig) -> dict:
             resp = llm.invoke([SystemMessage(content=system_prompt), HumanMessage(content=content)])
             raw_content = getattr(resp, "content", None) if resp is not None else None
             plan_text = (raw_content if isinstance(raw_content, str) else str(raw_content or "")).strip()
-            plan_lines = _parse_planner_llm_lines(plan_text)
+            plan_lines = _parse_planner_llm_lines(strip_english_meta_sections(plan_text))
+            # 영어 추론만 쓰고 단계 형식이 안 나왔거나, 단계가 영어면 한국어로 한 번만 재생성 (평가 v2 planner 실패 원인)
+            if len(plan_lines) < 2 or needs_korean_retry("\n".join(plan_lines)):
+                print("[DEBUG] Planner: 영어/비규격 계획 감지 → 한국어 재생성 1회", flush=True)
+                retry_resp = llm.invoke(
+                    [
+                        SystemMessage(content=system_prompt),
+                        HumanMessage(content=content),
+                        AIMessage(content=plan_text or "(빈 응답)"),
+                        HumanMessage(content=KOREAN_RETRY_NUDGE + " 형식: '1단계: …' 줄부터 시작."),
+                    ]
+                )
+                rc = getattr(retry_resp, "content", None) if retry_resp is not None else None
+                retry_text = (rc if isinstance(rc, str) else str(rc or "")).strip()
+                retry_lines = _parse_planner_llm_lines(strip_english_meta_sections(retry_text))
+                if len(retry_lines) >= 2 and not needs_korean_retry("\n".join(retry_lines)):
+                    plan_text, plan_lines = retry_text, retry_lines
             if len(plan_lines) > 5:
                 print(f"[WARN] Planner: 단계 {len(plan_lines)}개 → 상한 5개로 절단 (토큰/형식 방어)")
                 plan_lines = plan_lines[:5]
@@ -1182,7 +1392,11 @@ def executor_node(state: AgentState) -> dict:
                 state.get("user_request") or "", k=TOOL_RAG_TOP_K
             )
             rag = get_chroma_rag_tool()
-            rag_context = rag.search(state["user_request"], session_context="")[:500] if state.get("user_request") else ""
+            if state.get("user_request"):
+                rag_query = _extract_english_rag_query(state["user_request"], session_context="")
+                rag_context = rag.search(rag_query, session_context="")[:500]
+            else:
+                rag_context = ""
 
         llm = get_coding_groq_llm()
         plan_str = "\n".join(f"{i+1}. {p}" for i, p in enumerate(state.get("plan", [])))
@@ -1209,14 +1423,11 @@ def executor_node(state: AgentState) -> dict:
         executor_system_prompt = EXECUTOR_SYSTEM_CODE_RUN if is_code_run else EXECUTOR_SYSTEM_FULL
 
         resp = llm.invoke([SystemMessage(content=executor_system_prompt), HumanMessage(content=content)])
-        code = resp.content.strip() if resp.content else ""
-        for marker in ("```python", "```"):
-            if marker in code:
-                start = code.find(marker) + len(marker)
-                end = code.rfind("```")
-                if end > start:
-                    code = code[start:end].strip()
-                break
+        raw = resp.content.strip() if resp.content else ""
+        # 펜스 변형·JSON {"code": ...} 래핑·<think> 잔여까지 벗김 (code_extract 참고)
+        code, how = extract_python_code(raw)
+        if how not in ("plain", "fence"):
+            print(f"[DEBUG] Executor: 코드 추출 방식={how} (원문 {len(raw)}자 → {len(code)}자)")
 
         result = _run_code_sandbox(code)
 
