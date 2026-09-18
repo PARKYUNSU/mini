@@ -72,3 +72,6 @@ __pycache__/
 yunsur_v4_adapter/
 yunsur_v4_adapter.tgz
 *.gguf
+
+# 개인 프로필 DB (Boardroom) — 절대 커밋 금지
+CEO_Profile.sqlite
