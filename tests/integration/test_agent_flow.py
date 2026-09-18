@@ -150,8 +150,10 @@ def run_gemini_check(*, verbose: bool) -> str:
         from langchain_core.messages import HumanMessage
         from langchain_google_genai import ChatGoogleGenerativeAI
 
+        from core.config.agent_config import GEMINI_MODEL
+
         llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
+            model=GEMINI_MODEL,
             api_key=os.getenv("GEMINI_API_KEY"),
             temperature=0.1,
         )
@@ -220,7 +222,7 @@ def run_full_graph_smoke(*, verbose: bool, quiet_graph: bool) -> str:
 
         conn = sqlite3.connect("./agent_checkpoints.db", check_same_thread=False)
         graph = build_graph(checkpointer=SqliteSaver(conn))
-        cfg = {"configurable": {"thread_id": "test_flow_smoke", "chat_id": "8587793069", "bot": None}}
+        cfg = {"configurable": {"thread_id": "test_flow_smoke", "chat_id": "100000001", "bot": None}}
         with _maybe_quiet_graph(quiet_graph):
             _run_graph_stream(graph, _base_graph_state("print(1+1) 실행해줘"), cfg)
         state = graph.get_state(cfg)
@@ -249,7 +251,7 @@ def run_full_graph_code_run(*, verbose: bool, quiet_graph: bool) -> str:
         msg = "파이썬으로 len('hello') 결과를 print하는 코드 실행해줘"
         conn = sqlite3.connect("./agent_checkpoints.db", check_same_thread=False)
         graph = build_graph(checkpointer=SqliteSaver(conn))
-        cfg = {"configurable": {"thread_id": "test_flow_coderun", "chat_id": "8587793069", "bot": None}}
+        cfg = {"configurable": {"thread_id": "test_flow_coderun", "chat_id": "100000001", "bot": None}}
         with _maybe_quiet_graph(quiet_graph):
             _run_graph_stream(graph, _base_graph_state(msg), cfg)
         state = graph.get_state(cfg)
