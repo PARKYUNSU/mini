@@ -1,0 +1,77 @@
+{
+  "version": "v5",
+  "targets": {
+    "rag": 400,
+    "chat": 300,
+    "planner": 400,
+    "coding": 300
+  },
+  "slots": {
+    "chat": {
+      "generated_ok": 353,
+      "unique": 353,
+      "used": 300,
+      "from_v4_raw": 299
+    },
+    "planner": {
+      "generated_ok": 400,
+      "unique": 400,
+      "used": 400,
+      "from_v4_raw": 249,
+      "step_count_dist": {
+        "2": 105,
+        "3": 288,
+        "4": 7
+      }
+    },
+    "coding": {
+      "generated_ok": 300,
+      "unique": 300,
+      "used": 300,
+      "from_v4_raw": 93,
+      "comment_ratio_median": 0.0,
+      "comment_ratio_p95": 0.164
+    },
+    "rag": {
+      "generated_ok": 400,
+      "unique": 400,
+      "used": 400
+    }
+  },
+  "rejected_total": 126,
+  "rejected_by_slot_reason": {
+    "chat": {
+      "cjk_leak": 4
+    },
+    "planner": {
+      "plan_n:0": 7,
+      "english_mix": 12,
+      "cjk_leak": 10,
+      "plan_only_warn": 2
+    },
+    "coding": {
+      "runtime": 9,
+      "no_output": 3,
+      "syntax": 15,
+      "format_drift:fence_open": 9,
+      "comment_heavy": 30,
+      "format_drift:fence_multi": 3,
+      "uses_input": 21,
+      "banned_call": 1
+    },
+    "amplify": {}
+  },
+  "final_total": 1400,
+  "final_by_slot": {
+    "planner": 400,
+    "rag": 400,
+    "chat": 300,
+    "coding": 300
+  },
+  "output_len_median": {
+    "planner": 156,
+    "rag": 1411,
+    "chat": 75,
+    "coding": 98
+  }
+}

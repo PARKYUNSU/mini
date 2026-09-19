@@ -32,6 +32,8 @@ raw_data_queue/
 finetune_datasets/*
 !finetune_datasets/v4/
 finetune_datasets/v4/raw/
+!finetune_datasets/v5/
+finetune_datasets/v5/raw/
 chroma_db/
 chroma_db_backup_*/
 tool_chroma_db/
@@ -71,6 +73,8 @@ __pycache__/
 *.egg-info/
 yunsur_v4_adapter/
 yunsur_v4_adapter.tgz
+yunsur_v5_hub/
+outputs/
 *.gguf
 
 # 개인 프로필 DB (Boardroom) — 절대 커밋 금지
