@@ -42,6 +42,7 @@ from core.llm.agent_llm import (
     get_rag_query_rewrite_llm,
     get_router_llm,
     normalize_ai_message_content,
+    get_rag_answer_llm,
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.agent_prompts import (
@@ -618,10 +619,13 @@ def _invoke_llm_with_fallback(
     messages,
     fallback_msg: str = "죄송해요, 답변을 생성하지 못했어요. 잠시 후 다시 질문해 주세요.",
     timeout_sec: float | None = None,
+    getters=None,
 ) -> str:
-    """Ollama 우선, 실패 시 Gemini 폴백. 타임아웃 시 executor는 wait=False로 블로킹 없이 정리."""
+    """Ollama 우선, 실패 시 Gemini 폴백. 타임아웃 시 executor는 wait=False로 블로킹 없이 정리.
+
+    ``getters`` 로 1차 로컬 LLM 을 바꿀 수 있다 (RAG 답변은 get_rag_answer_llm)."""
     _llm_invoke_trace("entry", f"timeout_sec={timeout_sec!r} n_msg={len(messages) if messages else 0}")
-    getters = (get_planner_llm, get_executor_llm)
+    getters = tuple(getters) if getters else (get_planner_llm, get_executor_llm)
     n = len(getters)
     for i, llm_getter in enumerate(getters):
         pool = None
@@ -876,6 +880,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             answer = _invoke_llm_with_fallback(
                 [SystemMessage(content=system_prompt), HumanMessage(content=content)],
                 timeout_sec=rag_timeout,
+                getters=(get_rag_answer_llm, get_executor_llm),
             )
             _da_trace("after _invoke_llm_with_fallback", "B RAG answer")
 

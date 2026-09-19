@@ -79,3 +79,4 @@ v3 파인튜닝 모델은 **학습이 겨냥한 RAG 슬롯에서는 베이스와
 | 2026-09-18 | llama.cpp 변환 완료 → `yunsur_v4`(q4_k_m 5.2GB) Ollama 등록. 운영 v3가 q8_0임을 발견 → `yunsur_v3_q4` 추가해 4모델 재측정 시작. |
 | 2026-09-18 | **머지 오류 발견**: `llm/Qwen3.5-9B.BF16.gguf`가 이름과 달리 v3 머지본(`general.name=Yunsur_V3_Model`) → v4 어댑터가 v3 위에 얹혀 모델 붕괴(80% 실패). 또 "v3_q4"로 잰 것은 4월 2일 v2 머지본. → v4는 `FROM qwen3.5:9b + ADAPTER`로 재생성, v3_q4는 진짜 v3 bf16에서 재양자화, 두 모델 재측정. 잘못된 결과는 `04_eval_v4/bad_merge_record/`에 보관. |
 | 2026-09-18 | 재측정 완료(4모델, 총 7.4h). v4 17% / base 4% / v3 26%·24%. 사전 기준으로 **부분 통과**. 05_conclusion.md 작성. |
+| 2026-09-19 | 운영 반영: `LOCAL_LLM_MODEL=qwen3.5:9b`(잡담·계획·라우터), `RAG_ANSWER_MODEL=yunsur_v4`(RAG 답변만). `get_rag_answer_llm` 추가, `_invoke_llm_with_fallback(getters=)`. |
