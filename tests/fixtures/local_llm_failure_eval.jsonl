@@ -28,3 +28,9 @@
 {"id": "coding_04", "slot": "coding", "timeout_sec": 120, "text": "1부터 20까지 짝수만 출력하는 파이썬 코드를 짜줘."}
 {"id": "coding_05", "slot": "coding", "timeout_sec": 120, "text": "딕셔너리 {'a': 1, 'b': 2}의 값 합을 출력하는 파이썬 코드를 짜줘."}
 {"id": "coding_06", "slot": "coding", "timeout_sec": 120, "text": "피보나치 수열 앞 10개를 리스트로 만들어 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_07", "slot": "coding", "timeout_sec": 120, "text": "리스트 [3, 1, 4, 1, 5, 9, 2, 6]의 누적합 리스트를 만들어 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_08", "slot": "coding", "timeout_sec": 120, "text": "1부터 15까지 돌면서 3의 배수면 Fizz, 5의 배수면 Buzz, 둘 다면 FizzBuzz, 아니면 숫자를 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_09", "slot": "coding", "timeout_sec": 120, "text": "문자열 banana의 글자별 개수를 딕셔너리로 만들어 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_10", "slot": "coding", "timeout_sec": 120, "text": "문자열 'name=kim;age=30;city=seoul'을 딕셔너리로 바꿔 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_11", "slot": "coding", "timeout_sec": 120, "text": "정수 리스트를 받아 두 번째로 큰 값을 돌려주는 함수 second_largest를 만들어줘. 중복은 같은 값으로 치고, 서로 다른 값이 2개 미만이면 None을 돌려줘. [4, 4, 2], [5], [1, 3, 3, 7] 세 경우를 각각 print 해줘."}
+{"id": "coding_12", "slot": "coding", "timeout_sec": 120, "text": "students = [{'name': 'kim', 'scores': [80, 90]}, {'name': 'lee', 'scores': [70, 100, 85]}] 에서 학생별 평균 점수를 소수점 첫째 자리까지 구해 이름과 함께 print 하는 파이썬 코드를 짜줘."}
