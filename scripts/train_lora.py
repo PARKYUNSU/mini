@@ -216,16 +216,32 @@ def main() -> int:
     )
     if args.max_steps:
         sft_kwargs["max_steps"] = args.max_steps
-    trainer = SFTTrainer(
-        model=model,
-        tokenizer=tokenizer,
-        train_dataset=dataset,
-        dataset_text_field="text",
-        max_seq_length=H["max_seq_length"],
-        dataset_num_proc=2,
-        packing=H["packing"],
-        args=SFTConfig(**sft_kwargs),
-    )
+
+    # TRL 0.12+ 는 tokenizer= → processing_class=, TRL 0.20+ 는 dataset_text_field·max_seq_length·
+    # packing·dataset_num_proc 를 SFTTrainer 대신 SFTConfig 로 받고 max_seq_length → max_length 로 개명했다.
+    # 노트북 시절 인자 이름을 그대로 쓰면 TypeError 로 학습 직전에 죽으므로, 시그니처를 보고 맞춘다.
+    import inspect
+
+    cfg_fields = set(inspect.signature(SFTConfig.__init__).parameters)
+    trainer_fields = set(inspect.signature(SFTTrainer.__init__).parameters)
+    dataset_kwargs = {
+        "dataset_text_field": "text",
+        "dataset_num_proc": 2,
+        "packing": H["packing"],
+        ("max_length" if "max_length" in cfg_fields else "max_seq_length"): H["max_seq_length"],
+    }
+    trainer_kwargs = dict(model=model, train_dataset=dataset)
+    trainer_kwargs["processing_class" if "processing_class" in trainer_fields else "tokenizer"] = tokenizer
+    for key, value in dataset_kwargs.items():
+        if key in cfg_fields:
+            sft_kwargs[key] = value
+        elif key in trainer_fields:
+            trainer_kwargs[key] = value
+        else:
+            log(f"[경고] SFTConfig/SFTTrainer 둘 다 {key} 를 받지 않음 — 생략")
+    log(f"TRL 인자 매핑: config={sorted(k for k in dataset_kwargs if k in sft_kwargs)} "
+        f"trainer={sorted(k for k in trainer_kwargs if k != 'model' and k != 'train_dataset')}")
+    trainer = SFTTrainer(args=SFTConfig(**sft_kwargs), **trainer_kwargs)
     trainer = train_on_responses_only(trainer, instruction_part=INSTRUCTION_MARK, response_part=RESPONSE_MARK)
 
     # 7) 학습 (셀 20)
