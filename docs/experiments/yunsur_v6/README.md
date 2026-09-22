@@ -113,7 +113,7 @@ v5 실행에서 확인된 주의점이 스크립트 주석에 들어가 있다 �
 ## 체크리스트
 
 - [x] 평가 세트 확장 — `tests/fixtures/local_llm_failure_eval.jsonl` 36문항 (코딩 12). 유사도 격리 확인 완료: 학습 1,400건 대비 최대 0.416, 기존 문항 대비 최대 0.639 (상한 0.72). 참조 답안 6개가 판정기 조건에서 실행 통과
-- [ ] 맥미니: base·v5를 새 36문항으로 재측정 → `04_eval_v6/base_summary.json`, `v5_summary.json` 고정
+- [ ] 맥미니: base·v5를 새 36문항으로 재측정 ([`scripts/eval_v6_baseline.sh`](../../../scripts/eval_v6_baseline.sh)) → `04_eval_v6/base_summary.json`, `yunsur_v5_summary.json` 고정
 - [ ] `scripts/gen_v6_dataset.py` — v5 파일에서 RAG·잡담·계획 그대로 가져오고 코딩만 재생성, 필터 교체(`multi_block`·`self_revision`)
 - [ ] v5 코딩 raw 에 새 필터 소급 적용 → 거절률 확인 후 본 생성
 - [ ] `02_data_design.md` 기입 (거절 사유 분포·코드 블록 개수 분포)
