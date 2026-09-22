@@ -13,6 +13,8 @@ Gemini/Groq는 호출하지 않는다. 코딩은 ast.parse + 짧은 로컬 exec 
 - hard  : 타임아웃/빈 답/형식 파싱 실패/코드 문법·실행 오류  → ``ok`` / ``fail_kind``
 - quality: 영어 혼입 과다·<think> 유출·같은 줄 반복·펜스 없는 잡담 등 → ``quality_ok`` / ``quality_kind``
   (항상 기록하며, ``--quality`` 를 주면 요약의 실패율에도 합산한다)
+  판정 예외(yunsur_v5 사전 선언): 잡담의 ``code_fence_in_chat`` 은 요청이 템플릿·표·양식·서식·
+  마크다운을 요구했으면 실패로 세지 않는다 (``TEMPLATE_REQUEST_RE``). 4모델에 동일 적용.
 코드 추출은 Executor 노드와 같은 ``core.llm.code_extract.extract_python_code`` 를 쓴다
 (펜스 변형·JSON {"code": ...} 래핑 대응). 벗겨낸 방식은 ``code_unwrap`` 으로 남긴다.
 
@@ -163,6 +165,12 @@ from core.llm.lang_guard import english_ratio as _english_ratio  # 봇 노드와
 
 _THINK_LEAK_RE = re.compile(r"<(?:/?)(?:redacted_)?think(?:ing)?>|<\|im_(?:start|end)\|>", re.IGNORECASE)
 
+# 잡담 펜스 판정 예외 (yunsur_v5 사전 선언, docs/experiments/yunsur_v5/README.md §3):
+# 요청이 템플릿·표·양식·서식·마크다운을 요구했으면 답변의 코드 펜스는 합리적이므로 실패로 세지 않는다.
+# scripts/gen_v5_dataset.py 의 TEMPLATE_REQUEST_RE 와 같은 패턴이어야 한다 (생성 필터 = 평가 판정기).
+# 두 패턴이 갈라지지 않도록 tests/unit/test_eval_chat_fence_exception.py 가 동일성을 검사한다.
+TEMPLATE_REQUEST_RE = re.compile(r"템플릿|양식|서식|표로|표 만들|표를|마크다운|markdown", re.IGNORECASE)
+
 
 def _repeated_line(text: str, min_chars: int = 20, times: int = 3) -> bool:
     """같은 긴 줄이 3번 이상 나오면 반복 붕괴로 본다."""
@@ -170,8 +178,11 @@ def _repeated_line(text: str, min_chars: int = 20, times: int = 3) -> bool:
     return any(c >= times for c in cnt.values())
 
 
-def _quality_check(slot: str, text: str, *, english_max: float) -> tuple[bool, str]:
-    """(quality_ok, quality_kind). hard 통과한 답변에만 의미 있음."""
+def _quality_check(slot: str, text: str, *, english_max: float, request: str = "") -> tuple[bool, str]:
+    """(quality_ok, quality_kind). hard 통과한 답변에만 의미 있음.
+
+    ``request`` 는 그 답변을 만든 요청 문장. 잡담 펜스 예외 판정에만 쓴다.
+    """
     body = text or ""
     if _THINK_LEAK_RE.search(body):
         return False, "think_leak"
@@ -181,7 +192,7 @@ def _quality_check(slot: str, text: str, *, english_max: float) -> tuple[bool, s
         r = _english_ratio(body)
         if r > english_max:
             return False, f"english_mix"
-    if slot == "chat" and "```" in body:
+    if slot == "chat" and "```" in body and not TEMPLATE_REQUEST_RE.search(request or ""):
         return False, "code_fence_in_chat"
     return True, ""
 
@@ -250,7 +261,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
         inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=512)
         ok = inv["status"] == "ok" and len(inv.get("text") or "") >= 8
         fail_kind = "" if ok else (inv["status"] if inv["status"] != "ok" else "too_short")
-        q_ok, q_kind = _quality_check("chat", inv.get("text") or "", english_max=english_max) if ok else (False, "")
+        q_ok, q_kind = _quality_check("chat", inv.get("text") or "", english_max=english_max, request=text) if ok else (False, "")
         return {
             **inv,
             "ok": ok,
@@ -278,7 +289,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
         body = inv.get("text") or ""
         ok = inv["status"] == "ok" and len(body) >= 120 and FALLBACK_MSG not in body
         fail_kind = "" if ok else (inv["status"] if inv["status"] != "ok" else "too_short")
-        q_ok, q_kind = _quality_check("rag", body, english_max=english_max) if ok else (False, "")
+        q_ok, q_kind = _quality_check("rag", body, english_max=english_max, request=text) if ok else (False, "")
         return {
             **inv,
             "ok": ok,
@@ -308,7 +319,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
             fail_kind = "parse_fail"
         else:
             fail_kind = ""
-        q_ok, q_kind = _quality_check("planner", "\n".join(lines), english_max=english_max) if ok else (False, "")
+        q_ok, q_kind = _quality_check("planner", "\n".join(lines), english_max=english_max, request=text) if ok else (False, "")
         return {
             **inv,
             "ok": ok,
@@ -340,7 +351,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
         else:
             fail_kind = ""
         if ok:
-            q_ok, q_kind = _quality_check("coding", body, english_max=1.0)
+            q_ok, q_kind = _quality_check("coding", body, english_max=1.0, request=text)
             if q_ok and unwrap in ("json", "fence_json", "fence_multi", "fence_open"):
                 q_ok, q_kind = False, f"format_drift:{unwrap}"
         else:

@@ -68,7 +68,7 @@ Pod 사양: **L40S 48GB, 볼륨 50GB** (v4 때 20GB로 GGUF 실패). GGUF 변환
 - [ ] 시드 작성 (`finetune_datasets/v5/seeds/`) — 계획 60+ / 코딩 60+ / 잡담 30+, 저장 후 `grep -cvE '^\s*(#|$)'`로 줄 수 확인
 - [x] 맥미니: `gen_v5_dataset.py --import-v4-raw --limit 3` 스모크 (v4 raw 흡수 후 1,047건 조립, 소급 거절 22: `comment_heavy` 7·한자 13·기타 2, 코딩 주석 p95 0.42→0.13)
 - [x] 본 실행 → 1,400건 (계획 +151 / 코딩 +207 신규). [`02_data_design.md`](02_data_design.md) 기입
-- [ ] 평가 판정기 잡담 펜스 예외 (`eval_local_llm_failure.py`) — 4모델 재측정 전에 반영
+- [x] 평가 판정기 잡담 펜스 예외 (`eval_local_llm_failure.py`) — `TEMPLATE_REQUEST_RE` 를 생성기와 같은 패턴으로 두고 `_quality_check(request=...)` 로 판정. `tests/unit/test_eval_chat_fence_exception.py` 5건 통과(생성기·판정기 패턴 동일성 검사 포함)
 - [x] `git push` (v5 데이터 포함 — `.gitignore`에 `!finetune_datasets/v5/` 있음)
 - [x] RunPod Secret `HF_TOKEN`(write) · HF private 모델 레포 `YUNSU24/yunsur_v5_lora`(스크립트가 생성) · mini 레포는 public 이므로 `GH_TOKEN` 불필요
 - [x] RunPod MCP로 Pod 생성 (L40S, 볼륨 50GB, 시작 명령 `scripts/runpod_train.sh`) → 2026-09-22 학습 완료
