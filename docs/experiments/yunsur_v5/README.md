@@ -69,9 +69,9 @@ Pod 사양: **L40S 48GB, 볼륨 50GB** (v4 때 20GB로 GGUF 실패). GGUF 변환
 - [x] 맥미니: `gen_v5_dataset.py --import-v4-raw --limit 3` 스모크 (v4 raw 흡수 후 1,047건 조립, 소급 거절 22: `comment_heavy` 7·한자 13·기타 2, 코딩 주석 p95 0.42→0.13)
 - [x] 본 실행 → 1,400건 (계획 +151 / 코딩 +207 신규). [`02_data_design.md`](02_data_design.md) 기입
 - [ ] 평가 판정기 잡담 펜스 예외 (`eval_local_llm_failure.py`) — 4모델 재측정 전에 반영
-- [ ] `git push` (v5 데이터 포함 — `.gitignore`에 `!finetune_datasets/v5/` 있음)
-- [ ] RunPod Secret `HF_TOKEN`(write) · HF private 모델 레포 생성 · (레포가 private이면) Secret `GH_TOKEN`
-- [ ] RunPod MCP로 Pod 생성 (L40S, 볼륨 50GB, 시작 명령 `scripts/runpod_train.sh`)
+- [x] `git push` (v5 데이터 포함 — `.gitignore`에 `!finetune_datasets/v5/` 있음)
+- [x] RunPod Secret `HF_TOKEN`(write) · HF private 모델 레포 `YUNSU24/yunsur_v5_lora`(스크립트가 생성) · mini 레포는 public 이므로 `GH_TOKEN` 불필요
+- [x] RunPod MCP로 Pod 생성 (L40S, 볼륨 50GB, 시작 명령 `scripts/runpod_train.sh`) → 2026-09-22 학습 완료
 - [ ] 맥미니: `huggingface-cli download $HF_REPO --local-dir "/Volumes/T7 Shield/yunsur_v5_hub"` → `bash scripts/merge_lora_gguf.sh v5` (베이스 `general.name` 검증 포함)
 - [x] 기존 `yunsur_v4`(ADAPTER 방식) Ollama 0.34.2에서 어댑터 적용 확인 (temperature 0·seed 고정 A/B에서 base와 출력 상이) → 운영 유지
 - [x] 공정 비교용 `merge_lora_gguf.sh v4` → `yunsur_v4_merged` 등록(2026-09-19, 5.8GB). temp 0·seed 고정 A/B: base와 상이, 어댑터판 v4와 첫 문장 거의 동일 → 머지 적용 확인. 재측정 4모델 = v5 / v4_merged / v3_q4 / base, 참고로 v4(어댑터) 병기
@@ -81,6 +81,7 @@ Pod 사양: **L40S 48GB, 볼륨 50GB** (v4 때 20GB로 GGUF 실패). GGUF 변환
 
 | 날짜 | 내용 |
 |---|---|
+| 2026-09-22 | **RunPod L40S 학습 완료** — 175스텝/1epoch, loss 1.600→1.122(train_loss 1.245), 10.1분, 잘림 0. `YUNSU24/yunsur_v5_lora`(private) 업로드. 하이퍼파라미터 변경 없음. 실행 중 두 곳이 막혔다: (1) v4 이미지 핀 `runpod/pytorch:2.4.0-py3.11-cuda12.4.1` 이 레지스트리에서 삭제됨 → cu128/torch2.8 이미지로 교체(스크립트의 cu124 재설치는 더 낮은 버전이라 무효, 실제로 2.8.0+cu128 로 학습), (2) 최신 TRL 이 `SFTTrainer(tokenizer=)` → `processing_class=`, `max_seq_length` → `max_length` 로 바뀌어 학습 직전 TypeError → `inspect.signature` 로 매핑(`53f6d69`). Pod 과금 약 $0.6. |
 | 2026-09-19 | 본 생성 완료 1,400건 (17:49→19:50). 개발 도구 커버리지 24%→62%(신규분), 코딩 주석 p95 0.42→0.16. 4~5단계 계획은 실패(38건 중 1건) — 자기 증류 한계로 기록. |
 | 2026-09-19 | 스모크 통과. HF 베이스 원본 다운로드 → `llm/Qwen3.5-9B-base.BF16.gguf`(진짜 베이스, 공용) → `yunsur_v4_merged` 등록·A/B 검증. |
 | 2026-09-19 | Ollama brew 재설치 후 4모델 존재 확인. 그러나 `ollama create -f Modelfile.v4` → "LoRA adapters are no longer supported" — 배포 방식을 ADAPTER → 머지로 변경, `scripts/merge_lora_gguf.sh` 작성. |

@@ -2,8 +2,12 @@
 # yunsur LoRA — RunPod Pod 시작 명령(Docker Command). clone → 설치 → 학습 → HF Hub private 업로드 → Pod 자동 종료.
 #
 # Pod 설정 (RunPod MCP / 콘솔):
-#   이미지    runpod/pytorch:2.4.0-py3.11-cuda12.4.1  (v4 와 동일; torch 는 아래에서 2.5+ cu124 로 올림)
+#   이미지    runpod/pytorch:1.3.2-cu1281-torch280-ubuntu2404
+#             (v4 의 runpod/pytorch:2.4.0-py3.11-cuda12.4.1 은 2026-09 레지스트리에서 사라졌고
+#              cu124 이미지 자체가 더 없다. 아래 cu124 재설치는 이미지의 torch 2.8.0+cu128 보다
+#              낮은 2.6.0 이라 --upgrade 가 아무것도 바꾸지 않는다 — 실제 학습은 2.8.0+cu128 로 돌았다.)
 #   GPU       L40S 48GB · 볼륨 50GB (/workspace) — v4 때 20GB 로 부족했음
+#   컨테이너 디스크 60GB — pip 설치·HF 캐시가 여기 쌓이고 재시작 때 지워진다
 #   시작 명령 bash -c "curl -fsSL https://raw.githubusercontent.com/PARKYUNSU/mini/main/scripts/runpod_train.sh | bash"
 #            (레포가 private 이면 GH_TOKEN 이 필요하므로 아래 방식으로: )
 #            bash -c "git clone https://\${GH_TOKEN}@github.com/PARKYUNSU/mini.git /workspace/mini && bash /workspace/mini/scripts/runpod_train.sh"
@@ -13,6 +17,9 @@
 #            GH_TOKEN = {{ RUNPOD_SECRET_GH_TOKEN }}    (레포가 private 일 때만)
 #            GIT_REF  = main                            (선택: 태그·브랜치·커밋)
 #            KEEP_POD = 1                               (선택: 디버깅용, 끝나도 Pod 안 끔)
+#              ⚠️ KEEP_POD=1 로 rc=0 종료하면 시작 명령이 끝난 것이므로 RunPod 이 컨테이너를
+#                 자동 재시작해 학습이 처음부터 다시 돈다 (HF 어댑터가 덮어써진다).
+#                 디버깅이 끝나면 업로드 로그를 확인하고 곧바로 Pod 을 terminate 할 것.
 #
 # 결과 확인 (맥미니):
 #   huggingface-cli download "$HF_REPO" --local-dir "/Volumes/T7 Shield/yunsur_v5_hub"   → adapter/, train_log.json, train_stats.json
