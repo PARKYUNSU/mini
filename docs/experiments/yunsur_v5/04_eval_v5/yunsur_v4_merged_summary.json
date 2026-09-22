@@ -1,0 +1,71 @@
+{
+  "generated": "2026-09-22T22:23:05+09:00",
+  "model": "yunsur_v4_merged",
+  "n": 90,
+  "fail": 5,
+  "fail_rate": 0.0556,
+  "quality_fail": 2,
+  "strict_fail": 7,
+  "strict_fail_rate": 0.0778,
+  "one_liner": "고정 30문항 반복 포함 n=90, 로컬 1차만: hard 실패 5/90 = 6% · 품질 포함 7/90 = 8%",
+  "by_slot": {
+    "chat": {
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 24
+      },
+      "quality_fail": 0,
+      "quality_kinds": {},
+      "strict_fail_rate": 0.0,
+      "elapsed_median_sec": 5.3,
+      "elapsed_max_sec": 14.7
+    },
+    "coding": {
+      "n": 18,
+      "fail": 1,
+      "fail_rate": 0.0556,
+      "fail_kinds": {
+        "ok": 17,
+        "syntax": 1
+      },
+      "quality_fail": 2,
+      "quality_kinds": {
+        "format_drift:fence_open": 1,
+        "repetition": 1
+      },
+      "strict_fail_rate": 0.1667,
+      "elapsed_median_sec": 5.7,
+      "elapsed_max_sec": 99.1
+    },
+    "planner": {
+      "n": 24,
+      "fail": 4,
+      "fail_rate": 0.1667,
+      "fail_kinds": {
+        "ok": 20,
+        "parse_fail": 4
+      },
+      "quality_fail": 0,
+      "quality_kinds": {},
+      "strict_fail_rate": 0.1667,
+      "elapsed_median_sec": 9.8,
+      "elapsed_max_sec": 15.2
+    },
+    "rag": {
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 24
+      },
+      "quality_fail": 0,
+      "quality_kinds": {},
+      "strict_fail_rate": 0.0,
+      "elapsed_median_sec": 33.2,
+      "elapsed_max_sec": 52.3
+    }
+  },
+  "results_path": ".cron/eval_v5_yunsur_v4_merged.jsonl"
+}

@@ -61,7 +61,11 @@ Pod 사양: **L40S 48GB, 볼륨 50GB** (v4 때 20GB로 GGUF 실패). GGUF 변환
 
 ## 6. 재측정 · 결론
 
-→ `04_eval_v5/`, `05_conclusion.md` (측정 후 작성)
+→ [`04_eval_v5/`](04_eval_v5/), [`05_conclusion.md`](05_conclusion.md)
+
+**판정: 실패** (사전 선언 기준). 전체 strict 실패율 base 1% / **v5 6%** / v4 머지 8% / v4 어댑터 16% / v3 q4 17%.
+H1(계획 커버리지) 확인 — 플래너 16.7% → 4.2%. H3(잡담·RAG 유지) 확인 — 둘 다 0%, RAG는 base보다 낮음.
+H2(코딩 주석 습관) 반증 — 코딩 16.7% → 22.2%. 실패 원인은 주석이 아니라 **자기 수정 서술로 인한 재작성**이었다.
 
 ## 체크리스트
 
@@ -72,15 +76,16 @@ Pod 사양: **L40S 48GB, 볼륨 50GB** (v4 때 20GB로 GGUF 실패). GGUF 변환
 - [x] `git push` (v5 데이터 포함 — `.gitignore`에 `!finetune_datasets/v5/` 있음)
 - [x] RunPod Secret `HF_TOKEN`(write) · HF private 모델 레포 `YUNSU24/yunsur_v5_lora`(스크립트가 생성) · mini 레포는 public 이므로 `GH_TOKEN` 불필요
 - [x] RunPod MCP로 Pod 생성 (L40S, 볼륨 50GB, 시작 명령 `scripts/runpod_train.sh`) → 2026-09-22 학습 완료
-- [ ] 맥미니: `huggingface-cli download $HF_REPO --local-dir "/Volumes/T7 Shield/yunsur_v5_hub"` → `bash scripts/merge_lora_gguf.sh v5` (베이스 `general.name` 검증 포함)
+- [x] 맥미니: `hf download $HF_REPO --local-dir "/Volumes/T7 Shield/yunsur_v5_hub"` → `bash scripts/merge_lora_gguf.sh v5` — `yunsur_v5-q4_k_m.gguf` 5.4GB 등록 (huggingface_hub 1.x 에서 `huggingface-cli` 가 `hf` 로 바뀜)
 - [x] 기존 `yunsur_v4`(ADAPTER 방식) Ollama 0.34.2에서 어댑터 적용 확인 (temperature 0·seed 고정 A/B에서 base와 출력 상이) → 운영 유지
 - [x] 공정 비교용 `merge_lora_gguf.sh v4` → `yunsur_v4_merged` 등록(2026-09-19, 5.8GB). temp 0·seed 고정 A/B: base와 상이, 어댑터판 v4와 첫 문장 거의 동일 → 머지 적용 확인. 재측정 4모델 = v5 / v4_merged / v3_q4 / base, 참고로 v4(어댑터) 병기
-- [ ] 4모델 같은 밤 재측정 (`scripts/eval_v5_all.sh`) → 05_conclusion.md
+- [x] 4모델 같은 밤 재측정 (`scripts/eval_v5_all.sh`, 2026-09-22 21:18→09-23 00:34, 196분) → [`05_conclusion.md`](05_conclusion.md)
 
 ## 진행 로그
 
 | 날짜 | 내용 |
 |---|---|
+| 2026-09-23 | **4모델 재측정 완료 → 판정 실패** (196분). base 1% / v5 6% / v4머지 8% / v4어댑터 16% / v3q4 17%. 플래너 16.7%→4.2%(H1 확인), 잡담·RAG 0%(H3 확인), 코딩 16.7%→22.2%(H2 반증). 코딩 실패는 `coding_06` 3/3 + `coding_04` 1회로 2문항에 몰렸고, 원인은 주석이 아니라 구현을 한 번 쓴 뒤 자기 주석으로 의심하고 재작성을 시작하다 토큰 상한에서 잘리는 행동. 잡담 펜스 예외는 5모델 모두 `code_fence_in_chat` 0건으로 작동 확인. [`05_conclusion.md`](05_conclusion.md) |
 | 2026-09-22 | **RunPod L40S 학습 완료** — 175스텝/1epoch, loss 1.600→1.122(train_loss 1.245), 10.1분, 잘림 0. `YUNSU24/yunsur_v5_lora`(private) 업로드. 하이퍼파라미터 변경 없음. 실행 중 두 곳이 막혔다: (1) v4 이미지 핀 `runpod/pytorch:2.4.0-py3.11-cuda12.4.1` 이 레지스트리에서 삭제됨 → cu128/torch2.8 이미지로 교체(스크립트의 cu124 재설치는 더 낮은 버전이라 무효, 실제로 2.8.0+cu128 로 학습), (2) 최신 TRL 이 `SFTTrainer(tokenizer=)` → `processing_class=`, `max_seq_length` → `max_length` 로 바뀌어 학습 직전 TypeError → `inspect.signature` 로 매핑(`53f6d69`). Pod 과금 약 $0.6. |
 | 2026-09-19 | 본 생성 완료 1,400건 (17:49→19:50). 개발 도구 커버리지 24%→62%(신규분), 코딩 주석 p95 0.42→0.16. 4~5단계 계획은 실패(38건 중 1건) — 자기 증류 한계로 기록. |
 | 2026-09-19 | 스모크 통과. HF 베이스 원본 다운로드 → `llm/Qwen3.5-9B-base.BF16.gguf`(진짜 베이스, 공용) → `yunsur_v4_merged` 등록·A/B 검증. |
