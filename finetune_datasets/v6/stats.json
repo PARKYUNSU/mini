@@ -1,0 +1,18 @@
+{
+  "version": "v6",
+  "source": "finetune_datasets/v5/train_data_v5.jsonl",
+  "samples": 1400,
+  "slot_dist": {
+    "planner": 400,
+    "rag": 400,
+    "chat": 300,
+    "coding": 300
+  },
+  "change": {
+    "kind": "rag_unescape_newlines",
+    "rows": 175,
+    "fields": 175,
+    "newlines": 3066
+  },
+  "note": "v5 와 RAG 이스케이프 수정분 외에는 동일. 코딩·잡담·계획은 v5 그대로."
+}

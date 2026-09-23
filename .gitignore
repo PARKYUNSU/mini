@@ -34,6 +34,7 @@ finetune_datasets/*
 finetune_datasets/v4/raw/
 !finetune_datasets/v5/
 finetune_datasets/v5/raw/
+!finetune_datasets/v6/
 chroma_db/
 chroma_db_backup_*/
 tool_chroma_db/

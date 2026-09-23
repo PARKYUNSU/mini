@@ -1,33 +1,35 @@
 #!/usr/bin/env python3
-"""yunsur_v6 학습 데이터 생성 — v5 파이프라인 재사용 + 두 가지 변경.
+"""yunsur_v6 학습 데이터 — v5 에서 RAG 이스케이프 결함만 고친다 (단일 변수).
 
-docs/experiments/yunsur_v6/README.md §4 의 두 변수를 구현한다.
-  1) 코딩 거절 필터 교체: comment_heavy(주석 비율) 해제 → multi_block + self_revision
-  2) RAG 이스케이프 수정: literal `\\n`(역슬래시+n) → 진짜 개행 (v5 400건 중 175건)
+docs/experiments/yunsur_v6/README.md §4. v5 학습 파일의 RAG 400건 중 175건이 개행을
+literal `\\n`(역슬래시+n 두 글자)으로 담고 있다. 출처는 전부 `train_data_v3_clean.jsonl`
+이고 v4 에도 164건 있었다 — v3 파이프라인의 이중 이스케이프가 그대로 상속됐다.
 
-잡담·계획은 v5 raw 를 그대로 흡수하고, 코딩만 새 필터로 다시 만든다.
-건수·하이퍼파라미터·seed 는 v5 와 같다 (RAG 400건은 같은 seed → 같은 샘플).
+학습된 모델은 이 습관을 재현하고 다른 슬롯으로 번뜨린다. 기준선 측정의 대조:
+base 는 108건 전부 literal `\\n` 을 쓰지 않는데, v5 는 RAG 24/24 전부, 잡담 3/24,
+코딩 3/36 에서 쓴다. 코딩에서는 코드 추출이 깨져 `syntax` 실패가 된다.
 
-  # 1) 새 필터를 v5 생성분에 소급 적용해 거절률만 본다 (LLM 없이, 맥북에서도 빠름)
-  python scripts/gen_v6_dataset.py --audit
+**v6 는 그 175건의 이스케이프만 되돌린다.** 나머지 1,225건은 v5 파일을 그대로 쓴다 —
+바이트 단위로 같다. 그래서 v6 와 v5 의 차이는 이 수정 하나로 귀속된다.
+코딩 샘플의 literal `\\n` 2건은 `sep='\\n'` 등 파이썬 코드 안의 정상 문자열이므로
+건드리지 않는다.
 
-  # 2) v5 raw 흡수 후 부족분만 생성 → 조립 (맥미니, Ollama 필요)
-  python scripts/gen_v6_dataset.py --import-v5-raw
+  python scripts/gen_v6_dataset.py --build     # train_data_v5 → train_data_v6 (+ 검증)
+  python scripts/gen_v6_dataset.py --verify    # 결과 검증만
+  python scripts/gen_v6_dataset.py --audit     # 데이터 실태 조사 (이스케이프 현황·필터 소급)
 
-  # 3) 생성 없이 재조립만 / 결과 검증
-  python scripts/gen_v6_dataset.py --assemble
-  python scripts/gen_v6_dataset.py --verify
+LLM·무거운 임포트가 필요 없다. 맥북에서도 즉시 돌아간다.
 
---audit 와 --verify 는 무거운 임포트(core.graph 등)를 하지 않는다. 생성·조립 때만
-scripts/gen_v5_dataset.py 를 불러 전역을 v6 로 갈아끼운다 — 파이프라인을 복제하지 않고
-바뀐 부분만 덮어써서 두 버전이 갈라지지 않게 한다.
+왜 코딩 필터가 없는가: 원래 v6 는 코딩 거절 필터(multi_block·self_revision) 교체를
+같이 하려 했으나, --audit 으로 v5 생성분에 소급 적용해 보니 307건 중 1건만 걸렸다.
+자기 수정 행동은 학습 데이터에 없고 추론 시점에 생긴다 — 필터로는 바꿀 수 없어
+범위에서 뺐다. 그 조사 기능은 --audit 에 남겨 두었다 (v7 질문).
 """
 from __future__ import annotations
 
 import argparse
 import json
 import re
-import sys
 from collections import Counter
 from pathlib import Path
 
@@ -35,11 +37,11 @@ ROOT = Path(__file__).resolve().parents[1]
 VERSION = "v6"
 V5_DIR = ROOT / "finetune_datasets" / "v5"
 V6_DIR = ROOT / "finetune_datasets" / VERSION
-TRAIN_V5 = V5_DIR / f"train_data_v5.jsonl"
+TRAIN_V5 = V5_DIR / "train_data_v5.jsonl"
 TRAIN_V6 = V6_DIR / f"train_data_{VERSION}.jsonl"
+STATS_V6 = V6_DIR / "stats.json"
 
-# ── 변수 1: 코딩 거절 필터 (README §4)
-# v5 의 실패 원문에서 추린 표현들. 한 번 쓴 구현을 주석으로 의심하고 다시 쓰기 시작하는 신호.
+# v5 실패 원문에서 추린 자기 수정 표현. --audit 전용 (v6 는 이 필터를 쓰지 않는다).
 SELF_REVISION_RE = re.compile(
     r"재작성"
     r"|다시\s*(?:쓰|작성)"
@@ -53,7 +55,6 @@ SELF_REVISION_RE = re.compile(
     r"|앞서(?:의|서)"
     r"|대신\s*이렇게"
 )
-FENCE_TOKEN_RE = re.compile(r"```")
 
 
 def literal_newlines(text: str) -> int:
@@ -65,218 +66,173 @@ def unescape_newlines(text: str) -> str:
     return (text or "").replace("\\n", "\n")
 
 
-def fence_count(output: str) -> int:
-    return len(FENCE_TOKEN_RE.findall(output or ""))
-
-
-def coding_reject(output: str) -> str:
-    """v6 가 새로 거절하는 사유. 통과면 ''.
-
-    multi_block  — 펜스 토큰 3개 이상. 닫힌 블록 하나 + 열린 블록 하나부터 걸린다.
-    self_revision — 자기 수정 표현. v5 실패는 대부분 한 블록 안에서 일어나므로 이쪽이 주력이다.
-    """
-    if fence_count(output) >= 3:
-        return "multi_block"
-    m = SELF_REVISION_RE.search(output or "")
-    if m:
-        return "self_revision"
-    return ""
-
-
 def _read_jsonl(p: Path) -> list[dict]:
     if not p.is_file():
         return []
-    out = []
-    for line in p.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if line:
-            out.append(json.loads(line))
-    return out
+    return [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
-# ---------------------------------------------------------------- --audit
-def audit() -> int:
-    """새 필터를 v5 생성분에 소급 적용한다. 목표 300건을 채울 수 있는지 먼저 본다."""
-    print("===== v6 코딩 필터 소급 적용 (v5 생성분) =====\n")
+def _write_jsonl(p: Path, rows: list[dict]) -> None:
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
 
-    raw = _read_jsonl(V5_DIR / "raw" / "coding.jsonl")
-    passed = [r for r in raw if r.get("output") and not r.get("reject_reason")]
-    print(f"v5 코딩 raw: {len(raw)}건, 그중 v5 필터 통과 {len(passed)}건")
 
-    reasons = Counter()
-    hits = Counter()
-    for r in passed:
-        why = coding_reject(r["output"])
-        reasons[why or "pass"] += 1
-        if why == "self_revision":
-            m = SELF_REVISION_RE.search(r["output"])
-            if m:
-                hits[m.group(0).strip()] += 1
-    keep = reasons["pass"]
-    print(f"v6 필터 적용 후: 통과 {keep}건 / 거절 {len(passed) - keep}건 {dict(reasons)}")
-    if passed:
-        print(f"  → 통과율 {100 * keep / len(passed):.0f}%")
-    if keep < 300:
-        print(f"  ⚠️ 목표 300건 미달 — {300 - keep}건을 새로 생성해야 한다")
-    else:
-        print("  목표 300건 충족 — 재생성 없이 조립만으로 가능")
+# ---------------------------------------------------------------- --build
+def build() -> int:
+    rows = _read_jsonl(TRAIN_V5)
+    if not rows:
+        print(f"❌ {TRAIN_V5} 없음")
+        return 1
+    print(f"v5 학습 파일: {len(rows)}건 {dict(Counter(r['slot'] for r in rows))}")
 
-    if hits:
-        print("\nself_revision 을 발동시킨 표현 (상위 12):")
-        for phrase, n in hits.most_common(12):
-            print(f"  {n:4}회  {phrase!r}")
+    changed_rows = 0
+    changed_fields = 0
+    changed_chars = 0
+    out: list[dict] = []
+    for r in rows:
+        r = dict(r)
+        if r.get("slot") == "rag":
+            hit = 0
+            for k in ("instruction", "output"):
+                n = literal_newlines(r.get(k, ""))
+                if n:
+                    r[k] = unescape_newlines(r[k])
+                    hit += 1
+                    changed_chars += n
+            if hit:
+                changed_rows += 1
+                changed_fields += hit
+                r["escape_fixed"] = True
+        out.append(r)
 
-    # v5 가 comment_heavy 로 버렸던 것들이 v6 에서는 살아나는가
-    rej = [r for r in _read_jsonl(V5_DIR / "rejected.jsonl") if r.get("reason") == "comment_heavy"]
-    print(f"\nv5 가 comment_heavy 로 거절한 {len(rej)}건 — v6 는 이 규칙을 해제한다")
+    _write_jsonl(TRAIN_V6, out)
+    print(f"이스케이프 수정: RAG {changed_rows}건 · {changed_fields}필드 · {changed_chars}개 개행")
+    print(f"→ {TRAIN_V6} ({len(out)}건)")
 
-    # 학습 파일 기준 교차 확인
-    tr = [r for r in _read_jsonl(TRAIN_V5) if r.get("slot") == "coding"]
-    tr_rej = Counter(coding_reject(r["output"]) or "pass" for r in tr)
-    print(f"\nv5 train_data 의 코딩 {len(tr)}건에 v6 필터: {dict(tr_rej)}")
+    # v5 와 달라진 행이 RAG 수정분뿐인지 확인한다 — 단일 변수의 근거
+    diff_slots = Counter()
+    for a, b in zip(rows, out):
+        if a != b:
+            diff_slots[a["slot"]] += 1
+    print(f"v5 대비 달라진 행: {dict(diff_slots)}  (rag 외에 있으면 단일 변수가 깨진 것)")
 
-    # RAG 이스케이프 현황
-    rag = [r for r in _read_jsonl(TRAIN_V5) if r.get("slot") == "rag"]
-    bad = [r for r in rag if literal_newlines(r.get("output", "")) or literal_newlines(r.get("instruction", ""))]
-    print(f"\n===== RAG 이스케이프 =====")
-    print(f"v5 RAG {len(rag)}건 중 literal \\n 포함 {len(bad)}건 ({100 * len(bad) / max(1, len(rag)):.0f}%)")
-    if bad:
-        tot = sum(literal_newlines(r["output"]) for r in bad)
-        print(f"  총 {tot}개 — v6 는 이를 진짜 개행으로 되돌린다")
-    other = [
-        r for r in _read_jsonl(TRAIN_V5)
-        if r.get("slot") != "rag" and literal_newlines(r.get("output", ""))
-    ]
-    print(f"다른 슬롯의 literal \\n: {len(other)}건 " + (f"{Counter(r['slot'] for r in other)}" if other else ""))
-    for r in other:
-        print(f"  [{r['slot']}] {r['output'][:90]!r}  ← 코드 안 정상 문자열이면 건드리지 않는다")
-    return 0
+    stats = {
+        "version": VERSION,
+        "source": str(TRAIN_V5.relative_to(ROOT)),
+        "samples": len(out),
+        "slot_dist": dict(Counter(r["slot"] for r in out)),
+        "change": {
+            "kind": "rag_unescape_newlines",
+            "rows": changed_rows,
+            "fields": changed_fields,
+            "newlines": changed_chars,
+        },
+        "note": "v5 와 RAG 이스케이프 수정분 외에는 동일. 코딩·잡담·계획은 v5 그대로.",
+    }
+    STATS_V6.parent.mkdir(parents=True, exist_ok=True)
+    STATS_V6.write_text(json.dumps(stats, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"→ {STATS_V6}")
+    return verify()
 
 
 # ---------------------------------------------------------------- --verify
 def verify() -> int:
     rows = _read_jsonl(TRAIN_V6)
     if not rows:
-        print(f"❌ {TRAIN_V6} 없음 — 먼저 생성·조립할 것")
+        print(f"❌ {TRAIN_V6} 없음 — 먼저 --build")
         return 1
-    dist = Counter(r["slot"] for r in rows)
-    print(f"{TRAIN_V6}: {len(rows)}건 {dict(dist)}")
+    print(f"\n===== 검증 =====")
+    print(f"{TRAIN_V6.name}: {len(rows)}건 {dict(Counter(r['slot'] for r in rows))}")
     rc = 0
 
-    rag_bad = [r for r in rows if r["slot"] == "rag" and literal_newlines(r.get("output", ""))]
+    rag = [r for r in rows if r["slot"] == "rag"]
+    rag_bad = [r for r in rag if literal_newlines(r.get("output", "")) or literal_newlines(r.get("instruction", ""))]
     if rag_bad:
-        print(f"❌ RAG 에 literal \\n 이 {len(rag_bad)}건 남았다 — 이스케이프 수정이 안 먹었다")
+        print(f"❌ RAG {len(rag_bad)}건에 literal \\n 이 남았다")
         rc = 1
     else:
-        print("✅ RAG literal \\n 0건")
+        print(f"✅ RAG {len(rag)}건 literal \\n 0건")
 
+    # 코딩의 정상 \n 은 보존돼야 한다
     cod = [r for r in rows if r["slot"] == "coding"]
     cod_lit = [r for r in cod if literal_newlines(r.get("output", ""))]
-    print(f"   코딩 {len(cod)}건 중 literal \\n 포함 {len(cod_lit)}건 (파이썬 코드 안 정상 문자열이면 보존이 맞다)")
-    for r in cod_lit:
-        print(f"     {r['output'][:90]!r}")
-
-    bad_filter = [(r, coding_reject(r["output"])) for r in cod]
-    bad_filter = [(r, w) for r, w in bad_filter if w]
-    if bad_filter:
-        print(f"❌ 코딩 {len(bad_filter)}건이 v6 필터에 걸리는데 학습 파일에 들어 있다 {Counter(w for _, w in bad_filter)}")
-        rc = 1
+    if len(cod_lit) == 2:
+        print(f"✅ 코딩의 정상 literal \\n 2건 보존 (파이썬 코드 안 문자열)")
     else:
-        print("✅ 코딩 전건이 v6 필터 통과")
+        print(f"⚠️ 코딩의 literal \\n 이 {len(cod_lit)}건 — v5 에서는 2건이었다")
+        for r in cod_lit:
+            print(f"     {r['output'][:90]!r}")
+
+    # 다른 슬롯은 v5 와 동일해야 한다
+    v5 = _read_jsonl(TRAIN_V5)
+    if len(v5) == len(rows):
+        diff = Counter(a["slot"] for a, b in zip(v5, rows) if a != b)
+        extra = {k: v for k, v in diff.items() if k != "rag"}
+        if extra:
+            print(f"❌ rag 외 슬롯이 바뀌었다 {extra} — 단일 변수가 아니다")
+            rc = 1
+        else:
+            print(f"✅ 바뀐 행은 rag {diff.get('rag', 0)}건뿐 — 단일 변수 유지")
+    else:
+        print(f"❌ 건수가 v5({len(v5)})와 다르다({len(rows)})")
+        rc = 1
+
+    # 개행이 실제로 늘었는지 (되돌리기가 문자열만 지운 게 아님을 확인)
+    nl5 = sum(r["output"].count("\n") for r in v5 if r["slot"] == "rag")
+    nl6 = sum(r["output"].count("\n") for r in rag)
+    print(f"   RAG 진짜 개행 수: v5 {nl5} → v6 {nl6} (+{nl6 - nl5})")
     return rc
 
 
-# ---------------------------------------------------------------- 생성·조립 (무거운 임포트)
-def _load_v5_pipeline():
-    """gen_v5_dataset 을 불러 전역을 v6 로 갈아끼운다."""
-    import importlib.util
+# ---------------------------------------------------------------- --audit
+def audit() -> int:
+    rows = _read_jsonl(TRAIN_V5)
+    print("===== RAG 이스케이프 현황 (v5 학습 파일) =====")
+    rag = [r for r in rows if r["slot"] == "rag"]
+    bad = [r for r in rag if literal_newlines(r.get("output", "")) or literal_newlines(r.get("instruction", ""))]
+    tot = sum(literal_newlines(r.get("output", "")) for r in bad)
+    print(f"RAG {len(rag)}건 중 {len(bad)}건({100 * len(bad) / max(1, len(rag)):.0f}%) · literal \\n {tot}개")
+    other = [r for r in rows if r["slot"] != "rag" and literal_newlines(r.get("output", ""))]
+    print(f"다른 슬롯: {len(other)}건 {dict(Counter(r['slot'] for r in other))}")
+    for r in other:
+        print(f"  [{r['slot']}] {r['output'][:90]!r}  ← 코드 안 정상 문자열, 보존")
 
-    spec = importlib.util.spec_from_file_location("_gen_v5", ROOT / "scripts" / "gen_v5_dataset.py")
-    g5 = importlib.util.module_from_spec(spec)
-    sys.modules["_gen_v5"] = g5
-    spec.loader.exec_module(g5)
+    print("\n===== 슬롯별 자기 수정 표현·길이 =====")
+    for slot in ("rag", "chat", "planner", "coding"):
+        rs = [r for r in rows if r["slot"] == slot]
+        if not rs:
+            continue
+        hit = [r for r in rs if SELF_REVISION_RE.search(r["output"])]
+        ls = sorted(len(r["output"]) for r in rs)
+        print(f"{slot:8} 자기수정 {len(hit):3}/{len(rs):4} = {100 * len(hit) / len(rs):5.1f}%"
+              f"   길이 중앙값 {ls[len(ls) // 2]:5} p95 {ls[int(len(ls) * 0.95)]:5}")
 
-    # 경로: 출력은 v6, 흡수 원본(V4_RAW_DIR)은 v5 raw, 시드는 v6 전용이 있으면 그것
-    g5.VERSION = VERSION
-    g5.RAW_DIR = V6_DIR / "raw"
-    g5.REJECT_PATH = V6_DIR / "rejected.jsonl"
-    g5.TRAIN_PATH = TRAIN_V6
-    g5.STATS_PATH = V6_DIR / "stats.json"
-    g5.V4_RAW_DIR = V5_DIR / "raw"
-    v6_seeds = V6_DIR / "seeds"
-    g5.SEED_DIR = v6_seeds if v6_seeds.is_dir() else (V5_DIR / "seeds")
-
-    # 변수 1: comment_heavy 해제 (비율은 최대 1.0 이므로 1.01 이면 절대 걸리지 않는다) + 새 규칙 추가
-    g5.CODING_COMMENT_MAX = 1.01
-    _v5_post_filter = g5.post_filter
-
-    def post_filter(slot: str, instruction: str, output: str):
-        out, reason = _v5_post_filter(slot, instruction, output)
-        if reason:
-            return out, reason
-        if slot == "coding":
-            why = coding_reject(out)
-            if why:
-                return "", why
-        return out, reason
-
-    g5.post_filter = post_filter
-
-    # 변수 2: RAG 이스케이프 수정
-    _v5_sample_rag = g5.sample_rag
-
-    def sample_rag(n: int, rng):
-        rows = _v5_sample_rag(n, rng)
-        fixed = 0
-        for r in rows:
-            for k in ("instruction", "output"):
-                if literal_newlines(r.get(k, "")):
-                    r[k] = unescape_newlines(r[k])
-                    fixed += 1
-            r["escape_fixed"] = True
-        print(f"[rag] 이스케이프 수정 {fixed}개 필드 ({len(rows)}건 중)")
-        return rows
-
-    g5.sample_rag = sample_rag
-    print(f"[v6] 파이프라인 준비 — raw={g5.RAW_DIR} seeds={g5.SEED_DIR}")
-    return g5
+    print("\n===== 코딩 필터 소급 적용 (v6 범위에서 빠진 이유) =====")
+    raw = _read_jsonl(V5_DIR / "raw" / "coding.jsonl")
+    passed = [r for r in raw if r.get("output") and not r.get("reject_reason")]
+    rej = Counter()
+    for r in passed:
+        n_fence = r["output"].count("```")
+        why = "multi_block" if n_fence >= 3 else ("self_revision" if SELF_REVISION_RE.search(r["output"]) else "pass")
+        rej[why] += 1
+    print(f"v5 코딩 raw 통과분 {len(passed)}건 → {dict(rej)}")
+    print("  거절이 거의 없다 = 자기 수정 행동은 학습 데이터에 없고 추론 시점에 생긴다.")
+    print("  필터로는 바꿀 수 없어 v6 범위에서 뺐다 (v7 질문: RAG 의 길이·비중이 원인인가).")
+    return 0
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--audit", action="store_true", help="새 필터를 v5 생성분에 소급 적용해 거절률만 본다 (LLM 불필요)")
-    ap.add_argument("--verify", action="store_true", help="train_data_v6 검증 (이스케이프·필터) (LLM 불필요)")
-    ap.add_argument("--import-v5-raw", action="store_true", help="v5 raw 를 v6 raw 로 흡수한 뒤 부족분만 생성")
-    ap.add_argument("--assemble", action="store_true", help="생성 없이 raw → train_data_v6 재조립만")
-    ap.add_argument("--model", default="qwen3.5:9b")
-    ap.add_argument("--slots", default="coding", help="생성할 슬롯 (기본 coding — 잡담·계획은 v5 흡수분을 그대로 쓴다)")
-    ap.add_argument("--target", default="", help="예: coding=300")
-    ap.add_argument("--variants", type=int, default=8)
-    ap.add_argument("--limit", type=int, default=0)
-    ap.add_argument("--seed", type=int, default=3407, help="v4=v5=v6 동일 → RAG 400건 같은 샘플")
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("--build", action="store_true", help="train_data_v5 → train_data_v6 (RAG 이스케이프 수정 + 검증)")
+    g.add_argument("--verify", action="store_true", help="train_data_v6 검증만")
+    g.add_argument("--audit", action="store_true", help="데이터 실태 조사 (판정 아님, 기록용)")
     args = ap.parse_args()
-
-    if args.audit:
-        return audit()
+    if args.build:
+        return build()
     if args.verify:
         return verify()
-
-    V6_DIR.mkdir(parents=True, exist_ok=True)
-    g5 = _load_v5_pipeline()
-    argv = ["gen_v6_dataset.py", "--model", args.model, "--slots", args.slots,
-            "--variants", str(args.variants), "--limit", str(args.limit), "--seed", str(args.seed)]
-    if args.target:
-        argv += ["--target", args.target]
-    if args.import_v5_raw:
-        argv += ["--import-v4-raw"]  # 위에서 V4_RAW_DIR 을 v5 raw 로 갈아끼웠다
-    if args.assemble:
-        argv += ["--assemble"]
-    sys.argv = argv
-    rc = g5.main()
-    if rc == 0:
-        print("\n===== 검증 =====")
-        rc = verify()
-    return rc
+    return audit()
 
 
 if __name__ == "__main__":
