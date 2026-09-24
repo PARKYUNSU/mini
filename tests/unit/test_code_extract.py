@@ -67,3 +67,39 @@ def test_language_name_line_without_fence():
 
 def test_empty():
     assert extract_python_code("   ") == ("", "empty")
+
+
+def test_fused_fence_is_repaired():
+    """```python 과 첫 코드 줄이 붙어 나오는 출력을 복구한다.
+
+    파인튜닝 모델이 코드가 import 로 시작할 때 내는 결함 (base 는 내지 않는다).
+    docs/experiments/yunsur_v6/05_conclusion.md — 고치기 전에는 펜스 정규식이 언어 태그를
+    "pythonimport" 로 읽어 매치에 실패하고 전체가 plain 으로 떨어져 ast.parse 가 깨졌다.
+    """
+    code, how = extract_python_code("```pythonimport re\nd = {}\nprint(d)\n```")
+    assert how == "fence+fused"
+    assert code == "import re\nd = {}\nprint(d)"
+    assert _parses(code)
+
+
+def test_fused_fence_open_and_variants():
+    code, how = extract_python_code("```pythonimport ast, json\ns = 'x'\nprint(s)")
+    assert how == "fence_open+fused" and _parses(code)
+
+    code, how = extract_python_code("```py3print(1)\n```")
+    assert how == "fence+fused" and code == "print(1)"
+
+    code, how = extract_python_code("```python3import os\nprint(1)\n```")
+    assert how == "fence+fused" and code == "import os\nprint(1)"
+
+
+def test_normal_language_tags_are_not_split():
+    """python 이 py + thon 으로 쪼개지면 안 된다 (정확 일치 가드).
+
+    언어 후보를 정규식 교대로 쓰면 python 이 조건에 걸려 실패한 뒤 백트래킹으로 py 가
+    매치돼 thon 을 코드로 잘라낸다 — 실제로 한 번 그렇게 깨뜨렸다.
+    """
+    for lang in ("python", "py", "Python", "python3", "py3"):
+        code, how = extract_python_code(f"```{lang}\nprint('hi')\n```")
+        assert how == "fence", f"{lang}: how={how}"
+        assert code == "print('hi')", f"{lang}: code={code!r}"

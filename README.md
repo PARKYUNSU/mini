@@ -88,7 +88,7 @@ python -m apps.backfill.run_backfill -s 2024-06-01 -e 2024-12-31 -b 20  # 20개�
 | `TELEGRAM_TOKEN` | 메인 봇 | ✅ |
 | `ALLOWED_CHAT_ID` | 접근 허용 Chat ID (쉼표 구분) | ✅ |
 | `LOCAL_LLM_MODEL` | 로컬 LLM 모델명 (기본값: `qwen3.5:9b`) | |
-| `RAG_ANSWER_MODEL` | RAG 답변(B) 전용 로컬 모델 (기본: `LOCAL_LLM_MODEL`). 예: `yunsur_v4` — [실험 노트](docs/experiments/yunsur_v4/) | |
+| `RAG_ANSWER_MODEL` | RAG 답변(B) 전용 로컬 모델 (기본: `LOCAL_LLM_MODEL`). 현재 `yunsur_v6` — [실험 노트](docs/experiments/yunsur_v6/) | |
 | `E2B_API_KEY` | Agent 코드 실행 (E2B 샌드박스) | Agent 봇 사용 시 |
 | `E2B_SANDBOX_ENV_MODE` | `full`(기본): 호스트 환경 전부를 샌드박스에 전달. `minimal`: LANG·UTF-8 등만 전달(`.env` 역슬래시·unicodeescape 이슈 완화) | |
 | `E2B_SANDBOX_EXTRA_KEYS` | `minimal`일 때 추가로 넘길 키 목록(쉼표 구분), 예: `WEATHER_API_KEY,TAVILY_API_KEY` | |

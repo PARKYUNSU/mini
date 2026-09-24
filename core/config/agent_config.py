@@ -77,8 +77,12 @@ TOOL_COLLECTION_NAME = "agent_tools_rag"
 TOOL_RAG_TOP_K = 3
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 OLLAMA_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b")
-# RAG 답변(B) 전용 로컬 모델. 비어 있으면 OLLAMA_MODEL. 실험(docs/experiments/yunsur_v4): 잡담·계획·코딩은 base 가,
-# RAG 답변은 yunsur_v4 가 나음 (실패율 0% vs 12%) → 슬롯별로 분리. 두 모델을 번갈아 로드하므로 RAG 첫 응답이 수 초 느려질 수 있음.
+# RAG 답변(B) 전용 로컬 모델. 비어 있으면 OLLAMA_MODEL. 잡담·계획·코딩은 base 가, RAG 답변은 파인튜닝본이 낫다
+# (docs/experiments/yunsur_v4: 0% vs 12%) → 슬롯별로 분리. 두 모델을 번갈아 로드하므로 RAG 첫 응답이 수 초 느려질 수 있음.
+# 2026-09-24 yunsur_v4 → yunsur_v6. 실패율은 v4=v5=v6 모두 0% 로 같지만, v4·v5 는 RAG 응답 24/24 에서 개행을
+# literal \n 으로 내보내고 v6 만 0/24 다 (docs/experiments/yunsur_v6/05_conclusion.md). 텔레그램 경로는
+# apps/telegram_bot/rag_engine.py 의 normalize_model_newlines() 로 우회 중이었으나, 이 getter 를 쓰는
+# 에이전트 그래프 경로(core/graph/agent_nodes.py)에는 그 정규화가 없다 → 교체가 곧 수정이다. 속도도 v6 가 가장 빠르다.
 RAG_ANSWER_MODEL = (os.getenv("RAG_ANSWER_MODEL") or "").strip() or OLLAMA_MODEL
 OLLAMA_TIMEOUT = 120
 OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "-1s")  # -1은 invalid, -1s 등 단위 필요
