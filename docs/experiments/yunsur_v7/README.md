@@ -65,12 +65,13 @@ P2 가 맞으면 v6 의 남은 코딩 실패는 `coding_04` 1건 · `coding_06` 
 
 - [x] `core/llm/code_extract.py` — 붙은 펜스 복구 (`+fused` 표시). 회귀 10건·복구 4건 확인
 - [x] `tests/unit/test_code_extract.py` — 16건 통과 (정확 일치 가드 포함: `python` 이 `py`+`thon` 으로 쪼개지면 안 된다)
-- [ ] 3모델 재측정 (base / v5 / v6, 약 105분) → `04_eval_v7/` 에 새 기준선 고정
-- [ ] 붙은 펜스 발생률을 모델별로 기록 (P4 확인)
+- [ ] 3모델 재측정 ([`scripts/eval_v7_rebaseline.sh`](../../../scripts/eval_v7_rebaseline.sh), 약 105분) → `04_eval_v7/` 에 새 기준선 고정
+- [ ] 붙은 펜스 발생률을 모델별로 기록 (P4 확인 — 스크립트가 `code_unwrap` 의 `+fused` 와 원문 패턴 두 방식으로 센다)
 - [ ] `05_conclusion.md` — P1~P4 판정, v8 표적 확정
 
 ## 진행 로그
 
 | 날짜 | 내용 |
 |---|---|
+| 2026-09-24 | 재측정 스크립트 작성([`scripts/eval_v7_rebaseline.sh`](../../../scripts/eval_v7_rebaseline.sh)). 105분짜리 측정을 옛 코드로 태우지 않도록 **사전 확인 두 개를 실제로 검증**했다: 평가 세트 sha256 이 `a1cfe0f7f562` 로 v6 라운드와 동일, 추출기가 붙은 펜스를 `fence+fused` 로 복구하면서 정상 펜스는 `fence` 로 유지. 요약에서 P1~P4 를 자동 판정한다. |
 | 2026-09-24 | 실험 노트 개설. 추출기 수정 완료 — 언어 태그를 통째로 잡고 접두어를 검사하는 방식. **한 번 깨뜨렸다가 고쳤다**: 언어 후보를 정규식 교대(`python3\|python\|py3\|py`)로 쓰니 ` ```python\n ` 에서 `python` 이 선행 조건에 걸려 실패한 뒤 백트래킹으로 `py` 가 매치돼 `thon` 을 코드로 잘라냈다. 정확 일치 가드를 넣어 해결하고 회귀 테스트로 고정했다. 운영 반영도 함께: `RAG_ANSWER_MODEL` 을 `yunsur_v4` → `yunsur_v6` 으로 교체(v6 결론의 운영 결정). |
