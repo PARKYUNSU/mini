@@ -1,0 +1,125 @@
+{
+  "note": "평가 문항이 실제로 풀리는지 확인하는 참조답안. 채점에는 쓰지 않는다 (_coding_ok 는 실행만 본다).",
+  "items": {
+    "coding_01": {
+      "tier": "쉬움",
+      "solution": "print(sum(range(1, 11)))\n"
+    },
+    "coding_02": {
+      "tier": "쉬움",
+      "solution": "print(sorted([3, 1, 2]))\n"
+    },
+    "coding_03": {
+      "tier": "쉬움",
+      "solution": "print(len('hello'))\n"
+    },
+    "coding_04": {
+      "tier": "쉬움",
+      "solution": "for i in range(1, 21):\n    if i % 2 == 0:\n        print(i)\n"
+    },
+    "coding_05": {
+      "tier": "쉬움",
+      "solution": "d = {'a': 1, 'b': 2}\nprint(sum(d.values()))\n"
+    },
+    "coding_06": {
+      "tier": "쉬움",
+      "solution": "fib = [0, 1]\nwhile len(fib) < 10:\n    fib.append(fib[-1] + fib[-2])\nprint(fib)\n"
+    },
+    "coding_07": {
+      "tier": "보통",
+      "solution": "data = [3, 1, 4, 1, 5, 9, 2, 6]\nacc, total = [], 0\nfor x in data:\n    total += x\n    acc.append(total)\nprint(acc)\n"
+    },
+    "coding_08": {
+      "tier": "보통",
+      "solution": "for i in range(1, 16):\n    if i % 15 == 0: print('FizzBuzz')\n    elif i % 3 == 0: print('Fizz')\n    elif i % 5 == 0: print('Buzz')\n    else: print(i)\n"
+    },
+    "coding_09": {
+      "tier": "보통",
+      "solution": "counts = {}\nfor ch in 'banana':\n    counts[ch] = counts.get(ch, 0) + 1\nprint(counts)\n"
+    },
+    "coding_10": {
+      "tier": "보통",
+      "solution": "s = 'name=kim;age=30;city=seoul'\nd = dict(p.split('=', 1) for p in s.split(';'))\nprint(d)\n"
+    },
+    "coding_11": {
+      "tier": "어려움",
+      "solution": "def second_largest(nums):\n    u = sorted(set(nums), reverse=True)\n    return u[1] if len(u) >= 2 else None\nprint(second_largest([4, 4, 2]))\nprint(second_largest([5]))\nprint(second_largest([1, 3, 3, 7]))\n"
+    },
+    "coding_12": {
+      "tier": "어려움",
+      "solution": "students = [{'name': 'kim', 'scores': [80, 90]}, {'name': 'lee', 'scores': [70, 100, 85]}]\nfor st in students:\n    print(st['name'], round(sum(st['scores']) / len(st['scores']), 1))\n"
+    },
+    "coding_13": {
+      "tier": "보통",
+      "solution": "data = [3, 1, 3, 2, 1, 4]\nseen = set()\nout = []\nfor x in data:\n    if x not in seen:\n        seen.add(x)\n        out.append(x)\nprint(out)\n"
+    },
+    "coding_14": {
+      "tier": "보통",
+      "solution": "a = [1, 2, 3, 4]\nb = [3, 4, 5]\nprint(sorted(set(a) & set(b)))\n"
+    },
+    "coding_15": {
+      "tier": "보통",
+      "solution": "words = ['pear', 'fig', 'apple', 'kiwi']\nprint(sorted(words, key=lambda w: (len(w), w)))\n"
+    },
+    "coding_16": {
+      "tier": "보통",
+      "solution": "total = sum(n for n in range(1, 31) if n % 3 == 0 or n % 5 == 0)\nprint(total)\n"
+    },
+    "coding_17": {
+      "tier": "보통",
+      "solution": "d = {'a': 3, 'b': 1, 'c': 2}\nfor k, v in sorted(d.items(), key=lambda kv: kv[1], reverse=True):\n    print(k, v)\n"
+    },
+    "coding_18": {
+      "tier": "보통",
+      "solution": "s = 'the cat and the hat and the bat'\ncounts = {}\nfor w in s.split():\n    counts[w] = counts.get(w, 0) + 1\ntop = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:2]\nprint(top)\n"
+    },
+    "coding_19": {
+      "tier": "보통",
+      "solution": "data = [1, 2, 3, 4, 5, 6, 7]\nout = [data[i:i + 3] for i in range(0, len(data), 3)]\nprint(out)\n"
+    },
+    "coding_20": {
+      "tier": "보통",
+      "solution": "s = 'Never odd or even'\nt = ''.join(ch.lower() for ch in s if ch.isalnum())\nprint(t == t[::-1])\n"
+    },
+    "coding_21": {
+      "tier": "어려움",
+      "solution": "def chunk(lst, n):\n    if n <= 0:\n        return []\n    return [lst[i:i + n] for i in range(0, len(lst), n)]\nprint(chunk([1, 2, 3, 4, 5], 2))\nprint(chunk([1, 2], 5))\nprint(chunk([1, 2, 3], 0))\n"
+    },
+    "coding_22": {
+      "tier": "어려움",
+      "solution": "def flatten(x):\n    out = []\n    for item in x:\n        if isinstance(item, list):\n            out.extend(flatten(item))\n        else:\n            out.append(item)\n    return out\nprint(flatten([1, [2, [3, 4]], 5]))\nprint(flatten([]))\nprint(flatten([[[1]]]))\n"
+    },
+    "coding_23": {
+      "tier": "어려움",
+      "solution": "def merge_dicts(d1, d2):\n    out = dict(d1)\n    for k, v in d2.items():\n        if k in out:\n            out[k] = [out[k], v]\n        else:\n            out[k] = v\n    return out\nprint(merge_dicts({'a': 1, 'b': 2}, {'b': 3, 'c': 4}))\n"
+    },
+    "coding_24": {
+      "tier": "어려움",
+      "solution": "def balanced(s):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    stack = []\n    for ch in s:\n        if ch in '([{':\n            stack.append(ch)\n        elif ch in pairs:\n            if not stack or stack.pop() != pairs[ch]:\n                return False\n    return not stack\nfor case in ('([]{})', '([)]', '', '('):\n    print(balanced(case))\n"
+    },
+    "coding_25": {
+      "tier": "어려움",
+      "solution": "def rle(s):\n    out = []\n    for ch in s:\n        if out and out[-1][0] == ch:\n            out[-1] = (ch, out[-1][1] + 1)\n        else:\n            out.append((ch, 1))\n    return out\nprint(rle('aaabbc'))\nprint(rle(''))\n"
+    },
+    "coding_26": {
+      "tier": "어려움",
+      "solution": "def merge_sorted(a, b):\n    i = j = 0\n    out = []\n    while i < len(a) and j < len(b):\n        if a[i] <= b[j]:\n            out.append(a[i]); i += 1\n        else:\n            out.append(b[j]); j += 1\n    out.extend(a[i:])\n    out.extend(b[j:])\n    return out\nprint(merge_sorted([1, 3, 5], [2, 4]))\nprint(merge_sorted([], [1, 2]))\n"
+    },
+    "coding_27": {
+      "tier": "어려움",
+      "solution": "def group_by_first(words):\n    out = {}\n    for w in words:\n        if not w:\n            continue\n        out.setdefault(w[0], []).append(w)\n    return out\nprint(group_by_first(['ant', 'bee', 'ape']))\nprint(group_by_first([]))\n"
+    },
+    "coding_28": {
+      "tier": "어려움",
+      "solution": "def roman_to_int(s):\n    vals = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}\n    total = 0\n    for i, ch in enumerate(s):\n        v = vals[ch]\n        if i + 1 < len(s) and v < vals[s[i + 1]]:\n            total -= v\n        else:\n            total += v\n    return total\nfor case in ('XIV', 'MCMXC', 'IX', 'I'):\n    print(roman_to_int(case))\n"
+    },
+    "coding_29": {
+      "tier": "어려움",
+      "solution": "def transpose(m):\n    if not m:\n        return []\n    n = len(m[0])\n    if any(len(row) != n for row in m):\n        return None\n    return [[row[i] for row in m] for i in range(n)]\nprint(transpose([[1, 2], [3, 4], [5, 6]]))\nprint(transpose([[1, 2], [3]]))\n"
+    },
+    "coding_30": {
+      "tier": "어려움",
+      "solution": "def top_k(nums, k):\n    return sorted(nums, reverse=True)[:k]\nprint(top_k([5, 1, 5, 3], 3))\nprint(top_k([2], 5))\n"
+    }
+  }
+}

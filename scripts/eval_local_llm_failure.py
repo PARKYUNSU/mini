@@ -172,6 +172,23 @@ _THINK_LEAK_RE = re.compile(r"<(?:/?)(?:redacted_)?think(?:ing)?>|<\|im_(?:start
 TEMPLATE_REQUEST_RE = re.compile(r"템플릿|양식|서식|표로|표 만들|표를|마크다운|markdown", re.IGNORECASE)
 
 
+def _wilson_ci(k: int, n: int, z: float = 1.96) -> tuple[float, float] | None:
+    """실패율의 95% Wilson 점수 구간. (low, high) 또는 n=0 이면 None.
+
+    왜 필요한가 (docs/experiments/protocol.md): n=24 에서 1건은 4.17%p 다. yunsur_v5~v7 에서
+    같은 모델·같은 문항의 실패가 밤마다 ±1~2건 움직였고, 그 폭이 판정선 ±5%p 와 같은
+    크기였다. 실패율만 적으면 그 사실이 보이지 않으므로 구간을 같이 기록한다.
+    정규근사(wald)는 k=0 에서 폭이 0 이 되어 오해를 부르므로 Wilson 을 쓴다.
+    """
+    if n <= 0:
+        return None
+    p = k / n
+    d = 1 + z * z / n
+    center = (p + z * z / (2 * n)) / d
+    half = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / d
+    return round(max(0.0, center - half), 4), round(min(1.0, center + half), 4)
+
+
 def _repeated_line(text: str, min_chars: int = 20, times: int = 3) -> bool:
     """같은 긴 줄이 3번 이상 나오면 반복 붕괴로 본다."""
     cnt = Counter(ln.strip() for ln in (text or "").splitlines() if len(ln.strip()) >= min_chars)
@@ -403,6 +420,8 @@ def _summarize(out_path: Path, model: str, *, include_quality: bool = False) -> 
             "quality_fail": nq,
             "quality_kinds": dict(qkinds),
             "strict_fail_rate": round((nf + nq) / len(rs), 4) if rs else None,
+            "strict_fail_ci95": _wilson_ci(nf + nq, len(rs)),
+            "fail_ci95": _wilson_ci(nf, len(rs)),
             "elapsed_median_sec": round(elapsed[len(elapsed) // 2], 1) if elapsed else None,
             "elapsed_max_sec": round(elapsed[-1], 1) if elapsed else None,
         }
@@ -415,6 +434,9 @@ def _summarize(out_path: Path, model: str, *, include_quality: bool = False) -> 
         "quality_fail": len(q_fails),
         "strict_fail": strict_fails,
         "strict_fail_rate": round(strict_fails / n, 4) if n else None,
+        "strict_fail_ci95": _wilson_ci(strict_fails, n),
+        "fail_ci95": _wilson_ci(len(fails), n),
+        "repeats": max((int(r.get("trial") or 1) for r in rows), default=0),
         "one_liner": (
             f"고정 {len({r.get('id') for r in rows})}문항 반복 포함 n={n}, 로컬 1차만: "
             f"hard 실패 {len(fails)}/{n} = {100 * len(fails) / n:.0f}%"

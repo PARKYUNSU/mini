@@ -34,3 +34,21 @@
 {"id": "coding_10", "slot": "coding", "timeout_sec": 120, "text": "문자열 'name=kim;age=30;city=seoul'을 딕셔너리로 바꿔 print 하는 파이썬 코드를 짜줘."}
 {"id": "coding_11", "slot": "coding", "timeout_sec": 120, "text": "정수 리스트를 받아 두 번째로 큰 값을 돌려주는 함수 second_largest를 만들어줘. 중복은 같은 값으로 치고, 서로 다른 값이 2개 미만이면 None을 돌려줘. [4, 4, 2], [5], [1, 3, 3, 7] 세 경우를 각각 print 해줘."}
 {"id": "coding_12", "slot": "coding", "timeout_sec": 120, "text": "students = [{'name': 'kim', 'scores': [80, 90]}, {'name': 'lee', 'scores': [70, 100, 85]}] 에서 학생별 평균 점수를 소수점 첫째 자리까지 구해 이름과 함께 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_13", "slot": "coding", "timeout_sec": 120, "text": "리스트 [3, 1, 3, 2, 1, 4]에서 중복을 제거하고 원래 순서를 유지한 리스트를 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_14", "slot": "coding", "timeout_sec": 120, "text": "리스트 [1, 2, 3, 4]와 [3, 4, 5]의 공통 원소를 정렬해서 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_15", "slot": "coding", "timeout_sec": 120, "text": "리스트 ['pear', 'fig', 'apple', 'kiwi']를 길이 순으로, 길이가 같으면 알파벳 순으로 정렬해 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_16", "slot": "coding", "timeout_sec": 120, "text": "1부터 30까지 중 3의 배수이거나 5의 배수인 수의 합을 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_17", "slot": "coding", "timeout_sec": 120, "text": "딕셔너리 {'a': 3, 'b': 1, 'c': 2}를 값 기준 내림차순으로 정렬해 (키, 값) 쌍을 한 줄씩 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_18", "slot": "coding", "timeout_sec": 120, "text": "문장 'the cat and the hat and the bat'에서 단어별 등장 횟수를 세어 가장 많이 나온 단어 2개를 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_19", "slot": "coding", "timeout_sec": 120, "text": "리스트 [1, 2, 3, 4, 5, 6, 7]을 앞에서부터 3개씩 묶어 리스트의 리스트로 만들어 print 하는 파이썬 코드를 짜줘. 마지막 묶음은 남은 개수만큼만 담아줘."}
+{"id": "coding_20", "slot": "coding", "timeout_sec": 120, "text": "문자열 'Never odd or even'이 대소문자와 공백을 무시했을 때 회문인지 판단해 True 또는 False를 print 하는 파이썬 코드를 짜줘."}
+{"id": "coding_21", "slot": "coding", "timeout_sec": 120, "text": "리스트와 정수 n을 받아 n개씩 묶어 돌려주는 함수 chunk를 만들어줘. n이 0 이하면 빈 리스트를 돌려줘. chunk([1,2,3,4,5], 2), chunk([1,2], 5), chunk([1,2,3], 0) 세 경우를 각각 print 해줘."}
+{"id": "coding_22", "slot": "coding", "timeout_sec": 120, "text": "임의 깊이로 중첩된 리스트를 평탄화하는 함수 flatten을 만들어줘. flatten([1, [2, [3, 4]], 5]), flatten([]), flatten([[[1]]]) 세 경우를 각각 print 해줘."}
+{"id": "coding_23", "slot": "coding", "timeout_sec": 120, "text": "두 딕셔너리를 합치는 함수 merge_dicts를 만들어줘. 같은 키가 양쪽에 있으면 두 값을 리스트로 묶어줘. merge_dicts({'a':1,'b':2}, {'b':3,'c':4}) 를 print 해줘."}
+{"id": "coding_24", "slot": "coding", "timeout_sec": 120, "text": "소괄호·중괄호·대괄호가 올바르게 짝지어졌는지 판단하는 함수 balanced를 만들어줘. balanced('([]{})'), balanced('([)]'), balanced(''), balanced('(') 네 경우를 각각 print 해줘."}
+{"id": "coding_25", "slot": "coding", "timeout_sec": 120, "text": "문자열을 연속 문자 런렝스로 인코딩하는 함수 rle을 만들어줘. 'aaabbc'는 [('a',3),('b',2),('c',1)] 처럼 돌려줘. rle('aaabbc') 와 rle('') 두 경우를 각각 print 해줘."}
+{"id": "coding_26", "slot": "coding", "timeout_sec": 120, "text": "정렬된 두 리스트를 정렬 상태를 유지하며 합치는 함수 merge_sorted를 만들어줘. merge_sorted([1,3,5], [2,4]), merge_sorted([], [1,2]) 두 경우를 각각 print 해줘."}
+{"id": "coding_27", "slot": "coding", "timeout_sec": 120, "text": "문자열 리스트를 첫 글자별로 묶어 딕셔너리로 돌려주는 함수 group_by_first를 만들어줘. group_by_first(['ant','bee','ape']) 와 group_by_first([]) 두 경우를 각각 print 해줘."}
+{"id": "coding_28", "slot": "coding", "timeout_sec": 120, "text": "로마 숫자 문자열을 정수로 바꾸는 함수 roman_to_int를 만들어줘. roman_to_int('XIV'), roman_to_int('MCMXC'), roman_to_int('IX'), roman_to_int('I') 네 경우를 각각 print 해줘."}
+{"id": "coding_29", "slot": "coding", "timeout_sec": 120, "text": "이차원 리스트의 행과 열을 바꾸는 함수 transpose를 만들어줘. 행마다 길이가 다르면 None을 돌려줘. transpose([[1,2],[3,4],[5,6]]) 와 transpose([[1,2],[3]]) 두 경우를 각각 print 해줘."}
+{"id": "coding_30", "slot": "coding", "timeout_sec": 120, "text": "정수 리스트에서 큰 값 k개를 내림차순으로 돌려주는 함수 top_k를 만들어줘. k가 리스트 길이보다 크면 전체를 돌려주고, 같은 값이 여러 개면 그대로 여러 개 담아줘. top_k([5,1,5,3], 3) 와 top_k([2], 5) 두 경우를 각각 print 해줘."}
