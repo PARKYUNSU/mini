@@ -51,12 +51,29 @@ load_dotenv(ROOT / ".env")
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from core.config.agent_config import (
+    OLLAMA_DIRECT_NUM_PREDICT,
     OLLAMA_MODEL,
     ollama_kwargs,
 )
 from core.graph.agent_nodes import _parse_planner_llm_lines
 from core.llm.agent_llm import normalize_ai_message_content
 from core.llm.code_extract import extract_python_code
+
+# 슬롯별 출력 토큰 상한. 운영과 어긋나면 그 차이가 장황한 모델에 불리하게 작용해
+# 모델 차이로 오인된다 (docs/experiments/protocol.md §2.2, baseline_0925 경고 절).
+#   잡담  운영 get_planner_llm       → OLLAMA_DIRECT_NUM_PREDICT
+#   RAG   운영 get_rag_answer_llm    → OLLAMA_DIRECT_NUM_PREDICT
+#   계획  운영 get_planner_plan_llm  → 300
+#   코딩  운영은 로컬을 쓰지 않는다 (Executor = get_coding_groq_llm, Groq). 이 슬롯은
+#         "로컬이 Groq 을 대신할 수 있나" 라는 가정 질문이므로, 상한이 병목이 되지
+#         않도록 넉넉히 준다. 2026-09-25 측정에서 800 이 병목이었다 — 코딩 실패 36건 중
+#         16건이 잘림이었고, 그것만으로 McNemar p 가 0.002 ↔ 0.250 사이를 오갔다.
+SLOT_NUM_PREDICT = {
+    "chat": OLLAMA_DIRECT_NUM_PREDICT,
+    "rag": OLLAMA_DIRECT_NUM_PREDICT,
+    "planner": 300,
+    "coding": OLLAMA_DIRECT_NUM_PREDICT,
+}
 from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
     DIRECT_ANSWER_RAG_SYSTEM_BASE,
@@ -145,7 +162,14 @@ def _invoke_local_num_predict(messages, timeout_sec: float, num_predict: int) ->
         elapsed = time.perf_counter() - t0
         if not (text or "").strip():
             return {"status": "empty", "text": "", "elapsed_sec": round(elapsed, 3)}
-        return {"status": "ok", "text": text.strip(), "elapsed_sec": round(elapsed, 3)}
+        body = text.strip()
+        return {
+            "status": "ok",
+            "text": body,
+            "elapsed_sec": round(elapsed, 3),
+            "out_chars": len(body),
+            "num_predict": num_predict,
+        }
     except FuturesTimeout:
         elapsed = time.perf_counter() - t0
         return {"status": "timeout", "text": "", "elapsed_sec": round(elapsed, 3)}
@@ -275,7 +299,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
             SystemMessage(content=DIRECT_ANSWER_DAILY_CHAT_SYSTEM),
             HumanMessage(content=direct_answer_daily_user("(없음)", text)),
         ]
-        inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=512)
+        inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=SLOT_NUM_PREDICT["chat"])
         ok = inv["status"] == "ok" and len(inv.get("text") or "") >= 8
         fail_kind = "" if ok else (inv["status"] if inv["status"] != "ok" else "too_short")
         q_ok, q_kind = _quality_check("chat", inv.get("text") or "", english_max=english_max, request=text) if ok else (False, "")
@@ -302,7 +326,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
             SystemMessage(content=DIRECT_ANSWER_RAG_SYSTEM_BASE),
             HumanMessage(content=user),
         ]
-        inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=2048)
+        inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=SLOT_NUM_PREDICT["rag"])
         body = inv.get("text") or ""
         ok = inv["status"] == "ok" and len(body) >= 120 and FALLBACK_MSG not in body
         fail_kind = "" if ok else (inv["status"] if inv["status"] != "ok" else "too_short")
@@ -325,7 +349,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
                 content=planner_user_prompt(3, "(도구 후보 없음)", "(참고 지식 없음)", "(없음)", text)
             ),
         ]
-        inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=400)
+        inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=SLOT_NUM_PREDICT["planner"])
         body = inv.get("text") or ""
         lines = _parse_planner_llm_lines(body)
         parse_ok = len(lines) >= 2 and lines != PLANNER_FALLBACK
@@ -356,7 +380,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
             SystemMessage(content=EXECUTOR_SYSTEM_CODE_RUN),
             HumanMessage(content=prompt),
         ]
-        inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=800)
+        inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=SLOT_NUM_PREDICT["coding"])
         body = inv.get("text") or ""
         code, unwrap = extract_python_code(body)
         ran_ok, detail = _coding_ok(code) if inv["status"] == "ok" else (False, inv["status"])
@@ -424,6 +448,14 @@ def _summarize(out_path: Path, model: str, *, include_quality: bool = False) -> 
             "fail_ci95": _wilson_ci(nf, len(rs)),
             "elapsed_median_sec": round(elapsed[len(elapsed) // 2], 1) if elapsed else None,
             "elapsed_max_sec": round(elapsed[-1], 1) if elapsed else None,
+            # 장황함을 실패로 숨기지 않고 지표로 본다 (protocol.md §2.2)
+            "out_chars_median": (lambda v: v[len(v) // 2] if v else None)(
+                sorted(int(x.get("out_chars") or 0) for x in rs)
+            ),
+            "out_chars_max": max((int(x.get("out_chars") or 0) for x in rs), default=None),
+            # 닫는 펜스가 없다 = 출력이 잘렸다는 직접 신호 (코딩 슬롯에서만 의미)
+            "unclosed_fence": sum(1 for x in rs if str(x.get("code_unwrap") or "").startswith("fence_open")),
+            "num_predict": next((int(x["num_predict"]) for x in rs if x.get("num_predict")), None),
         }
     summary = {
         "generated": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
