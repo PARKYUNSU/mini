@@ -1,0 +1,111 @@
+{
+  "generated": "2026-09-25T06:18:07+09:00",
+  "model": "yunsur_v6",
+  "n": 162,
+  "fail": 34,
+  "fail_rate": 0.2099,
+  "quality_fail": 2,
+  "strict_fail": 36,
+  "strict_fail_rate": 0.2222,
+  "strict_fail_ci95": [
+    0.1651,
+    0.2923
+  ],
+  "fail_ci95": [
+    0.1543,
+    0.2789
+  ],
+  "repeats": 3,
+  "one_liner": "고정 54문항 반복 포함 n=162, 로컬 1차만: hard 실패 34/162 = 21% · 품질 포함 36/162 = 22%",
+  "by_slot": {
+    "chat": {
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 24
+      },
+      "quality_fail": 0,
+      "quality_kinds": {},
+      "strict_fail_rate": 0.0,
+      "strict_fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "elapsed_median_sec": 5.2,
+      "elapsed_max_sec": 21.6
+    },
+    "coding": {
+      "n": 90,
+      "fail": 34,
+      "fail_rate": 0.3778,
+      "fail_kinds": {
+        "ok": 56,
+        "runtime": 10,
+        "syntax": 24
+      },
+      "quality_fail": 2,
+      "quality_kinds": {
+        "format_drift:fence_open": 2
+      },
+      "strict_fail_rate": 0.4,
+      "strict_fail_ci95": [
+        0.3049,
+        0.5033
+      ],
+      "fail_ci95": [
+        0.2846,
+        0.481
+      ],
+      "elapsed_median_sec": 12.2,
+      "elapsed_max_sec": 62.7
+    },
+    "planner": {
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 24
+      },
+      "quality_fail": 0,
+      "quality_kinds": {},
+      "strict_fail_rate": 0.0,
+      "strict_fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "elapsed_median_sec": 6.3,
+      "elapsed_max_sec": 10.5
+    },
+    "rag": {
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 24
+      },
+      "quality_fail": 0,
+      "quality_kinds": {},
+      "strict_fail_rate": 0.0,
+      "strict_fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "elapsed_median_sec": 30.2,
+      "elapsed_max_sec": 36.2
+    }
+  },
+  "results_path": ".cron/round_0925/target.jsonl"
+}
