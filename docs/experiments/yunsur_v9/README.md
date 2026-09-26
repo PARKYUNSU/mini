@@ -63,14 +63,15 @@ v6 와 동일. [`scripts/runpod_train.sh`](../../../scripts/runpod_train.sh) (L4
 
 - [x] [`scripts/gen_v9_dataset.py`](../../../scripts/gen_v9_dataset.py) `--build` → 1,100건. 검증 전항목 통과 (슬롯 분포 · 코딩 0건 · 남은 1,100건이 v6 와 완전 동일 · RAG literal `\n` 0건)
 - [x] `.gitignore` v9 예외
-- [ ] `git push` (v9 데이터 포함)
-- [ ] RunPod 학습 → HF `YUNSU24/yunsur_v9_lora`
-- [ ] 맥미니: `hf download` → `merge_lora_gguf.sh v9`
-- [ ] `bash scripts/eval_round.sh yunsur_v9` (약 110분) → `04_eval_v9/`
-- [ ] `05_conclusion.md` — H1~H3 판정, 채택 여부
+- [x] `git push` (v9 데이터 포함)
+- [x] RunPod 학습 → HF `YUNSU24/yunsur_v9_lora` (L40S·138스텝·8.9분·$0.25)
+- [x] 맥미니: `hf download` → `merge_lora_gguf.sh v9` (q4_k_m 5.4GB)
+- [x] `bash scripts/eval_round.sh yunsur_v9` (121분) → [`04_eval_v9/`](04_eval_v9/)
+- [x] [`05_conclusion.md`](05_conclusion.md) — **통과, 운영 최종본 채택**
 
 ## 진행 로그
 
 | 날짜 | 내용 |
 |---|---|
+| 2026-09-27 | **통과 — 코딩 데이터가 원인이었다.** 잡담·계획·RAG 짝지은 불일치 **0개**(base 는 각 슬롯 1건 실패, v9 는 0건). 코딩은 v9만 실패 **1개**로 v6 의 9개에서 떨어져 base 와 구분되지 않는다(McNemar **p=1.000**, v6 는 0.004). 코딩 실패율 46.7% → **21.1%**(base 15.6%), `timeout` 35 → 13. **네 라운드가 필터·문항·판정기·디코딩으로 찾아다닌 것을 그 데이터를 없애는 것이 해결했다.** H3(loss 궤적)은 빗나갔고 애초에 데이터 구성이 다르면 loss 는 비교 대상이 아니었다 — 예측에 넣은 것이 설계 실수. 운영: RAG 슬롯을 v6 → v9 로 교체 권고(성능 우위가 아니라 부채 제거). |
 | 2026-09-27 | 노트 개설, 판정 사전 선언. v6 에서 코딩 300건만 빼 1,100건 생성 — 남은 행이 v6 와 바이트 단위로 같음을 검증했다. 근거는 네 라운드 누적: 코딩은 base 보다 유의하게 나쁘고(p=0.004), 디코딩으로 못 고치며(v8), 데이터 필터로도 못 잡고(v6 감사 307건 중 1건), **운영 Executor 는 Groq 이라 로컬 코딩이 필요 없다.** 포기하는 것도 기록했다 — Groq 대체 수단을 잃는다. |
