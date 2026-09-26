@@ -1,0 +1,51 @@
+{
+  "generated": "2026-09-26T20:06:30+09:00",
+  "model": "qwen3.5:9b",
+  "n": 27,
+  "fail": 1,
+  "fail_rate": 0.037,
+  "quality_fail": 1,
+  "strict_fail": 2,
+  "strict_fail_rate": 0.0741,
+  "strict_fail_ci95": [
+    0.0206,
+    0.2337
+  ],
+  "fail_ci95": [
+    0.0066,
+    0.1828
+  ],
+  "repeats": 3,
+  "one_liner": "고정 9문항 반복 포함 n=27, 로컬 1차만: hard 실패 1/27 = 4% · 품질 포함 2/27 = 7%",
+  "by_slot": {
+    "coding": {
+      "n": 27,
+      "fail": 1,
+      "fail_rate": 0.037,
+      "fail_kinds": {
+        "ok": 26,
+        "runtime": 1
+      },
+      "quality_fail": 1,
+      "quality_kinds": {
+        "repetition": 1
+      },
+      "strict_fail_rate": 0.0741,
+      "strict_fail_ci95": [
+        0.0206,
+        0.2337
+      ],
+      "fail_ci95": [
+        0.0066,
+        0.1828
+      ],
+      "elapsed_median_sec": 7.6,
+      "elapsed_max_sec": 38.3,
+      "out_chars_median": 278,
+      "out_chars_max": 1609,
+      "unclosed_fence": 0,
+      "num_predict": 4096
+    }
+  },
+  "results_path": ".cron/sweep_0926/base_ref.jsonl"
+}

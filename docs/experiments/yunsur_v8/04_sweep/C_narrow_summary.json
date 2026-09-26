@@ -1,0 +1,54 @@
+{
+  "generated": "2026-09-26T22:02:20+09:00",
+  "model": "yunsur_v6",
+  "n": 27,
+  "fail": 14,
+  "fail_rate": 0.5185,
+  "quality_fail": 2,
+  "strict_fail": 16,
+  "strict_fail_rate": 0.5926,
+  "strict_fail_ci95": [
+    0.4073,
+    0.7549
+  ],
+  "fail_ci95": [
+    0.3399,
+    0.6926
+  ],
+  "repeats": 3,
+  "one_liner": "고정 9문항 반복 포함 n=27, 로컬 1차만: hard 실패 14/27 = 52% · 품질 포함 16/27 = 59%",
+  "by_slot": {
+    "coding": {
+      "n": 27,
+      "fail": 14,
+      "fail_rate": 0.5185,
+      "fail_kinds": {
+        "ok": 13,
+        "timeout": 10,
+        "syntax": 3,
+        "runtime": 1
+      },
+      "quality_fail": 2,
+      "quality_kinds": {
+        "format_drift:fence_open": 1,
+        "repetition": 1
+      },
+      "strict_fail_rate": 0.5926,
+      "strict_fail_ci95": [
+        0.4073,
+        0.7549
+      ],
+      "fail_ci95": [
+        0.3399,
+        0.6926
+      ],
+      "elapsed_median_sec": 50.5,
+      "elapsed_max_sec": 120.0,
+      "out_chars_median": 205,
+      "out_chars_max": 4065,
+      "unclosed_fence": 1,
+      "num_predict": 4096
+    }
+  },
+  "results_path": ".cron/sweep_0926/C_narrow.jsonl"
+}
