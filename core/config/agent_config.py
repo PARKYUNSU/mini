@@ -79,10 +79,13 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM
 OLLAMA_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b")
 # RAG 답변(B) 전용 로컬 모델. 비어 있으면 OLLAMA_MODEL. 잡담·계획·코딩은 base 가, RAG 답변은 파인튜닝본이 낫다
 # (docs/experiments/yunsur_v4: 0% vs 12%) → 슬롯별로 분리. 두 모델을 번갈아 로드하므로 RAG 첫 응답이 수 초 느려질 수 있음.
-# 2026-09-24 yunsur_v4 → yunsur_v6. 실패율은 v4=v5=v6 모두 0% 로 같지만, v4·v5 는 RAG 응답 24/24 에서 개행을
-# literal \n 으로 내보내고 v6 만 0/24 다 (docs/experiments/yunsur_v6/05_conclusion.md). 텔레그램 경로는
-# apps/telegram_bot/rag_engine.py 의 normalize_model_newlines() 로 우회 중이었으나, 이 getter 를 쓰는
-# 에이전트 그래프 경로(core/graph/agent_nodes.py)에는 그 정규화가 없다 → 교체가 곧 수정이다. 속도도 v6 가 가장 빠르다.
+# 2026-09-24 yunsur_v4 → yunsur_v6: v4·v5 는 RAG 응답 24/24 에서 개행을 literal \n 으로 내보내고 v6 만 0/24 다.
+# 텔레그램 경로는 apps/telegram_bot/rag_engine.py 의 normalize_model_newlines() 로 우회 중이었으나, 이 getter 를
+# 쓰는 에이전트 그래프 경로(core/graph/agent_nodes.py)에는 그 정규화가 없어 교체가 곧 수정이었다.
+# 2026-09-27 yunsur_v6 → yunsur_v9. RAG 실패율(0%)·literal \n(0/24)·속도는 둘이 같다. 바꾸는 이유는 성능이 아니라
+# 부채 제거다: v6 는 코딩 300건을 싣고 있고 그 데이터가 코딩을 base 아래로 끌어내린 원인으로 확인됐다
+# (docs/experiments/yunsur_v9/05_conclusion.md — 빼자 base 대비 McNemar p 가 0.004 → 1.000). v9 는 그 부채가 없고
+# 잡담·계획·RAG 세 슬롯 모두 0% 다. RAG 슬롯만 놓고 보면 측정된 우위는 없다.
 RAG_ANSWER_MODEL = (os.getenv("RAG_ANSWER_MODEL") or "").strip() or OLLAMA_MODEL
 OLLAMA_TIMEOUT = 120
 OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "-1s")  # -1은 invalid, -1s 등 단위 필요
