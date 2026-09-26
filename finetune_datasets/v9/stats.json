@@ -1,0 +1,16 @@
+{
+  "version": "v9",
+  "source": "finetune_datasets/v6/train_data_v6.jsonl",
+  "samples": 1100,
+  "slot_dist": {
+    "planner": 400,
+    "rag": 400,
+    "chat": 300
+  },
+  "change": {
+    "kind": "drop_slot",
+    "slot": "coding",
+    "rows": 300
+  },
+  "note": "v6 에서 코딩만 뺐다. 남은 1,100건은 v6 와 동일. 운영 Executor 는 Groq 이라 로컬 코딩 능력이 필요 없고, 코딩 학습은 base 보다 나쁜 결과만 냈다 (baseline_0926 McNemar p=0.004)."
+}
