@@ -86,17 +86,28 @@ v6 만 실패했던 9문항(`coding_07`·`19`·`21`·`22`·`25`·`26`·`27`·`28
 2. **최선의 경우가 base 수준이다.** 로컬 천장은 우리 측정으로 15.6%(base)이고 v9 가 이미 거기 도달했다 (둘 다 과반 실패 5문항). 교차 증류가 base 를 넘어야 의미가 있는데, 여섯 라운드가 9B 에서 그것이 안 된다는 방향을 일관되게 보였다. 격차가 용량이라면 완벽한 교사를 줘도 천장은 남는다.
 3. **원하던 것(Groq 끊김 대비)은 학습으로 얻는 것이 아니다.** 폴백이 필요하다면 이미 쓸 수 있는 최선의 로컬 모델이 **base** 다 — v9 도 v6 도 base 보다 낫지 않다. 필요한 것은 학습이 아니라 **코드 수정**이다 (아래).
 
-### 대신 할 일 — `executor_node` 에 폴백이 없다
+### 대신 할 일 — `executor_node` 에 폴백이 없었다 ✔︎ 배선 완료 (2026-09-27)
 
-[`core/graph/agent_nodes.py`](../../core/graph/agent_nodes.py) 의 `executor_node` 는 `get_coding_groq_llm()` 을 **직접** 호출하고, 실패하면 `except` 로 떨어져 `Error: Executor: ...` 를 반환한다. 다른 노드들은 `_invoke_llm_with_fallback(getters=...)` 로 폴백 체인을 쓰는데 **코딩만 단일 경로**다.
+**했다.** [`core/graph/agent_nodes.py`](../../core/graph/agent_nodes.py) 의 `executor_node` 는 이제 `_invoke_llm_with_fallback(getters=(get_coding_groq_llm, get_planner_llm))` 으로 **Groq → 로컬 base** 체인을 탄다. 다른 노드들과 같은 경로이고, 코딩만 단일 경로였던 것이 없어졌다.
 
-즉 Groq 이 429 나 장애를 내면 지금은 **답변 자체가 실패**한다. base 가 받으면 15.6% 실패율로라도 동작한다. 목표별로 정리하면:
+전(前): `get_coding_groq_llm()` 을 **직접** 호출하고 `llm.invoke(...)` 로 썼다 → Groq 이 429 나 장애를 내면 `except` 로 떨어져 `Error: Executor: ...` 를 반환, **답변 자체가 실패**했다.
 
-| 목표 | 필요한 것 | 학습 필요? |
-|---|---|---|
-| Groq 끊김 대비 | `executor_node` 에 base 폴백 배선 (`getters=(get_coding_groq_llm, get_planner_llm)` 형태) | **아니오** |
-| 로컬 코딩을 base 보다 낫게 | 교차 증류 + 검증된 정답 + replay + lr 인하 | 예 — 다만 여섯 라운드가 회의적 |
-| 운영 코딩 품질 개선 | **불필요** — 이미 0% | — |
+바뀐 점:
+
+- **폴백 체인**: Groq 이 죽으면(getter 예외든 `invoke` 예외든) 로컬 base(`get_planner_llm`, `OLLAMA_MODEL` · `num_predict=OLLAMA_DIRECT_NUM_PREDICT`)가 받는다. base 는 15.6% 실패율이지만 위 표대로 **아무 답도 못 주는 것보다는 낫다.** 파인튜닝(v6·v9)은 base 보다 나쁘므로 폴백에 쓰지 않는다.
+- **`fallback_msg=""`**: 전부 실패하면 사과문 대신 빈 문자열을 받아 `RuntimeError` 로 올린다 → 기존과 같은 `Error: Executor: ...` 를 돌려주고, **사과문이 코드로 실행되는 일이 없다.**
+- **어느 LLM 이 답했는지 로그에 남는다**: `_invoke_llm_with_fallback` 이 `adopted` 트레이스(`getter=... label=... fallback_used=...`)를 `_llm_invoke_trace` 관례로 bot.log 에 찍고, `adopted_out` dict 로 호출자에게도 넘긴다. Executor 는 `[DEBUG] Executor: LLM=... getter=... fallback=...` 을 남긴다. 모든 노드가 같이 얻는 정보다.
+- **테스트**: [`tests/unit/test_executor_groq_fallback.py`](../../tests/unit/test_executor_groq_fallback.py) — Groq getter 429, Groq `invoke` 503, 양쪽 전멸, 정상 Groq 시 로컬 미호출, 배선 회귀(폴백이 base 인지 · 파인튜닝이 아닌지) 5건. `core.graph.agent_nodes` 임포트가 SMB 마운트에서 10분 걸리므로, 모듈을 임포트하지 않고 **해당 함수 소스만 ast 로 떼어내** 스텁 전역에서 실행한다 (1.2초).
+
+남은 한계 둘. **(1) 타임아웃은 걸지 않았다.** Groq 이 에러를 내지 않고 매달리면(hang) 폴백이 발동하지 않는다 — 전과 같다. **(2) Groq 이 빈 응답을 주면 폴백하지 않는다** — `_invoke_llm_with_fallback` 은 빈 출력을 "실패" 로 보지 않고 그대로 `fallback_msg` 를 돌려주므로(모든 노드 공통 동작) 다음 getter 를 타지 않는다. 이 경우 Executor 는 `Error: Executor: RuntimeError` 로 끝난다 (전에는 빈 코드를 실행했다). 429·장애와는 다른 결이라 이번 범위에 넣지 않았다. `_invoke_llm_with_fallback(timeout_sec=...)` 이 이미 있으니 필요해지면 코딩 슬롯 상한을 재고 붙이면 된다. 코드 생성은 길어질 수 있어 값을 재지 않고 넣으면 정상 생성을 자르는 쪽이 더 위험하다.
+
+목표별로 정리하면:
+
+| 목표 | 필요한 것 | 학습 필요? | 상태 |
+|---|---|---|---|
+| Groq 끊김 대비 | `executor_node` 에 base 폴백 배선 (`getters=(get_coding_groq_llm, get_planner_llm)` 형태) | **아니오** | **✔︎ 완료 (2026-09-27)** |
+| 로컬 코딩을 base 보다 낫게 | 교차 증류 + 검증된 정답 + replay + lr 인하 | 예 — 다만 여섯 라운드가 회의적 | 미착수 (권하지 않음) |
+| 운영 코딩 품질 개선 | **불필요** — 이미 0% | — | — |
 
 ### 그래도 교사 라운드를 연다면 — 착수 조건
 
@@ -104,7 +115,7 @@ v6 만 실패했던 9문항(`coding_07`·`19`·`21`·`22`·`25`·`26`·`27`·`28
 
 **그리고 지금은 할 이유가 없다.** 운영 Executor 가 이미 Groq 이므로, 교차 증류로 로컬 코딩을 개선한다는 것은 **"Groq 답안으로 학습해 Groq 보다 못한 로컬을 만든다"** 가 된다. 실익은 Groq 이 끊길 때의 대비뿐이다.
 
-**착수 조건**: Groq 비용·가용성이 실제 문제가 되고, **폴백 배선(base)으로도 부족할 때.** 위 측정 이후 조건이 한 단계 올라갔다 — 끊김 대비만이 목적이라면 폴백 배선이 먼저다.
+**착수 조건**: Groq 비용·가용성이 실제 문제가 되고, **폴백 배선(base)으로도 부족할 때.** 위 측정 이후 조건이 한 단계 올라갔고, 그 폴백 배선은 2026-09-27 에 끝났다 (위) — 이제 남은 착수 근거는 "base 폴백이 실제 장애에서 부족했다" 는 **측정**뿐이다. 끊김 대비만이 목적이라면 더 할 것이 없다.
 
 **주의**: Groq 은 우리 평가 문항 30개를 전부 맞힌다. 그 데이터로 학습하면 평가 오염이므로, 교사 증류는 **학습용 프롬프트**에만 쓰고 평가 문항과의 유사도 격리(< 0.72)를 반드시 유지한다. 또한 "교사가 맞힌다" 는 사실은 학생이 맞힌다는 근거가 되지 못한다 — 격차가 용량이기 때문이다.
 

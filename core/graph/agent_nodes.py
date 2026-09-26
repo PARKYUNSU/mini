@@ -620,10 +620,15 @@ def _invoke_llm_with_fallback(
     fallback_msg: str = "죄송해요, 답변을 생성하지 못했어요. 잠시 후 다시 질문해 주세요.",
     timeout_sec: float | None = None,
     getters=None,
+    adopted_out: dict | None = None,
 ) -> str:
     """Ollama 우선, 실패 시 Gemini 폴백. 타임아웃 시 executor는 wait=False로 블로킹 없이 정리.
 
-    ``getters`` 로 1차 로컬 LLM 을 바꿀 수 있다 (RAG 답변은 get_rag_answer_llm)."""
+    ``getters`` 로 1차 로컬 LLM 을 바꿀 수 있다 (RAG 답변은 get_rag_answer_llm,
+    코딩은 get_coding_groq_llm → get_planner_llm).
+
+    ``adopted_out`` 에 dict 를 주면 실제로 답한 getter 를 기록한다
+    (``getter``·``label``·``index``·``fallback_used``). 전부 실패하면 비어 있다."""
     _llm_invoke_trace("entry", f"timeout_sec={timeout_sec!r} n_msg={len(messages) if messages else 0}")
     getters = tuple(getters) if getters else (get_planner_llm, get_executor_llm)
     n = len(getters)
@@ -678,6 +683,20 @@ def _invoke_llm_with_fallback(
                 llm_getter.__name__,
                 elapsed,
             )
+            # 어느 LLM 이 답했는지는 bot.log 에 항상 남긴다 (폴백 발동 여부 추적).
+            _llm_invoke_trace(
+                "adopted",
+                f"getter={llm_getter.__name__} label={label!r} i={i}/{n - 1} fallback_used={i > 0}",
+            )
+            if adopted_out is not None:
+                adopted_out.update(
+                    {
+                        "getter": llm_getter.__name__,
+                        "label": label,
+                        "index": i,
+                        "fallback_used": i > 0,
+                    }
+                )
             try:
                 text_out = normalize_ai_message_content(resp)
             except Exception as norm_exc:
@@ -1380,7 +1399,7 @@ def planner_debate_node(state: AgentState) -> dict:
 
 
 def executor_node(state: AgentState) -> dict:
-    """Executor: Groq(ChatGroq)로 코드 작성 및 exec/eval 실행"""
+    """Executor: Groq(ChatGroq)로 코드 작성 및 exec/eval 실행. Groq 실패 시 로컬 base 폴백."""
     if state.get("approval_status") != "approved":
         return {"generated_code": "", "execution_result": "승인되지 않음"}
     fe = (state.get("agent_fatal_error") or "").strip()
@@ -1403,7 +1422,6 @@ def executor_node(state: AgentState) -> dict:
             else:
                 rag_context = ""
 
-        llm = get_coding_groq_llm()
         plan_str = "\n".join(f"{i+1}. {p}" for i, p in enumerate(state.get("plan", [])))
         error_hint = state.get("error_hint", "")
         user_request = state.get("user_request", "")
@@ -1427,8 +1445,24 @@ def executor_node(state: AgentState) -> dict:
         content = _build_message_content(prompt, image_base64)
         executor_system_prompt = EXECUTOR_SYSTEM_CODE_RUN if is_code_run else EXECUTOR_SYSTEM_FULL
 
-        resp = llm.invoke([SystemMessage(content=executor_system_prompt), HumanMessage(content=content)])
-        raw = resp.content.strip() if resp.content else ""
+        # Groq(코딩) → 로컬 base(get_planner_llm) 폴백. Groq 이 429·장애를 내면
+        # 답변 실패 대신 base 가 받는다 (docs/experiments/prior_work.md §6: base 는
+        # Groq 보다 나쁘지만 — 15.6% vs 0% 실패 — 아무 답도 못 주는 것보다는 낫다).
+        # 파인튜닝(v6·v9)은 base 보다 나쁘므로 폴백에 쓰지 않는다.
+        adopted: dict = {}
+        raw = _invoke_llm_with_fallback(
+            [SystemMessage(content=executor_system_prompt), HumanMessage(content=content)],
+            fallback_msg="",  # 실패를 빈 문자열로 받아 사과문이 코드로 실행되지 않게 한다
+            getters=(get_coding_groq_llm, get_planner_llm),
+            adopted_out=adopted,
+        )
+        if not raw:
+            raise RuntimeError("코딩 LLM 전부 실패 (Groq → 로컬 base)")
+        print(
+            f"[DEBUG] Executor: LLM={adopted.get('label')} getter={adopted.get('getter')} "
+            f"fallback={adopted.get('fallback_used')}",
+            flush=True,
+        )
         # 펜스 변형·JSON {"code": ...} 래핑·<think> 잔여까지 벗김 (code_extract 참고)
         code, how = extract_python_code(raw)
         if how not in ("plain", "fence"):
