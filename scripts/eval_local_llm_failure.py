@@ -68,6 +68,11 @@ from core.llm.code_extract import extract_python_code
 #         "로컬이 Groq 을 대신할 수 있나" 라는 가정 질문이므로, 상한이 병목이 되지
 #         않도록 넉넉히 준다. 2026-09-25 측정에서 800 이 병목이었다 — 코딩 실패 36건 중
 #         16건이 잘림이었고, 그것만으로 McNemar p 가 0.002 ↔ 0.250 사이를 오갔다.
+# 디코딩 설정. 기본값은 운영 get_planner_llm 과 동일하며 baseline_0926 을 만든 값이다.
+# CLI 로 덮어써서 디코딩 스윕을 돌린다 (docs/experiments/yunsur_v8/). 실제 쓴 값은 각 행에
+# decoding 으로 남기므로 결과 파일만 봐도 어떤 설정이었는지 알 수 있다.
+DECODING = {"temperature": 0.2, "top_p": 0.8, "top_k": None, "repeat_penalty": 1.18}
+
 SLOT_NUM_PREDICT = {
     "chat": OLLAMA_DIRECT_NUM_PREDICT,
     "rag": OLLAMA_DIRECT_NUM_PREDICT,
@@ -139,18 +144,30 @@ def _append_jsonl(path: Path, row: dict) -> None:
         f.flush()
 
 
+def _decoding_tag() -> str:
+    """결과 파일이 스스로 설정을 설명하도록 남기는 짧은 문자열."""
+    d = DECODING
+    tk = f" k{d['top_k']}" if d.get("top_k") is not None else ""
+    return f"t{d['temperature']} p{d['top_p']}{tk} rp{d['repeat_penalty']}"
+
+
 def _invoke_local_num_predict(messages, timeout_sec: float, num_predict: int) -> dict:
     from langchain_ollama import ChatOllama
     from core.config.agent_config import ollama_planner_reasoning_enabled
 
+    opts = {
+        "temperature": DECODING["temperature"],
+        "top_p": DECODING["top_p"],
+        "repeat_penalty": DECODING["repeat_penalty"],
+    }
+    if DECODING.get("top_k") is not None:
+        opts["top_k"] = DECODING["top_k"]
     llm = ChatOllama(
         **ollama_kwargs(
-            temperature=0.2,
-            top_p=0.8,
-            repeat_penalty=1.18,
             reasoning=False,
             num_predict=num_predict,
             timeout=max(float(timeout_sec) + 5.0, 30.0),
+            **opts,
         )
     )
     t0 = time.perf_counter()
@@ -169,6 +186,7 @@ def _invoke_local_num_predict(messages, timeout_sec: float, num_predict: int) ->
             "elapsed_sec": round(elapsed, 3),
             "out_chars": len(body),
             "num_predict": num_predict,
+            "decoding": _decoding_tag(),
         }
     except FuturesTimeout:
         elapsed = time.perf_counter() - t0
@@ -501,6 +519,11 @@ def main() -> int:
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--limit", type=int, default=0, help="앞에서 N문항만 (스모크)")
     ap.add_argument("--slots", default="", help="쉼표 구분 chat,rag,planner,coding")
+    ap.add_argument("--ids", default="", help="쉼표 구분 문항 id 만 (예: coding_21,coding_22). 스윕용")
+    ap.add_argument("--temperature", type=float, default=None, help="디코딩 스윕용 (기본 0.2)")
+    ap.add_argument("--top-p", type=float, default=None, help="디코딩 스윕용 (기본 0.8)")
+    ap.add_argument("--top-k", type=int, default=None, help="디코딩 스윕용 (기본 미설정)")
+    ap.add_argument("--repeat-penalty", type=float, default=None, help="디코딩 스윕용 (기본 1.18)")
     ap.add_argument("--model", default="", help="Ollama 모델명 (기본 LOCAL_LLM_MODEL). 예: qwen3.5:9b 로 베이스 A/B")
     ap.add_argument("--quality", action="store_true", help="품질 실패(영어 혼입·think 유출·반복)를 요약 실패율에 합산")
     ap.add_argument(
@@ -510,6 +533,10 @@ def main() -> int:
         help="chat/rag/planner에서 (한글+라틴) 중 라틴 비율이 이 값을 넘으면 english_mix (기본 0.45)",
     )
     args = ap.parse_args()
+    for key, val in (("temperature", args.temperature), ("top_p", args.top_p),
+                     ("top_k", args.top_k), ("repeat_penalty", args.repeat_penalty)):
+        if val is not None:
+            DECODING[key] = val
     if args.model:
         os.environ["LOCAL_LLM_MODEL"] = args.model
         import core.config.agent_config as _cfg
@@ -525,6 +552,13 @@ def main() -> int:
     if args.slots:
         allow = {s.strip() for s in args.slots.split(",") if s.strip()}
         items = [i for i in items if i.get("slot") in allow]
+    if args.ids:
+        want = {x.strip() for x in args.ids.split(",") if x.strip()}
+        missing = want - {i["id"] for i in items}
+        if missing:
+            print(f"❌ 없는 문항 id: {sorted(missing)}")
+            return 2
+        items = [i for i in items if i["id"] in want]
     if args.limit and args.limit > 0:
         items = items[: args.limit]
 
@@ -532,7 +566,7 @@ def main() -> int:
     done = _done_keys(args.out)
     pending = [(it, t) for it, t in jobs if (it["id"], t) not in done]
     print(
-        f"model={OLLAMA_MODEL} ollama={why}\n"
+        f"model={OLLAMA_MODEL} decoding={_decoding_tag()} ollama={why}\n"
         f"total={len(jobs)} done={len(jobs) - len(pending)} pending={len(pending)}\n"
         f"out={args.out}"
     )
