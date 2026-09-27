@@ -10,6 +10,8 @@ from typing import Optional, Union
 
 import google.generativeai as genai
 
+from core.config.agent_config import GEMINI_MODEL
+
 
 class QaGenerator:
     """논문 본문에서 Q&A 세트를 생성하여 파인튜닝용 JSONL로 저장하는 클래스"""
@@ -33,7 +35,7 @@ JSON 형식 (이 구조만 정확히 따르세요):
     def __init__(
         self,
         output_path: Union[str, Path] = "./finetune_datasets/qa_data.jsonl",
-        model_name: str = "gemini-2.5-flash",
+        model_name: str = GEMINI_MODEL,
         system_prompt: str = "당신은 최신 AI 논문을 분석하는 수석 연구원입니다.",
     ):
         """

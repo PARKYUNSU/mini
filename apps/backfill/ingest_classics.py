@@ -38,11 +38,12 @@ from pipelines.ingest.arxiv_fetcher import PaperMetadata  # noqa: E402
 from pipelines.ingest.data_storage import DataStorage, normalize_paper_id  # noqa: E402
 from pipelines.ingest.pdf_parser import PdfParser  # noqa: E402
 from pipelines.ingest.rag_processor import RagProcessor  # noqa: E402
+from core.config.agent_config import CHROMA_DB_DIR  # noqa: E402
 from core.config.chroma_lock import chroma_write_lock  # noqa: E402
 
 CLASSICS_YAML = Path(__file__).parent / "classics.yaml"
 RAW_DATA_DIR = _ROOT / "raw_data_queue"
-CHROMA_DIR = _ROOT / "chroma_db"
+CHROMA_DIR = CHROMA_DB_DIR
 
 ATOM_NS = "http://www.w3.org/2005/Atom"
 ARXIV_API = "http://export.arxiv.org/api/query"
@@ -256,6 +257,7 @@ def run(
                         published=meta.published,
                         pdf_url=meta.pdf_url,
                         paper_id=meta.paper_id,
+                        abstract=getattr(meta, "abstract", "") or "",
                     )
                 print(f"  ✓ Chroma 적재 완료 ({chunk_count}개 청크)")
                 success += 1

@@ -52,7 +52,9 @@ def test_external_gemini_smoke():
     from langchain_core.messages import HumanMessage
     from langchain_google_genai import ChatGoogleGenerativeAI
 
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=key, temperature=0.1)
+    from core.config.agent_config import GEMINI_MODEL
+
+    llm = ChatGoogleGenerativeAI(model=GEMINI_MODEL, api_key=key, temperature=0.1)
     r = llm.invoke([HumanMessage(content="1+1=? answer digit only")])
     assert r.content and "2" in r.content.replace(" ", "")
 

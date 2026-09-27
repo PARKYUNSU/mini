@@ -78,6 +78,7 @@ def main():
                 published=published,
                 pdf_url=pdf_url,
                 paper_id=pid,
+                abstract=str(paper.get("abstract", "") or ""),
             )
             success += 1
             total_chunks += n

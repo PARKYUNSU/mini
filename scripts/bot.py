@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 import telebot
 
+from core.config.agent_config import CHROMA_DB_DIR
 from core.llm.agent_llm import get_planner_llm
 
 load_dotenv()
@@ -25,7 +26,7 @@ load_dotenv()
 # 환경 변수 (RAG_BOT_TOKEN 우선, 없으면 TELEGRAM_TOKEN)
 TELEGRAM_TOKEN = os.getenv("RAG_BOT_TOKEN") or os.getenv("TELEGRAM_TOKEN")
 ALLOWED_CHAT_ID = os.getenv("ALLOWED_CHAT_ID")
-CHROMA_DB_PATH = "./chroma_db"
+CHROMA_DB_PATH = str(CHROMA_DB_DIR)
 COLLECTION_NAME = "arxiv_papers"
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K = 5  # 검색할 문서 수
