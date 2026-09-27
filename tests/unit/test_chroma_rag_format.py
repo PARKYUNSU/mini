@@ -23,7 +23,17 @@ def test_format_chroma_hits_prefixes_date():
         ["Abstract body here."],
         [{"paper_id": "1234", "title": "My Paper", "published": "2023-06-01"}],
     )
-    assert text.startswith("[발행일: 2023-06-01]")
+    assert text.startswith("[Distance: 미상]")
+    assert "[발행일: 2023-06-01]" in text
     assert "[1234]" in text
     assert "My Paper" in text
     assert "Abstract body" in text
+
+
+def test_format_chroma_hits_includes_distance_four_decimals():
+    text = _format_chroma_hits(
+        ["Abstract body here."],
+        [{"paper_id": "1234", "title": "My Paper"}],
+        dists=[0.33281234],
+    )
+    assert "[Distance: 0.3328]" in text

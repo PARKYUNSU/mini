@@ -24,10 +24,11 @@ def test_dedupe_hits_by_paper_reorders_same_pid():
         {"paper_id": "A"},
     ]
     result = _dedupe_hits_by_paper(docs, metas)
-    pids = [m["paper_id"] for _, m in result]
+    pids = [m["paper_id"] for _, m, _ in result]
     assert pids == ["A", "B", "A", "A"], f"Expected A,B then extras but got {pids}"
     assert result[0][0] == "chunk A1"
     assert result[1][0] == "chunk B1"
+    assert result[0][2] is None
 
 
 def test_dedupe_hits_by_paper_no_pid():
@@ -37,7 +38,7 @@ def test_dedupe_hits_by_paper_no_pid():
     metas = [{"paper_id": ""}, {}, {"paper_id": ""}]
     result = _dedupe_hits_by_paper(docs, metas)
     assert len(result) == 3
-    assert [d for d, _ in result] == ["c1", "c2", "c3"]
+    assert [d for d, _, _ in result] == ["c1", "c2", "c3"]
 
 
 def test_dedupe_hits_by_paper_all_unique():
@@ -46,7 +47,7 @@ def test_dedupe_hits_by_paper_all_unique():
     docs = ["c1", "c2", "c3"]
     metas = [{"paper_id": "A"}, {"paper_id": "B"}, {"paper_id": "C"}]
     result = _dedupe_hits_by_paper(docs, metas)
-    pids = [m["paper_id"] for _, m in result]
+    pids = [m["paper_id"] for _, m, _ in result]
     assert pids == ["A", "B", "C"]
 
 
@@ -153,7 +154,7 @@ def test_title_match_rerank_promotes_exact_title():
         {"title": "Molecular Facts: Decontextualization", "paper_id": "B"},
         {"title": "Dialectical Alignment: Resolving the Tension of 3H", "paper_id": "C"},
     ]
-    new_docs, new_metas = _title_match_rerank(docs, metas, "Dialectical Alignment")
+    new_docs, new_metas, _ = _title_match_rerank(docs, metas, "Dialectical Alignment")
     assert new_metas[0]["paper_id"] == "C", f"Expected C at #0 but got {new_metas[0]}"
     assert new_docs[0] == "body_correct"
 
@@ -163,7 +164,7 @@ def test_title_match_rerank_no_change_when_already_top():
 
     docs = ["d1", "d2"]
     metas = [{"title": "GPT-4o Technical Report"}, {"title": "Other Paper"}]
-    new_docs, new_metas = _title_match_rerank(docs, metas, "GPT-4o Technical Report")
+    new_docs, new_metas, _ = _title_match_rerank(docs, metas, "GPT-4o Technical Report")
     assert new_docs[0] == "d1"
 
 
@@ -172,7 +173,7 @@ def test_title_match_rerank_no_change_on_low_overlap():
 
     docs = ["d1", "d2"]
     metas = [{"title": "Alpha Beta"}, {"title": "Gamma Delta"}]
-    new_docs, _ = _title_match_rerank(docs, metas, "totally unrelated query words")
+    new_docs, _, _ = _title_match_rerank(docs, metas, "totally unrelated query words")
     assert new_docs == ["d1", "d2"]
 
 
@@ -184,6 +185,22 @@ def test_same_paper_all_chunks_merges_by_pid():
 
     blocks = [
         "[2404.00486v1] Dialectical Alignment\nchunk1 body",
+        "[2603.13134v1] When Right Meets Wrong\nother paper body",
+        "[2404.00486v1] Dialectical Alignment\nchunk2 body with more details",
+    ]
+    ctx = "\n\n---\n\n".join(blocks)
+    merged = _rag_context_same_paper_all_chunks(ctx)
+    assert "chunk1 body" in merged
+    assert "chunk2 body" in merged
+    assert "When Right Meets Wrong" not in merged
+
+
+def test_same_paper_all_chunks_skips_distance_line_for_pid():
+    """블록 첫 줄이 `[Distance:…]`일 때도 paper_id 줄을 찾는다."""
+    from core.graph.agent_nodes import _rag_context_same_paper_all_chunks
+
+    blocks = [
+        "[Distance: 0.3328]\n[2404.00486v1] Dialectical Alignment\nchunk1 body",
         "[2603.13134v1] When Right Meets Wrong\nother paper body",
         "[2404.00486v1] Dialectical Alignment\nchunk2 body with more details",
     ]
@@ -271,7 +288,7 @@ def test_demote_reference_chunks_moves_refs_to_end():
         "- [2] Author B. Survey. _ACM_ ISSN 1234 doi: 10.2/y",
     ]
     metas = [{"paper_id": "A"}, {"paper_id": "B"}, {"paper_id": "C"}]
-    new_docs, new_metas = _demote_reference_chunks(docs, metas)
+    new_docs, new_metas, _ = _demote_reference_chunks(docs, metas)
     assert new_metas[0]["paper_id"] == "B"
     assert new_docs[0] == "Body text discussing hallucination in detail."
 

@@ -18,7 +18,7 @@ from core.config.agent_config import (
     AGENT_TOOLS_DIR,
     EMBEDDING_MODEL,
     PROJECT_ROOT,
-    TOOL_CHROMA_DB_PATH,
+    TOOL_CHROMA_DB_DIR,
     TOOL_COLLECTION_NAME,
     TOOL_RAG_TOP_K,
 )
@@ -42,9 +42,7 @@ class ToolRAGStore:
         self._embedding_fn = SentenceTransformerEmbeddingFunction(
             model_name=EMBEDDING_MODEL, device="cpu", normalize_embeddings=True
         )
-        abs_db = Path(TOOL_CHROMA_DB_PATH)
-        if not abs_db.is_absolute():
-            abs_db = PROJECT_ROOT / abs_db
+        abs_db = TOOL_CHROMA_DB_DIR
         abs_db.mkdir(parents=True, exist_ok=True)
         self._db_path = str(abs_db)
         self._client = chromadb.PersistentClient(
