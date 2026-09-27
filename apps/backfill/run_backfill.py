@@ -6,6 +6,8 @@
 - MIN_DELAY~MAX_DELAY(기본 60~120초) 랜덤 딜레이로 Rate Limit 방지
   (페이지 간, API 호출 전, PDF 다운로드 전 각각 적용)
 - raw_data_queue 저장 + ChromaDB 적재
+
+주제별 상한·SOTA 타겟 수집은 ``apps/backfill/run_targeted_batch_crawl.py`` 사용.
 """
 
 import argparse
@@ -31,21 +33,28 @@ from pipelines.ingest.cleanup import cleanup_legacy_files  # noqa: E402
 from pipelines.ingest.data_storage import DataStorage, normalize_paper_id  # noqa: E402
 from pipelines.ingest.pdf_parser import PdfParser  # noqa: E402
 from pipelines.ingest.rag_processor import RagProcessor  # noqa: E402
+from core.config.agent_config import CHROMA_DB_DIR  # noqa: E402
 from core.config.chroma_lock import chroma_write_lock  # noqa: E402
 
 load_dotenv()
 
 # 데이터 저장 경로
 RAW_DATA_DIR = Path("./raw_data_queue")
-CHROMA_DIR = Path("./chroma_db")
+CHROMA_DIR = CHROMA_DB_DIR
 DEBATE_INDEX_PATH = Path("./finetune_datasets/debated_paper_ids.jsonl")
 
 # 기본값 (최신 1~2년 치 권장)
 DEFAULT_START_DATE = "2024-01-01"
 DEFAULT_END_DATE = "2024-12-31"
-DEFAULT_BATCH_SIZE = 15
+DEFAULT_BATCH_SIZE = 1000
 MIN_DELAY = 60
 MAX_DELAY = 120
+
+# arXiv search_query AND 조건: 제목·초록에 RAG 또는 Retrieval-Augmented Generation (하이픈/공백 변형 포함)
+RAG_TARGET_EXTRA_QUERY = (
+    '(ti:RAG OR abs:RAG OR ti:"Retrieval-Augmented Generation" OR abs:"Retrieval-Augmented Generation" '
+    'OR ti:"Retrieval Augmented Generation" OR abs:"Retrieval Augmented Generation")'
+)
 
 
 def _configure_utf8_stdio() -> None:
@@ -120,6 +129,8 @@ def run_backfill(
     batch_size: int = DEFAULT_BATCH_SIZE,
     category: str = "cs.AI",
     time_limit_sec: int | None = None,
+    extra_query: str | None = None,
+    max_papers: int | None = None,
 ) -> None:
     """
     기간 기반 과거 논문 수집 후 raw_data_queue와 ChromaDB에 적재.
@@ -128,9 +139,11 @@ def run_backfill(
     Args:
         start_date: 수집 시작일 (YYYY-MM-DD)
         end_date: 수집 종료일 (YYYY-MM-DD)
-        batch_size: API 한 번에 가져올 개수 (10~20 권장)
+        batch_size: API max_results(한 페이지당). 기본 1000
         category: arXiv 카테고리
         time_limit_sec: 최대 실행 시간(초). None이면 제한 없음.
+        extra_query: arXiv ``search_query``에 AND로 붙일 추가 조건 (제목/초록 키워드 등). None이면 카테고리+기간만.
+        max_papers: 신규 JSONL 저장 성공이 이 수에 도달하면 종료. None이면 제한 없음.
     """
     _configure_utf8_stdio()
     project_root = Path(__file__).resolve().parent
@@ -139,11 +152,18 @@ def run_backfill(
 
     ensure_data_dirs()
 
+    # 키워드/추가 검색이 있으면 관련도 순(영양가 높은 매칭 우선), 없으면 제출일 최신순
+    sort_by = ArxivFetcher.SORT_RELEVANCE if extra_query else ArxivFetcher.SORT_SUBMITTED
+    sort_order = "descending"
+
     fetcher = ArxivFetcher(
         category=category,
         limit=batch_size,
         min_delay=MIN_DELAY,
         max_delay=MAX_DELAY,
+        extra_query=extra_query,
+        sort_by=sort_by,
+        sort_order=sort_order,
     )
     parser = PdfParser(table_strategy="lines_strict")
     storage = DataStorage(output_path=RAW_DATA_DIR / "crawled_papers.jsonl")
@@ -154,9 +174,14 @@ def run_backfill(
     print("\n" + "=" * 60)
     print("📚 arXiv 백필 (기간 기반 과거 데이터 수집)")
     print(f"   기간: {start_date} ~ {end_date}")
-    print(f"   배치: {batch_size}개, 카테고리: {category}")
+    print(f"   배치(max_results/페이지): {batch_size}개, 카테고리: {category}")
+    print(f"   정렬: sortBy={sort_by}, sortOrder={sort_order}")
+    if extra_query:
+        print(f"   추가 검색식(AND): {extra_query}")
     if time_limit_sec:
         print(f"   ⏱️  시간 제한: {time_limit_sec // 3600}시간 {time_limit_sec % 3600 // 60}분")
+    if max_papers is not None:
+        print(f"   🎯 최대 신규 저장: {max_papers:,}편 (도달 시 종료)")
     print("=" * 60)
 
     print("📊 arXiv API 총 검색 결과(opensearch:totalResults) 조회 중...")
@@ -246,6 +271,7 @@ def run_backfill(
 
         print(f"\n✅ [{start_offset + 1}~{start_offset + len(papers)}] {len(papers)}개 메타데이터 수집")
 
+        reached_paper_limit = False
         # 각 논문 처리 (main.py와 동일한 파이프라인)
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir_path = Path(tmpdir)
@@ -323,6 +349,7 @@ def run_backfill(
                             published=paper.published,
                             pdf_url=paper.pdf_url,
                             paper_id=paper.paper_id,
+                            abstract=paper.abstract,
                         )
                     print(f"  ✓ RAG 완료 ({chunk_count}개 청크)")
                 except Exception as e:
@@ -340,8 +367,16 @@ def run_backfill(
                 gc.collect()
                 time.sleep(1.0)
 
+                if max_papers is not None and total_success >= max_papers:
+                    print(f"\n✅ max_papers={max_papers} 도달(신규 저장 {total_success}편). 수집 종료.")
+                    reached_paper_limit = True
+                    break
+
         total_fetched += len(papers)
         start_offset += batch_size
+
+        if reached_paper_limit:
+            break
 
         if len(papers) < batch_size:
             print(f"\n⚠️  요청한 {batch_size}개 미만 수신. 수집 종료.")
@@ -422,7 +457,7 @@ def main() -> None:
         "-b", "--batch-size",
         type=int,
         default=DEFAULT_BATCH_SIZE,
-        help="API 한 번에 가져올 개수 (10~20 권장)",
+        help="API max_results(한 페이지당 건수). 대량 수집 시 1000 권장",
     )
     parser.add_argument(
         "-c", "--category",
@@ -437,7 +472,36 @@ def main() -> None:
         metavar="SEC",
         help="최대 실행 시간(초). 예: 7200 = 2시간",
     )
+    parser.add_argument(
+        "--extra-query",
+        type=str,
+        default=None,
+        metavar="EXPR",
+        help="arXiv search_query에 AND로 붙일 조건 (예: ti/abs 키워드). --rag-target보다 우선.",
+    )
+    parser.add_argument(
+        "--rag-target",
+        action="store_true",
+        help="RAG/Retrieval-Augmented Generation이 제목·초록에 있는 cs.AI 논문만 (내장 검색식 사용)",
+    )
+    parser.add_argument(
+        "--max-papers",
+        type=int,
+        default=None,
+        metavar="N",
+        help="신규 JSONL 저장 성공 N편에 도달하면 종료 (이미 큐에 있는 논문은 건너뛰므로 스킵은 카운트 안 함)",
+    )
     args = parser.parse_args()
+
+    extra_q: str | None = None
+    if args.extra_query and str(args.extra_query).strip():
+        extra_q = str(args.extra_query).strip()
+    elif args.rag_target:
+        extra_q = RAG_TARGET_EXTRA_QUERY
+
+    max_n = args.max_papers
+    if max_n is not None and max_n < 1:
+        parser.error("--max-papers는 1 이상이어야 합니다.")
 
     run_backfill(
         start_date=args.start_date,
@@ -445,6 +509,8 @@ def main() -> None:
         batch_size=args.batch_size,
         category=args.category,
         time_limit_sec=args.time_limit,
+        extra_query=extra_q,
+        max_papers=max_n,
     )
 
 

@@ -11,6 +11,8 @@ from typing import Any, Union
 
 import fcntl
 
+from pipelines.ingest.latex_equation_postprocess import enrich_text_for_llm_math
+
 
 def normalize_paper_id(raw_id: str) -> str:
     """
@@ -123,14 +125,16 @@ class DataStorage:
         Returns:
             QLoRA/RAG용으로 구조화된 딕셔너리
         """
+        abs_e = enrich_text_for_llm_math(abstract or "")
+        md_e = enrich_text_for_llm_math(markdown_content or "")
         return {
             "paper_id": paper_id,
             "title": title,
             "authors": authors,
-            "abstract": abstract,
+            "abstract": abs_e,
             "published": published,
             "pdf_url": pdf_url,
-            "content": markdown_content,
+            "content": md_e,
         }
 
     @staticmethod

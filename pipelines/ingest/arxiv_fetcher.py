@@ -5,6 +5,7 @@ arXiv 논문 수집 모듈 (ArxivFetcher)
 - 네트워크 요청에 tenacity 재시도 (1분→3분→5분, 최대 3회)
 """
 
+import os
 import random
 import sys
 import time
@@ -45,7 +46,13 @@ class PaperMetadata:
 class ArxivFetcher:
     """arXiv API에서 논문을 검색하고 메타데이터를 추출하는 클래스"""
 
-    BASE_URL = "http://export.arxiv.org/api/query"
+    # 리다이렉트(http→https) 생략으로 타임아웃·지연 감소
+    BASE_URL = "https://export.arxiv.org/api/query"
+
+    # arXiv API sortBy: relevance | lastUpdatedDate | submittedDate
+    SORT_RELEVANCE = "relevance"
+    SORT_SUBMITTED = "submittedDate"
+    SORT_LAST_UPDATED = "lastUpdatedDate"
 
     def __init__(
         self,
@@ -53,18 +60,28 @@ class ArxivFetcher:
         limit: int = 3,
         min_delay: float = 3.0,
         max_delay: float = 5.0,
+        extra_query: Optional[str] = None,
+        sort_by: str = "submittedDate",
+        sort_order: str = "descending",
     ):
         """
         Args:
             category: arXiv 카테고리 (기본: cs.AI)
-            limit: 한 번에 가져올 논문 수
+            limit: 한 번에 가져올 논문 수 (API ``max_results``)
             min_delay: 최소 딜레이(초)
             max_delay: 최대 딜레이(초)
+            extra_query: arXiv ``search_query``에 AND로 붙일 추가 조건 (예: ti/abs 키워드).
+                미지정이면 ``cat`` + ``submittedDate`` 만 사용.
+            sort_by: ``relevance``(관련도), ``submittedDate``(제출일), ``lastUpdatedDate``
+            sort_order: ``ascending`` | ``descending``
         """
         self.category = category
         self.limit = limit
         self.min_delay = min_delay
         self.max_delay = max_delay
+        self.extra_query = (extra_query or "").strip() or None
+        self.sort_by = sort_by
+        self.sort_order = sort_order
         self._session = requests.Session()
         self._session.headers.update(
             {"User-Agent": "arXivPaperCollector/1.0 (AI Research Pipeline)"}
@@ -104,9 +121,9 @@ class ArxivFetcher:
                 if name_elem is not None and name_elem.text:
                     authors.append(name_elem.text.strip())
 
-            # 요약
+            # 요약 (LaTeX 줄바꿈 보존: 공백으로만 합치지 않음)
             summary_elem = entry.find(f"{ns}summary")
-            abstract = summary_elem.text.strip().replace("\n", " ") if summary_elem is not None and summary_elem.text else ""
+            abstract = summary_elem.text.strip() if summary_elem is not None and summary_elem.text else ""
 
             # 출판일
             published_elem = entry.find(f"{ns}published")
@@ -143,6 +160,18 @@ class ArxivFetcher:
         """
         return self.fetch_metadata_batch(start=0, limit=self.limit)
 
+    def _category_search_clause(self) -> str:
+        """``cat:cs.AI`` 또는 쉼표 구분 시 ``(cat:cs.AI OR cat:cs.LG)`` 형태."""
+        raw = (self.category or "cs.AI").strip()
+        if not raw:
+            raw = "cs.AI"
+        if "," in raw:
+            parts = [p.strip() for p in raw.split(",") if p.strip()]
+            if len(parts) >= 2:
+                return "(" + " OR ".join(f"cat:{p}" for p in parts) + ")"
+            raw = parts[0] if parts else "cs.AI"
+        return f"cat:{raw}"
+
     def _build_search_query(
         self,
         start_date: Optional[str] = None,
@@ -153,12 +182,14 @@ class ArxivFetcher:
         submittedDate 형식: [YYYYMMDDhhmm TO YYYYMMDDhhmm] (arXiv API, GMT)
         - 0600 = 00:00 UTC 권장 (arXiv 예시)
         """
-        base = f"cat:{self.category}"
+        base = self._category_search_clause()
         if start_date and end_date:
             # "2023-01-01" -> "202301010600", "2023-12-31" -> "202312312359"
             start_ts = start_date.replace("-", "") + "0600"
             end_ts = end_date.replace("-", "") + "2359"
             base = f"{base} AND submittedDate:[{start_ts} TO {end_ts}]"
+        if self.extra_query:
+            base = f"({self.extra_query}) AND {base}"
         return base
 
     def get_search_total_results(
@@ -175,12 +206,18 @@ class ArxivFetcher:
             "search_query": search_query,
             "start": 0,
             "max_results": 1,
-            "sortBy": "submittedDate",
-            "sortOrder": "descending",
+            "sortBy": self.sort_by,
+            "sortOrder": self.sort_order,
         }
         url = f"{self.BASE_URL}?{urlencode(params)}"
         try:
-            response = self._get_with_retry(url, timeout=30)
+            self._random_delay()
+            try:
+                meta_to = int(os.getenv("ARXIV_API_TIMEOUT_SEC", "120"))
+            except ValueError:
+                meta_to = 120
+            meta_to = max(30, min(600, meta_to))
+            response = self._get_with_retry(url, timeout=meta_to)
             response.raise_for_status()
         except requests.RequestException as e:
             print(f"⚠️  API 총건수 조회 실패: {e}")
@@ -223,15 +260,22 @@ class ArxivFetcher:
             "search_query": search_query,
             "start": start,
             "max_results": batch_limit,
-            "sortBy": "submittedDate",
-            "sortOrder": "descending",
+            "sortBy": self.sort_by,
+            "sortOrder": self.sort_order,
         }
         url = f"{self.BASE_URL}?{urlencode(params)}"
+        # 대량 엔트리(수백~천 건) XML은 응답이 커질 수 있음
+        api_timeout = 30 if batch_limit <= 50 else (90 if batch_limit <= 200 else 180)
+        try:
+            env_to = int(os.getenv("ARXIV_API_TIMEOUT_SEC", str(api_timeout)))
+        except ValueError:
+            env_to = api_timeout
+        api_timeout = max(api_timeout, max(30, min(600, env_to)))
 
         try:
             self._random_delay()
             print("📡 arXiv API 요청 중...")
-            response = self._get_with_retry(url, timeout=30)
+            response = self._get_with_retry(url, timeout=api_timeout)
             response.raise_for_status()
         except requests.RequestException as e:
             # 429 같은 레이트리밋은 run_backfill에서 재대기/복구하도록 예외로 올린다.
