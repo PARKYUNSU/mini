@@ -394,7 +394,7 @@ def match_whitelisted_tool_local(user_request: str, req_lower: str) -> Optional[
     return match_whitelisted_tool(user_request, req_lower, AGENT_TOOLS_DIR)
 
 
-def router_step1_hard_rules(user_request: str, req_lower: str, chat_id: str) -> Optional[dict]:
+def router_step1_hard_rules(user_request: str, req_lower: str, chat_id: str, *, is_scheduled: bool = False) -> Optional[dict]:
     return _router_step1_hard_rules_core(
         user_request,
         req_lower,
@@ -404,6 +404,7 @@ def router_step1_hard_rules(user_request: str, req_lower: str, chat_id: str) -> 
             get_paper_mode=get_paper_mode,
             resolve_recent_tool=_resolve_recent_tool_reference,
         ),
+        is_scheduled=is_scheduled,
     )
 
 

@@ -305,9 +305,8 @@ def resolve_recent_tool_from_snapshot(recent: list, user_request: str) -> Option
         for item in recent:
             if item.get("tag") == "coin_price":
                 return item.get("tool_name")
-    weather_lookup_verbs = ("알려줘", "보여줘", "조회", "확인", "가져와", "예보", "몇 도", "온도")
     weather_smalltalk = ("날씨 좋네", "날씨 좋다", "오늘 날씨 좋네", "오늘 날씨 좋다", "기분", "좋네", "좋다")
-    if any(k in req for k in ("날씨", "부산", "제주", "서울")) and any(v in user_request for v in weather_lookup_verbs) and not any(x in user_request for x in weather_smalltalk):
+    if is_weather_tool_request(user_request) and not any(x in user_request for x in weather_smalltalk):
         for item in recent:
             if item.get("tag") == "weather":
                 return item.get("tool_name")
@@ -332,6 +331,72 @@ def _ascii_greeting_in_smalltalk(req_lower: str) -> bool:
     if re.search(r"(?<![\w'])\bhi\b(?![\w'])", scan):
         return True
     if re.search(r"(?<![\w'])\bhello\b(?![\w'])", scan):
+        return True
+    return False
+
+
+def is_trivial_unit_conversion_query(user_request: str, req_lower: str) -> bool:
+    """숫자+ms(밀리초) ↔ 초 등 단순 단위 환산 — 논문 RAG로 보내면 잘못된 청크가 붙는다."""
+    r = (user_request or "").strip()
+    if not r or len(r) > 180:
+        return False
+    compact = re.sub(r"\s+", "", req_lower)
+    if not re.search(r"\d+\s*ms\b", req_lower) and not re.search(r"\d+ms", compact):
+        return False
+    if any(
+        k in r
+        for k in (
+            "몇 초",
+            "몇초",
+            "초야",
+            "초로",
+            "몇 분",
+            "몇분",
+            "환산",
+            "second",
+            "seconds",
+        )
+    ):
+        return True
+    if any(k in req_lower for k in ("how many second", "how many seconds", "convert")):
+        return True
+    return False
+
+
+def is_meta_bot_availability_query(user_request: str, _req_lower: str) -> bool:
+    """봇에게 말해도 되는지·답변 가능한지 묻는 짧은 메타 질문 — 플래너(C)로 가면 세션 맥락이 섞인 이상한 '계획'이 나올 수 있음."""
+    r = (user_request or "").strip()
+    if not r or len(r) > 96:
+        return False
+    task_blockers = (
+        "논문",
+        "chromadb",
+        "코드",
+        "실행",
+        "크롤",
+        "파이썬",
+        "도구",
+        "베이스",
+        "검색해",
+        "찾아줘",
+        "요약해",
+        "스크립트",
+        "api",
+    )
+    if any(b in r for b in task_blockers):
+        return False
+    if any(
+        k in r
+        for k in (
+            "답변 가능",
+            "물어봐도 돼",
+            "질문해도 돼",
+            "말해도 돼",
+            "이야기해도",
+        )
+    ):
+        return True
+    if "궁금한게" in r and ("답변" in r or "물어봐" in r or "가능" in r):
         return True
     return False
 
@@ -425,7 +490,57 @@ def get_search_intent(user_request: str, req_lower: str) -> Literal["web", "rag"
     return "none"
 
 
-def match_whitelisted_tool(user_request: str, req_lower: str, agent_tools_dir: Path) -> Optional[str]:
+def is_weather_tool_request(user_request: str) -> bool:
+    """
+    OpenWeatherMap 날씨 도구(서울_지금_현재_날씨_알려줘) 사용 여부.
+    대도시·소도시(파주·분당·제주 등) 모두 동일 도구로 처리; 뉴스/기사형 '날씨 보도'는 제외.
+    """
+    if "날씨" not in user_request:
+        return False
+    # 날씨 관련 뉴스·기사·속보는 웹 검색 영역
+    if any(x in user_request for x in ("뉴스", "기사", "속보", "보도", "언론")):
+        return False
+    if re.search(r"weather\s+news|news\s+about\s+the\s+weather", user_request, re.I):
+        return False
+    weather_smalltalk_markers = (
+        "날씨 좋네",
+        "날씨 좋다",
+        "오늘 날씨 좋네",
+        "오늘 날씨 좋다",
+        "덥네",
+        "춥네",
+        "비 오네",
+        "날씨가 좋네",
+    )
+    weather_query_markers = (
+        "알려줘",
+        "알려 줘",
+        "어때",
+        "어떠니",
+        "조회",
+        "확인",
+        "가져와",
+        "예보",
+        "몇 도",
+        "온도",
+        "미세먼지",
+        "뭐야",
+        "어떻니",
+    )
+    if any(x in user_request for x in weather_smalltalk_markers) and not any(
+        x in user_request for x in weather_query_markers
+    ):
+        return False
+    return True
+
+
+def match_whitelisted_tool(
+    user_request: str,
+    req_lower: str,
+    agent_tools_dir: Path,
+    *,
+    is_scheduled: bool = False,
+) -> Optional[str]:
     """B 경로 화이트리스트: 목적이 명확히 일치하는 도구만 반환."""
     has_url = bool(re.search(r"https?://\S+", user_request))
 
@@ -475,7 +590,10 @@ def match_whitelisted_tool(user_request: str, req_lower: str, agent_tools_dir: P
         if tool.exists():
             return "schedule_list_jobs"
 
-    if any(kw in user_request for kw in ("매일", "매주", "매월", "정기적으로", "예약", "알람", "리마인더")):
+    # 크론 실행 시 user_request에 붙는 접미사에 "예약" 등이 포함되어 schedule_add_job으로 오인되면 안 됨.
+    if not is_scheduled and any(
+        kw in user_request for kw in ("매일", "매주", "매월", "정기적으로", "예약", "알람", "리마인더")
+    ):
         tool = agent_tools_dir / "schedule_add_job.py"
         if tool.exists():
             return "schedule_add_job"
@@ -491,16 +609,16 @@ def match_whitelisted_tool(user_request: str, req_lower: str, agent_tools_dir: P
         if tool.exists():
             return "chromadb_db_inventory"
 
+    # 날씨: 웹 검색(tavily)보다 우선. 서울뿐 아니라 파주·분당·제주 등 전 지역 동일 도구.
+    weather_tool = agent_tools_dir / "서울_지금_현재_날씨_알려줘.py"
+    if weather_tool.exists() and is_weather_tool_request(user_request):
+        return "서울_지금_현재_날씨_알려줘"
+
     search_intent = get_search_intent(user_request, req_lower)
     if search_intent == "web":
         tool = agent_tools_dir / "tavily_search_tool.py"
         if tool.exists():
             return "tavily_search_tool"
-
-    weather_tool = agent_tools_dir / "서울_지금_현재_날씨_알려줘.py"
-    if weather_tool.exists():
-        if "서울" in user_request and "날씨" in user_request:
-            return "서울_지금_현재_날씨_알려줘"
 
     smart_plug_tool = agent_tools_dir / "smart_plug.py"
     if smart_plug_tool.exists():
@@ -531,6 +649,8 @@ def router_step1_hard_rules(
     req_lower: str,
     chat_id: str,
     deps: RouterStep1Deps,
+    *,
+    is_scheduled: bool = False,
 ) -> Optional[dict]:
     """1단계: 명백한 하드룰. 매칭 시 즉시 반환, None이면 2단계로."""
     d = deps.agent_tools_dir
@@ -538,7 +658,11 @@ def router_step1_hard_rules(
 
     if is_smalltalk_or_memory_request(user_request, req_lower):
         return {"route_type": "direct_answer", "router_choice": "A"}
-    whitelisted_tool = match_whitelisted_tool(user_request, req_lower, d)
+    if is_trivial_unit_conversion_query(user_request, req_lower):
+        return {"route_type": "direct_answer", "router_choice": "A"}
+    if is_meta_bot_availability_query(user_request, req_lower):
+        return {"route_type": "direct_answer", "router_choice": "A"}
+    whitelisted_tool = match_whitelisted_tool(user_request, req_lower, d, is_scheduled=is_scheduled)
     if whitelisted_tool:
         out = {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": whitelisted_tool}
         if whitelisted_tool == "tavily_search_tool":
@@ -617,9 +741,10 @@ def router_step1_hard_rules(
             if (d / "agent_tools_list.py").exists():
                 return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "agent_tools_list"}
         return {"route_type": "use_existing_tool", "router_choice": "B"}
-    schedule_keywords = ("매일", "매주", "매월", "정기적으로", "스케줄", "예약", "알람", "리마인더")
-    if any(kw in user_request for kw in schedule_keywords) and (d / "schedule_add_job.py").exists():
-        return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "schedule_add_job"}
+    if not is_scheduled:
+        schedule_keywords = ("매일", "매주", "매월", "정기적으로", "스케줄", "예약", "알람", "리마인더")
+        if any(kw in user_request for kw in schedule_keywords) and (d / "schedule_add_job.py").exists():
+            return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "schedule_add_job"}
     # 주제·조건이 있는 논문 찾기/검색은 RAG(B) — '목록으로 알려줘'만 있는 문장이 인벤토리보다 먼저 걸리지 않게 순서 우선.
     if ("chromadb" in req_lower or "논문" in user_request) and any(w in req_lower for w in ("검색", "요약", "설명", "찾아")):
         return {"route_type": "direct_answer", "router_choice": "B"}

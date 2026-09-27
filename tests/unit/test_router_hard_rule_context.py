@@ -19,6 +19,8 @@ from core.graph.agent_router_rules import (  # noqa: E402
     _req_lower_for_ascii_greeting_scan,
     is_factual_lookup,
     is_smalltalk_or_memory_request,
+    is_meta_bot_availability_query,
+    is_trivial_unit_conversion_query,
     router_step1_hard_rules,
 )
 
@@ -112,3 +114,32 @@ def test_normal_factual_lookup_still_works():
     """일반 사실 조회('비트코인 뭐야?')는 여전히 factual_lookup으로 분류."""
     assert is_factual_lookup("비트코인 뭐야?") is True
     assert _is_followup_vague_query("비트코인 뭐야?") is False
+
+
+def test_ms_to_seconds_is_direct_answer_not_rag():
+    """ms→초 환산은 논문 RAG(B)가 아니라 일상(A) 하드룰."""
+    msg = "28087ms 는 몇 초야?"
+    low = msg.lower()
+    assert is_trivial_unit_conversion_query(msg, low) is True
+    r = router_step1_hard_rules(msg, low, "x", _DEPS)
+    assert r == {"route_type": "direct_answer", "router_choice": "A"}
+
+
+def test_meta_can_you_answer_not_planner():
+    """'답변 가능해?' 류는 플래너(C)가 아니라 일상(A)."""
+    msg = "궁금한게 있는데, 답변 가능해?"
+    low = msg.lower()
+    assert is_meta_bot_availability_query(msg, low) is True
+    r = router_step1_hard_rules(msg, low, "x", _DEPS)
+    assert r == {"route_type": "direct_answer", "router_choice": "A"}
+
+
+def test_scheduled_suffix_weather_not_schedule_add_job():
+    """크론 접미사의 '예약' 때문에 schedule_add_job으로 오인하면 안 됨 → 날씨 도구."""
+    from apps.scheduler import agent_scheduled_runner as asr
+
+    msg = "서울 현재 날씨 알려줘" + asr._SCHEDULE_OUTPUT_KO_SUFFIX
+    low = msg.lower()
+    r = router_step1_hard_rules(msg, low, "x", _DEPS, is_scheduled=True)
+    assert r is not None
+    assert r.get("used_tool_name") == "서울_지금_현재_날씨_알려줘"
