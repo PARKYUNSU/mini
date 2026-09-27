@@ -8,6 +8,12 @@
 하이퍼파라미터는 HPARAMS 상수로 고정 (v3 = v4 = v5). 바꾸면 "데이터만 바꾼 효과"를 분리할 수 없으므로 CLI 로 열지 않는다.
 바꿔야 하면 새 버전 실험 노트에 사유를 적고 이 파일을 수정한다.
 
+예외 하나 — ``LEARNING_RATE`` 환경변수로 lr 만 덮어쓸 수 있다 (기본값은 HPARAMS 그대로 2e-4).
+lr 자체가 실험 변수인 라운드를 위한 것이다 (docs/experiments/yunsur_v10/). 소스를 고쳐 박으면
+이전 라운드의 재현이 깨지므로 환경변수로 받고, 대신 **조용히 바뀌지 않게** 한다:
+기본값과 다르면 배너를 찍고 train_stats.json 의 ``hparam_overrides`` 에 기록한다.
+  LEARNING_RATE=5e-5 python scripts/train_lora.py --version v10
+
 출력 (--out-dir, 기본 outputs/yunsur_{version})
   adapter/                 — LoRA 어댑터 + 토크나이저 (save_pretrained). 맥미니에서 convert_lora_to_gguf.py 로 변환
   train_log.json           — trainer.state.log_history (loss 추이 → 03_train_config.md)
@@ -55,6 +61,27 @@ REQUIRED_KEYS = ("slot", "system", "instruction", "output")
 
 def log(msg: str) -> None:
     print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
+
+
+def resolve_learning_rate(raw: str | None, default: float) -> tuple[float, dict]:
+    """``LEARNING_RATE`` 환경변수를 검증해 (실제 lr, 오버라이드 기록) 을 돌려준다.
+
+    lr 이 실험 변수인 라운드(docs/experiments/yunsur_v10/)를 위한 유일한 예외다.
+    소스를 고쳐 박으면 이전 라운드 재현이 깨지므로 환경변수로 받되,
+    **조용히 바뀌지 않게** 기본값과 다를 때만 기록을 남긴다 (train_stats.json).
+    값이 없거나 기본값과 같으면 기록은 비어 있다.
+    """
+    if raw is None or not raw.strip():
+        return default, {}
+    try:
+        lr = float(raw.strip())
+    except ValueError:
+        raise SystemExit(f"LEARNING_RATE 를 float 로 읽을 수 없다: {raw!r}")
+    if not 0 < lr < 1:
+        raise SystemExit(f"LEARNING_RATE 범위가 이상하다: {lr} (0 < lr < 1)")
+    if lr == default:
+        return lr, {}
+    return lr, {"learning_rate": {"default": default, "used": lr}}
 
 
 # ---------------------------------------------------------------- 0) 환경 검증 (노트북 셀 4)
@@ -125,7 +152,15 @@ def main() -> int:
     from unsloth import FastLanguageModel
     from unsloth.chat_templates import get_chat_template, standardize_sharegpt, train_on_responses_only
 
-    H = HPARAMS
+    H = dict(HPARAMS)
+    lr, hparam_overrides = resolve_learning_rate(os.environ.get("LEARNING_RATE"), HPARAMS["learning_rate"])
+    H["learning_rate"] = lr
+    if hparam_overrides:
+        log("=" * 66)
+        log(f"  하이퍼파라미터 오버라이드: learning_rate {HPARAMS['learning_rate']} -> {lr}")
+        log("  라운드 노트에 사유가 적혀 있어야 한다 (docs/experiments/).")
+        log("=" * 66)
+    log(f"learning_rate = {lr} ({'LEARNING_RATE 오버라이드' if hparam_overrides else 'HPARAMS 기본값'})")
     dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
 
     # 2) 모델 로드 (셀 9)
@@ -257,6 +292,7 @@ def main() -> int:
         "data_file": str(data_path.relative_to(ROOT)) if data_path.is_relative_to(ROOT) else str(data_path),
         "data": data_stats,
         "hparams": H,
+        "hparam_overrides": hparam_overrides,
         "dtype": str(dtype),
         "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "global_step": trainer.state.global_step,

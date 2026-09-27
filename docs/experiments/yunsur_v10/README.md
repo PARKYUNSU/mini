@@ -50,9 +50,9 @@ v9 와 동일. [`scripts/runpod_train.sh`](../../../scripts/runpod_train.sh) (L4
 
 ## 체크리스트
 
-- [ ] `train_lora.py`: `LEARNING_RATE` 환경변수 오버라이드 추가 (기본 2e-4 유지) + 학습 로그에 실제 lr 출력
+- [x] `train_lora.py`: `LEARNING_RATE` 환경변수 오버라이드 추가 (기본 2e-4 유지) + 학습 로그에 실제 lr 출력 — `resolve_learning_rate()` 로 분리, 기본값과 다르면 배너 + `train_stats.json` 의 `hparam_overrides` 에 기록. 테스트 13건 ([`tests/unit/test_train_lora_lr_override.py`](../../../tests/unit/test_train_lora_lr_override.py))
 - [ ] 데이터 확인: v9 jsonl 을 그대로 쓰는지, 해시가 v9 라운드와 같은지
-- [ ] RunPod 학습 (`LEARNING_RATE=5e-5`) → HF `YUNSU24/yunsur_v10_lora` · 138스텝 예상
+- [ ] RunPod 학습 (`LEARNING_RATE=5e-5 python scripts/train_lora.py --version v10`) → HF `YUNSU24/yunsur_v10_lora` · 138스텝 예상
 - [ ] 맥미니: `hf download` → `merge_lora_gguf.sh v10`
 - [ ] `bash scripts/eval_round.sh yunsur_v10` → `04_eval_v10/`
 - [ ] `05_conclusion.md`
