@@ -227,17 +227,40 @@ def test_invoke_llm_with_fallback_all_timeout_returns_fallback(monkeypatch):
 
 
 def test_direct_answer_a_path_passes_timeout_to_invoke(monkeypatch, cfg):
+    """A 경로가 DIRECT_ANSWER_TIMEOUT_SEC 를 그대로 넘기는지만 본다.
+
+    스텁 답변은 **한국어여야 한다.** 영어를 돌려주면 needs_korean_retry 가 걸려
+    한국어 재생성이 한 번 더 invoke 를 부르고(그 경로는 아래 테스트가 따로 본다),
+    이 테스트의 관심사가 아닌 호출이 섞인다.
+    """
     captured = []
 
     def _cap(*_a, timeout_sec=None, **_k):
         captured.append(timeout_sec)
-        return "ok"
+        return "네, 반가워요"
 
     monkeypatch.setattr(agent_nodes, "_invoke_llm_with_fallback", _cap)
     monkeypatch.setattr(agent_nodes, "DIRECT_ANSWER_TIMEOUT_SEC", 33.0)
     unique = "q9f2k_node_contract_timeout_pass_only"
     agent_nodes.direct_answer_node({"user_request": unique, "router_choice": "A"}, config=cfg)
     assert captured == [33.0]
+
+
+def test_direct_answer_a_english_answer_retries_in_korean_with_same_timeout(monkeypatch, cfg):
+    """영어 답변이 오면 한국어로 1회 재생성하고, 재시도도 같은 타임아웃을 쓴다."""
+    captured = []
+    replies = ["ok", "네, 반가워요"]
+
+    def _cap(*_a, timeout_sec=None, **_k):
+        captured.append(timeout_sec)
+        return replies[len(captured) - 1] if len(captured) <= len(replies) else replies[-1]
+
+    monkeypatch.setattr(agent_nodes, "_invoke_llm_with_fallback", _cap)
+    monkeypatch.setattr(agent_nodes, "DIRECT_ANSWER_TIMEOUT_SEC", 33.0)
+    unique = "q9f2k_node_contract_korean_retry_only"
+    out = agent_nodes.direct_answer_node({"user_request": unique, "router_choice": "A"}, config=cfg)
+    assert captured == [33.0, 33.0], "재생성도 같은 타임아웃으로 호출돼야 한다"
+    assert "반가워요" in (out.get("direct_response") or ""), "재생성한 한국어 답변을 채택해야 한다"
 
 
 def test_paper_mode_biases_knowledge_from_a_to_rag(monkeypatch, cfg):
