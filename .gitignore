@@ -1,5 +1,11 @@
 # 환경 변수 (API 키 포함)
+# `.env` 만 막혀 있어 `.env.bak-<타임스탬프>` 백업(키 26개)이 새어나올 수 있었다.
+# `.env.example` 은 계속 추적한다 (아래 패턴에 걸리지 않음).
 .env
+.env.bak*
+.env.*.bak
+.env.local
+.env.*.local
 
 # 가상환경
 .venv/
