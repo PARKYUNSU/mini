@@ -30,6 +30,40 @@ def _parse_csv(value):
     return [v.strip() for v in value.split(",") if v.strip()]
 
 
+def _normalize_prompt_for_dedupe(prompt: str) -> str:
+    """스케줄 실행 시 붙는 접미사·공백 차이는 같은 작업으로 본다."""
+    p = (prompt or "").strip()
+    if "[출력 언어·예약 발송]" in p:
+        p = p.split("[출력 언어·예약 발송]", 1)[0].strip()
+    return re.sub(r"\s+", " ", p)
+
+
+def _active_job_signature(
+    *,
+    chat_id: str,
+    prompt: str,
+    title: str,
+    schedule_type: str,
+    time_of_day: str | None,
+    days_of_week: list | None,
+    day_of_month: int | None,
+    interval: int | None,
+    timezone: str,
+) -> tuple:
+    text = _normalize_prompt_for_dedupe(prompt or title or "")
+    dow = tuple(sorted(days_of_week or []))
+    return (
+        str(chat_id or ""),
+        text,
+        schedule_type,
+        time_of_day,
+        dow,
+        day_of_month,
+        interval,
+        (timezone or "Asia/Seoul").strip(),
+    )
+
+
 def add_job(
     title: str,
     schedule_type: str,
@@ -56,6 +90,39 @@ def add_job(
         return "monthly는 day_of_month(1-31)가 필요합니다."
     if schedule_type == "interval" and not interval:
         return "interval은 interval(분)이 필요합니다."
+
+    new_sig = _active_job_signature(
+        chat_id=chat_id,
+        prompt=prompt or title,
+        title=title,
+        schedule_type=schedule_type,
+        time_of_day=time_of_day,
+        days_of_week=days_of_week or [],
+        day_of_month=day_of_month,
+        interval=interval,
+        timezone=timezone,
+    )
+    data = load_jobs()
+    for existing in data.get("jobs", {}).values():
+        if existing.get("status") != "active":
+            continue
+        if _active_job_signature(
+            chat_id=str(existing.get("chat_id") or ""),
+            prompt=str(existing.get("prompt") or existing.get("title") or ""),
+            title=str(existing.get("title") or ""),
+            schedule_type=existing.get("schedule_type"),
+            time_of_day=existing.get("time_of_day"),
+            days_of_week=list(existing.get("days_of_week") or []),
+            day_of_month=existing.get("day_of_month"),
+            interval=existing.get("interval"),
+            timezone=str(existing.get("timezone") or "Asia/Seoul"),
+        ) == new_sig:
+            return (
+                "동일한 스케줄·프롬프트가 이미 등록되어 있어 추가하지 않았습니다.\n"
+                f"  기존 ID: {existing.get('id')}\n"
+                f"  Next run: {existing.get('next_run_at')} ({existing.get('timezone') or timezone})\n"
+                "※ 같은 말로 반복 등록하면 알림이 수백 통으로 쌓일 수 있습니다."
+            )
 
     job_id = f"JOB-{str(uuid.uuid4())[:4].upper()}"
     now = datetime.now().isoformat()
@@ -93,7 +160,6 @@ def add_job(
         "updated_at": now,
     }
 
-    data = load_jobs()
     data["jobs"][job_id] = job
     save_jobs(data)
 
@@ -101,7 +167,14 @@ def add_job(
     stats["total_jobs_created"] = stats.get("total_jobs_created", 0) + 1
     save_stats(stats)
 
-    return f"✓ Job added: {job_id}\n  Title: {title}\n  Next run: {job['next_run_at']}\n  Prompt: {prompt[:50]}..."
+    return (
+        f"✓ Job added: {job_id}\n"
+        f"  Title: {title}\n"
+        f"  Next run: {job['next_run_at']} ({timezone})\n"
+        f"  Prompt: {prompt[:50]}...\n"
+        f"\n"
+        f"※ 지금 메시지는 «등록 확인»입니다. 뉴스·날씨 등 실제 답변은 위 Next run 시각에 이 채팅으로 옵니다."
+    )
 
 
 def list_jobs() -> str:

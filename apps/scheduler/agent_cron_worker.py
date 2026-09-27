@@ -57,6 +57,18 @@ def _cron_worker_loop_impl() -> None:
     while True:
         try:
             due = get_due_jobs()
+            try:
+                max_per = int((os.getenv("CRON_MAX_JOBS_PER_TICK") or "30").strip())
+            except ValueError:
+                max_per = 30
+            max_per = max(1, min(max_per, 500))
+            if len(due) > max_per:
+                print(
+                    f"[cron] due 작업 {len(due)}건 중 이번 분에는 최대 {max_per}건만 처리 "
+                    f"(나머지는 다음 분. 상한: CRON_MAX_JOBS_PER_TICK)",
+                    flush=True,
+                )
+                due = due[:max_per]
             for job in due:
                 job_id = job.get("id")
                 prompt = job.get("prompt") or job.get("title", "")
@@ -90,7 +102,17 @@ def _cron_worker_loop_impl() -> None:
                         _log_run("succeeded", message_preview=prompt[:80])
                     else:
                         _log_run("failed", error=str(result)[:200], message_preview=prompt[:80])
-                        print(f"[cron] 실행 실패 (next_run 유지): {result}", flush=True)
+                        print(f"[cron] 실행 실패: {result}", flush=True)
+                        # 실패 시에도 next_run 을 넘기지 않으면 next_run_at 이 과거로 남아
+                        # 매 분 due 목록에 잡혀 텔레그램 오류 알림이 폭주할 수 있음.
+                        _advance = (os.getenv("CRON_ADVANCE_NEXT_RUN_ON_FAILURE") or "1").strip().lower()
+                        if _advance not in ("0", "false", "no", "off"):
+                            mark_job_run(job_id)
+                            print(
+                                "[cron] 실패했지만 다음 실행 시각으로 진행합니다 "
+                                "(재시도만 원하면 .env 에 CRON_ADVANCE_NEXT_RUN_ON_FAILURE=0)",
+                                flush=True,
+                            )
                 except Exception as job_exc:
                     import traceback
 
@@ -98,10 +120,18 @@ def _cron_worker_loop_impl() -> None:
                     err_msg = f"{type(job_exc).__name__}: {job_exc!r}"
                     print(f"[cron] job 예외 {job_id}: {err_msg}\n{tb}", flush=True)
                     _log_run("failed", error=err_msg[:200], message_preview=(prompt or "")[:80])
-                    print(
-                        f"[cron] 실행 실패 (next_run 유지, 예외): {job_id} — {err_msg}",
-                        flush=True,
-                    )
+                    print(f"[cron] 실행 예외: {job_id} — {err_msg}", flush=True)
+                    _advance = (os.getenv("CRON_ADVANCE_NEXT_RUN_ON_FAILURE") or "1").strip().lower()
+                    if _advance not in ("0", "false", "no", "off"):
+                        mark_job_run(job_id)
+                        print(
+                            "[cron] 예외 후에도 다음 실행 시각으로 진행합니다 "
+                            "(매 분 재시도만 원하면 CRON_ADVANCE_NEXT_RUN_ON_FAILURE=0)",
+                            flush=True,
+                        )
+                finally:
+                    # 동일 분에 due인 작업이 많으면 Telegram 429 방지
+                    time.sleep(2.0)
         except Exception as e:
             import traceback
 
