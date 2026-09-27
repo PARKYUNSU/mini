@@ -1,10 +1,12 @@
 """
-서울 날씨: OpenWeatherMap 현재 + 미세먼지 + 24시간 예보(강수·기온 구간).
-.env 에 WEATHER_API_KEY 필요. (에어/예보는 동일 키로 무료 티어에서 일반적으로 사용 가능)
+OpenWeatherMap 현재·미세먼지·24h 예보(한국 전역 도시). .env에 WEATHER_API_KEY 필요.
+【도구 선택】사용자가 특정 지역의 날씨·기온·미세먼지·예보를 물으면, 그곳이 대도시든 소도시(파주·분당·제주·수원 등)든 상관없이 **일반 웹 검색(Tavily 등)보다 무조건 이 날씨 도구를 최우선**으로 호출하세요.
+【파라미터】도시명은 OpenWeatherMap에 넘기기 전에 **반드시 영문 표기**로 바꿉니다(예: 서울→Seoul, 파주→Paju, 부산→Busan). 한국어 지명은 아래 매핑으로 해석합니다.
 """
 from __future__ import annotations
 
 import os
+import re
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
@@ -13,6 +15,96 @@ import requests
 KST = ZoneInfo("Asia/Seoul")
 SESSION = requests.Session()
 TIMEOUT = 20
+
+# 긴 키워드 먼저 (부분 문자열 오매칭 방지)
+_KO_TO_EN_CITY: tuple[tuple[str, str], ...] = (
+    ("서울특별시", "Seoul"),
+    ("제주특별자치도", "Jeju"),
+    ("부산광역시", "Busan"),
+    ("대구광역시", "Daegu"),
+    ("인천광역시", "Incheon"),
+    ("광주광역시", "Gwangju"),
+    ("대전광역시", "Daejeon"),
+    ("울산광역시", "Ulsan"),
+    ("파주시", "Paju"),
+    ("성남시", "Seongnam"),
+    ("제주시", "Jeju"),
+    ("수원시", "Suwon"),
+    ("고양시", "Goyang"),
+    ("용인시", "Yongin"),
+    ("청주시", "Cheongju"),
+    ("전주시", "Jeonju"),
+    ("창원시", "Changwon"),
+    ("시흥시", "Siheung"),
+    ("김포시", "Gimpo"),
+    ("안산시", "Ansan"),
+    ("안양시", "Anyang"),
+    ("남양주시", "Namyangju"),
+    ("하남시", "Hanam"),
+    ("의정부시", "Uijeongbu"),
+    ("과천시", "Gwacheon"),
+    ("구리시", "Guri"),
+    ("광명시", "Gwangmyeong"),
+    ("군포시", "Gunpo"),
+    ("오산시", "Osan"),
+    ("서울", "Seoul"),
+    ("제주도", "Jeju"),
+    ("제주", "Jeju"),
+    ("부산", "Busan"),
+    ("대구", "Daegu"),
+    ("인천", "Incheon"),
+    ("광주", "Gwangju"),
+    ("대전", "Daejeon"),
+    ("울산", "Ulsan"),
+    ("파주", "Paju"),
+    ("분당", "Bundang"),
+    ("성남", "Seongnam"),
+    ("수원", "Suwon"),
+    ("고양", "Goyang"),
+    ("용인", "Yongin"),
+    ("청주", "Cheongju"),
+    ("전주", "Jeonju"),
+    ("창원", "Changwon"),
+    ("시흥", "Siheung"),
+    ("김포", "Gimpo"),
+    ("안산", "Ansan"),
+    ("안양", "Anyang"),
+    ("남양주", "Namyangju"),
+    ("하남", "Hanam"),
+    ("의정부", "Uijeongbu"),
+    ("과천", "Gwacheon"),
+    ("구리", "Guri"),
+    ("광명", "Gwangmyeong"),
+    ("군포", "Gunpo"),
+    ("오산", "Osan"),
+)
+
+_EN_CITY_WORD = re.compile(
+    r"\b(Seoul|Busan|Daegu|Incheon|Gwangju|Daejeon|Ulsan|Jeju|Paju|Bundang|"
+    r"Suwon|Goyang|Yongin|Seongnam|Cheongju|Jeonju|Changwon|Siheung|Gimpo|Ansan|Anyang|"
+    r"Namyangju|Hanam|Uijeongbu|Gwacheon|Guri|Gwangmyeong|Gunpo|Osan)\b",
+    re.I,
+)
+
+
+def resolve_city_en_from_user_request(user_request: str) -> str:
+    """사용자 문장에서 도시명을 찾아 OpenWeatherMap용 영문 도시명으로 반환. 기본은 Seoul."""
+    req = (user_request or "").strip()
+    if not req:
+        return "Seoul"
+    for ko, en in _KO_TO_EN_CITY:
+        if ko in req:
+            return en
+    m = _EN_CITY_WORD.search(req)
+    if m:
+        return m.group(1).title() if m.group(1).lower() != "bundang" else "Bundang"
+    return "Seoul"
+
+
+def _owm_city_query(city_en: str) -> str:
+    """한국 좌표 모호성 완화를 위해 ,KR 접미사 사용."""
+    c = (city_en or "Seoul").strip()
+    return f"{c},KR"
 
 
 def _pm25_grade_kr(pm25: float) -> str:
@@ -49,18 +141,20 @@ def _fetch_json(url: str, params: dict) -> dict | None:
         return None
 
 
-def build_seoul_weather_report() -> str:
+def build_city_weather_report(city_en: str = "Seoul") -> str:
+    """OpenWeatherMap: 현재 + 미세먼지 + 24시간 예보(강수·기온 구간). city_en은 영문 도시명."""
     api_key = (os.getenv("WEATHER_API_KEY") or "").strip()
     if not api_key:
         return "오류: WEATHER_API_KEY 환경 변수가 설정되지 않았습니다. .env 파일을 확인해 주세요."
 
-    city = "Seoul"
+    city_q = _owm_city_query(city_en)
+    display_name = city_en.strip() or "Seoul"
     base = "https://api.openweathermap.org/data/2.5"
     common = {"appid": api_key, "units": "metric", "lang": "kr"}
 
-    cur = _fetch_json(f"{base}/weather", {"q": city, **common})
+    cur = _fetch_json(f"{base}/weather", {"q": city_q, **common})
     if not cur or not cur.get("main") or not cur.get("weather"):
-        return "오류: 서울 현재 날씨 응답을 해석할 수 없습니다."
+        return f"오류: {display_name} 현재 날씨 응답을 해석할 수 없습니다. (도시명 영문·철자 확인)"
 
     m = cur["main"]
     w0 = cur["weather"][0]
@@ -71,7 +165,7 @@ def build_seoul_weather_report() -> str:
     wind = (cur.get("wind") or {}).get("speed", 0)
 
     lines: list[str] = [
-        f"현재 {city}의 날씨 정보:",
+        f"현재 {display_name}({city_q})의 날씨 정보:",
         f"  온도: {temp}°C (체감: {feels}°C)",
         f"  날씨: {desc}",
         f"  습도: {humidity}%",
@@ -109,7 +203,7 @@ def build_seoul_weather_report() -> str:
         else:
             lines.append("  미세먼지: 공기질 API 조회 실패(키·쿼터 확인).")
 
-    fc = _fetch_json(f"{base}/forecast", {"q": city, **common})
+    fc = _fetch_json(f"{base}/forecast", {"q": city_q, **common})
     if fc and fc.get("list"):
         slots = fc["list"][:8]  # 약 24시간(3시간×8)
         temps: list[float] = []
@@ -149,9 +243,20 @@ def build_seoul_weather_report() -> str:
     return "\n".join(lines)
 
 
+def build_seoul_weather_report() -> str:
+    """호환용: 서울 고정."""
+    return build_city_weather_report("Seoul")
+
+
 def run(user_request: str = "") -> str:
-    """호스트 도구 로더(importlib)가 우선 호출."""
-    return build_seoul_weather_report()
+    """
+    OpenWeatherMap으로 지역 날씨 조회. run(user_request) 시그니처 유지.
+
+    【필수 라우팅】사용자가 특정 지역의 날씨를 물어보면, 대도시·소도시(예: 파주, 분당, 제주)를 가리키든 **웹 검색보다 무조건 이 날씨 도구를 최우선**으로 사용하세요.
+    【도시명】API에는 한국어 지명을 영문으로 바꿔 전달합니다(예: 서울→Seoul, 파주→Paju, 부산→Busan). 본 구현은 user_request에서 지명을 추출해 매핑합니다.
+    """
+    city_en = resolve_city_en_from_user_request(user_request)
+    return build_city_weather_report(city_en)
 
 
 if __name__ == "__main__":
