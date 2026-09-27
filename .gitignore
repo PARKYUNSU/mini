@@ -66,8 +66,10 @@ tuya-raw.json
 snapshot.json
 
 # 봇이 저장한 일회성 도구 (코어 스크립트는 agent_tools/*.py 루트 유지)
-agent_tools/saved/*
-!agent_tools/saved/.gitkeep
+# `**/` 로 중첩 경로(tools/runtime/agent_tools/agent_tools/saved/)까지 잡는다.
+# 슬래시가 든 패턴은 .gitignore 위치에 고정되어 루트만 매칭됐다.
+**/agent_tools/saved/*
+!**/agent_tools/saved/.gitkeep
 
 # Python
 __pycache__/
