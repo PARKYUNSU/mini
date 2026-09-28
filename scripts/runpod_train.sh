@@ -14,6 +14,10 @@
 #   환경변수  HF_TOKEN = {{ RUNPOD_SECRET_HF_TOKEN }}   ← RunPod Secret 참조. 값은 어디에도 적지 않는다.
 #            HF_REPO  = <hf_user>/yunsur_v5_lora        (private 모델 레포, 없으면 스크립트가 생성)
 #            VERSION  = v5
+#            DATA_VERSION  = v9                         (선택: 학습 데이터만 다른 버전에서. 기본 = VERSION)
+#                                                        lr 처럼 데이터 외 변수만 바꾸는 라운드용 (v10)
+#            LEARNING_RATE = 5e-5                       (선택: 기본은 train_lora.py HPARAMS 의 2e-4.
+#                                                        바꾸면 train_stats.json 의 hparam_overrides 에 남는다)
 #            GH_TOKEN = {{ RUNPOD_SECRET_GH_TOKEN }}    (레포가 private 일 때만)
 #            GIT_REF  = main                            (선택: 태그·브랜치·커밋)
 #            KEEP_POD = 1                               (선택: 디버깅용, 끝나도 Pod 안 끔)
@@ -27,6 +31,7 @@
 set -uo pipefail
 
 VERSION="${VERSION:-v5}"
+DATA_VERSION="${DATA_VERSION:-$VERSION}"   # 학습 데이터 버전. 기본은 VERSION 과 같다
 GIT_REF="${GIT_REF:-main}"
 REPO_DIR="${REPO_DIR:-/workspace/mini}"
 REPO_HTTPS="https://github.com/PARKYUNSU/mini.git"
@@ -61,7 +66,9 @@ PY
   exit "$rc"
 }
 
-step "0. 사전 확인 — VERSION=$VERSION GIT_REF=$GIT_REF"
+step "0. 사전 확인 — VERSION=$VERSION DATA_VERSION=$DATA_VERSION GIT_REF=$GIT_REF"
+echo "learning_rate: ${LEARNING_RATE:-기본값(train_lora.py HPARAMS)}"
+[[ "$DATA_VERSION" != "$VERSION" ]] && echo "⚠️ 데이터는 $DATA_VERSION, 모델은 $VERSION — 데이터 외 변수만 바꾸는 라운드인지 노트에서 확인할 것"
 [[ -n "${HF_TOKEN:-}" ]] || echo "⚠️ HF_TOKEN 없음 — 학습은 하지만 업로드 못 함 (RunPod Secret 확인)"
 [[ -n "${HF_REPO:-}" ]]  || echo "⚠️ HF_REPO 없음 — 업로드 생략됨"
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || true
@@ -78,7 +85,7 @@ fi
 cd "$REPO_DIR" || finish 10
 git fetch --quiet origin "$GIT_REF" && git checkout --quiet FETCH_HEAD || finish 10
 echo "commit: $(git rev-parse --short HEAD) — $(git log -1 --format=%s)"
-DATA="finetune_datasets/${VERSION}/train_data_${VERSION}.jsonl"
+DATA="finetune_datasets/${DATA_VERSION}/train_data_${DATA_VERSION}.jsonl"
 [[ -f "$DATA" ]] || { echo "❌ 데이터 없음: $DATA (git push 했는지, .gitignore 예외가 있는지 확인)"; finish 11; }
 echo "데이터: $DATA ($(wc -l < "$DATA")건)"
 
@@ -95,7 +102,7 @@ pip uninstall -q -y torchao || true
 python -c "import torch, transformers; print('torch', torch.__version__, '| transformers', transformers.__version__)" || finish 20
 
 step "3. 학습 → 업로드"
-python scripts/train_lora.py --version "$VERSION" --hub-repo "${HF_REPO:-}" --out-dir "/workspace/outputs/yunsur_${VERSION}"
+python scripts/train_lora.py --version "$VERSION" --data "$DATA" --hub-repo "${HF_REPO:-}" --out-dir "/workspace/outputs/yunsur_${VERSION}"
 RC=$?
 [[ $RC -eq 0 ]] && echo "✅ 학습·업로드 완료" || echo "❌ train_lora.py rc=$RC — 어댑터는 /workspace/outputs/yunsur_${VERSION}/adapter 에 남아 있음 (KEEP_POD=1 로 재실행해 회수)"
 finish "$RC"

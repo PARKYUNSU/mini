@@ -64,17 +64,28 @@ v9 는 세 운영 슬롯(잡담·계획·RAG)에서 base 와 짝지은 불일치
 
 ## 4. 학습
 
-v9 와 동일. [`scripts/runpod_train.sh`](../../../scripts/runpod_train.sh) (L40S 48GB · 볼륨 50GB · 컨테이너 디스크 60GB) → HF private → 맥미니 `merge_lora_gguf.sh v10`.
+v9 와 동일한 파드 구성. [`scripts/runpod_train.sh`](../../../scripts/runpod_train.sh) (L40S 48GB · 볼륨 50GB · 컨테이너 디스크 60GB) → HF private → 맥미니 `merge_lora_gguf.sh v10`.
 
-`VERSION=v10`, `HF_REPO=YUNSU24/yunsur_v10_lora`, 데이터는 v9 것을 그대로 지정. **`KEEP_POD` 은 켜지 않는다** (v5 에서 컨테이너 재시작 루프를 만들었다).
+RunPod 환경변수:
 
-**lr 은 소스를 고쳐 박지 말고 환경변수로 준다.** [`scripts/train_lora.py`](../../../scripts/train_lora.py) `HPARAMS["learning_rate"]` 를 `LEARNING_RATE` 로 덮어쓸 수 있게 바꾸고 기본값은 2e-4 로 둔다 — 그래야 v9 재현이 깨지지 않고, 이 라운드의 변경이 명령줄에 남는다.
+| 변수 | 값 | 비고 |
+|---|---|---|
+| `VERSION` | `v10` | 출력·HF 레포 이름에 쓰인다 |
+| `DATA_VERSION` | **`v9`** | **학습 데이터는 v9 것을 그대로.** 안 주면 `VERSION` 과 같아진다 |
+| `LEARNING_RATE` | **`5e-5`** | 이 라운드의 유일한 변수. 안 주면 `HPARAMS` 의 2e-4 |
+| `HF_REPO` | `YUNSU24/yunsur_v10_lora` | private |
+| `HF_TOKEN`·`GH_TOKEN` | RunPod Secret 참조 | 값은 어디에도 적지 않는다 |
+| `KEEP_POD` | **켜지 않는다** | v5 에서 컨테이너 재시작 루프를 만들어 학습이 다시 돌았다 |
+
+`DATA_VERSION` 은 이 라운드를 위해 추가했다. 그전에는 데이터 경로가 `VERSION` 에 묶여 있어 `VERSION=v10` 이면 존재하지 않는 `finetune_datasets/v10/` 을 찾고 죽었다 — **데이터를 그대로 두고 다른 변수만 바꾸는 라운드가 처음이라서** 생긴 구멍이다. 기본값이 `VERSION` 이므로 v5~v9 재실행은 달라지지 않는다.
+
+두 값 모두 파드 로그의 `step 0` 에 찍히고, 실제 lr 은 `train_stats.json` 의 `hparams.learning_rate` 와 `hparam_overrides` 에 남는다. 데이터 경로는 같은 파일의 `data_file` 에 남으므로, 사후에 "이 어댑터가 무슨 데이터로 무슨 lr 에 학습됐나" 를 산출물만 보고 확인할 수 있다.
 
 ## 체크리스트
 
 - [x] `train_lora.py`: `LEARNING_RATE` 환경변수 오버라이드 추가 (기본 2e-4 유지) + 학습 로그에 실제 lr 출력 — `resolve_learning_rate()` 로 분리, 기본값과 다르면 배너 + `train_stats.json` 의 `hparam_overrides` 에 기록. 테스트 13건 ([`tests/unit/test_train_lora_lr_override.py`](../../../tests/unit/test_train_lora_lr_override.py))
-- [ ] 데이터 확인: v9 jsonl 을 그대로 쓰는지, 해시가 v9 라운드와 같은지
-- [ ] RunPod 학습 (`LEARNING_RATE=5e-5 python scripts/train_lora.py --version v10`) → HF `YUNSU24/yunsur_v10_lora` · 138스텝 예상
+- [x] 데이터 경로: `runpod_train.sh` 에 `DATA_VERSION` 추가 (기본 = `VERSION`) + `train_lora.py --data` 전달. v9 jsonl 은 커밋돼 있다 (1,100줄, `.gitignore` 예외)
+- [ ] RunPod 학습 (`VERSION=v10 DATA_VERSION=v9 LEARNING_RATE=5e-5`) → HF `YUNSU24/yunsur_v10_lora` · 138스텝 예상
 - [ ] 맥미니: `hf download` → `merge_lora_gguf.sh v10`
 - [ ] `bash scripts/eval_round.sh yunsur_v10` → `04_eval_v10/`
 - [ ] `05_conclusion.md`
