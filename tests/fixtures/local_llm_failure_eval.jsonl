@@ -52,3 +52,19 @@
 {"id": "coding_28", "slot": "coding", "timeout_sec": 120, "text": "로마 숫자 문자열을 정수로 바꾸는 함수 roman_to_int를 만들어줘. roman_to_int('XIV'), roman_to_int('MCMXC'), roman_to_int('IX'), roman_to_int('I') 네 경우를 각각 print 해줘."}
 {"id": "coding_29", "slot": "coding", "timeout_sec": 120, "text": "이차원 리스트의 행과 열을 바꾸는 함수 transpose를 만들어줘. 행마다 길이가 다르면 None을 돌려줘. transpose([[1,2],[3,4],[5,6]]) 와 transpose([[1,2],[3]]) 두 경우를 각각 print 해줘."}
 {"id": "coding_30", "slot": "coding", "timeout_sec": 120, "text": "정수 리스트에서 큰 값 k개를 내림차순으로 돌려주는 함수 top_k를 만들어줘. k가 리스트 길이보다 크면 전체를 돌려주고, 같은 값이 여러 개면 그대로 여러 개 담아줘. top_k([5,1,5,3], 3) 와 top_k([2], 5) 두 경우를 각각 print 해줘."}
+{"id": "chat_09", "slot": "chat", "timeout_sec": 55, "text": "회의가 늦어진다고 알리는 문자 3개를 써줘. 한 줄에 하나씩, 각 줄은 30자 이내. 번호나 머리기호 없이 문장만 써.", "constraints": {"exact_lines": 3, "max_chars_per_line": 30}}
+{"id": "chat_10", "slot": "chat", "timeout_sec": 55, "text": "집중이 흐트러질 때 쓸 방법 4가지를 한 줄에 하나씩 써줘. 각 줄은 25자 이내로.", "constraints": {"exact_lines": 4, "max_chars_per_line": 25}}
+{"id": "chat_11", "slot": "chat", "timeout_sec": 55, "text": "분기 실적 공유 메일의 핵심만 정확히 5줄로 정리해줘. 각 줄은 40자 이내.", "constraints": {"exact_lines": 5, "max_chars_per_line": 40}}
+{"id": "chat_12", "slot": "chat", "timeout_sec": 55, "text": "신규 입사자 환영 인사를 120자 이내로, 줄바꿈 없이 한 문단으로만 써줘.", "constraints": {"max_lines": 1, "max_chars": 120}}
+{"id": "chat_13", "slot": "chat", "timeout_sec": 55, "text": "장비 점검 절차를 정확히 6줄로 써줘. 각 줄은 35자 이내로.", "constraints": {"exact_lines": 6, "max_chars_per_line": 35}}
+{"id": "chat_14", "slot": "chat", "timeout_sec": 55, "text": "외근 일정을 알리는 쪽지를 정확히 2줄로, 전체 90자 이내로 써줘.", "constraints": {"exact_lines": 2, "max_chars": 90}}
+{"id": "chat_15", "slot": "chat", "timeout_sec": 55, "text": "팀원 두 명의 담당 업무를 JSON 객체 하나로만 출력해줘. 키는 사람 이름, 값은 담당 업무 문자열이다. 다른 문장은 쓰지 마.", "constraints": {"json_only": true}}
+{"id": "chat_16", "slot": "chat", "timeout_sec": 55, "text": "오늘 처리할 일 3개를 JSON 배열로만 출력해줘. 각 원소는 title 과 minutes 두 키만 가진다. 설명 문장 없이 JSON만.", "constraints": {"json_only": true}}
+{"id": "planner_09", "slot": "planner", "timeout_sec": 120, "text": "폴더 안 이미지 파일 개수를 세는 계획을 세워줘. 각 단계는 30자 이내로 아주 짧게 써.", "constraints": {"max_chars_per_line": 30}}
+{"id": "planner_10", "slot": "planner", "timeout_sec": 120, "text": "텍스트 파일에서 중복 줄을 제거하는 계획을 세워줘. 각 단계는 35자 이내로 짧게.", "constraints": {"max_chars_per_line": 35}}
+{"id": "planner_11", "slot": "planner", "timeout_sec": 120, "text": "CSV 파일의 빈 칸 개수를 세는 계획을 세워줘. 각 단계는 32자 이내로 써.", "constraints": {"max_chars_per_line": 32}}
+{"id": "planner_12", "slot": "planner", "timeout_sec": 120, "text": "로그 파일을 날짜별로 나눠 저장하는 계획을 세워줘. 각 단계는 36자 이내로 써.", "constraints": {"max_chars_per_line": 36}}
+{"id": "planner_13", "slot": "planner", "timeout_sec": 120, "text": "PDF 파일에서 첫 장만 잘라내는 계획을 세워줘. 각 단계는 28자 이내로 아주 짧게.", "constraints": {"max_chars_per_line": 28}}
+{"id": "planner_14", "slot": "planner", "timeout_sec": 120, "text": "설정 파일을 백업하고 새 값으로 교체하는 계획을 세워줘. 각 단계는 34자 이내로 쓰고, '예시' 나 'TODO' 같은 자리표시 단어는 넣지 마.", "constraints": {"max_chars_per_line": 34, "must_exclude": ["예시", "TODO"]}}
+{"id": "planner_15", "slot": "planner", "timeout_sec": 120, "text": "폴더 두 개의 파일 이름을 비교하는 계획을 세워줘. 각 단계는 33자 이내로 써.", "constraints": {"max_chars_per_line": 33}}
+{"id": "planner_16", "slot": "planner", "timeout_sec": 120, "text": "오래된 임시 파일을 지우는 계획을 세워줘. 각 단계는 31자 이내로 아주 짧게 써.", "constraints": {"max_chars_per_line": 31}}

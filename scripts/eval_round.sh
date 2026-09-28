@@ -5,7 +5,7 @@
 #       bash scripts/eval_round.sh yunsur_v8 v8round
 #
 # docs/experiments/protocol.md 의 규칙을 구현한다:
-#   - 고정 54문항(sha256 a94d4708f9b6), 반복 3회, 문항 실패는 과반 시행
+#   - 고정 70문항(sha256 8a7101d49cac), 반복 3회, 문항 실패는 과반 시행
 #   - 영향을 받을 수 없는 대조군(base)을 같은 세션에서 같이 잰다
 #   - 판정은 독립 비율 ±%p 가 아니라 짝지은 문항 단위 McNemar
 #   - 실패율에 Wilson 95% 구간을 병기한다
@@ -21,7 +21,7 @@ export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$(pwd)"
 export PYTHONUNBUFFERED=1
 PY=".venv/bin/python"
 FIXTURE="tests/fixtures/local_llm_failure_eval.jsonl"
-EXPECT_SHA="a94d4708f9b6"
+EXPECT_SHA="8a7101d49cac"
 
 TARGET="${1:-}"
 TAG="${2:-$(date +%m%d)}"

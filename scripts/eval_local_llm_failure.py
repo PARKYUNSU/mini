@@ -204,6 +204,7 @@ def _invoke_local_num_predict(messages, timeout_sec: float, num_predict: int) ->
 
 
 from core.llm.lang_guard import english_ratio as _english_ratio  # 봇 노드와 동일한 지표
+from core.llm.constraint_check import check_constraints  # 문항의 기계 검증 가능한 제약
 
 _THINK_LEAK_RE = re.compile(r"<(?:/?)(?:redacted_)?think(?:ing)?>|<\|im_(?:start|end)\|>", re.IGNORECASE)
 
@@ -237,23 +238,40 @@ def _repeated_line(text: str, min_chars: int = 20, times: int = 3) -> bool:
     return any(c >= times for c in cnt.values())
 
 
-def _quality_check(slot: str, text: str, *, english_max: float, request: str = "") -> tuple[bool, str]:
+def _quality_check(
+    slot: str,
+    text: str,
+    *,
+    english_max: float,
+    request: str = "",
+    constraints: dict | None = None,
+) -> tuple[bool, str]:
     """(quality_ok, quality_kind). hard 통과한 답변에만 의미 있음.
 
     ``request`` 는 그 답변을 만든 요청 문장. 잡담 펜스 예외 판정에만 쓴다.
+
+    ``constraints`` 는 문항이 명시한 기계 검증 가능한 제약(정확히 N줄·JSON만 등).
+    붕괴 검사를 모두 통과한 뒤에 본다 — 붕괴한 답변의 형식을 따지는 것은 의미가 없다.
+    제약이 없는 문항(기존 54개)은 이 인자가 None 이라 결과가 달라지지 않는다.
     """
     body = text or ""
     if _THINK_LEAK_RE.search(body):
         return False, "think_leak"
     if _repeated_line(body):
         return False, "repetition"
-    if slot in ("chat", "rag", "planner"):
+    # JSON 만 내라고 지시한 문항은 영어 검사·펜스 검사에서 뺀다.
+    # JSON 은 키가 영어일 수밖에 없어 english_ratio 가 곧바로 넘고(2026-09-28 파일럿에서
+    # chat_c1 이 제약이 아니라 english_mix 로 실패했다), ```json 으로 감싸는 것도
+    # 형식 위반이 아니다 (constraint_check.strip_fence 가 한 겹 벗겨서 본다).
+    # 이 문항들의 형식은 json_only 제약이 직접 판정한다.
+    json_item = bool((constraints or {}).get("json_only"))
+    if slot in ("chat", "rag", "planner") and not json_item:
         r = _english_ratio(body)
         if r > english_max:
             return False, f"english_mix"
-    if slot == "chat" and "```" in body and not TEMPLATE_REQUEST_RE.search(request or ""):
+    if slot == "chat" and not json_item and "```" in body and not TEMPLATE_REQUEST_RE.search(request or ""):
         return False, "code_fence_in_chat"
-    return True, ""
+    return check_constraints(body, constraints)
 
 
 def _coding_ok(code: str) -> tuple[bool, str]:
@@ -312,6 +330,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
     slot = item["slot"]
     text = item["text"]
     timeout_sec = float(item.get("timeout_sec") or 55)
+    constraints = item.get("constraints") or None
     if slot == "chat":
         messages = [
             SystemMessage(content=DIRECT_ANSWER_DAILY_CHAT_SYSTEM),
@@ -320,7 +339,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
         inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=SLOT_NUM_PREDICT["chat"])
         ok = inv["status"] == "ok" and len(inv.get("text") or "") >= 8
         fail_kind = "" if ok else (inv["status"] if inv["status"] != "ok" else "too_short")
-        q_ok, q_kind = _quality_check("chat", inv.get("text") or "", english_max=english_max, request=text) if ok else (False, "")
+        q_ok, q_kind = _quality_check("chat", inv.get("text") or "", english_max=english_max, request=text, constraints=constraints) if ok else (False, "")
         return {
             **inv,
             "ok": ok,
@@ -348,7 +367,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
         body = inv.get("text") or ""
         ok = inv["status"] == "ok" and len(body) >= 120 and FALLBACK_MSG not in body
         fail_kind = "" if ok else (inv["status"] if inv["status"] != "ok" else "too_short")
-        q_ok, q_kind = _quality_check("rag", body, english_max=english_max, request=text) if ok else (False, "")
+        q_ok, q_kind = _quality_check("rag", body, english_max=english_max, request=text, constraints=constraints) if ok else (False, "")
         return {
             **inv,
             "ok": ok,
@@ -378,7 +397,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
             fail_kind = "parse_fail"
         else:
             fail_kind = ""
-        q_ok, q_kind = _quality_check("planner", "\n".join(lines), english_max=english_max, request=text) if ok else (False, "")
+        q_ok, q_kind = _quality_check("planner", "\n".join(lines), english_max=english_max, request=text, constraints=constraints) if ok else (False, "")
         return {
             **inv,
             "ok": ok,

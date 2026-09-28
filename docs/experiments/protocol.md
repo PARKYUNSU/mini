@@ -24,7 +24,13 @@ n=24 에서 1건은 4.17%p, 코딩 n=36 에서 1건은 2.78%p 다. 위 변동은
 ## 2. 규칙
 
 ### 2.1 문항 집합
-- 고정 54문항: 잡담 8 · RAG 8 · 계획 8 · **코딩 30** (sha256 `a94d4708f9b6`).
+- 고정 70문항: 잡담 16 · RAG 8 · 계획 16 · **코딩 30** (sha256 `8a7101d49cac`).
+- **2026-09-28 확장**: 잡담·계획에 **제약 문항 16개**를 더했다 (기존 54문항은 바이트 단위로 그대로 두어 옛 라운드와의 부분집합 비교가 유지된다). 이유는 [`yunsur_v10/05_conclusion.md`](yunsur_v10/05_conclusion.md) 가 보인 **측정의 천장**이다 — 세 운영 슬롯에서 base 가 0% 라 파인튜닝이 더 나을 자리가 없었다. 기존 판정기는 붕괴 탐지기(타임아웃·반복·영어 혼입)여서 내용을 채점하지 않기 때문이다.
+- 제약은 **기계 검증 가능한 것만** 쓴다 ([`core/llm/constraint_check.py`](../../core/llm/constraint_check.py)): `exact_lines` · `max_lines` · `max_chars_per_line` · `max_chars` · `json_only` · `must_include` · `must_exclude`. 문항 문장이 제약을 **명시**해야 한다 (숨은 제약은 함정이다).
+- 2026-09-28 파일럿(base 16문항 1회)에서 변별력이 나온 것은 **길이 제약**뿐이었다. 자연어 구절의 `must_include` 는 띄어쓰기로 갈려 취약했고(`오후 3시` vs `오후 3 시`), 기술 토큰 포함·금지는 base 가 전부 통과해 헤드룸이 없었다. 그래서 새 문항은 길이 제약을 축으로 하고 `json_only` 둘만 둔다.
+- **RAG 에는 제약을 넣지 않는다.** 출력 템플릿(`RAG_OUTPUT_TEMPLATE_MULTI_STRICT`)이 이미 형식을 강제해 충돌하면 풀 수 없는 문항이 된다. 계획 슬롯도 같은 이유로 줄 수 제약은 쓰지 않는다 (시스템 프롬프트가 3단계를 요구한다).
+- `json_only` 문항은 영어 비율·코드펜스 검사에서 **뺀다**. JSON 은 키가 영어일 수밖에 없고 ```json 으로 감싸는 것도 형식 위반이 아니다 — 파일럿에서 실제로 제약이 아니라 `english_mix` 로 실패했다.
+- 제약 문항도 **풀림 가능성을 증명한다**: [`tests/fixtures/constraint_reference_answers.json`](../../tests/fixtures/constraint_reference_answers.json) 의 참조답안이 제 제약을 통과하는지 [`tests/unit/test_constraint_fixture_solvable.py`](../../tests/unit/test_constraint_fixture_solvable.py) 가 지킨다.
 - 코딩은 난이도 3구간: 쉬움 6 · 보통 12 · 어려움 12. **쉬움은 변별력이 없다** — base 가 전부 통과하므로 모델 간 불일치를 만들지 못한다. 문항을 늘릴 때는 보통·어려움에 넣는다.
 - 문항은 **자기완결**이어야 한다. 판정기가 임시 디렉터리에서 8초 제한으로 실제 실행하므로 파일·네트워크·`input()` 금지. [`tests/unit/test_coding_fixture_solvable.py`](../../tests/unit/test_coding_fixture_solvable.py) 가 참조답안([`tests/fixtures/coding_reference_solutions.json`](../../tests/fixtures/coding_reference_solutions.json))으로 이를 지킨다.
 - 문항은 학습 데이터·기존 문항과 유사도 **< 0.72**(SequenceMatcher) 여야 한다.
