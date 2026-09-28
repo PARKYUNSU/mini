@@ -1,5 +1,7 @@
 # 05. 결론 — 통과. lr 을 1/4 로 낮춰도 v9 가 유지된다
 
+**2026-09-29 추가**: 문항 집합이 70개로 확장돼 [`../baseline_0929/`](../baseline_0929/) 에서 다시 쟀다. **새 문항에서는 base 대비 7:2 로 쏠린다** (p=0.180, 유의하지 않음; 계획 슬롯만 보면 4:0). 아래 결론은 옛 54문항 기준이고, 거기서 '개선을 유의하게 보일 수 없다' 고 적은 것은 그 문항 집합의 천장 때문이었다.
+
 측정일 2026-09-28 09:55 → 11:59 (124분). [`scripts/eval_round.sh`](../../../scripts/eval_round.sh) `yunsur_v10 v10`, 커밋 `fcb97cf`, 문항 54개 sha256 `a94d4708f9b6`, 반복 3회. 원본 [`04_eval_v10/`](04_eval_v10/).
 
 학습: RunPod L40S US-TX-4, 138스텝, loss 1.7572 → 1.3557, 8.8분, 파드 13분 **$0.24**. 데이터는 v9 것을 그대로 썼고(`finetune_datasets/v9/train_data_v9.jsonl`, 1,100건) `learning_rate` 만 2e-4 → **5e-5**. 산출물에 그대로 남아 있다 — `train_stats.json` 의 `hparam_overrides` = `{"learning_rate": {"default": 0.0002, "used": 5e-05}}`.
