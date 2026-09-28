@@ -86,14 +86,15 @@ RunPod 환경변수:
 - [x] `train_lora.py`: `LEARNING_RATE` 환경변수 오버라이드 추가 (기본 2e-4 유지) + 학습 로그에 실제 lr 출력 — `resolve_learning_rate()` 로 분리, 기본값과 다르면 배너 + `train_stats.json` 의 `hparam_overrides` 에 기록. 테스트 13건 ([`tests/unit/test_train_lora_lr_override.py`](../../../tests/unit/test_train_lora_lr_override.py))
 - [x] 데이터 경로: `runpod_train.sh` 에 `DATA_VERSION` 추가 (기본 = `VERSION`) + `train_lora.py --data` 전달. v9 jsonl 은 커밋돼 있다 (1,100줄, `.gitignore` 예외)
 - [x] RunPod 학습 (`VERSION=v10 DATA_VERSION=v9 LEARNING_RATE=5e-5`) → HF `YUNSU24/yunsur_v10_lora` · **138스텝 · 8.8분 · loss 1.7572 → 1.3557 · L40S US-TX-4 · 파드 13분 $0.24**
-- [ ] 맥미니: `hf download` → `merge_lora_gguf.sh v10`
-- [ ] `bash scripts/eval_round.sh yunsur_v10` → `04_eval_v10/`
-- [ ] `05_conclusion.md`
+- [x] 맥미니: `hf download` → `merge_lora_gguf.sh v10` (q4_k_m **5.4GB**, Ollama `yunsur_v10:latest`)
+- [x] `bash scripts/eval_round.sh yunsur_v10 v10` (124분) → [`04_eval_v10/`](04_eval_v10/)
+- [x] [`05_conclusion.md`](05_conclusion.md) — **통과. lr 1/4 로도 v9 가 유지된다**
 
 ## 진행 로그
 
 | 날짜 | 내용 |
 |---|---|
+| 2026-09-28 | **통과 — lr 을 1/4 로 낮춰도 v9 가 유지된다.** 세 운영 슬롯에서 v10 만 실패 **0개**(잡담·계획·RAG 전부), 코딩 base 대비 McNemar **p=0.500**. 54문항 전체에서 **v10 만 실패한 문항이 하나도 없다** (base 만 실패 3: `coding_10`·`coding_12`·`rag_01`). H2(과소적합)는 드러나지 않았다 — loss 가 v9 보다 높게 끝났는데도 능력 저하로 이어지지 않았다. **H3(코딩 격차 감소)은 판정할 수 없다**: 이번 밤 base 코딩이 18.9% 로, v9 밤의 15.6% 에서 움직였다. 기준선이 3.3%p 흔들렸으므로 라운드 간 비교(v10 17.8% vs v9 21.1%)는 성립하지 않고, 같은 밤 안에서 v10(17.8%) 과 base(18.9%) 는 사실상 같다. **초안이 "v9 의 21.1% 미만" 을 통과 조건으로 뒀다면 기준선 이동만으로 통과가 났을 것이다** — §2.3 의 금지가 이번에 실제로 값을 했다. 운영은 사전 선언대로 **v9 유지**(통과는 해롭지 않음이지 우위가 아니다). 다음은 replay. |
 | 2026-09-28 | **학습 완료.** RunPod L40S US-TX-4, 138스텝, 8.8분, 파드 13분 $0.24. HF `YUNSU24/yunsur_v10_lora` (private) 업로드. 파드 로그에서 단일 변수가 지켜진 것을 확인했다 — `DATA_VERSION=v9`(1,100건, v9 와 같은 파일), `learning_rate` 4.5e-05(step 10) → 3.516e-06(step 130) 으로 5e-5 에서 선형 감쇠, 스텝 수 138 로 v9 와 동일. **loss 는 v9 보다 높게 끝났다** — v9 1.6919 → 1.2170, v10 1.7572 → **1.3557** (train_loss 평균 1.437). 데이터·스텝이 같고 lr 만 다르므로 **이번에는 loss 비교가 성립한다** (v9 때 H3 에 loss 예측을 넣은 것은 데이터 구성이 달라 설계 실수였다). lr 을 1/4 로 낮췄으니 덜 적합한 것은 예상대로이고, 그것이 **H2(과소적합)의 방향**이다 — 다만 loss 는 판정 기준이 아니다. 실제 판정은 측정에서 한다. |
 | 2026-09-28 | **판정 확정 — 비열등성으로 바꿨다.** 초안은 통과 조건에 "코딩 실패율이 v9 의 21.1% 미만" 을 넣었는데, 이는 §2.3 이 이름까지 붙여 금지한 것이다(단일 측정값을 다음 라운드 문턱으로 고정 — v6 가 그렇게 했고 v7 에서 그 기준선이 노이즈로 움직였다). 더 근본적으로 **v9 가 측정의 천장에 닿아 있어 개선을 유의하게 보일 수 없다** — 세 슬롯 불일치 0, 코딩 2쌍(p=1.000). 그래서 판정은 "lr 1/4 로도 v9 가 유지되는가" 하나로 좁히고, 코딩 실패율·timeout·loss 는 참고 지표로 내렸다. 헤드룸 확보(문항 난도 상향)는 base·v6·v9 재측정이 따르는 별도 결정으로 미뤘다. |
 | 2026-09-28 | `train_lora.py` 에 `LEARNING_RATE` 오버라이드 배선 (`resolve_learning_rate()`, 기본 2e-4 유지, 기록은 `train_stats.json` 의 `hparam_overrides`, 테스트 13건). 체크리스트 1번 완료. |
