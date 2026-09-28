@@ -85,7 +85,7 @@ RunPod 환경변수:
 
 - [x] `train_lora.py`: `LEARNING_RATE` 환경변수 오버라이드 추가 (기본 2e-4 유지) + 학습 로그에 실제 lr 출력 — `resolve_learning_rate()` 로 분리, 기본값과 다르면 배너 + `train_stats.json` 의 `hparam_overrides` 에 기록. 테스트 13건 ([`tests/unit/test_train_lora_lr_override.py`](../../../tests/unit/test_train_lora_lr_override.py))
 - [x] 데이터 경로: `runpod_train.sh` 에 `DATA_VERSION` 추가 (기본 = `VERSION`) + `train_lora.py --data` 전달. v9 jsonl 은 커밋돼 있다 (1,100줄, `.gitignore` 예외)
-- [ ] RunPod 학습 (`VERSION=v10 DATA_VERSION=v9 LEARNING_RATE=5e-5`) → HF `YUNSU24/yunsur_v10_lora` · 138스텝 예상
+- [x] RunPod 학습 (`VERSION=v10 DATA_VERSION=v9 LEARNING_RATE=5e-5`) → HF `YUNSU24/yunsur_v10_lora` · **138스텝 · 8.8분 · loss 1.7572 → 1.3557 · L40S US-TX-4 · 파드 13분 $0.24**
 - [ ] 맥미니: `hf download` → `merge_lora_gguf.sh v10`
 - [ ] `bash scripts/eval_round.sh yunsur_v10` → `04_eval_v10/`
 - [ ] `05_conclusion.md`
@@ -94,6 +94,7 @@ RunPod 환경변수:
 
 | 날짜 | 내용 |
 |---|---|
+| 2026-09-28 | **학습 완료.** RunPod L40S US-TX-4, 138스텝, 8.8분, 파드 13분 $0.24. HF `YUNSU24/yunsur_v10_lora` (private) 업로드. 파드 로그에서 단일 변수가 지켜진 것을 확인했다 — `DATA_VERSION=v9`(1,100건, v9 와 같은 파일), `learning_rate` 4.5e-05(step 10) → 3.516e-06(step 130) 으로 5e-5 에서 선형 감쇠, 스텝 수 138 로 v9 와 동일. **loss 는 v9 보다 높게 끝났다** — v9 1.6919 → 1.2170, v10 1.7572 → **1.3557** (train_loss 평균 1.437). 데이터·스텝이 같고 lr 만 다르므로 **이번에는 loss 비교가 성립한다** (v9 때 H3 에 loss 예측을 넣은 것은 데이터 구성이 달라 설계 실수였다). lr 을 1/4 로 낮췄으니 덜 적합한 것은 예상대로이고, 그것이 **H2(과소적합)의 방향**이다 — 다만 loss 는 판정 기준이 아니다. 실제 판정은 측정에서 한다. |
 | 2026-09-28 | **판정 확정 — 비열등성으로 바꿨다.** 초안은 통과 조건에 "코딩 실패율이 v9 의 21.1% 미만" 을 넣었는데, 이는 §2.3 이 이름까지 붙여 금지한 것이다(단일 측정값을 다음 라운드 문턱으로 고정 — v6 가 그렇게 했고 v7 에서 그 기준선이 노이즈로 움직였다). 더 근본적으로 **v9 가 측정의 천장에 닿아 있어 개선을 유의하게 보일 수 없다** — 세 슬롯 불일치 0, 코딩 2쌍(p=1.000). 그래서 판정은 "lr 1/4 로도 v9 가 유지되는가" 하나로 좁히고, 코딩 실패율·timeout·loss 는 참고 지표로 내렸다. 헤드룸 확보(문항 난도 상향)는 base·v6·v9 재측정이 따르는 별도 결정으로 미뤘다. |
 | 2026-09-28 | `train_lora.py` 에 `LEARNING_RATE` 오버라이드 배선 (`resolve_learning_rate()`, 기본 2e-4 유지, 기록은 `train_stats.json` 의 `hparam_overrides`, 테스트 13건). 체크리스트 1번 완료. |
 | 2026-09-28 | 노트 개설(뼈대). 데이터 축은 v9 로 닫혔고([`../protocol.md`](../protocol.md) §3), 남은 것은 우리가 한 번도 건드리지 않은 하이퍼파라미터 축이다. 가장 싼 단일 변수로 lr 2e-4 → 5e-5 를 고른다. |
