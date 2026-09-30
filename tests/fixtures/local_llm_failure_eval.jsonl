@@ -68,3 +68,19 @@
 {"id": "planner_14", "slot": "planner", "timeout_sec": 120, "text": "설정 파일을 백업하고 새 값으로 교체하는 계획을 세워줘. 각 단계는 34자 이내로 쓰고, '예시' 나 'TODO' 같은 자리표시 단어는 넣지 마.", "constraints": {"max_chars_per_line": 34, "must_exclude": ["예시", "TODO"]}}
 {"id": "planner_15", "slot": "planner", "timeout_sec": 120, "text": "폴더 두 개의 파일 이름을 비교하는 계획을 세워줘. 각 단계는 33자 이내로 써.", "constraints": {"max_chars_per_line": 33}}
 {"id": "planner_16", "slot": "planner", "timeout_sec": 120, "text": "오래된 임시 파일을 지우는 계획을 세워줘. 각 단계는 31자 이내로 아주 짧게 써.", "constraints": {"max_chars_per_line": 31}}
+{"id": "planner_17", "slot": "planner", "timeout_sec": 120, "text": "서버 접속 기록에서 상태 코드별 건수를 세려고 해. 계획을 짜되 한 단계가 30자를 넘으면 안 돼.", "constraints": {"max_chars_per_line": 30}}
+{"id": "planner_18", "slot": "planner", "timeout_sec": 120, "text": "사진 이름을 촬영 날짜로 바꾸고 싶어. 단계마다 31자 안에서 끝내는 계획을 알려줘.", "constraints": {"max_chars_per_line": 31}}
+{"id": "planner_19", "slot": "planner", "timeout_sec": 120, "text": "엑셀에 중복된 행이 섞여 있는지 확인하려는데, 어떻게 할지 32자씩 넘기지 않게 정리해줘.", "constraints": {"max_chars_per_line": 32}}
+{"id": "planner_20", "slot": "planner", "timeout_sec": 120, "text": "메일에 붙은 첨부만 골라 따로 모아두려 한다. 각 단계 33자 제한으로 순서를 잡아줘.", "constraints": {"max_chars_per_line": 33}}
+{"id": "planner_21", "slot": "planner", "timeout_sec": 120, "text": "긴 영상을 10분씩 토막 내는 절차가 필요하다. 한 단계에 34자까지만 쓴다.", "constraints": {"max_chars_per_line": 34}}
+{"id": "planner_22", "slot": "planner", "timeout_sec": 120, "text": "번호 표기가 제각각인 주소록을 손보려 해. 35자 넘지 않는 단계로 계획해줘.", "constraints": {"max_chars_per_line": 35}}
+{"id": "planner_23", "slot": "planner", "timeout_sec": 120, "text": "어느 하위 폴더가 용량을 많이 먹는지 알고 싶다. 단계는 36자 이내.", "constraints": {"max_chars_per_line": 36}}
+{"id": "planner_24", "slot": "planner", "timeout_sec": 120, "text": "문서 속 링크가 아직 살아 있는지 점검하려 한다. 각 줄 37자를 넘기지 말고 절차를 써줘.", "constraints": {"max_chars_per_line": 37}}
+{"id": "planner_25", "slot": "planner", "timeout_sec": 120, "text": "설문 응답을 문항별로 집계해야 한다. 38자 한도로 단계를 나눠줘.", "constraints": {"max_chars_per_line": 38}}
+{"id": "planner_26", "slot": "planner", "timeout_sec": 120, "text": "내 시계가 서버와 얼마나 어긋났는지 재고 싶어. 계획의 각 단계는 39자까지.", "constraints": {"max_chars_per_line": 39}}
+{"id": "planner_27", "slot": "planner", "timeout_sec": 120, "text": "여기저기 흩어진 zip 을 한곳에 풀려고 한다. 단계당 40자 제한을 지켜서 알려줘.", "constraints": {"max_chars_per_line": 40}}
+{"id": "planner_28", "slot": "planner", "timeout_sec": 120, "text": "어떤 상품이 많이 팔렸는지 순위를 뽑아야 한다. 41자를 넘는 단계 없이 짜줘.", "constraints": {"max_chars_per_line": 41}}
+{"id": "planner_29", "slot": "planner", "timeout_sec": 120, "text": "문서함에 비밀번호가 적힌 파일이 있는지 훑어보려 해. 각 단계를 42자 안으로 써줘.", "constraints": {"max_chars_per_line": 42}}
+{"id": "planner_30", "slot": "planner", "timeout_sec": 120, "text": "달력 일정을 주 단위로 묶어 보고 싶다. 한 단계 30자를 넘기면 안 된다.", "constraints": {"max_chars_per_line": 30}}
+{"id": "planner_31", "slot": "planner", "timeout_sec": 120, "text": "센서값에 튀는 숫자가 섞여 있어 걸러내려 한다. 34자 이내 단계로 정리.", "constraints": {"max_chars_per_line": 34}}
+{"id": "planner_32", "slot": "planner", "timeout_sec": 120, "text": "원문에서 번역할 문장만 추려야 해. 단계마다 38자를 넘지 않게.", "constraints": {"max_chars_per_line": 38}}

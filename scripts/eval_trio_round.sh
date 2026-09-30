@@ -22,7 +22,7 @@ export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$(pwd)"
 export PYTHONUNBUFFERED=1
 PY=".venv/bin/python"
 FIXTURE="tests/fixtures/local_llm_failure_eval.jsonl"
-EXPECT_SHA="8a7101d49cac"
+EXPECT_SHA="7c74b3549057"
 BASE="qwen3.5:9b"
 
 A="${1:-}"
