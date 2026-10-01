@@ -84,3 +84,19 @@
 {"id": "planner_30", "slot": "planner", "timeout_sec": 120, "text": "달력 일정을 주 단위로 묶어 보고 싶다. 한 단계 30자를 넘기면 안 된다.", "constraints": {"max_chars_per_line": 30}}
 {"id": "planner_31", "slot": "planner", "timeout_sec": 120, "text": "센서값에 튀는 숫자가 섞여 있어 걸러내려 한다. 34자 이내 단계로 정리.", "constraints": {"max_chars_per_line": 34}}
 {"id": "planner_32", "slot": "planner", "timeout_sec": 120, "text": "원문에서 번역할 문장만 추려야 해. 단계마다 38자를 넘지 않게.", "constraints": {"max_chars_per_line": 38}}
+{"id": "planner_33", "slot": "planner", "timeout_sec": 120, "text": "창고 재고 수량을 품목별로 정리하려 한다. 각 단계는 44자를 넘기지 말고 적어줘.", "constraints": {"max_chars_per_line": 44}}
+{"id": "planner_34", "slot": "planner", "timeout_sec": 120, "text": "예전에 번역해 둔 문장을 다시 쓰고 싶어. 45자 한도로 단계를 나눠줘.", "constraints": {"max_chars_per_line": 45}}
+{"id": "planner_35", "slot": "planner", "timeout_sec": 120, "text": "백업이 제대로 됐는지 검증하는 절차가 필요하다. 한 단계에 46자까지만 쓴다.", "constraints": {"max_chars_per_line": 46}}
+{"id": "planner_36", "slot": "planner", "timeout_sec": 120, "text": "쓰지 않는 글꼴을 골라 지우려는데, 47자 안에서 각 단계를 설명해줘.", "constraints": {"max_chars_per_line": 47}}
+{"id": "planner_37", "slot": "planner", "timeout_sec": 120, "text": "오래된 로그를 압축해 보관하는 계획이 필요해. 단계마다 48자를 넘지 않게.", "constraints": {"max_chars_per_line": 48}}
+{"id": "planner_38", "slot": "planner", "timeout_sec": 120, "text": "브라우저 캐시를 안전하게 비우려 한다. 각 단계 49자 제한으로 순서를 잡아줘.", "constraints": {"max_chars_per_line": 49}}
+{"id": "planner_39", "slot": "planner", "timeout_sec": 120, "text": "알림이 너무 많아 조건을 다시 걸려고 해. 50자 넘는 단계 없이 계획해줘.", "constraints": {"max_chars_per_line": 50}}
+{"id": "planner_40", "slot": "planner", "timeout_sec": 120, "text": "달러 금액을 원화로 바꿔 표에 넣어야 한다. 단계는 44자 이내.", "constraints": {"max_chars_per_line": 44}}
+{"id": "planner_41", "slot": "planner", "timeout_sec": 120, "text": "명함 사진에서 이름과 번호를 뽑아 모으려 해. 한 단계가 45자를 넘으면 안 돼.", "constraints": {"max_chars_per_line": 45}}
+{"id": "planner_42", "slot": "planner", "timeout_sec": 120, "text": "긴 회의록을 안건 단위로 쪼개고 싶다. 46자 한도로 절차를 써줘.", "constraints": {"max_chars_per_line": 46}}
+{"id": "planner_43", "slot": "planner", "timeout_sec": 120, "text": "두 폴더 내용을 같게 맞추는 작업을 하려 한다. 각 단계는 47자까지.", "constraints": {"max_chars_per_line": 47}}
+{"id": "planner_44", "slot": "planner", "timeout_sec": 120, "text": "사진 용량이 커서 크기를 줄이려는데, 단계당 48자 제한을 지켜서 알려줘.", "constraints": {"max_chars_per_line": 48}}
+{"id": "planner_45", "slot": "planner", "timeout_sec": 120, "text": "계정 비밀번호를 순서대로 바꾸려 한다. 49자 이내 단계로 정리.", "constraints": {"max_chars_per_line": 49}}
+{"id": "planner_46", "slot": "planner", "timeout_sec": 120, "text": "매달 빠져나가는 구독을 추려 끊으려고 해. 각 줄 50자를 넘기지 말고 적어줘.", "constraints": {"max_chars_per_line": 50}}
+{"id": "planner_47", "slot": "planner", "timeout_sec": 120, "text": "영수증을 항목별로 나눠 기록해야 한다. 단계마다 46자 안에서 끝낸다.", "constraints": {"max_chars_per_line": 46}}
+{"id": "planner_48", "slot": "planner", "timeout_sec": 120, "text": "긴 주소를 짧은 링크로 바꿔 쓰려 한다. 48자 한도를 지켜 단계를 세워줘.", "constraints": {"max_chars_per_line": 48}}
