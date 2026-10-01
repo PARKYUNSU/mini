@@ -1,0 +1,139 @@
+{
+  "generated": "2026-09-30T22:39:02+09:00",
+  "model": "qwen3.5:9b",
+  "n": 258,
+  "fail": 18,
+  "fail_rate": 0.0698,
+  "quality_fail": 73,
+  "strict_fail": 91,
+  "strict_fail_rate": 0.3527,
+  "strict_fail_ci95": [
+    0.297,
+    0.4128
+  ],
+  "fail_ci95": [
+    0.0446,
+    0.1076
+  ],
+  "repeats": 3,
+  "one_liner": "고정 86문항 반복 포함 n=258, 로컬 1차만: hard 실패 18/258 = 7% · 품질 포함 91/258 = 35%",
+  "by_slot": {
+    "chat": {
+      "n": 48,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 48
+      },
+      "quality_fail": 19,
+      "quality_kinds": {
+        "english_mix": 1,
+        "constraint:max_chars_per_line": 10,
+        "constraint:exact_lines": 4,
+        "constraint:max_chars": 3,
+        "constraint:json_only": 1
+      },
+      "strict_fail_rate": 0.3958,
+      "strict_fail_ci95": [
+        0.2702,
+        0.5369
+      ],
+      "fail_ci95": [
+        0.0,
+        0.0741
+      ],
+      "elapsed_median_sec": 4.9,
+      "elapsed_max_sec": 11.7,
+      "out_chars_median": 135,
+      "out_chars_max": 289,
+      "unclosed_fence": 0,
+      "num_predict": 4096
+    },
+    "coding": {
+      "n": 90,
+      "fail": 7,
+      "fail_rate": 0.0778,
+      "fail_kinds": {
+        "ok": 83,
+        "runtime": 3,
+        "syntax": 3,
+        "timeout": 1
+      },
+      "quality_fail": 1,
+      "quality_kinds": {
+        "format_drift:fence_open": 1
+      },
+      "strict_fail_rate": 0.0889,
+      "strict_fail_ci95": [
+        0.0457,
+        0.1657
+      ],
+      "fail_ci95": [
+        0.0382,
+        0.1519
+      ],
+      "elapsed_median_sec": 5.2,
+      "elapsed_max_sec": 120.0,
+      "out_chars_median": 165,
+      "out_chars_max": 4478,
+      "unclosed_fence": 1,
+      "num_predict": 4096
+    },
+    "planner": {
+      "n": 96,
+      "fail": 11,
+      "fail_rate": 0.1146,
+      "fail_kinds": {
+        "ok": 85,
+        "parse_fail": 11
+      },
+      "quality_fail": 51,
+      "quality_kinds": {
+        "constraint:max_chars_per_line": 51
+      },
+      "strict_fail_rate": 0.6458,
+      "strict_fail_ci95": [
+        0.5462,
+        0.7342
+      ],
+      "fail_ci95": [
+        0.0652,
+        0.1936
+      ],
+      "elapsed_median_sec": 5.0,
+      "elapsed_max_sec": 10.9,
+      "out_chars_median": 131,
+      "out_chars_max": 242,
+      "unclosed_fence": 0,
+      "num_predict": 300
+    },
+    "rag": {
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 24
+      },
+      "quality_fail": 2,
+      "quality_kinds": {
+        "repetition": 2
+      },
+      "strict_fail_rate": 0.0833,
+      "strict_fail_ci95": [
+        0.0232,
+        0.2585
+      ],
+      "fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "elapsed_median_sec": 29.4,
+      "elapsed_max_sec": 64.4,
+      "out_chars_median": 786,
+      "out_chars_max": 2024,
+      "unclosed_fence": 0,
+      "num_predict": 4096
+    }
+  },
+  "results_path": ".cron/trio_v9v10_86/base.jsonl"
+}
