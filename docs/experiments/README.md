@@ -99,6 +99,7 @@ docs/experiments/
 ├─ README.md          ← 이 문서 (전체 지도)
 ├─ protocol.md        ← 측정 규칙 · §3 확립된 결론 · §4 변경 기록
 ├─ prior_work.md      ← 문헌 대조 · 우리 설계의 맹점 · 교사 재측정
+├─ length_mechanism_1003.md ← lr 효과의 기전 (탐색, 미해결)
 ├─ baseline_0925/     ← 문항 30개 확장 후 첫 통계
 ├─ baseline_0926/     ← 출력 상한 정렬 후 재측정
 ├─ baseline_0929/     ← 문항 70개 확장 후 재측정 (현행 기준선)
