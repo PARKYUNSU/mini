@@ -21,7 +21,7 @@ export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$(pwd)"
 export PYTHONUNBUFFERED=1
 PY=".venv/bin/python"
 FIXTURE="tests/fixtures/local_llm_failure_eval.jsonl"
-EXPECT_SHA="4573072530b6"
+EXPECT_SHA="ce4a7fa0acfa"
 
 TARGET="${1:-}"
 TAG="${2:-$(date +%m%d)}"
