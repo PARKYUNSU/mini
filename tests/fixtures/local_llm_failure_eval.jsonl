@@ -124,3 +124,27 @@
 {"id": "planner_54", "slot": "planner", "timeout_sec": 120, "text": "영상에서 자막만 뽑아내려 한다. 차례를 세우되 '저장하' 로 시작하는 말은 금지.", "constraints": {"must_exclude": ["저장하"]}}
 {"id": "planner_55", "slot": "planner", "timeout_sec": 120, "text": "책장에 꽂힌 책들의 목록을 만들고 싶어. '정리' 라는 두 글자는 빼고 알려줘.", "constraints": {"must_exclude": ["정리"]}}
 {"id": "planner_56", "slot": "planner", "timeout_sec": 120, "text": "주소록에 같은 사람이 두 번 들어가 있다. 없애는 차례를 '데이터를' 없이 적어줘.", "constraints": {"must_exclude": ["데이터를"]}}
+{"id": "chat_33", "slot": "chat", "timeout_sec": 55, "text": "장 보러 가기 전에 떠올릴 것들을 딱 3줄로 남겨줘.", "constraints": {"exact_lines": 3}}
+{"id": "chat_34", "slot": "chat", "timeout_sec": 55, "text": "손님 오기 전 치울 곳 3줄만 알려줘.", "constraints": {"exact_lines": 3}}
+{"id": "chat_35", "slot": "chat", "timeout_sec": 55, "text": "이력서를 고칠 때 들여다볼 대목을 6줄로 꼽아줘.", "constraints": {"exact_lines": 6}}
+{"id": "chat_36", "slot": "chat", "timeout_sec": 55, "text": "자취를 막 시작한 사람이 갖출 살림을 7줄에 담아줘.", "constraints": {"exact_lines": 7}}
+{"id": "chat_37", "slot": "chat", "timeout_sec": 55, "text": "장거리 운전 전에 손볼 것을 7줄로 적어줘.", "constraints": {"exact_lines": 7}}
+{"id": "chat_38", "slot": "chat", "timeout_sec": 55, "text": "주말에 혼자 해볼 만한 놀거리를 9줄로 늘어놓아줘.", "constraints": {"exact_lines": 9}}
+{"id": "chat_39", "slot": "chat", "timeout_sec": 55, "text": "캠핑 갈 때 챙길 것을 9줄에 나눠 적어줘.", "constraints": {"exact_lines": 9}}
+{"id": "chat_40", "slot": "chat", "timeout_sec": 55, "text": "면접관이 던질 법한 물음을 6줄로 뽑아줘.", "constraints": {"exact_lines": 6}}
+{"id": "chat_41", "slot": "chat", "timeout_sec": 55, "text": "커피 대신 마실 것을 골라줘. '입니다' 는 한 번도 쓰지 말고.", "constraints": {"must_exclude": ["입니다"]}}
+{"id": "chat_42", "slot": "chat", "timeout_sec": 55, "text": "장마철에 빨래 말리는 요령을 알려줘. '입니다' 라는 말은 빼고.", "constraints": {"must_exclude": ["입니다"]}}
+{"id": "chat_43", "slot": "chat", "timeout_sec": 55, "text": "낯선 모임에서 말을 트는 요령을 알려줘. '있는' 이라는 표현은 금지.", "constraints": {"must_exclude": ["있는"]}}
+{"id": "chat_44", "slot": "chat", "timeout_sec": 55, "text": "돈을 모으는 습관을 짚어줘. '것이' 라는 말 없이.", "constraints": {"must_exclude": ["것이"]}}
+{"id": "chat_45", "slot": "chat", "timeout_sec": 55, "text": "잠들기 어려울 때 해볼 만한 걸 말해줘. '있는' 이라는 표현은 쓰지 마.", "constraints": {"must_exclude": ["있는"]}}
+{"id": "chat_46", "slot": "chat", "timeout_sec": 55, "text": "새 취미를 고르는 기준을 들려줘. '좋은' 은 쓰지 않기로 하자.", "constraints": {"must_exclude": ["좋은"]}}
+{"id": "chat_47", "slot": "chat", "timeout_sec": 55, "text": "부탁을 거절하는 말투를 알려줘. '것이' 를 빼고 써줘.", "constraints": {"must_exclude": ["것이"]}}
+{"id": "chat_48", "slot": "chat", "timeout_sec": 55, "text": "이웃과 인사 나누는 법을 짧게 일러줘. '주세요' 는 넣지 말고.", "constraints": {"must_exclude": ["주세요"]}}
+{"id": "planner_57", "slot": "planner", "timeout_sec": 120, "text": "내려받은 글꼴을 종류별로 갈라 두려 한다. '확인하' 로 시작하는 말은 빼고 차례를 짜줘.", "constraints": {"must_exclude": ["확인하"]}}
+{"id": "planner_58", "slot": "planner", "timeout_sec": 120, "text": "달력에 겹친 일정을 찾아내고 싶어. '파일에' 라는 말 없이 순서를 세워줘.", "constraints": {"must_exclude": ["파일에"]}}
+{"id": "planner_59", "slot": "planner", "timeout_sec": 120, "text": "녹음한 회의를 글로 옮기려 한다. '실행하' 는 쓰지 말고 절차를 알려줘.", "constraints": {"must_exclude": ["실행하"]}}
+{"id": "planner_60", "slot": "planner", "timeout_sec": 120, "text": "노래 목록을 분위기별로 갈라 두려 해. '선택하' 로 시작하는 말은 금지야.", "constraints": {"must_exclude": ["선택하"]}}
+{"id": "planner_61", "slot": "planner", "timeout_sec": 120, "text": "흐릿한 사진을 골라내려 한다. '선택하' 로 시작하는 말은 쓰지 마.", "constraints": {"must_exclude": ["선택하"]}}
+{"id": "planner_62", "slot": "planner", "timeout_sec": 120, "text": "명함 더미를 회사별로 갈라 두려 한다. '분류하' 라는 말 없이 짜줘.", "constraints": {"must_exclude": ["분류하"]}}
+{"id": "planner_63", "slot": "planner", "timeout_sec": 120, "text": "영수증이 섞여 있어 달마다 따로 두고 싶어. '분류하' 를 빼고 절차를 세워줘.", "constraints": {"must_exclude": ["분류하"]}}
+{"id": "planner_64", "slot": "planner", "timeout_sec": 120, "text": "쌓인 다운로드 폴더를 치우려 해. '실행하' 를 빼고 차례를 적어줘.", "constraints": {"must_exclude": ["실행하"]}}
