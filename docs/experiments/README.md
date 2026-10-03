@@ -100,10 +100,14 @@ docs/experiments/
 ├─ protocol.md        ← 측정 규칙 · §3 확립된 결론 · §4 변경 기록
 ├─ prior_work.md      ← 문헌 대조 · 우리 설계의 맹점 · 교사 재측정
 ├─ length_mechanism_1003.md ← lr 효과의 기전 (탐색, 미해결)
+├─ length_mechanism_1003/  ← 위 메모 §6 의 원본·집계 스크립트
 ├─ baseline_0925/     ← 문항 30개 확장 후 첫 통계
 ├─ baseline_0926/     ← 출력 상한 정렬 후 재측정
 ├─ baseline_0929/     ← 문항 70개 확장 후 재측정 (현행 기준선)
 ├─ teacher_check_0927/← Groq 교사 후보 재측정 원본
+├─ planner_signal_0929/    ← 계획 길이 신호 사전 등록 재현
+├─ constraint_generalize_1002/ ← 제약 일반화 (판정 불가)
+├─ finetune_damage_1002/   ← 비길이 제약 손상 확인 검정 (반증)
 └─ yunsur_v4 … v10/   ← 라운드별: README(사전 선언) · 05_conclusion(결과) · 04_eval_*(원본)
 ```
 
