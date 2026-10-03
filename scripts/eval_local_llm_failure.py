@@ -546,6 +546,13 @@ def main() -> int:
     ap.add_argument("--model", default="", help="Ollama 모델명 (기본 LOCAL_LLM_MODEL). 예: qwen3.5:9b 로 베이스 A/B")
     ap.add_argument("--quality", action="store_true", help="품질 실패(영어 혼입·think 유출·반복)를 요약 실패율에 합산")
     ap.add_argument(
+        "--keep-text",
+        action="store_true",
+        help="응답 원문(text)을 결과에 남긴다. 기본은 240자 preview 만 — "
+        "사후 기전 분석에 원문이 필요하면 켠다 (length_mechanism_1003.md §6 에서 "
+        "preview 만으로 섹션을 세다 잘림을 세는 실수를 했다). 판정에는 영향이 없다.",
+    )
+    ap.add_argument(
         "--english-max",
         type=float,
         default=0.45,
@@ -617,8 +624,9 @@ def main() -> int:
             "model": OLLAMA_MODEL,
             **res,
         }
-        # 원문 전체는 파일만 비대하게 만드니 preview/code만 유지
-        row.pop("text", None)
+        # 원문 전체는 파일만 비대하게 만드니 기본은 preview/code만 유지 (--keep-text 로 보존)
+        if not args.keep_text:
+            row.pop("text", None)
         _append_jsonl(args.out, row)
         mark = "OK" if row.get("ok") else f"FAIL:{row.get('fail_kind')}"
         print(
