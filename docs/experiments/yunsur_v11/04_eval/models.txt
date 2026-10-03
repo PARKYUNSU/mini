@@ -1,0 +1,4 @@
+t1 yunsur_v9
+t2 yunsur_v11
+t3 yunsur_v10
+base qwen3.5:9b

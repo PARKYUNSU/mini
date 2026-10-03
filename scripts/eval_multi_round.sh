@@ -121,7 +121,11 @@ PY
 
 # 모든 쌍 (base 를 왼쪽에 두고, 대상끼리도 전부)
 echo
-mapfile -t MAP < "$OUT_DIR/models.txt"
+# macOS 기본 bash 는 3.2 로 mapfile 이 없다 — while-read 로 읽는다
+MAP=()
+while IFS= read -r line; do
+  [[ -n "$line" ]] && MAP+=("$line")
+done < "$OUT_DIR/models.txt"
 n=${#MAP[@]}
 for ((i=0; i<n; i++)); do
   for ((j=i+1; j<n; j++)); do

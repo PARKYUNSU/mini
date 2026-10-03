@@ -1,0 +1,133 @@
+{
+  "generated": "2026-10-03T20:01:57+09:00",
+  "model": "yunsur_v10",
+  "n": 450,
+  "fail": 26,
+  "fail_rate": 0.0578,
+  "quality_fail": 123,
+  "strict_fail": 149,
+  "strict_fail_rate": 0.3311,
+  "strict_fail_ci95": [
+    0.2892,
+    0.3759
+  ],
+  "fail_ci95": [
+    0.0397,
+    0.0833
+  ],
+  "repeats": 3,
+  "one_liner": "고정 150문항 반복 포함 n=450, 로컬 1차만: hard 실패 26/450 = 6% · 품질 포함 149/450 = 33%",
+  "by_slot": {
+    "chat": {
+      "n": 144,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 144
+      },
+      "quality_fail": 33,
+      "quality_kinds": {
+        "constraint:max_chars_per_line": 5,
+        "constraint:exact_lines": 16,
+        "constraint:must_exclude": 12
+      },
+      "strict_fail_rate": 0.2292,
+      "strict_fail_ci95": [
+        0.1681,
+        0.3043
+      ],
+      "fail_ci95": [
+        0.0,
+        0.026
+      ],
+      "elapsed_median_sec": 5.6,
+      "elapsed_max_sec": 42.2,
+      "out_chars_median": 143,
+      "out_chars_max": 448,
+      "unclosed_fence": 0,
+      "num_predict": 4096
+    },
+    "coding": {
+      "n": 90,
+      "fail": 26,
+      "fail_rate": 0.2889,
+      "fail_kinds": {
+        "ok": 64,
+        "timeout": 19,
+        "runtime": 3,
+        "syntax": 4
+      },
+      "quality_fail": 0,
+      "quality_kinds": {},
+      "strict_fail_rate": 0.2889,
+      "strict_fail_ci95": [
+        0.2054,
+        0.3896
+      ],
+      "fail_ci95": [
+        0.2054,
+        0.3896
+      ],
+      "elapsed_median_sec": 6.2,
+      "elapsed_max_sec": 120.0,
+      "out_chars_median": 106,
+      "out_chars_max": 2293,
+      "unclosed_fence": 1,
+      "num_predict": 4096
+    },
+    "planner": {
+      "n": 192,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 192
+      },
+      "quality_fail": 90,
+      "quality_kinds": {
+        "constraint:max_chars_per_line": 65,
+        "constraint:must_exclude": 25
+      },
+      "strict_fail_rate": 0.4688,
+      "strict_fail_ci95": [
+        0.3995,
+        0.5393
+      ],
+      "fail_ci95": [
+        0.0,
+        0.0196
+      ],
+      "elapsed_median_sec": 5.1,
+      "elapsed_max_sec": 10.5,
+      "out_chars_median": 122,
+      "out_chars_max": 192,
+      "unclosed_fence": 0,
+      "num_predict": 300
+    },
+    "rag": {
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 24
+      },
+      "quality_fail": 0,
+      "quality_kinds": {},
+      "strict_fail_rate": 0.0,
+      "strict_fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "elapsed_median_sec": 38.9,
+      "elapsed_max_sec": 57.7,
+      "out_chars_median": 1018,
+      "out_chars_max": 1565,
+      "unclosed_fence": 0,
+      "num_predict": 4096
+    }
+  },
+  "results_path": ".cron/multi_lr3/t3.jsonl"
+}
