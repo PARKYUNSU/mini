@@ -48,6 +48,34 @@ def _verdict(fails: dict, total: dict, rule: str) -> dict[str, bool]:
     return {i: fails.get(i, 0) * 2 > total[i] for i in total}  # majority
 
 
+def parse_ids(spec: str) -> list[str]:
+    """``planner_33-48,chat_02`` 같은 지정을 문항 id 목록으로 펼친다.
+
+    범위는 ``<접두사>_<시작>-<끝>`` 이고 끝 번호는 **포함**이다. 자리수는 시작 번호의
+    표기를 따른다 (``planner_09-12`` → planner_09 … planner_12).
+    순서는 적은 순서를 지키고 중복은 없앤다.
+    """
+    out: list[str] = []
+    for part in (p.strip() for p in spec.split(",")):
+        if not part:
+            continue
+        head, sep, tail = part.rpartition("_")
+        if sep and "-" in tail:
+            lo_s, _, hi_s = tail.partition("-")
+            if lo_s.isdigit() and hi_s.isdigit():
+                lo, hi = int(lo_s), int(hi_s)
+                if lo > hi:
+                    raise SystemExit(f"--ids 범위가 거꾸로다: {part}")
+                width = len(lo_s)
+                out += [f"{head}_{n:0{width}d}" for n in range(lo, hi + 1)]
+                continue
+        out.append(part)
+    seen: dict[str, None] = {}
+    for i in out:
+        seen.setdefault(i, None)
+    return list(seen)
+
+
 def _mcnemar_exact(b: int, c: int) -> float:
     """양측 이항검정. b, c 는 불일치 쌍의 두 방향 개수."""
     n = b + c
@@ -63,6 +91,10 @@ def main() -> int:
     ap.add_argument("a", type=Path, help="A 모델 결과 jsonl")
     ap.add_argument("b", type=Path, help="B 모델 결과 jsonl")
     ap.add_argument("--slot", default="", help="한 슬롯만 (chat/rag/planner/coding). 기본: 전체 + 슬롯별")
+    ap.add_argument("--ids", default="",
+                    help="문항 id 만 골라 비교한다. 쉼표 구분이고 범위를 쓸 수 있다 "
+                         "(예: planner_33-48 → planner_33 … planner_48). "
+                         "사전 등록한 주 지표만 재는 데 쓴다")
     ap.add_argument("--rule", default="majority", choices=RULES,
                     help="문항 실패 판정: majority(과반 시행 실패) | any(한 번이라도 실패)")
     args = ap.parse_args()
@@ -73,6 +105,13 @@ def main() -> int:
     vb = _verdict(fb, tb, args.rule)
 
     common = sorted(set(va) & set(vb))
+    if args.ids:
+        want = parse_ids(args.ids)
+        missing = [i for i in want if i not in set(va) & set(vb)]
+        if missing:
+            raise SystemExit(f"❌ --ids 에 두 결과에 없는 문항이 있다: {missing}")
+        common = [i for i in sorted(common) if i in set(want)]
+        print(f"--ids 로 {len(common)}문항만 비교한다: {args.ids}")
     only_a = sorted(set(va) - set(vb))
     only_b = sorted(set(vb) - set(va))
     print(f"A = {ma}  ({args.a.name}, 문항 {len(va)})")
