@@ -108,7 +108,7 @@ docs/experiments/
 ├─ planner_signal_0929/    ← 계획 길이 신호 사전 등록 재현
 ├─ constraint_generalize_1002/ ← 제약 일반화 (판정 불가)
 ├─ finetune_damage_1002/   ← 비길이 제약 손상 확인 검정 (반증)
-└─ yunsur_v4 … v10/   ← 라운드별: README(사전 선언) · 05_conclusion(결과) · 04_eval_*(원본)
+└─ yunsur_v4 … v11/   ← 라운드별: README(사전 선언) · 05_conclusion(결과) · 04_eval_*(원본)
 ```
 
 각 라운드 폴더의 `04_eval_*/` 에는 `base.jsonl` · `target.jsonl` 과 요약 JSON 이 그대로 들어 있다. 표의 숫자가 의심되면 원본을 다시 세면 된다.
