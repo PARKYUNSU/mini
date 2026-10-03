@@ -130,13 +130,15 @@ v9·v10 과 동일한 파드 구성. [`scripts/runpod_train.sh`](../../../script
 
 - [x] `eval_multi_round.sh` — N개 모델을 한 세션에서 재는 라운드 스크립트 (trio 는 대상 2개 고정). 가드(문항 sha·중복 대상·모델 존재·RESUME)는 trio 와 동일
 - [x] `eval_local_llm_failure.py --keep-text` — 응답 원문 보존 옵트인 (기본 꺼짐, 판정 무영향). 테스트 2건 ([`tests/unit/test_eval_keep_text_flag.py`](../../../tests/unit/test_eval_keep_text_flag.py))
-- [ ] RunPod 학습 (`VERSION=v11 DATA_VERSION=v9 LEARNING_RATE=1e-4`) → HF `YUNSU24/yunsur_v11_lora`
-- [ ] 맥미니: `hf download` → `merge_lora_gguf.sh v11` → Ollama `yunsur_v11`
-- [ ] `bash scripts/eval_multi_round.sh lr3 yunsur_v9 yunsur_v11 yunsur_v10` (≈350분)
+- [x] RunPod 학습 (`VERSION=v11 DATA_VERSION=v9 LEARNING_RATE=1e-4`) → HF `YUNSU24/yunsur_v11_lora` · **138스텝 · 7.2분 · loss 1.7279 → 1.2864 · L40S · 파드 ~17분 $0.31**
+- [x] 맥미니: `hf download` → `merge_lora_gguf.sh v11` → Ollama `yunsur_v11` (q4_k_m 5.78GB, 다이제스트 `634ede34a0b1`)
+- [ ] `bash scripts/eval_multi_round.sh lr3 yunsur_v9 yunsur_v11 yunsur_v10` (≈350분) — **2026-10-03 15:42 시작**
 - [ ] `05_conclusion.md`
 
 ## 진행 로그
 
 | 날짜 | 내용 |
 |---|---|
+| 2026-10-03 | **측정 시작 (15:42).** 4모델 1,800시행, 예상 ≈350분. 태그 매핑 t1=v9 · t2=v11 · t3=v10 · base, 문항 집합 sha `967eeb460559` 확인됨. 스모크(chat_01·planner_01·rag_01 각 1회, **주 지표 문항은 피했다** — 사전 등록한 엔드포인트를 미리 보지 않기 위해)에서 셋 다 통과하고 한국어 혼입 0. |
+| 2026-10-03 | **학습 완료.** 단일 변수를 산출물만으로 확인했다 — `train_stats.json` 의 `data_file`=v9 경로 · `hparam_overrides`={'learning_rate': {'default': 2e-4, 'used': 1e-4}} · 스텝 138 · 시드 3407. 파드 로그의 lr 궤적도 중간값이 맞다: step 10 에서 v11 **9e-5** 이고 v10 은 4.5e-5 였다(정확히 2배). **loss 가 lr 순서대로 사이에 놓인다** — v9 1.2170 < v11 **1.2864** < v10 1.3557. 데이터·스텝·시드가 같아 비교가 성립한다. 다만 §4.3 대로 **판정 기준이 아니다**: §5 의 역설(델타가 작은 쪽이 학습 분포를 더 따라갔다)은 loss 수준에서는 나타나지 않고 행동에서만 나왔으므로, loss 의 단조성이 행동의 단조성을 말해주지 않는다. 세 모델의 Ollama 가중치 블롭이 모두 다른 것도 확인했다. |
 | 2026-10-03 | 노트 개설 + 측정 배선. [`../length_mechanism_1003.md`](../length_mechanism_1003.md) §6 이 (A) 로 가른 뒤 남긴 갈림길이 "중간 lr" 이었다. 판정을 먼저 못 박았다 — 양성 대조(v9 vs v10 다섯 번째 재현)를 **문지기**로 두고, v11 의 위치는 T1·T2 **조합**으로만 읽는다. 네 조합과 비단조 경우까지 표로 적었다. 측정 쪽에 두 가지를 보탰다: 세 lr 수준이 한 밤에 들어가게 `eval_multi_round.sh`(N개 가변), 그리고 사후 기전 분석이 재측정을 요구하지 않게 `--keep-text`. 후자는 §6 에서 240자 preview 로 섹션을 세다 잘림을 센 실수의 재발 방지다. |
