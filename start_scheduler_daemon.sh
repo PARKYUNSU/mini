@@ -1,6 +1,10 @@
 #!/bin/bash
 # 통합 스케줄러(run_scheduler.py) 백그라운드 기동
-# - 월~금 02:00 LLM 토론, 매일 06:00 arXiv, 1분마다 cron_engine due 체크
+# - 매일 01:00 arXiv 파이프라인 (기본, ARXIV_PIPELINE_SCHEDULE_AT · Gemini 키 있을 때)
+# - 매일 morning_scraper → Phase35 심사: PHASE35_SCHEDULE_* (.env), 기본 07:30 / 08:00 (마스터 스위치 PHASE35_SCHEDULE_ENABLED)
+# - 월~금 02:00 LLM 논문 토론 배치는 **`LLM_DEBATE_SCHEDULE_ENABLED=1`** 일 때만 등록 (기본 꺼짐)
+# - Boardroom: BOARDROOM_SCHEDULE_* (.env) — 기본 매일(월~일) 10:00, BOARDROOM_SCHEDULE_DAILY=0 이면 월~금만
+# - 1분마다 텔레그램 cron_engine due 작업 점검
 # - 이미 떠 있으면 중복 기동하지 않음
 
 set -euo pipefail

@@ -30,6 +30,9 @@ if t:
     print('Webhook cleared.')
 " 2>/dev/null || true
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 새 봇 시작"
+MINI_ROOT="$(pwd)"
+mkdir -p "${MINI_ROOT}/tmp"
+export TMPDIR="${TMPDIR:-${MINI_ROOT}/tmp}"
 export PYTHONFAULTHANDLER=1
 export PYTHONUNBUFFERED=1
 export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$(pwd)"

@@ -12,6 +12,7 @@ langchain-community>=0.3.0
 langchain-ollama>=0.2.0
 chromadb>=0.5.0
 sentence-transformers>=2.2.0
+rank-bm25>=0.2.2  # bm25_index (하이브리드 검색)
 
 google-generativeai>=0.8.0
 python-dotenv>=1.0.0
@@ -26,10 +27,12 @@ schedule>=1.2.0
 tenacity>=8.2.0
 
 # Multi-Agent 코딩 봇
+# pip 패키지명: e2b-code-interpreter (import: e2b_code_interpreter) — E2B 샌드박스·execute_python_in_sandbox
 e2b-code-interpreter>=1.0.0
 langgraph>=0.2.0
 langgraph-checkpoint>=0.1.0
 langgraph-checkpoint-sqlite>=2.0.0
 langchain-google-genai>=2.0.0
+langchain-anthropic>=0.3.0  # Phase 4 Boardroom (Claude)
 # Executor/Monitor 코딩 전용 (Groq)
 langchain-groq>=0.2.0

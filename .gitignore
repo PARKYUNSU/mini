@@ -35,6 +35,8 @@ idea_vault.sqlite
 
 # 출력 데이터
 raw_data_queue/
+# Boardroom 이 날마다 쓰는 회의록 산출물 (소스가 아니라 결과)
+archives/
 finetune_datasets/*
 !finetune_datasets/v4/
 finetune_datasets/v4/raw/
@@ -44,6 +46,12 @@ finetune_datasets/v5/raw/
 !finetune_datasets/v9/
 chroma_db/
 chroma_db_backup_*/
+# 점(.) 구분자라 chroma_db_backup_* 에 걸리지 않는다 — 마이그레이션 전 스냅샷
+chroma_db.pre-migrate-*/
+# 임베딩·검색 실험용 일회성 DB
+chroma_db_test/
+chroma_db_emb_test/
+chroma_zero_test/
 tool_chroma_db/
 check_chroma.py
 test_chroma_minimal.py
