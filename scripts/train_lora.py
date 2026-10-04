@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import sys
 import time
 from collections import Counter
@@ -85,6 +86,25 @@ def resolve_learning_rate(raw: str | None, default: float) -> tuple[float, dict]
 
 
 # ---------------------------------------------------------------- 0) 환경 검증 (노트북 셀 4)
+def resolve_save_steps(raw: str | None, total_hint: int = 138) -> int | None:
+    """``SAVE_STEPS`` 환경변수를 검증해 중간 체크포인트 간격을 돌려준다 (없으면 None).
+
+    학습 자체를 바꾸지 않는다 — 어느 시점의 어댑터를 **남기는지**만 정한다. 그래서
+    HPARAMS 오버라이드로 기록하지 않고 별도 필드에 적는다.
+    """
+    if raw is None or not str(raw).strip():
+        return None
+    try:
+        n = int(str(raw).strip())
+    except ValueError:
+        raise SystemExit(f"SAVE_STEPS 를 정수로 읽을 수 없다: {raw!r}")
+    if n < 1:
+        raise SystemExit(f"SAVE_STEPS 는 1 이상이어야 한다: {n}")
+    if n > total_hint:
+        raise SystemExit(f"SAVE_STEPS({n}) 가 전체 스텝({total_hint})보다 크다 — 중간 저장이 하나도 안 생긴다")
+    return n
+
+
 def check_env() -> None:
     import torch
 
@@ -154,6 +174,7 @@ def main() -> int:
 
     H = dict(HPARAMS)
     lr, hparam_overrides = resolve_learning_rate(os.environ.get("LEARNING_RATE"), HPARAMS["learning_rate"])
+    save_steps = resolve_save_steps(os.environ.get("SAVE_STEPS"))
     H["learning_rate"] = lr
     if hparam_overrides:
         log("=" * 66)
@@ -252,6 +273,14 @@ def main() -> int:
     if args.max_steps:
         sft_kwargs["max_steps"] = args.max_steps
 
+    # 중간 체크포인트 — 기전 라운드에서 "몇 스텝에서 행동이 꺾이나" 를 보려면 필요하다.
+    # 끄면(기본) 동작은 v3~v11 과 같다.
+    if save_steps:
+        sft_kwargs["save_strategy"] = "steps"
+        sft_kwargs["save_steps"] = save_steps
+        sft_kwargs["save_total_limit"] = None  # 전부 남긴다 — 나중에 고를 수 있게
+        log(f"중간 체크포인트: {save_steps} 스텝마다 저장 (save_total_limit 없음)")
+
     # TRL 0.12+ 는 tokenizer= → processing_class=, TRL 0.20+ 는 dataset_text_field·max_seq_length·
     # packing·dataset_num_proc 를 SFTTrainer 대신 SFTConfig 로 받고 max_seq_length → max_length 로 개명했다.
     # 노트북 시절 인자 이름을 그대로 쓰면 TypeError 로 학습 직전에 죽으므로, 시그니처를 보고 맞춘다.
@@ -293,6 +322,7 @@ def main() -> int:
         "data": data_stats,
         "hparams": H,
         "hparam_overrides": hparam_overrides,
+        "save_steps": save_steps,
         "dtype": str(dtype),
         "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "global_step": trainer.state.global_step,
@@ -311,6 +341,29 @@ def main() -> int:
     tokenizer.save_pretrained(str(adapter_dir))
     log(f"어댑터 저장 {adapter_dir}")
 
+    # 8b) 중간 체크포인트 정리 — merge_lora_gguf.sh 가 쓰는 두 파일만 남긴다.
+    # 체크포인트 디렉터리에는 옵티마이저·RNG 상태까지 들어 있는데, 우리는 재개가 아니라
+    # **머지**만 하므로 필요 없다 (업로드도 그만큼 가벼워진다).
+    ckpt_steps: list[int] = []
+    if save_steps:
+        ckpt_root = out_dir / "checkpoints"
+        staged = out_dir / "ckpt_adapters"
+        for d in sorted(ckpt_root.glob("checkpoint-*"), key=lambda q: int(q.name.split("-")[-1])):
+            step = int(d.name.split("-")[-1])
+            wt = d / "adapter_model.safetensors"
+            cfg = d / "adapter_config.json"
+            if not wt.is_file() or not cfg.is_file():
+                log(f"[경고] checkpoint-{step} 에 어댑터 파일이 없다 — 건너뜀 ({[f.name for f in d.iterdir()][:6]})")
+                continue
+            dst = staged / f"step-{step:03d}"
+            dst.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(wt, dst / wt.name)
+            shutil.copy2(cfg, dst / cfg.name)
+            ckpt_steps.append(step)
+        log(f"중간 체크포인트 정리 완료: {ckpt_steps or '없음'}")
+        summary["ckpt_steps"] = ckpt_steps
+        (out_dir / "train_stats.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+
     # 9) HF Hub private 업로드 — 토큰은 HF_TOKEN 환경변수(RunPod Secret)만. 출력에 절대 찍지 않는다.
     if args.no_upload or not args.hub_repo:
         log("업로드 생략" + ("" if args.hub_repo else " (--hub-repo / HF_REPO 없음)"))
@@ -325,6 +378,17 @@ def main() -> int:
     api.upload_folder(folder_path=str(adapter_dir), repo_id=args.hub_repo, repo_type="model", path_in_repo="adapter", commit_message=f"yunsur_{args.version} LoRA adapter")
     for f in ("train_log.json", "train_stats.json"):
         api.upload_file(path_or_fileobj=str(out_dir / f), path_in_repo=f, repo_id=args.hub_repo, repo_type="model")
+    for step in ckpt_steps:
+        src = out_dir / "ckpt_adapters" / f"step-{step:03d}"
+        try:
+            api.upload_folder(
+                folder_path=str(src), repo_id=args.hub_repo, repo_type="model",
+                path_in_repo=f"checkpoints/step-{step:03d}",
+                commit_message=f"yunsur_{args.version} checkpoint step {step}",
+            )
+            log(f"체크포인트 업로드 step {step}")
+        except Exception as e:  # 파드가 곧 종료되므로 하나 실패해도 나머지를 계속 올린다
+            log(f"[경고] 체크포인트 step {step} 업로드 실패: {type(e).__name__}: {e}")
     log(f"업로드 완료 → https://huggingface.co/{args.hub_repo} (private)")
     return 0
 

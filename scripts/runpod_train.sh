@@ -16,6 +16,9 @@
 #            VERSION  = v5
 #            DATA_VERSION  = v9                         (선택: 학습 데이터만 다른 버전에서. 기본 = VERSION)
 #                                                        lr 처럼 데이터 외 변수만 바꾸는 라운드용 (v10)
+#            SAVE_STEPS = 23                            (선택: N 스텝마다 중간 어댑터를 남겨 HF 의
+#                                                        checkpoints/step-NNN/ 로 올린다. 학습은 안 바뀐다.
+#                                                        기전 라운드용 — docs/experiments/checkpoint_1004/)
 #            LEARNING_RATE = 5e-5                       (선택: 기본은 train_lora.py HPARAMS 의 2e-4.
 #                                                        바꾸면 train_stats.json 의 hparam_overrides 에 남는다)
 #            GH_TOKEN = {{ RUNPOD_SECRET_GH_TOKEN }}    (레포가 private 일 때만)
@@ -68,6 +71,7 @@ PY
 
 step "0. 사전 확인 — VERSION=$VERSION DATA_VERSION=$DATA_VERSION GIT_REF=$GIT_REF"
 echo "learning_rate: ${LEARNING_RATE:-기본값(train_lora.py HPARAMS)}"
+echo "save_steps: ${SAVE_STEPS:-없음(최종 어댑터만)}"
 [[ "$DATA_VERSION" != "$VERSION" ]] && echo "⚠️ 데이터는 $DATA_VERSION, 모델은 $VERSION — 데이터 외 변수만 바꾸는 라운드인지 노트에서 확인할 것"
 [[ -n "${HF_TOKEN:-}" ]] || echo "⚠️ HF_TOKEN 없음 — 학습은 하지만 업로드 못 함 (RunPod Secret 확인)"
 [[ -n "${HF_REPO:-}" ]]  || echo "⚠️ HF_REPO 없음 — 업로드 생략됨"
