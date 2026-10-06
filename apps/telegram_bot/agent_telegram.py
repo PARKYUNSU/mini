@@ -87,6 +87,30 @@ def _line_preserve_telegram_bold(line: str) -> str:
     return "".join(parts)
 
 
+# 다중 문서 템플릿의 본론 항목("1. **이름**: 두세 문장…")과 단일 논문 템플릿의 섹션
+# 제목("1. 핵심 주제")을 가른다. 제목은 짧고 인라인 굵게나 콜론이 없다. 이 구분이
+# 없으면 본론 항목 전체가 <b> 로 감싸이고 내부 **…** 가 리터럴로 남는다.
+_NUMBERED_TITLE_MAX = 30
+
+
+def _is_numbered_section_title(line: str) -> bool:
+    body = re.sub(r"^\d+\.\s*", "", line)
+    return len(body) <= _NUMBERED_TITLE_MAX and "**" not in body and ": " not in body
+
+
+_MD_BOLD = re.compile(r"\*\*(.+?)\*\*", re.S)
+
+
+def _md_bold_to_html(line: str) -> str:
+    """줄을 이스케이프하고 마크다운 ``**굵게**`` 를 ``<b>`` 로 바꾼다.
+
+    이스케이프를 **먼저** 한다 — ``**``는 html.escape 가 건드리지 않으므로 순서가
+    안전하고, 태그를 먼저 넣으면 그 태그가 이스케이프돼 버린다.
+    """
+    escaped = escape_telegram_html(line)
+    return _MD_BOLD.sub(lambda m: f"<b>{m.group(1)}</b>", escaped)
+
+
 def rag_structured_lines_to_html(body: str) -> str:
     """
     RAG 후처리 본문(### 제목 또는 '1. 핵심 주제' 같은 번호 제목 + - bullet)을 Telegram HTML로 변환.
@@ -109,15 +133,16 @@ def rag_structured_lines_to_html(body: str) -> str:
             if "<b>" in rest and "</b>" in rest:
                 out_lines.append("• " + _line_preserve_telegram_bold(rest))
             else:
-                out_lines.append("• " + escape_telegram_html(rest))
+                out_lines.append("• " + _md_bold_to_html(rest))
         elif "<b>" in line and "</b>" in line:
             out_lines.append(_line_preserve_telegram_bold(line.strip()))
-        elif re.match(r"^\d+\.\s+\S", line):
-            # "1. 핵심 주제" 형식 (RAG 단순 섹션)
+        elif re.match(r"^\d+\.\s+\S", line) and _is_numbered_section_title(line.strip()):
+            # "1. 핵심 주제" 처럼 **짧은 제목**만 줄째 굵게 (단일 논문 템플릿의 섹션).
             title = escape_telegram_html(line.strip())
             out_lines.append(f"<b>{title}</b>")
         else:
-            out_lines.append(escape_telegram_html(line.strip()))
+            # 번호 본문 항목("1. **이름**: 긴 설명")과 일반 문장은 인라인 굵게만 변환한다.
+            out_lines.append(_md_bold_to_html(line.strip()))
     return "\n".join(out_lines)
 
 

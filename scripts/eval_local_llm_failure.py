@@ -366,6 +366,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
             "",
             text,
             output_template_strict=RAG_OUTPUT_TEMPLATE_MULTI_STRICT,
+            doc_count=len(doc_ids),
         )
         messages = [
             SystemMessage(content=DIRECT_ANSWER_RAG_SYSTEM_BASE),

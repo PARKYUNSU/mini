@@ -186,6 +186,7 @@ def direct_answer_rag_user(
     output_template_strict: str = RAG_OUTPUT_TEMPLATE_SINGLE_STRICT,
     rag_max_chars: int = 5000,
     last_ai_max: int = 800,
+    doc_count: int | None = None,
 ) -> str:
     ref = rag_context[:rag_max_chars] if rag_context != "관련 문서 없음" else "없음"
     empty_note = ""
@@ -200,6 +201,25 @@ def direct_answer_rag_user(
 [직전 답변 — ⚠️ 아래 내용은 중복 방지 참조용이며, 절대 복사·재사용하지 마세요]
 {last_ai[:last_ai_max]}
 """
+    # 문서 수를 못 박는다. 운영은 컨텍스트를 top-1/top-5 로 걸러내므로 문서가 1편일
+    # 수도 있는데, 모델이 **본론 항목 번호를 문서 번호로 착각**해 [문서 2]·[문서 3] 을
+    # 쓰는 것을 실제로 관측했다 (문서 1편인데 인용 4건 전부 범위 초과 → 전부 삭제).
+    doc_note = ""
+    if doc_count:
+        rng = "[문서 1]" if doc_count == 1 else f"[문서 1]~[문서 {doc_count}]"
+        # 항목 수를 문서 수에 묶는다. 운영에서 문서 1편인데 "항목 2~4개" 를 요구하니
+        # 모델이 3항목을 쓰고 [문서 2]·[문서 3] 을 인용했다 (범위 초과 → 전부 삭제).
+        cap = (
+            "본론 항목은 **1개만** 쓴다 (문서가 1편이므로)."
+            if doc_count == 1
+            else f"본론 항목은 **{min(doc_count, 4)}개를 넘기지 않는다** (문서가 {doc_count}편이므로)."
+        )
+        doc_note = (
+            f"\n[참고 문서 수] **{doc_count}편**이다. 인용은 {rng} 중에서만 쓴다. {cap}\n"
+            "⚠️ **본론 항목 번호와 문서 번호는 다르다.** 2번 항목이라고 [문서 2]가 아니다 — "
+            "그 내용이 어느 문서에서 왔는지 보고 그 번호를 쓴다. 모르면 생략한다.\n"
+        )
+
     return f"""[대화 맥락]
 {session_context}
 
@@ -208,7 +228,7 @@ def direct_answer_rag_user(
 {last_ai_section}
 [사용자]
 {user_request}
-{empty_note}
+{empty_note}{doc_note}
 {output_template_strict}"""
 
 

@@ -894,6 +894,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 user_request,
                 output_template_strict=output_template,
                 rag_max_chars=rag_max_chars,
+                doc_count=len(_doc_ids),
             )
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
