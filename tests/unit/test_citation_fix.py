@@ -103,3 +103,86 @@ def test_is_idempotent() -> None:
     twice, st = fix_citations(once, CTX)
     assert twice == once
     assert st["dropped"] == 0
+
+
+# ── 번호 인용 (`[문서 N]`) ──────────────────────────────────────────────────
+from core.llm.citation_fix import RAG_HIT_SEP, number_context_papers  # noqa: E402
+
+CTX2 = (
+    "[Distance: 0.5]\n[2408.08067v2] 논문 A\n본문 A"
+    + RAG_HIT_SEP
+    + "[Distance: 0.4]\n[2407.21059v1] 논문 B\n본문 B"
+)
+
+
+def test_numbering_labels_each_block_and_maps_ids() -> None:
+    nc, mp = number_context_papers(CTX2)
+    assert mp == {1: "2408.08067v2", 2: "2407.21059v1"}
+    assert nc.startswith("[문서 1]\n")
+    assert "[문서 2]\n" in nc
+    # 본문은 보존된다
+    assert "본문 A" in nc and "본문 B" in nc
+
+
+def test_numbering_is_contiguous_after_filtering() -> None:
+    """핵심 설계 요건 — 블록이 걸러진 뒤 번호를 매기면 구멍이 없다.
+
+    agent_nodes 는 rag.search() 뒤에 _rag_context_top_n_hits 등으로 블록을
+    걸러낸다. 조립 시점에 번호를 매겼다면 [1],[3] 처럼 비었을 것이다.
+    """
+    filtered = RAG_HIT_SEP.join(
+        [b for i, b in enumerate(CTX2.split(RAG_HIT_SEP)) if i != 0]
+    )
+    nc, mp = number_context_papers(filtered)
+    assert list(mp) == [1], mp          # 1번부터 연속
+    assert mp[1] == "2407.21059v1"      # 남은 블록이 1번이 된다
+    assert "[문서 2]" not in nc
+
+
+def test_numbering_skips_blocks_without_id() -> None:
+    """ID 가 없는 블록도 번호는 받지만 매핑에는 없다 — 인용되면 지워진다."""
+    ctx = "[Distance: 0.5]\nID 없는 블록" + RAG_HIT_SEP + "[2407.21059v1] 논문 B"
+    nc, mp = number_context_papers(ctx)
+    assert "[문서 1]" in nc and "[문서 2]" in nc
+    assert mp == {2: "2407.21059v1"}
+    out, st = fix_citations("근거 [문서 1] 과 [문서 2].", nc, doc_ids=mp)
+    assert "[2407.21059v1]" in out
+    assert st["expanded"] == 1 and st["bad_refs"] == [1]
+
+
+def test_numbering_noop_on_empty_context() -> None:
+    for ctx in ("", "   ", "관련 문서 없음"):
+        nc, mp = number_context_papers(ctx)
+        assert nc == ctx and mp == {}
+
+
+def test_doc_refs_expand_to_ids() -> None:
+    nc, mp = number_context_papers(CTX2)
+    out, st = fix_citations("첫째 [문서 1] 둘째 [문서 2] 이다.", nc, doc_ids=mp)
+    assert out == "첫째 [2408.08067v2] 둘째 [2407.21059v1] 이다."
+    assert st["expanded"] == 2
+
+
+def test_out_of_range_doc_ref_is_dropped() -> None:
+    """문서가 2편인데 [문서 7] 이면 가리킬 대상이 없다 — 지운다."""
+    nc, mp = number_context_papers(CTX2)
+    out, st = fix_citations("근거다 [문서 7].", nc, doc_ids=mp)
+    assert "문서 7" not in out and "[" not in out
+    assert st["bad_refs"] == [7] and st["expanded"] == 0
+
+
+def test_raw_ids_still_fixed_when_numbering_used() -> None:
+    """번호 인용으로 바꿔도 모델이 ID 를 쓸 수 있다 — 그 경로도 살아 있어야 한다."""
+    nc, mp = number_context_papers(CTX2)
+    out, st = fix_citations("A [문서 1] B [2407.2105v1] C [9999.99999v9].", nc, doc_ids=mp)
+    assert "[2408.08067v2]" in out        # 번호 → ID
+    assert "[2407.21059v1]" in out        # 한 글자 오류 → 교정
+    assert "9999.99999" not in out        # 후보 없음 → 삭제
+    assert (st["expanded"], st["fixed"], st["dropped"]) == (1, 1, 1)
+
+
+def test_doc_ref_expansion_is_idempotent() -> None:
+    nc, mp = number_context_papers(CTX2)
+    once, _ = fix_citations("근거 [문서 1].", nc, doc_ids=mp)
+    twice, st = fix_citations(once, nc, doc_ids=mp)
+    assert twice == once and st["expanded"] == 0

@@ -90,7 +90,11 @@ from core.llm.agent_prompts import (
     executor_user_prompt_code_run,
     planner_user_prompt,
 )
-from core.llm.citation_fix import extract_context_ids, fix_citations
+from core.llm.citation_fix import (
+    extract_context_ids,
+    fix_citations,
+    number_context_papers,
+)
 
 FALLBACK_MSG = "죄송해요, 답변을 생성하지 못했어요"
 PLANNER_FALLBACK = [
@@ -353,6 +357,9 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
 
     if slot == "rag":
         ctx, ctx_len = _rag_context(text)
+        # 운영과 같은 순서: 번호 라벨을 붙인 컨텍스트를 프롬프트에 넣고,
+        # 생성 뒤 그 매핑으로 [문서 N] 을 ID 로 펼친다 (protocol §2.2 · §5.4).
+        ctx, doc_ids = number_context_papers(ctx)
         user = direct_answer_rag_user(
             "(없음)",
             ctx,
@@ -368,7 +375,7 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
         body = inv.get("text") or ""
         # 운영과 같은 후처리 (agent_nodes 의 router_choice=="B" 경로) — protocol.md §2.2.
         # 평가기가 운영보다 느슨하면 "운영에서는 고쳐지는 인용" 이 실패로 잡힌다.
-        body, cit = fix_citations(body, ctx)
+        body, cit = fix_citations(body, ctx, doc_ids=doc_ids)
         if inv.get("text") is not None:
             inv = {**inv, "text": body}
         ok = inv["status"] == "ok" and len(body) >= 120 and FALLBACK_MSG not in body

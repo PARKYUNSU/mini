@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import re
 
-__all__ = ["extract_context_ids", "fix_citations"]
+__all__ = ["extract_context_ids", "fix_citations", "number_context_papers", "RAG_HIT_SEP"]
 
 # arXiv 신형 ID: 4자리.4~5자리(+판). 구형(hep-th/9901001)은 코퍼스에 없어 다루지 않는다.
 # 컨텍스트에서 **참조 집합**을 뽑을 때는 엄격하게 본다 — 여기에 쓰레기가 섞이면 교정 기준이 망가진다.
@@ -33,6 +33,44 @@ _ID = r"\d{4}\.\d{4,5}(?:v\d+)?"
 _ID_LOOSE = r"\d{4}\.\d{3,6}(?:v\d+)?"
 _ID_IN_BRACKET = re.compile(rf"\[\s*({_ID_LOOSE})\s*\]")
 _BARE = re.compile(r"v\d+$")
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 번호 인용 — 모델이 12자 ID 를 옮겨 적는 대신 작은 정수를 쓰게 한다.
+#
+# §5.4 측정에서 모델은 ID 를 **날조**했다 (삭제 8개 중 7개가 코퍼스에도 없음).
+# 긴 숫자열을 전사하는 일 자체가 안 되는 것이므로, 컨텍스트에 `[문서 1]` 라벨을
+# 붙이고 그것을 인용하게 한 뒤 **후처리가 결정적으로 ID 로 펼친다.**
+#
+# 번호를 **변환이 끝난 뒤** 매기는 것이 핵심이다. agent_nodes 는 rag.search() 뒤에
+# 컨텍스트를 걸러내므로(_rag_context_top_n_hits 등) 조립 시점에 번호를 매기면
+# 필터 후 [1],[3],[7] 처럼 구멍이 생긴다.
+RAG_HIT_SEP = "\n\n---\n\n"
+_DOC_REF = re.compile(r"\[\s*문서\s*(\d{1,2})\s*\]")
+
+
+def number_context_papers(context: str) -> tuple[str, dict[int, str]]:
+    """블록마다 ``[문서 N]`` 라벨을 붙이고 ``{N: paper_id}`` 매핑을 돌려준다.
+
+    블록에서 ID 를 못 찾으면 라벨은 붙이되 매핑에서 뺀다 — 그 번호를 인용하면
+    펼칠 수 없으므로 후처리가 지운다.
+    """
+    s = context or ""
+    if not s.strip() or s.strip() == "관련 문서 없음":
+        return context, {}
+    blocks = s.split(RAG_HIT_SEP)
+    out: list[str] = []
+    mapping: dict[int, str] = {}
+    n = 0
+    for b in blocks:
+        if not b.strip():
+            continue
+        n += 1
+        ids = extract_context_ids(b)
+        if ids:
+            mapping[n] = ids[0]
+        out.append(f"[문서 {n}]\n{b.strip()}")
+    return RAG_HIT_SEP.join(out), mapping
 
 
 def _bare(pid: str) -> str:
@@ -73,15 +111,37 @@ def _edit_distance_le1(a: str, b: str) -> bool:
     return False
 
 
-def fix_citations(answer: str, context: str) -> tuple[str, dict]:
-    """``(고친 답변, 통계)``. 통계 키: kept · fixed · dropped · unknown_ids."""
+def fix_citations(
+    answer: str, context: str, doc_ids: dict[int, str] | None = None
+) -> tuple[str, dict]:
+    """``(고친 답변, 통계)``. 통계 키: kept · fixed · dropped · unknown_ids · expanded.
+
+    ``doc_ids`` 를 주면 먼저 ``[문서 N]`` 을 그 논문의 ID 로 펼친다
+    (``number_context_papers()`` 가 돌려주는 매핑). 범위를 벗어난 번호는 지운다 —
+    문서가 3편인데 ``[문서 7]`` 이라고 쓰면 가리킬 대상이 없다.
+    """
+    stats_expanded = {"expanded": 0, "bad_refs": []}
+    if doc_ids is not None:
+        def _exp(m: re.Match[str]) -> str:
+            k = int(m.group(1))
+            pid = doc_ids.get(k)
+            if pid:
+                stats_expanded["expanded"] += 1
+                return f"[{pid}]"
+            stats_expanded["bad_refs"].append(k)
+            return ""
+        answer = _DOC_REF.sub(_exp, answer)
+        if stats_expanded["bad_refs"]:
+            answer = re.sub(r"[ \t]{2,}", " ", answer)
+            answer = re.sub(r"[ \t]+([.,;:)])", r"\1", answer)
+            answer = re.sub(r"[ \t]+$", "", answer, flags=re.M)
     valid = extract_context_ids(context)
     by_bare: dict[str, list[str]] = {}
     for pid in valid:
         by_bare.setdefault(_bare(pid), []).append(pid)
     exact = set(valid)
 
-    stats = {"kept": 0, "fixed": 0, "dropped": 0, "unknown_ids": []}
+    stats = {"kept": 0, "fixed": 0, "dropped": 0, "unknown_ids": [], **stats_expanded}
 
     # 컨텍스트에서 ID 를 하나도 못 찾았으면 **판단 근거가 없다** — 손대지 않는다.
     # (참고 문서가 없는 질의, 컨텍스트 형식 변경, 검색 실패 등. 이 가드가 없으면
