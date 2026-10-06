@@ -45,6 +45,7 @@ from core.llm.agent_llm import (
     get_rag_answer_llm,
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
+from core.llm.citation_fix import fix_citations
 from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
     DIRECT_ANSWER_PYTHON_EXAMPLE_SYSTEM,
@@ -910,6 +911,16 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         if router_choice == "B":
             answer = _strip_thinking_tags(answer)
             answer = _sanitize_rag_answer_placeholders(answer)
+            # arXiv ID 인용을 **이 답변에 쓰인 컨텍스트**와 대조해 고친다 (protocol.md §5.4).
+            # 모델이 ID 를 옮겨 적다가 자릿수를 흘려 20~36% 가 없는 ID 였다 — 사용자가
+            # 그 ID 로 논문을 찾으면 없으므로 출처로 쓸 수 없다. 애매하면 고치지 않고 지운다.
+            answer, _cit = fix_citations(answer, rag_context)
+            if _cit.get("fixed") or _cit.get("dropped"):
+                print(
+                    f"[DEBUG] DirectAnswer: 인용 교정 kept={_cit['kept']} "
+                    f"fixed={_cit['fixed']} dropped={_cit['dropped']} "
+                    f"unknown={_cit['unknown_ids']}"
+                )
             # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"

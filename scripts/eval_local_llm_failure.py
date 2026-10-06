@@ -90,6 +90,7 @@ from core.llm.agent_prompts import (
     executor_user_prompt_code_run,
     planner_user_prompt,
 )
+from core.llm.citation_fix import extract_context_ids, fix_citations
 
 FALLBACK_MSG = "죄송해요, 답변을 생성하지 못했어요"
 PLANNER_FALLBACK = [
@@ -365,6 +366,11 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
         ]
         inv = _invoke_local_num_predict(messages, timeout_sec, num_predict=SLOT_NUM_PREDICT["rag"])
         body = inv.get("text") or ""
+        # 운영과 같은 후처리 (agent_nodes 의 router_choice=="B" 경로) — protocol.md §2.2.
+        # 평가기가 운영보다 느슨하면 "운영에서는 고쳐지는 인용" 이 실패로 잡힌다.
+        body, cit = fix_citations(body, ctx)
+        if inv.get("text") is not None:
+            inv = {**inv, "text": body}
         ok = inv["status"] == "ok" and len(body) >= 120 and FALLBACK_MSG not in body
         fail_kind = "" if ok else (inv["status"] if inv["status"] != "ok" else "too_short")
         q_ok, q_kind = _quality_check("rag", body, english_max=english_max, request=text, constraints=constraints) if ok else (False, "")
@@ -376,6 +382,10 @@ def run_one(item: dict, *, english_max: float = 0.45) -> dict:
             "quality_kind": q_kind,
             "english_ratio": round(_english_ratio(body), 3),
             "rag_ctx_chars": ctx_len,
+            # 컨텍스트 ID 를 **목록으로** 남긴다 — 사후에 "삭제된 인용이 컨텍스트 ID 의
+            # 전사 오류인가 날조인가" 를 재측정 없이 가릴 수 있어야 한다.
+            "rag_ctx_id_list": extract_context_ids(ctx),
+            "citation_fix": cit,
             "preview": body[:240],
         }
 
