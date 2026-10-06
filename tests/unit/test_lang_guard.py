@@ -18,6 +18,29 @@ def test_english_answer_high_ratio():
     assert needs_korean_retry(t)
 
 
+def test_rag_multi_essay_format_not_flagged():
+    """다중 문서 템플릿의 **현재** 형식(서론/본론/결론)에서 오탐하지 않는다.
+
+    2026-10-06 에 RAG_OUTPUT_TEMPLATE_MULTI_STRICT 를 이 형식으로 바꿨다
+    (docs/experiments/template_collapse_1006/). 영문 시스템 이름이 굵게 들어가므로
+    english_ratio 가 뜨기 쉬운 자리다 — 아래는 실측 응답에서 가져온 모양이다.
+    """
+    t = (
+        "### 서론\n"
+        "RAG는 외부 지식을 활용하여 LLM의 환각을 억제하지만, 검색된 정보가 답변에 "
+        "부정적 영향을 미치는 **retrieval-induced hallucination**이라는 한계가 있습니다.\n\n"
+        "### 본론\n"
+        "1. **Hyper-RAG**: 이진 관계에 국한된 구조적 제약에서 벗어나 n-ary relationships를 "
+        "포착하는 하이퍼그래프 표현으로 지식 간 상관관계를 보존합니다 [1]\n"
+        "2. **RAGO (Retriever and Output Grading)**: 검색과 생성을 분리해 독립적으로 평가하여 "
+        "부적절한 정보 수용 경향을 제어합니다 [2]\n\n"
+        "### 결론\n"
+        "결과적으로 하이퍼그래프 기반 구조화와 단계별 독립 평가가 병행되어야 합니다."
+    )
+    assert english_ratio(t) < 0.2
+    assert not needs_korean_retry(t)
+
+
 def test_rag_titles_excluded():
     # RAG 답변: 영문 논문 제목은 볼드/📄 줄이라 제외되어야 함 (v2에서 오탐 22/24 났던 케이스)
     t = (
