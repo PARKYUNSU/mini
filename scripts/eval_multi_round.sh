@@ -35,6 +35,10 @@ OUT_DIR=".cron/multi_${TAG}"
 echo "===== 사전 확인 ====="
 echo "커밋: $(git rev-parse --short HEAD) — $(git log -1 --format=%s)"
 echo "대상: ${TARGETS[*]}  (대조군 $BASE)"
+if [[ -n "${SLOTS:-}" ]]; then
+  echo "⚠️ 슬롯 제한 라운드: SLOTS=$SLOTS — 문항 집합의 일부만 잰다."
+  echo "   전체 라운드와 실패율을 맞대지 말 것. 라운드 노트에 사유가 적혀 있어야 한다."
+fi
 if ! git diff --quiet -- scripts/eval_local_llm_failure.py core/llm/code_extract.py core/llm/constraint_check.py "$FIXTURE"; then
   echo "⚠️ 판정기·추출기·제약 검사·문항 집합에 커밋 안 된 수정이 있다 — 결과를 커밋에 귀속시킬 수 없다"
 fi
@@ -92,7 +96,7 @@ for i in "${!TAGS[@]}"; do
   # 분석이 재측정을 요구하지 않게 한다 — length_mechanism_1003.md §6 에서 240자
   # preview 로 섹션을 세다 잘림을 세는 실수를 했고, RAG 전문을 다시 받아야 했다.
   "$PY" scripts/eval_local_llm_failure.py --model "$model" --repeats 3 --quality --keep-text \
-      --out "$OUT_DIR/${tag}.jsonl"
+      ${SLOTS:+--slots "$SLOTS"} --out "$OUT_DIR/${tag}.jsonl"
   echo "[$(date '+%m-%d %H:%M')] $model 완료 ($(( ($(date +%s) - t0) / 60 ))분)"
 done
 

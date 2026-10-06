@@ -86,3 +86,38 @@ def test_save_steps_does_not_touch_hparams() -> None:
     )
     keys = {k.value for k in hp.value.keys if isinstance(k, ast.Constant)}
     assert "save_steps" not in keys and "save_strategy" not in keys
+
+
+resolve_save_steps_max = _load("resolve_save_steps_max")
+
+
+@pytest.mark.parametrize("raw", [None, "", "  "])
+def test_save_steps_max_default_is_off(raw) -> None:
+    """안 주면 None — 체크포인트를 전부 올린다."""
+    assert resolve_save_steps_max(raw) is None
+
+
+@pytest.mark.parametrize("raw,want", [("24", 24), (" 3 ", 3), ("138", 138), ("500", 500)])
+def test_save_steps_max_accepts_positive(raw, want) -> None:
+    """전체 스텝보다 커도 받는다 — '전부 올려라' 와 같은 뜻이고 해로울 게 없다."""
+    assert resolve_save_steps_max(raw) == want
+
+
+@pytest.mark.parametrize("raw", ["0", "-1", "abc", "24.5"])
+def test_save_steps_max_rejects_bad(raw) -> None:
+    with pytest.raises(SystemExit):
+        resolve_save_steps_max(raw)
+
+
+def test_cap_filters_upload_not_training() -> None:
+    """상한은 **업로드**만 건다 — 학습·디스크 저장은 건드리지 않는다.
+
+    sft_kwargs(= 학습 설정)에 save_steps_max 가 들어가면 안 된다.
+    """
+    assert "save_steps_max" in _SRC
+    # 학습 설정 블록에서 쓰이지 않는지 본다
+    i = _SRC.index('sft_kwargs["save_steps"] = save_steps')
+    j = _SRC.index("trainer = SFTTrainer")
+    assert "save_steps_max" not in _SRC[i:j], "save_steps_max 가 학습 설정에 새어들었다"
+    # 업로드 선별 자리에서는 쓰인다
+    assert "step > save_steps_max" in _SRC

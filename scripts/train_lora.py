@@ -105,6 +105,23 @@ def resolve_save_steps(raw: str | None, total_hint: int = 138) -> int | None:
     return n
 
 
+def resolve_save_steps_max(raw: str | None) -> int | None:
+    """``SAVE_STEPS_MAX`` — **업로드할** 중간 체크포인트의 스텝 상한 (없으면 전부).
+
+    학습도, 디스크 저장도 바꾸지 않는다. 촘촘한 간격(예 3스텝)으로 저장하면서 관심
+    구간만 올릴 때 쓴다 — 46개를 전부 올리면 6GB 이고 파드는 곧 종료된다.
+    """
+    if raw is None or not str(raw).strip():
+        return None
+    try:
+        n = int(str(raw).strip())
+    except ValueError:
+        raise SystemExit(f"SAVE_STEPS_MAX 를 정수로 읽을 수 없다: {raw!r}")
+    if n < 1:
+        raise SystemExit(f"SAVE_STEPS_MAX 는 1 이상이어야 한다: {n}")
+    return n
+
+
 def check_env() -> None:
     import torch
 
@@ -175,6 +192,7 @@ def main() -> int:
     H = dict(HPARAMS)
     lr, hparam_overrides = resolve_learning_rate(os.environ.get("LEARNING_RATE"), HPARAMS["learning_rate"])
     save_steps = resolve_save_steps(os.environ.get("SAVE_STEPS"))
+    save_steps_max = resolve_save_steps_max(os.environ.get("SAVE_STEPS_MAX"))
     H["learning_rate"] = lr
     if hparam_overrides:
         log("=" * 66)
@@ -323,6 +341,7 @@ def main() -> int:
         "hparams": H,
         "hparam_overrides": hparam_overrides,
         "save_steps": save_steps,
+        "save_steps_max": save_steps_max,
         "dtype": str(dtype),
         "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "global_step": trainer.state.global_step,
@@ -350,6 +369,8 @@ def main() -> int:
         staged = out_dir / "ckpt_adapters"
         for d in sorted(ckpt_root.glob("checkpoint-*"), key=lambda q: int(q.name.split("-")[-1])):
             step = int(d.name.split("-")[-1])
+            if save_steps_max is not None and step > save_steps_max:
+                continue  # 저장은 됐지만 올리지 않는다 (SAVE_STEPS_MAX)
             wt = d / "adapter_model.safetensors"
             cfg = d / "adapter_config.json"
             if not wt.is_file() or not cfg.is_file():
@@ -360,7 +381,8 @@ def main() -> int:
             shutil.copy2(wt, dst / wt.name)
             shutil.copy2(cfg, dst / cfg.name)
             ckpt_steps.append(step)
-        log(f"중간 체크포인트 정리 완료: {ckpt_steps or '없음'}")
+        cap = f" (SAVE_STEPS_MAX={save_steps_max} 로 걸러냄)" if save_steps_max else ""
+        log(f"중간 체크포인트 정리 완료: {ckpt_steps or '없음'}{cap}")
         summary["ckpt_steps"] = ckpt_steps
         (out_dir / "train_stats.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 
