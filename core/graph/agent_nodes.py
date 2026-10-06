@@ -52,7 +52,6 @@ from core.llm.agent_prompts import (
     DIRECT_ANSWER_RAG_DEPTH_SUFFIX,
     DIRECT_ANSWER_RAG_SYSTEM_BASE,
     RAG_OUTPUT_TEMPLATE_MULTI_STRICT,
-    RAG_OUTPUT_TEMPLATE_SINGLE_STRICT,
     EXECUTOR_INTENTIONAL_SYNTAX_BLOCK,
     EXECUTOR_SYSTEM_CODE_RUN,
     EXECUTOR_SYSTEM_FULL,
@@ -879,7 +878,12 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             if wants_depth and prefer_single_hit:
                 system_prompt += DIRECT_ANSWER_RAG_DEPTH_SUFFIX
 
-            output_template = RAG_OUTPUT_TEMPLATE_SINGLE_STRICT if prefer_single_hit else RAG_OUTPUT_TEMPLATE_MULTI_STRICT
+            # 단일/다중 모두 같은 에세이 템플릿을 쓴다. 운영 20시행에서 v9 은 SINGLE
+            # 템플릿 뼈대를 **0/20** 으로 무시하고(심층 분석 섹션도 0/20) 그 템플릿의
+            # 단어만 주워 `1. 핵심 주제:` 같은 상투어 항목 이름을 만들었다
+            # (docs/experiments/template_collapse_1006/07_single_path/). 문서 수에 따른
+            # 항목 수 상한은 direct_answer_rag_user(doc_count=…) 가 넣는다.
+            output_template = RAG_OUTPUT_TEMPLATE_MULTI_STRICT
             rag_max_chars = 8000 if (prefer_single_hit and wants_depth) else (5000 if prefer_single_hit else 8000)
 
             # 번호 라벨은 **필터가 끝난 뒤** 붙인다 — 위 _rag_context_* 변환이 블록을
@@ -928,7 +932,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     f"dropped={_cit['dropped']} unknown={_cit['unknown_ids']} "
                     f"bad_refs={_cit['bad_refs']}"
                 )
-            # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
+            # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_MULTI_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
 
