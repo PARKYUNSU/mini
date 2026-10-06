@@ -1,0 +1,7 @@
+t1 yunsur_ckpt23
+t2 yunsur_v10
+t3 yunsur_v9
+t4 yunsur_ckpt46
+t5 yunsur_v11
+t6 yunsur_ckpt138
+base qwen3.5:9b

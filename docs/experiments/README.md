@@ -108,6 +108,7 @@ docs/experiments/
 ├─ planner_signal_0929/    ← 계획 길이 신호 사전 등록 재현
 ├─ constraint_generalize_1002/ ← 제약 일반화 (판정 불가)
 ├─ finetune_damage_1002/   ← 비길이 제약 손상 확인 검정 (반증)
+├─ checkpoint_1004/        ← 중간 체크포인트: lr 크기냐 누적 갱신량이냐 (판정 불가 · 해리 발견)
 └─ yunsur_v4 … v11/   ← 라운드별: README(사전 선언) · 05_conclusion(결과) · 04_eval_*(원본)
 ```
 
