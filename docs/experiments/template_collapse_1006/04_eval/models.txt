@@ -1,0 +1,11 @@
+t1 yunsur_v9
+t2 yunsur_v10
+t3 yunsur_s003
+t4 yunsur_s006
+t5 yunsur_s009
+t6 yunsur_s012
+t7 yunsur_s015
+t8 yunsur_s018
+t9 yunsur_s021
+t10 yunsur_s024
+base qwen3.5:9b

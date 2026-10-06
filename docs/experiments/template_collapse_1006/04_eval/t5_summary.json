@@ -1,0 +1,51 @@
+{
+  "generated": "2026-10-06T13:32:09+09:00",
+  "model": "yunsur_s009",
+  "n": 24,
+  "fail": 0,
+  "fail_rate": 0.0,
+  "quality_fail": 2,
+  "strict_fail": 2,
+  "strict_fail_rate": 0.0833,
+  "strict_fail_ci95": [
+    0.0232,
+    0.2585
+  ],
+  "fail_ci95": [
+    0.0,
+    0.138
+  ],
+  "repeats": 3,
+  "one_liner": "고정 8문항 반복 포함 n=24, 로컬 1차만: hard 실패 0/24 = 0% · 품질 포함 2/24 = 8%",
+  "by_slot": {
+    "rag": {
+      "n": 24,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 24
+      },
+      "quality_fail": 2,
+      "quality_kinds": {
+        "repetition": 1,
+        "english_mix": 1
+      },
+      "strict_fail_rate": 0.0833,
+      "strict_fail_ci95": [
+        0.0232,
+        0.2585
+      ],
+      "fail_ci95": [
+        0.0,
+        0.138
+      ],
+      "elapsed_median_sec": 32.1,
+      "elapsed_max_sec": 55.6,
+      "out_chars_median": 904,
+      "out_chars_max": 1794,
+      "unclosed_fence": 0,
+      "num_predict": 4096
+    }
+  },
+  "results_path": ".cron/multi_tmpl/t5.jsonl"
+}
