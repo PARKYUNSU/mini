@@ -23,6 +23,7 @@ def block(kind, s="", id_=None, **extra):
 def world(monkeypatch):
     monkeypatch.setenv("NOTION_SUNDAY_DB_ID", "sunday")
     monkeypatch.setenv("NOTION_LYRICS_DB_ID", "lyrics?v=abc")
+    monkeypatch.delenv("CHURCH_LYRICS_SKIP", raising=False)
     w = {
         "pages": [{"id": "p1", "created_time": "2026-10-07T00:00:00.000Z",
                    "properties": {"실제 주일 날짜": {"formula": {"date": {"start": "2026-10-11"}}}}}],
@@ -121,3 +122,9 @@ def test_one_failing_song_does_not_stop_the_rest(world, monkeypatch):
     jobs.lyrics_job("2026-10-11")
     icons = [b["callout"]["icon"]["emoji"] for b in world["appended"][0][2]]
     assert icons == ["❌", "⚠️"]
+
+
+def test_skip_list_leaves_fixed_songs_out(world, monkeypatch):
+    monkeypatch.setenv("CHURCH_LYRICS_SKIP", "둘째곡, 없는 곡")
+    jobs.lyrics_job("2026-10-11")
+    assert [header(b).split(" · ")[0] for b in world["appended"][0][2]] == ["[자동 가사] 첫째 곡"]

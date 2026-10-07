@@ -24,6 +24,11 @@ MARK = "[자동 가사] "
 TODO_TEXT = "확인 완료 (악보와 대조하고, 틀린 곳은 위 가사를 고친 뒤 체크)"
 
 
+def skip_titles() -> set[str]:
+    """가사를 만들지 않을 곡(당분간 고정인 헌금·파송 찬양 등). .env 의 CHURCH_LYRICS_SKIP=곡1,곡2"""
+    return {setlist.norm(t) for t in (os.getenv("CHURCH_LYRICS_SKIP") or "").split(",") if t.strip()}
+
+
 def _env(name):
     return os.environ[name].split("?")[0].strip()
 
@@ -225,7 +230,7 @@ def lyrics_job(date=None, dry_run=False) -> int:
         print(f"{date}: 콘티가 아직 없습니다.")
         return 2
 
-    done = {setlist.norm(title) for _, title in auto_callouts(section)}
+    done = {setlist.norm(title) for _, title in auto_callouts(section)} | skip_titles()
     blocks = []
     for song in songs:
         if setlist.norm(song.title) in done:
