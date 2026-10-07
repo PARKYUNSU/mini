@@ -143,7 +143,7 @@ def harvest(page_id, index, dry_run=False) -> int:
             continue
         kids = notion.children(block["id"])
         checked = any(k["type"] == "to_do" and k["to_do"]["checked"] for k in kids)
-        lyrics = "\n\n".join(notion.block_text(k) for k in kids if k["type"] == "code").strip()
+        lyrics = compare.tidy("\n\n".join(notion.block_text(k) for k in kids if k["type"] == "code"))
         if checked and lyrics:
             print("가사 DB 저장:", title)
             index[setlist.norm(title)] = "dry-run" if dry_run else lyrics_save(title, lyrics)

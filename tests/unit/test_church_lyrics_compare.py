@@ -11,6 +11,12 @@ def test_tidy_removes_labels_and_repeats():
     assert tidy(A) == "아침 햇살이 창을 두드리면\n나는 일어나 길을 나서네\n\n함께 걷는 이 길 위에서\n노래하리 오늘도"
 
 
+def test_tidy_removes_markdown_and_punctuation():
+    raw = "**내게로 부터 눈을 들어**\n\n**주를 보기 시작할 때\n주의 일을 보겠네**\n아버지, 당신 같은 분은 없네.\n- “할렐루야!” 주님…"
+    assert tidy(raw) == "내게로 부터 눈을 들어\n\n주를 보기 시작할 때\n주의 일을 보겠네\n아버지 당신 같은 분은 없네\n할렐루야 주님"
+    assert tidy("**[후렴]**\n주님을 볼 때 (x2)") == "주님을 볼 때"
+
+
 def test_agree_despite_line_breaks_and_spacing():
     b = "아침 햇살이 창을 두드리면 나는 일어나 길을 나서네\n함께걷는 이 길 위에서\n노래하리, 오늘도"
     result = compare([A, b])

@@ -11,6 +11,10 @@ _LABEL = re.compile(
     re.I,
 )
 _REPEAT = re.compile(r"\s*[(\[]?\s*[x×*]\s*\d+\s*[)\]]?\s*$", re.I)
+# 자막에 쓰지 않는 것: 마크다운 강조·제목·인용 표시와 줄 앞 글머리, 문장부호·따옴표
+_MARKUP = re.compile(r"[*_#`>]+")
+_BULLET = re.compile(r"^[-•·]\s+")
+_PUNCT = re.compile(r"[,.!?;:…~\"'“”‘’、。，．！？；：]+")
 
 
 def key(s: str) -> str:
@@ -19,12 +23,17 @@ def key(s: str) -> str:
 
 
 def tidy(text: str) -> str:
-    """구간 표시([후렴], 1절)와 반복 표시(x2)를 지우고 빈 줄을 하나로 줄입니다."""
+    """마크다운 표시(**)·문장부호(, .)·구간 표시([후렴], 1절)·반복 표시(x2)를 지우고 빈 줄을 하나로 줄입니다.
+
+    글자를 지우기만 하고 바꾸거나 더하지는 않습니다.
+    """
     out: list[str] = []
     for raw in text.replace("\r", "").split("\n"):
-        line = _REPEAT.sub("", raw.strip())
+        line = _BULLET.sub("", _MARKUP.sub("", raw).strip())
+        line = _REPEAT.sub("", line)
         if _LABEL.match(line):
             line = ""
+        line = re.sub(r"\s+", " ", _PUNCT.sub(" ", line)).strip()
         if line or (out and out[-1]):
             out.append(line)
     return "\n".join(out).strip()
