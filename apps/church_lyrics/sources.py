@@ -32,6 +32,12 @@ def _tavily_key() -> str:
     return raw
 
 
+def gemini_keys() -> list[str]:
+    """이 작업용 키: GEMINI_API_KEY_2 ~ _20 중 값이 있는 것(1번 키는 다른 작업용으로 남김)."""
+    keys = [(os.getenv(f"GEMINI_API_KEY_{i}") or "").strip() for i in range(2, 21)]
+    return list(dict.fromkeys(k for k in keys if k))
+
+
 def youtube_title(url: str) -> str | None:
     """콘티의 유튜브 링크에서 영상 제목을 읽습니다(같은 제목의 다른 곡 구분용)."""
     try:
@@ -70,11 +76,11 @@ def locate(title: str, hint: str | None, docs: list[list[str]]) -> list[tuple[in
         'JSON으로만 답한다: {"spans": [{"doc": 문서 번호, "found": true 또는 false, "start": 정수, "end": 정수}, ...]}\n\n'
         + body
     )
-    # 저장소 공용 호출: 429 면 기존 방식대로 쿨다운 후 재시도. 이 작업은 GEMINI_API_KEY_2 만 쓴다.
+    # 저장소 공용 호출: 429 면 다음 키로 넘기고, 모든 키가 막히면 쿨다운 후 재시도.
     from core.config.agent_config import GEMINI_MODEL
     from core.llm.agent_gemini import gemini_sdk_generate_json
 
-    raw = gemini_sdk_generate_json([os.environ["GEMINI_API_KEY_2"]], GEMINI_MODEL, prompt)
+    raw = gemini_sdk_generate_json(gemini_keys(), GEMINI_MODEL, prompt)
     out: list[tuple[int, int] | None] = [None] * len(docs)
     try:
         spans = json.loads(raw)["spans"]

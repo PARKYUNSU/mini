@@ -2,6 +2,7 @@
 import pytest
 
 from apps.church_lyrics import sources
+from core.config import agent_config  # noqa: F401 — 실제 .env 로딩을 가짜 키 설정보다 먼저 끝냄
 from core.llm import agent_gemini
 
 pytestmark = pytest.mark.unit
@@ -12,7 +13,12 @@ BOTH = '{"spans": [{"doc": 0, "found": true, "start": 2, "end": 5}, {"doc": 1, "
 
 @pytest.fixture
 def fake(monkeypatch):
+    for i in range(1, 21):
+        monkeypatch.delenv(f"GEMINI_API_KEY_{i}", raising=False)
+    monkeypatch.setenv("GEMINI_API_KEY", "k1")
     monkeypatch.setenv("GEMINI_API_KEY_2", "k2")
+    monkeypatch.setenv("GEMINI_API_KEY_5", "k5")
+    monkeypatch.setenv("GEMINI_API_KEY_7", "k2")   # 중복 값은 한 번만
     calls = {"answer": BOTH, "keys": [], "prompts": []}
 
     def generate(keys, model, prompt):
@@ -32,7 +38,7 @@ def test_one_call_per_song_and_lyrics_cut_from_source(fake):
     found = sources.candidates("첫째 곡")
     assert [c.url for c in found] == ["https://a.example/1", "https://b.example/1"]
     assert found[0].lyrics == "아침 햇살이\n창을 두드리면\n나는 일어나\n길을 나서네"
-    assert fake["keys"] == [["k2"]]
+    assert fake["keys"] == [["k2", "k5"]]  # 1번 키는 쓰지 않고 2~20번을 순서대로
     assert "=== 문서 1 ===" in fake["prompts"][0] and "=== 문서 2 ===" not in fake["prompts"][0]
 
 
