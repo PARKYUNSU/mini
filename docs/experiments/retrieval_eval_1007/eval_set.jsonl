@@ -1,0 +1,189 @@
+{"id": "A001", "stratum": "A", "query": "verifying curvature tensor nonnegativity for optimal transport map continuity with polynomial optimization", "relevant_papers": ["2412.13372"], "title_jaccard": 0.118}
+{"id": "A002", "stratum": "A", "query": "longer training window and extra features hurt mortgage default forecasting", "relevant_papers": ["2501.00034"], "title_jaccard": 0.118}
+{"id": "A003", "stratum": "A", "query": "language agents that optimize their own prompts and pipelines like backpropagation over natural language", "relevant_papers": ["2406.18532"], "title_jaccard": 0.071}
+{"id": "A004", "stratum": "A", "query": "resolving github issues that contain screenshots and images with LLMs", "relevant_papers": ["2412.17315"], "title_jaccard": 0.1}
+{"id": "A005", "stratum": "A", "query": "entropy based uncertainty fails in RAG because of induction heads copying context", "relevant_papers": ["2603.21607"], "title_jaccard": 0.286}
+{"id": "A006", "stratum": "A", "query": "routing drift causes forgetting in mixture of experts continual instruction tuning of multimodal models", "relevant_papers": ["2603.27481"], "title_jaccard": 0.111}
+{"id": "A007", "stratum": "A", "query": "clipping rotary position embedding frequencies to extend context length", "relevant_papers": ["2602.05258"], "title_jaccard": 0.067}
+{"id": "A008", "stratum": "A", "query": "end to end workflow scheduling of LLM applications with fine grained task primitives", "relevant_papers": ["2407.00326"], "title_jaccard": 0.182}
+{"id": "A009", "stratum": "A", "query": "defending LLM agents against indirect prompt injection by checking alignment with user goals", "relevant_papers": ["2412.16682"], "title_jaccard": 0.429}
+{"id": "A010", "stratum": "A", "query": "taxonomy and benchmark of hallucinations in LLM generated code", "relevant_papers": ["2408.08333"], "title_jaccard": 0.5}
+{"id": "A011", "stratum": "A", "query": "agentic RAG over a knowledge graph for exploring an agricultural research institute's scientific data", "relevant_papers": ["2507.16507"], "title_jaccard": 0.158}
+{"id": "A012", "stratum": "A", "query": "benchmark for reasoning across an entire document collection with millions of tokens where evidence is dispersed", "relevant_papers": ["2601.14952"], "title_jaccard": 0.118}
+{"id": "A013", "stratum": "A", "query": "data selection with Jensen-Shannon divergence for dental caries image training", "relevant_papers": ["2407.00362"], "title_jaccard": 0.294}
+{"id": "A014", "stratum": "A", "query": "sample complexity of cooperating with a population of rational partner agents", "relevant_papers": ["2407.00419"], "title_jaccard": 0.273}
+{"id": "A015", "stratum": "A", "query": "evaluating vision language models on open vocabulary detection and segmentation across many scenarios", "relevant_papers": ["2504.09480"], "title_jaccard": 0.25}
+{"id": "A016", "stratum": "A", "query": "graph neural networks to learn parameters of multilevel domain decomposition PDE solvers", "relevant_papers": ["2301.11378"], "title_jaccard": 0.429}
+{"id": "A017", "stratum": "A", "query": "reverse KL distillation makes the student overconfident, adding diversity term", "relevant_papers": ["2604.00223"], "title_jaccard": 0.25}
+{"id": "A018", "stratum": "A", "query": "beginner guide to computational drug discovery methods from target identification onward", "relevant_papers": ["2412.11137"], "title_jaccard": 0.231}
+{"id": "A019", "stratum": "A", "query": "Chinese K12 multimodal math benchmark for evaluating foundation models", "relevant_papers": ["2407.12023"], "title_jaccard": 0.333}
+{"id": "A020", "stratum": "A", "query": "Socratic interdisciplinary STEM tutoring agent trained with evolutionary reinforcement learning", "relevant_papers": ["2512.11930"], "title_jaccard": 0.455}
+{"id": "A021", "stratum": "A", "query": "automatic selection of main diagnosis code from hospital discharge records", "relevant_papers": ["2412.09651"], "title_jaccard": 0.312}
+{"id": "A022", "stratum": "A", "query": "encoding state action trajectories visually as prompts for vision language action robot policies", "relevant_papers": ["2412.10345"], "title_jaccard": 0.053}
+{"id": "A023", "stratum": "A", "query": "self supervised speech encoder covering four thousand languages", "relevant_papers": ["2407.00837"], "title_jaccard": 0.154}
+{"id": "A024", "stratum": "A", "query": "adaptive OFDM frame configuration with reinforcement learning for vehicle sensing and communication", "relevant_papers": ["2412.18500"], "title_jaccard": 0.25}
+{"id": "A025", "stratum": "A", "query": "evidential deep learning simplified losses with Dirichlet uncertainty in a single pass", "relevant_papers": ["2605.22746"], "title_jaccard": 0.4}
+{"id": "A026", "stratum": "A", "query": "LLM based automatic evaluator for medical multimodal model answers instead of ROUGE and BLEU", "relevant_papers": ["2412.11453"], "title_jaccard": 0.4}
+{"id": "A027", "stratum": "A", "query": "synthesizing diverse retrieval augmented instruction data from any corpus", "relevant_papers": ["2501.00353"], "title_jaccard": 0.25}
+{"id": "A028", "stratum": "A", "query": "LLM agents distinguishing trusted execution environments from insecure ones during negotiation", "relevant_papers": ["2603.19011"], "title_jaccard": 0.071}
+{"id": "A029", "stratum": "A", "query": "graph RAG helping online course learners understand knowledge concepts", "relevant_papers": ["2505.10074"], "title_jaccard": 0.25}
+{"id": "A030", "stratum": "A", "query": "residual policy refining imitation learned robot policies through online interaction", "relevant_papers": ["2412.13630"], "title_jaccard": 0.154}
+{"id": "A031", "stratum": "A", "query": "instance conditional learnable prompt vectors for CLIP to generalize to unseen classes", "relevant_papers": ["2203.05557"], "title_jaccard": 0.182}
+{"id": "A032", "stratum": "A", "query": "multi knowledge base RAG with traceable evidence for traditional Tibetan medicine questions", "relevant_papers": ["2602.05195"], "title_jaccard": 0.267}
+{"id": "A033", "stratum": "A", "query": "fine grained LLM based evaluation of summaries beyond ROUGE", "relevant_papers": ["2412.19906"], "title_jaccard": 0.2}
+{"id": "A034", "stratum": "A", "query": "open source LLMs for German law student appraisal style analysis", "relevant_papers": ["2412.15902"], "title_jaccard": 0.143}
+{"id": "A035", "stratum": "A", "query": "two pass generation with hierarchical filtering winning a NeurIPS RAG competition", "relevant_papers": ["2512.22442"], "title_jaccard": 0.462}
+{"id": "A036", "stratum": "A", "query": "sparse neurons in vision language models that already encode anomaly knowledge for zero shot anomaly detection", "relevant_papers": ["2604.07802"], "title_jaccard": 0.357}
+{"id": "A037", "stratum": "A", "query": "finding frequent item sequences with importance weights in probabilistic data that keeps growing", "relevant_papers": ["2404.00746"], "title_jaccard": 0.0}
+{"id": "A038", "stratum": "A", "query": "Bayesian inference over language model priors and cognitive hierarchy for cooperative language games", "relevant_papers": ["2412.12409"], "title_jaccard": 0.5}
+{"id": "A039", "stratum": "A", "query": "estimating confidence of LLM answers that mix true and false claims to detect hallucination", "relevant_papers": ["2601.00348"], "title_jaccard": 0.0}
+{"id": "A040", "stratum": "A", "query": "RAG for clinician questions about novel psychoactive substances using Reddit posts", "relevant_papers": ["2405.19519"], "title_jaccard": 0.042}
+{"id": "A041", "stratum": "A", "query": "measuring LLM factual accuracy with test questions drawn from a knowledge graph of ten million facts", "relevant_papers": ["2404.00942"], "title_jaccard": 0.067}
+{"id": "A042", "stratum": "A", "query": "poisoning a RAG retrieval database with deceptive documents to change model behavior", "relevant_papers": ["2406.19417"], "title_jaccard": 0.062}
+{"id": "A043", "stratum": "A", "query": "transfer learning to make deep reinforcement learning practical for industrial process control", "relevant_papers": ["2404.00247"], "title_jaccard": 0.417}
+{"id": "A044", "stratum": "A", "query": "prompting LLMs with knowledge graph context selected by reinforcement learning to reduce hallucination", "relevant_papers": ["2312.06185"], "title_jaccard": 0.3}
+{"id": "A045", "stratum": "A", "query": "energy efficiency tradeoffs when serving LLM inference in data centers", "relevant_papers": ["2403.20306"], "title_jaccard": 0.25}
+{"id": "A046", "stratum": "A", "query": "fine tuned Mistral with RAG for hierarchical summarization of crypto news", "relevant_papers": ["2509.03527"], "title_jaccard": 0.417}
+{"id": "A047", "stratum": "A", "query": "simulation benchmark of a thousand everyday household activities for embodied agents", "relevant_papers": ["2403.09227"], "title_jaccard": 0.385}
+{"id": "A048", "stratum": "A", "query": "learning particle physics simulators from multi view RGB video without depth", "relevant_papers": ["2503.24009"], "title_jaccard": 0.25}
+{"id": "A049", "stratum": "A", "query": "vision language model that recognizes character identities across scenes for movie understanding", "relevant_papers": ["2407.07577"], "title_jaccard": 0.25}
+{"id": "A050", "stratum": "A", "query": "token level advantage weighting by visual dependency in RL with verifiable rewards for vision language models", "relevant_papers": ["2604.01840"], "title_jaccard": 0.056}
+{"id": "A051", "stratum": "A", "query": "differentiable relaxation of cardinality constraint for portfolio index tracking", "relevant_papers": ["2412.17175"], "title_jaccard": 0.4}
+{"id": "A052", "stratum": "A", "query": "latent diffusion generating realistic LiDAR point cloud scenes", "relevant_papers": ["2404.00815"], "title_jaccard": 0.273}
+{"id": "A053", "stratum": "A", "query": "using backdoor triggers to inject bias into text classifiers", "relevant_papers": ["2412.18975"], "title_jaccard": 0.4}
+{"id": "A054", "stratum": "A", "query": "5W3H structured intent prompts robustness across Claude GPT-4o and Gemini", "relevant_papers": ["2603.29953"], "title_jaccard": 0.158}
+{"id": "A055", "stratum": "A", "query": "state space model with local feature enhancement for point cloud classification", "relevant_papers": ["2404.14966"], "title_jaccard": 0.417}
+{"id": "A056", "stratum": "A", "query": "deciding when to retrieve using the LLM's own token embeddings without pretraining corpus access", "relevant_papers": ["2404.03514"], "title_jaccard": 0.0}
+{"id": "A057", "stratum": "A", "query": "invisible watermarks to detect when LLMs imitate a writer's creative works", "relevant_papers": ["2504.00035"], "title_jaccard": 0.214}
+{"id": "A058", "stratum": "A", "query": "progressively dropping layers to specialize a small fast domain LLM", "relevant_papers": ["2412.11242"], "title_jaccard": 0.182}
+{"id": "A059", "stratum": "A", "query": "theory of ensembling multiple RAG systems together", "relevant_papers": ["2508.13828"], "title_jaccard": 0.071}
+{"id": "A060", "stratum": "A", "query": "security benchmark of attacks on retrieval augmented generation like noise and conflict injection", "relevant_papers": ["2501.18636"], "title_jaccard": 0.333}
+{"id": "A061", "stratum": "A", "query": "dynamically choosing context compression rate by query complexity in RAG", "relevant_papers": ["2507.22931"], "title_jaccard": 0.273}
+{"id": "A062", "stratum": "A", "query": "graph RAG that builds hierarchical knowledge layers to connect local and global information", "relevant_papers": ["2503.10150"], "title_jaccard": 0.154}
+{"id": "A063", "stratum": "A", "query": "small model trained to be faithful to context including unanswerable and counterfactual contexts in RAG", "relevant_papers": ["2409.09916"], "title_jaccard": 0.167}
+{"id": "A064", "stratum": "A", "query": "finding semantic edit directions in diffusion latent space via Jacobian without training", "relevant_papers": ["2412.12912"], "title_jaccard": 0.067}
+{"id": "A065", "stratum": "A", "query": "building knowledge graphs from text aligned to Wikidata types and relations with LLMs", "relevant_papers": ["2512.00590"], "title_jaccard": 0.333}
+{"id": "A066", "stratum": "A", "query": "certifying trustworthiness of embodied AI with maturity levels and uncertainty measurement", "relevant_papers": ["2601.03470"], "title_jaccard": 0.333}
+{"id": "A067", "stratum": "A", "query": "code generation that explores many candidate solutions then refines the best one to cut latency", "relevant_papers": ["2502.17442"], "title_jaccard": 0.1}
+{"id": "A068", "stratum": "A", "query": "python library for aggregate field based programming of distributed systems", "relevant_papers": ["2603.29999"], "title_jaccard": 0.091}
+{"id": "A069", "stratum": "A", "query": "more retrieved passages hurt long context LLMs in RAG because of hard negatives", "relevant_papers": ["2410.05983"], "title_jaccard": 0.214}
+{"id": "A070", "stratum": "A", "query": "LLM generated rationales as augmentation for detecting social meaning in dialogue", "relevant_papers": ["2406.19545"], "title_jaccard": 0.333}
+{"id": "A071", "stratum": "A", "query": "theoretical inevitability and taxonomy of LLM hallucination types", "relevant_papers": ["2508.01781"], "title_jaccard": 0.143}
+{"id": "A072", "stratum": "A", "query": "ontology based machine readable materials science simulation workflows for reproducibility", "relevant_papers": ["2601.12582"], "title_jaccard": 0.188}
+{"id": "A073", "stratum": "A", "query": "softmax policy gradient for selecting the lowest variance arm in bandits", "relevant_papers": ["2604.00241"], "title_jaccard": 0.385}
+{"id": "A074", "stratum": "A", "query": "black box watermarking a RAG knowledge base to detect intellectual property theft", "relevant_papers": ["2501.05249"], "title_jaccard": 0.267}
+{"id": "A075", "stratum": "A", "query": "controllable reactive driving agents for autonomous vehicle simulation using offline RL", "relevant_papers": ["2403.19918"], "title_jaccard": 0.417}
+{"id": "A076", "stratum": "A", "query": "LLMs taking patient medical history in infertility clinics", "relevant_papers": ["2504.00061"], "title_jaccard": 0.273}
+{"id": "A077", "stratum": "A", "query": "free energy based subgoal discovery with state aggregation in hierarchical reinforcement learning", "relevant_papers": ["2412.16687"], "title_jaccard": 0.455}
+{"id": "A078", "stratum": "A", "query": "segmenting colon muscle layers in histopathology for Hirschsprung's disease with transformers", "relevant_papers": ["2412.20571"], "title_jaccard": 0.385}
+{"id": "A079", "stratum": "A", "query": "is it safe to drop features with small average absolute SHAP values", "relevant_papers": ["2503.23111"], "title_jaccard": 0.25}
+{"id": "A080", "stratum": "A", "query": "measuring LLM bias against Bengali regional dialects in question answering", "relevant_papers": ["2603.21359"], "title_jaccard": 0.105}
+{"id": "A081", "stratum": "A", "query": "challenges of deploying retrieval augmented generation in enterprises such as security and scalability", "relevant_papers": ["2406.04369"], "title_jaccard": 0.077}
+{"id": "A082", "stratum": "A", "query": "webcam facial emotion recognition that plays matching music", "relevant_papers": ["2503.20739"], "title_jaccard": 0.2}
+{"id": "A083", "stratum": "A", "query": "training LLMs to write review comments that actually trigger code fixes", "relevant_papers": ["2412.20340"], "title_jaccard": 0.273}
+{"id": "A084", "stratum": "A", "query": "explaining uncertainty of probabilistic ICP point cloud registration with kernel SHAP", "relevant_papers": ["2412.20612"], "title_jaccard": 0.455}
+{"id": "A085", "stratum": "A", "query": "video model that localizes and captions instructional steps given a text query using sound and frames", "relevant_papers": ["2412.13543"], "title_jaccard": 0.05}
+{"id": "A086", "stratum": "A", "query": "legal ownership and attribution of content generated by large language models", "relevant_papers": ["2504.01032"], "title_jaccard": 0.091}
+{"id": "A087", "stratum": "A", "query": "LLM assisted semantic overlay linking web documents to support research tasks", "relevant_papers": ["2504.08763"], "title_jaccard": 0.25}
+{"id": "A088", "stratum": "A", "query": "fine grained answer span attribution in RAG using attention plus dependency parsing", "relevant_papers": ["2412.11404"], "title_jaccard": 0.545}
+{"id": "A089", "stratum": "A", "query": "QLoRA fine tuning a 1.5B model for Arabic on a 4GB GPU", "relevant_papers": ["2412.17548"], "title_jaccard": 0.071}
+{"id": "A090", "stratum": "A", "query": "do LLMs reduce energy consumption of code compared with human optimizations", "relevant_papers": ["2503.20126"], "title_jaccard": 0.231}
+{"id": "A091", "stratum": "A", "query": "roadmap for large language models in transportation systems", "relevant_papers": ["2503.21411"], "title_jaccard": 0.375}
+{"id": "A092", "stratum": "A", "query": "resolving conflicts between parametric and context knowledge by reweighting context sensitive neurons", "relevant_papers": ["2406.18406"], "title_jaccard": 0.357}
+{"id": "A093", "stratum": "A", "query": "dynamic retrieval based compression of the KV cache that handles attention drift for long context", "relevant_papers": ["2601.13684"], "title_jaccard": 0.462}
+{"id": "A094", "stratum": "A", "query": "GPT-4 generating metamorphic relations for software testing", "relevant_papers": ["2503.22141"], "title_jaccard": 0.2}
+{"id": "A095", "stratum": "A", "query": "utility based perturbed gradient descent against loss of plasticity and forgetting", "relevant_papers": ["2404.00781"], "title_jaccard": 0.25}
+{"id": "A096", "stratum": "A", "query": "lightweight LSTM with shared weights to reduce computation", "relevant_papers": ["2201.11624"], "title_jaccard": 0.0}
+{"id": "A097", "stratum": "A", "query": "autonomous LLM agent that runs deep learning experiments around the clock", "relevant_papers": ["2604.05854"], "title_jaccard": 0.286}
+{"id": "A098", "stratum": "A", "query": "early layers identify relevant tokens to compress long context input a thousand fold", "relevant_papers": ["2409.17422"], "title_jaccard": 0.294}
+{"id": "A099", "stratum": "A", "query": "synthesizing GUI agent training trajectories by exploring the interface first and inferring tasks afterward", "relevant_papers": ["2412.19723"], "title_jaccard": 0.111}
+{"id": "A100", "stratum": "A", "query": "LLM assisted chip design reading very long hardware spec documents with multi hop reasoning", "relevant_papers": ["2512.05371"], "title_jaccard": 0.167}
+{"id": "A101", "stratum": "A", "query": "learning what normal multivariate sensor sequences look like across channels and time to flag outliers", "relevant_papers": ["2406.19770"], "title_jaccard": 0.095}
+{"id": "A102", "stratum": "A", "query": "gradient based joint attack poisoning both retriever and generator in RAG", "relevant_papers": ["2506.06151"], "title_jaccard": 0.2}
+{"id": "A103", "stratum": "A", "query": "neuro symbolic online failure detection and recovery for robot tasks", "relevant_papers": ["2404.00756"], "title_jaccard": 0.5}
+{"id": "A104", "stratum": "A", "query": "knowledge graph RAG feedback and exercise recommendation in a programming learning system", "relevant_papers": ["2603.24940"], "title_jaccard": 0.429}
+{"id": "A105", "stratum": "A", "query": "training bomberman style team agents with staged difficulty and self play against a pool", "relevant_papers": ["2407.00662"], "title_jaccard": 0.167}
+{"id": "A106", "stratum": "A", "query": "retrieving similar rare traffic scenarios to help VLMs reason about dangerous driving situations", "relevant_papers": ["2412.11050"], "title_jaccard": 0.05}
+{"id": "A107", "stratum": "A", "query": "LSTM estimating ocean wave direction for unmanned surface vessels", "relevant_papers": ["2412.16205"], "title_jaccard": 0.333}
+{"id": "A108", "stratum": "A", "query": "multi hop RAG that revisits and corrects earlier evidence with backward reasoning", "relevant_papers": ["2501.05475"], "title_jaccard": 0.077}
+{"id": "A109", "stratum": "A", "query": "selective state space models for point cloud video action recognition", "relevant_papers": ["2508.14604"], "title_jaccard": 0.357}
+{"id": "A110", "stratum": "A", "query": "data free model stealing with hard labels and few queries", "relevant_papers": ["2412.15276"], "title_jaccard": 0.286}
+{"id": "A111", "stratum": "A", "query": "citation specific pretraining of BART for local citation recommendation", "relevant_papers": ["2412.17534"], "title_jaccard": 0.3}
+{"id": "A112", "stratum": "A", "query": "RAG retrieval that considers utility and compactness beyond similarity", "relevant_papers": ["2405.19893"], "title_jaccard": 0.118}
+{"id": "A113", "stratum": "A", "query": "RAG chatbot for automotive standards compliance and design copilot", "relevant_papers": ["2411.09590"], "title_jaccard": 0.182}
+{"id": "A114", "stratum": "A", "query": "explainable RAG benchmark with labeled context relevance and utilization", "relevant_papers": ["2407.11005"], "title_jaccard": 0.167}
+{"id": "A115", "stratum": "A", "query": "distilling GNNs into interpretable logic classifiers with counting quantifiers", "relevant_papers": ["2406.07126"], "title_jaccard": 0.0}
+{"id": "A116", "stratum": "A", "query": "domain specific RAG combining vector store knowledge graph and tensor factorization", "relevant_papers": ["2410.02721"], "title_jaccard": 0.4}
+{"id": "A117", "stratum": "A", "query": "determinantal point processes to choose diverse relevant chunks for RAG context", "relevant_papers": ["2604.03240"], "title_jaccard": 0.071}
+{"id": "A118", "stratum": "A", "query": "tokenization and the distributional hypothesis as the basis of meaning in LLMs", "relevant_papers": ["2412.10924"], "title_jaccard": 0.333}
+{"id": "A119", "stratum": "A", "query": "adapting CLIP with mixture of adapters for monocular depth estimation", "relevant_papers": ["2604.01118"], "title_jaccard": 0.364}
+{"id": "A120", "stratum": "A", "query": "checking electricity network regulations compliance with retrieval and LLM reasoning", "relevant_papers": ["2508.12682"], "title_jaccard": 0.143}
+{"id": "B001", "stratum": "B", "query": "retrieval augmented generation survey", "relevant_papers": ["2312.10997"], "title_jaccard": 1.0}
+{"id": "B002", "stratum": "B", "query": "RAG retrieval accuracy improvement", "relevant_papers": ["2407.08223", "2408.02545"], "title_jaccard": 0.167}
+{"id": "B003", "stratum": "B", "query": "hallucination mitigation in RAG systems", "relevant_papers": ["2409.10102"], "title_jaccard": 0.111}
+{"id": "B004", "stratum": "B", "query": "RAG evaluation benchmark", "relevant_papers": ["2407.11005", "2405.07437"], "title_jaccard": 0.2}
+{"id": "B005", "stratum": "B", "query": "retrieval augmented generation for question answering", "relevant_papers": ["2604.02259"], "title_jaccard": 0.364}
+{"id": "B006", "stratum": "B", "query": "discourse aware retrieval augmented generation", "relevant_papers": ["2601.04377"], "title_jaccard": 0.714}
+{"id": "B007", "stratum": "B", "query": "RAG playground evaluation framework", "relevant_papers": ["2412.12322"], "title_jaccard": 0.4}
+{"id": "B008", "stratum": "B", "query": "enterprise RAG optimization content design", "relevant_papers": ["2410.12812"], "title_jaccard": 0.364}
+{"id": "B009", "stratum": "B", "query": "medical RAG benchmarking", "relevant_papers": ["2402.13178"], "title_jaccard": 0.143}
+{"id": "B010", "stratum": "B", "query": "knowledge oriented retrieval augmented generation", "relevant_papers": ["2503.10677"], "title_jaccard": 0.833}
+{"id": "B011", "stratum": "B", "query": "transformer self attention mechanism neural network", "relevant_papers": ["1706.03762"], "title_jaccard": 0.111}
+{"id": "B012", "stratum": "B", "query": "anomalous attention distribution in transformers", "relevant_papers": ["2407.01601"], "title_jaccard": 0.667}
+{"id": "B013", "stratum": "B", "query": "vision transformer image classification", "relevant_papers": ["2412.16188"], "title_jaccard": 0.0}
+{"id": "B014", "stratum": "B", "query": "large language model autonomous agents survey", "relevant_papers": ["2407.01603"], "title_jaccard": 0.4}
+{"id": "B015", "stratum": "B", "query": "foundation agents brain inspired AI", "relevant_papers": ["2504.01990"], "title_jaccard": 0.364}
+{"id": "B016", "stratum": "B", "query": "fairness bias in large language models", "relevant_papers": ["2404.01349"], "title_jaccard": 0.25}
+{"id": "B017", "stratum": "B", "query": "CRAG corrective retrieval augmented generation", "relevant_papers": ["2407.08223", "2407.11005"], "title_jaccard": 0.214}
+{"id": "B018", "stratum": "B", "query": "chunking optimization for retrieval systems", "relevant_papers": ["2601.15457"], "title_jaccard": 0.154}
+{"id": "B019", "stratum": "B", "query": "reranking cross encoder in retrieval pipeline", "relevant_papers": ["2601.15457"], "title_jaccard": 0.067}
+{"id": "B020", "stratum": "B", "query": "speculative decoding draft verification parallel language model inference", "relevant_papers": ["2407.08223"], "title_jaccard": 0.077}
+{"id": "B021", "stratum": "B", "query": "ontology and knowledge graph grounded retrieval question answering", "relevant_papers": ["2412.15235"], "title_jaccard": 0.3}
+{"id": "B022", "stratum": "B", "query": "query decomposition hybrid retrieval BM25", "relevant_papers": ["2601.15457"], "title_jaccard": 0.067}
+{"id": "B023", "stratum": "B", "query": "ontology grounded RAG knowledge graph", "relevant_papers": ["2412.15235"], "title_jaccard": 0.375}
+{"id": "B024", "stratum": "B", "query": "accelerating retrieval augmented generation inference", "relevant_papers": ["2412.15246"], "title_jaccard": 0.8}
+{"id": "B025", "stratum": "B", "query": "seven failure points RAG engineering", "relevant_papers": ["2401.05856"], "title_jaccard": 0.4}
+{"id": "C1_01", "stratum": "C1", "query": "survey of retrieval augmented generation for large language models", "relevant_papers": ["2312.10997", "2410.12837", "2508.06401", "2409.14924", "2601.05264"], "title_jaccard": 0.125}
+{"id": "C1_02", "stratum": "C1", "query": "survey of graph based retrieval augmented generation", "relevant_papers": ["2501.13958", "2408.08921"], "title_jaccard": 0.833}
+{"id": "C1_03", "stratum": "C1", "query": "survey of multimodal retrieval augmented generation", "relevant_papers": ["2504.08748", "2502.08826"], "title_jaccard": 0.556}
+{"id": "C1_04", "stratum": "C1", "query": "survey of agentic RAG with reasoning", "relevant_papers": ["2501.09136", "2506.10408", "2507.09477"], "title_jaccard": 0.308}
+{"id": "C1_05", "stratum": "C1", "query": "survey on how to evaluate RAG systems", "relevant_papers": ["2405.07437"], "title_jaccard": 0.111}
+{"id": "C1_06", "stratum": "C1", "query": "survey on trustworthiness privacy and security of RAG", "relevant_papers": ["2502.06872", "2409.10102", "2603.21654"], "title_jaccard": 0.118}
+{"id": "C1_07", "stratum": "C1", "query": "survey of hallucination in large language models", "relevant_papers": ["2309.01219", "2510.24476", "2508.01781", "2402.02420"], "title_jaccard": 0.125}
+{"id": "C1_08", "stratum": "C1", "query": "survey of LLM based autonomous agents", "relevant_papers": ["2503.23037", "2412.13437"], "title_jaccard": 0.111}
+{"id": "C1_09", "stratum": "C1", "query": "survey of GUI and web agents that operate computers", "relevant_papers": ["2504.13865", "2412.13501", "2503.23350"], "title_jaccard": 0.333}
+{"id": "C1_10", "stratum": "C1", "query": "survey of state space models as alternatives to transformers", "relevant_papers": ["2404.16112", "2404.09516", "2503.11224"], "title_jaccard": 0.182}
+{"id": "C1_11", "stratum": "C1", "query": "survey of large vision language models", "relevant_papers": ["2404.07214", "2501.02189", "2404.01322"], "title_jaccard": 0.118}
+{"id": "C1_12", "stratum": "C1", "query": "survey of embodied AI and robotics with foundation models", "relevant_papers": ["2407.06886", "2402.02385", "2505.20503"], "title_jaccard": 0.25}
+{"id": "C1_13", "stratum": "C1", "query": "survey of KV cache management for LLM inference acceleration", "relevant_papers": ["2412.19442"], "title_jaccard": 0.8}
+{"id": "C1_14", "stratum": "C1", "query": "review of low rank adaptation methods for foundation models", "relevant_papers": ["2501.00365"], "title_jaccard": 0.714}
+{"id": "C1_15", "stratum": "C1", "query": "survey on test time compute scaling in LLMs", "relevant_papers": ["2503.24235"], "title_jaccard": 0.444}
+{"id": "C1_16", "stratum": "C1", "query": "survey of large language model safety", "relevant_papers": ["2412.17686"], "title_jaccard": 0.667}
+{"id": "C1_17", "stratum": "C1", "query": "survey on text embeddings in the era of large language models", "relevant_papers": ["2412.09165"], "title_jaccard": 0.25}
+{"id": "C1_18", "stratum": "C1", "query": "survey of inference optimization for mixture of experts models", "relevant_papers": ["2412.14219"], "title_jaccard": 0.833}
+{"id": "C1_19", "stratum": "C1", "query": "survey of small language models", "relevant_papers": ["2409.15790"], "title_jaccard": 0.5}
+{"id": "C1_20", "stratum": "C1", "query": "survey of LLMs and generative models for recommender systems", "relevant_papers": ["2412.13432", "2404.00579"], "title_jaccard": 0.444}
+{"id": "C1_21", "stratum": "C1", "query": "survey of diffusion based video editing", "relevant_papers": ["2407.07111"], "title_jaccard": 1.0}
+{"id": "C1_22", "stratum": "C1", "query": "review of retrieval augmented generation in medicine and healthcare", "relevant_papers": ["2511.05901", "2511.11347"], "title_jaccard": 0.286}
+{"id": "C1_23", "stratum": "C1", "query": "survey of data poisoning attacks in deep learning", "relevant_papers": ["2503.22759"], "title_jaccard": 0.833}
+{"id": "C1_24", "stratum": "C1", "query": "review of LLM based text to SQL", "relevant_papers": ["2410.01066"], "title_jaccard": 0.6}
+{"id": "C2_01", "stratum": "C2", "query": "original architecture replacing recurrence entirely with self attention for machine translation", "relevant_papers": ["1706.03762"], "title_jaccard": 0.083}
+{"id": "C2_02", "stratum": "C2", "query": "bidirectional masked language model pretraining for language understanding", "relevant_papers": ["1810.04805"], "title_jaccard": 0.222}
+{"id": "C2_03", "stratum": "C2", "query": "175 billion parameter model showing few shot in context learning", "relevant_papers": ["2005.14165"], "title_jaccard": 0.222}
+{"id": "C2_04", "stratum": "C2", "query": "training language models to follow instructions with human feedback reinforcement learning", "relevant_papers": ["2203.02155"], "title_jaccard": 0.714}
+{"id": "C2_05", "stratum": "C2", "query": "preference optimization without a separate reward model", "relevant_papers": ["2305.18290"], "title_jaccard": 0.375}
+{"id": "C2_06", "stratum": "C2", "query": "low rank update matrices for parameter efficient fine tuning of large models", "relevant_papers": ["2106.09685"], "title_jaccard": 0.2}
+{"id": "C2_07", "stratum": "C2", "query": "finetuning a 4-bit quantized model with low rank adapters on a single GPU", "relevant_papers": ["2305.14314"], "title_jaccard": 0.2}
+{"id": "C2_08", "stratum": "C2", "query": "prompting with intermediate reasoning steps improves arithmetic reasoning", "relevant_papers": ["2201.11903"], "title_jaccard": 0.222}
+{"id": "C2_09", "stratum": "C2", "query": "interleaving reasoning traces and tool actions in language models", "relevant_papers": ["2210.03629"], "title_jaccard": 0.125}
+{"id": "C2_10", "stratum": "C2", "query": "deliberate search over a tree of intermediate reasoning steps with self evaluation", "relevant_papers": ["2305.10601"], "title_jaccard": 0.167}
+{"id": "C2_11", "stratum": "C2", "query": "combining a parametric seq2seq generator with dense retrieval over wikipedia for knowledge intensive tasks", "relevant_papers": ["2005.11401"], "title_jaccard": 0.286}
+{"id": "C2_12", "stratum": "C2", "query": "power law relationship between language model loss and parameters data and compute", "relevant_papers": ["2001.08361"], "title_jaccard": 0.0}
+{"id": "C2_13", "stratum": "C2", "query": "compute optimal training should scale training tokens equally with model size", "relevant_papers": ["2203.15556"], "title_jaccard": 0.375}
+{"id": "C2_14", "stratum": "C2", "query": "applying a pure transformer to sequences of image patches for classification", "relevant_papers": ["2010.11929"], "title_jaccard": 0.077}
+{"id": "C2_15", "stratum": "C2", "query": "image generation by learning to reverse a gradual noising process", "relevant_papers": ["2006.11239"], "title_jaccard": 0.0}
+{"id": "C2_16", "stratum": "C2", "query": "diffusion in the latent space of a pretrained autoencoder for high resolution image synthesis", "relevant_papers": ["2112.10752"], "title_jaccard": 0.667}
+{"id": "C2_17", "stratum": "C2", "query": "connecting a vision encoder to an LLM and instruction tuning with GPT-4 generated multimodal data", "relevant_papers": ["2304.08485"], "title_jaccard": 0.2}
+{"id": "C2_18", "stratum": "C2", "query": "LLM controller that plans tasks and dispatches them to models hosted on hugging face", "relevant_papers": ["2303.17580"], "title_jaccard": 0.25}
+{"id": "C2_19", "stratum": "C2", "query": "sparse mixture of experts language model where each token is routed to two of eight experts", "relevant_papers": ["2401.04088"], "title_jaccard": 0.1}
+{"id": "C2_20", "stratum": "C2", "query": "open efficient foundation language models from 7B to 65B trained only on public data", "relevant_papers": ["2302.13971"], "title_jaccard": 0.333}
