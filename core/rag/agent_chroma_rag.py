@@ -284,8 +284,14 @@ def _merge_bm25_union_chunks(
     top_m: int,
     chunks_per_paper: int,
     min_doc_chars: int = 80,
+    query_text: str = "",
 ) -> tuple[list[str], list[dict[str, str]], list[float | None] | None, int]:
     """벡터 후보에 없는 BM25 상위 논문의 청크를 Chroma에서 가져와 합집합.
+
+    ``query_text`` 가 있으면 논문별로 **같은 질의의 필터 벡터 검색**을 해서 그 논문에서 질의와
+    가장 가까운 청크와 그 실제 거리를 가져온다. 없으면 예전처럼 앞쪽 청크를 거리 없이(None) 가져온다.
+    거리가 None 이면 RRF 에서 벡터 순위가 맨 뒤가 되어, BM25 1위 논문도 구조적으로 상위에 못
+    오른다 (retrieval_eval_1007/05_conclusion.md §8.1).
 
     Returns:
         (docs_clean, metas_clean, dists_clean, bm25_only_paper_count)
@@ -305,15 +311,26 @@ def _merge_bm25_union_chunks(
             continue
         existing.add(pid)
         try:
-            bm25_extra = collection.get(
-                where={"paper_id": {"$in": _paper_id_version_candidates(pid)}},
-                include=["documents", "metadatas"],
-                limit=chunks_per_paper,
-            )
-            b_docs = bm25_extra.get("documents") or []
-            b_metas = bm25_extra.get("metadatas") or []
+            where = {"paper_id": {"$in": _paper_id_version_candidates(pid)}}
+            if query_text:
+                res = collection.query(
+                    query_texts=[query_text],
+                    where=where,
+                    n_results=chunks_per_paper,
+                    include=["documents", "metadatas", "distances"],
+                )
+                b_docs, b_metas, b_dists = _parse_chroma_query_result_row(res)
+            else:
+                bm25_extra = collection.get(
+                    where=where,
+                    include=["documents", "metadatas"],
+                    limit=chunks_per_paper,
+                )
+                b_docs = bm25_extra.get("documents") or []
+                b_metas = bm25_extra.get("metadatas") or []
+                b_dists = [None] * len(b_docs)
             added = 0
-            for bd, bm in zip(b_docs, b_metas):
+            for bd, bm, bdist in zip(b_docs, b_metas, b_dists):
                 if bd and len(bd) >= min_doc_chars:
                     docs_clean.append(bd if isinstance(bd, str) else str(bd))
                     metas_clean.append(
@@ -322,7 +339,7 @@ def _merge_bm25_union_chunks(
                         else {}
                     )
                     if dists_clean is not None:
-                        dists_clean.append(None)
+                        dists_clean.append(bdist)
                     added += 1
             if added > 0:
                 injected_papers += 1
@@ -479,6 +496,7 @@ def _retrieve_and_rank_one_query_intent(
             dists_clean,
             top_m=BM25_UNION_TOP_M,
             chunks_per_paper=BM25_UNION_CHUNKS_PER_PAPER,
+            query_text=q,
         )
         print(
             f"[ChromaRAG TRACE] rank-then-merge sub [{lab}]: chunks={len(docs_clean)} "
@@ -574,6 +592,7 @@ def _single_query_candidate_pool(
             dists_clean,
             top_m=BM25_UNION_TOP_M,
             chunks_per_paper=BM25_UNION_CHUNKS_PER_PAPER,
+            query_text=search_query,
         )
         print(
             f"[ChromaRAG TRACE] BM25 single-query: {n_bm25_only} BM25-only papers injected",

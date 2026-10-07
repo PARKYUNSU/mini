@@ -46,3 +46,40 @@ def test_skips_paper_already_in_vector_pool_across_versions():
     _, metas, _, n = _merge(col, [{"paper_id": "2005.14165"}], [{"paper_id": "2005.14165v4"}])
     assert n == 0
     assert len(metas) == 1
+
+
+class _FakeQueryCollection(_FakeCollection):
+    """필터 벡터 검색: 저장된 거리 순으로 돌려준다."""
+
+    def __init__(self, rows: list[tuple[str, str, float]]):
+        super().__init__([(p, d) for p, d, _ in rows])
+        self.dist = {(p, d): x for p, d, x in rows}
+
+    def query(self, query_texts, where, n_results, include):
+        ok = set(where["paper_id"]["$in"])
+        hits = sorted(
+            [(p, d) for p, d in self.rows if p in ok], key=lambda pd: self.dist[pd]
+        )[:n_results]
+        return {
+            "documents": [[d for _, d in hits]],
+            "metadatas": [[{"paper_id": p, "title": "t"} for p, _ in hits]],
+            "distances": [[self.dist[h] for h in hits]],
+        }
+
+
+def test_injected_chunks_carry_real_vector_distance_when_query_given():
+    """거리가 None 이면 RRF 에서 벡터 순위가 맨 뒤라 BM25 1위 논문도 못 오른다 (§8.1)."""
+    import core.rag.agent_chroma_rag as rag
+
+    col = _FakeQueryCollection([
+        ("2409.09916v1", "far" * 50, 0.9),
+        ("2409.09916v1", "near" * 50, 0.2),
+        ("2409.09916v1", "mid" * 50, 0.5),
+    ])
+    docs, metas, dists, n = rag._merge_bm25_union_chunks(
+        col, [{"paper_id": "2409.09916"}], [], [], [],
+        top_m=10, chunks_per_paper=2, query_text="faithful small model",
+    )
+    assert n == 1
+    assert dists == [0.2, 0.5]
+    assert docs[0].startswith("near")
