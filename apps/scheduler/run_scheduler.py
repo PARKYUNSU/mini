@@ -9,6 +9,8 @@
 - morning_scraper: 매일 **07:30** (기본) — ``MORNING_SCRAPER_SCHEDULE_AT`` (Phase35와 같은 마스터 스위치)
 - Boardroom(자율 R&D 회의): 기본 **매일(월~일)** 동일 시각 — ``BOARDROOM_SCHEDULE_DAILY=0`` 이면 **월~금만**
   - ``BOARDROOM_SCHEDULE_AT`` / ``BOARDROOM_SCHEDULE_ENABLED`` / ``BOARDROOM_SCHEDULE_SKIP_IF_NO_YES`` (swarm_meeting 자식)
+- 주일 찬양 가사(apps.church_lyrics): 수 08:35 ``rename`` · 토 09:00 ``lyrics`` (종료 코드 2=콘티 없음이면 토 11:00 한 번 더).
+  ``NOTION_TOKEN`` 있고 ``CHURCH_LYRICS_SCHEDULE_ENABLED``≠0 일 때. 결과는 ``.cron/job_runs.jsonl`` (event=church_lyrics_run).
 - cron_engine: 1분마다 due job 체크 → LangGraph 트리거 → 텔레그램 선톡 (agent_bot 단독 실행 시에도 동일 worker 가 뜸, 락으로 중복 방지)
 - 메인 루프: ``SCHEDULER_POLL_SEC``(기본 30초) 간격으로 ``run_pending`` — 예약 시각 부근 재김이 더 촘촘함.
 - 프로세스 기동 직후: 서울 당일·각 작업 시각+grace 이후면 ``morning_scraper`` / Phase35 / arXiv / Boardroom 보충 시도(LLM 토론 배치 제외).
@@ -500,6 +502,82 @@ def run_llm_debate() -> None:
         raise subprocess.CalledProcessError(rc, cmd)
 
 
+def _church_lyrics_schedule_enabled() -> bool:
+    """주일 찬양 가사 자동화. NOTION_TOKEN 이 있고 ``CHURCH_LYRICS_SCHEDULE_ENABLED``≠0 일 때 등록."""
+    v = (os.getenv("CHURCH_LYRICS_SCHEDULE_ENABLED") or "1").strip().lower()
+    return bool((os.getenv("NOTION_TOKEN") or "").strip()) and v not in ("0", "false", "no", "off", "")
+
+
+def _church_lyrics_pending_marker(d: date) -> Path:
+    return _CRON_DIR / f"church_lyrics_pending_{d.isoformat()}.marker"
+
+
+def _run_church_lyrics_sync(cmd: str) -> None:
+    """``python -m apps.church_lyrics <cmd>`` 실행 → 결과를 job_runs.jsonl 에 남김. 종료 코드 2(콘티 없음)면 재시도 마커."""
+    from tools.cron_engine.lib.storage import append_job_run
+
+    _CRON_DIR.mkdir(parents=True, exist_ok=True)
+    log_path = _CRON_DIR / "church_lyrics_stdout.log"
+    argv = [sys.executable, "-u", "-m", "apps.church_lyrics", cmd]
+    started = time.time()
+    rc: int | None = None
+    error: str | None = None
+    try:
+        with open(log_path, "a", encoding="utf-8") as logf:
+            logf.write(f"\n{'=' * 60}\n[{time.strftime('%Y-%m-%d %H:%M:%S')}] run_scheduler → {' '.join(argv[2:])}\n")
+            logf.flush()
+            rc = subprocess.run(
+                argv, cwd=PROJECT_ROOT, env=_subprocess_env(), stdout=logf, stderr=subprocess.STDOUT,
+                timeout=3 * 3600, **_SUBPROCESS_KWARGS,
+            ).returncode
+    except Exception as e:
+        error = f"{type(e).__name__}: {e}"
+    status = {0: "succeeded", 2: "waiting_setlist"}.get(rc, "failed")
+    evt = {
+        "event": "church_lyrics_run",
+        "job_id": f"church_lyrics_{cmd}",
+        "status": status,
+        "exit_code": rc,
+        "started_at": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(started)),
+        "duration_ms": int((time.time() - started) * 1000),
+    }
+    if error:
+        evt["error"] = error[:200]
+    append_job_run(evt)
+    print(f"   church_lyrics {cmd}: {status} (exit={rc}, 로그: .cron/church_lyrics_stdout.log)", flush=True)
+    if cmd == "lyrics" and rc == 2:
+        _church_lyrics_pending_marker(_seoul_now().date()).write_text(
+            _seoul_now().isoformat(timespec="seconds") + "\n", encoding="utf-8"
+        )
+
+
+def _spawn_church_lyrics(cmd: str) -> None:
+    """검색·모델 대기(429 쿨다운)가 길 수 있어 메인 루프를 막지 않도록 스레드로 실행."""
+    import threading
+
+    threading.Thread(target=_run_church_lyrics_sync, args=(cmd,), daemon=True, name=f"church_lyrics_{cmd}").start()
+
+
+def run_church_rename() -> None:
+    print("\n⛪ [스케줄] 주일 페이지 제목 정리 (church_lyrics rename)", flush=True)
+    _spawn_church_lyrics("rename")
+
+
+def run_church_lyrics() -> None:
+    print("\n⛪ [스케줄] 주일 찬양 가사 게시 (church_lyrics lyrics)", flush=True)
+    _spawn_church_lyrics("lyrics")
+
+
+def run_church_lyrics_retry() -> None:
+    """같은 날 09:00 실행이 콘티 없음(종료 코드 2)이었을 때만 한 번 더."""
+    m = _church_lyrics_pending_marker(_seoul_now().date())
+    if not m.is_file():
+        return
+    m.unlink(missing_ok=True)
+    print("\n⛪ [스케줄] 콘티가 비어 있었음 → church_lyrics lyrics 재시도", flush=True)
+    _spawn_church_lyrics("lyrics")
+
+
 def main() -> None:
     # Gemini 없어도 cron_engine(봇 스케줄)은 돌아야 함. 예전에는 여기서 return 해 Ollama 전용일 때 job이 영원히 안 돌았음.
     has_gemini = bool(get_gemini_api_keys())
@@ -533,6 +611,11 @@ def main() -> None:
         schedule.every().day.at(_ph_at).do(run_phase35_curator)
     else:
         print("   Phase35 일일 심사·morning_scraper: PHASE35_SCHEDULE_ENABLED=0 — 등록 생략\n", flush=True)
+
+    if _church_lyrics_schedule_enabled():
+        schedule.every().wednesday.at("08:35").do(run_church_rename)
+        schedule.every().saturday.at("09:00").do(run_church_lyrics)
+        schedule.every().saturday.at("11:00").do(run_church_lyrics_retry)
 
     # cron_engine: 1분마다 due job 체크 (agent_bot 과 중복 시 파일 락으로 1곳만 실행)
     start_cron_worker_daemon(respect_agent_disable_env=False)
@@ -572,6 +655,13 @@ def main() -> None:
         )
     else:
         print("   - Phase35/morning_scraper: PHASE35_SCHEDULE_ENABLED=0 — 등록 생략")
+    if _church_lyrics_schedule_enabled():
+        print(
+            "   - 주일 찬양: 수 08:35 제목 정리 · 토 09:00 가사 게시 (콘티 없으면 11:00 재시도, "
+            "로그: .cron/church_lyrics_stdout.log)"
+        )
+    else:
+        print("   - 주일 찬양: NOTION_TOKEN 없음 또는 CHURCH_LYRICS_SCHEDULE_ENABLED=0 — 등록 생략")
     print("   - cron_engine: 1분마다 due job 체크 → 텔레그램 선톡")
     poll_sec = _scheduler_poll_sec()
     print(f"   - 메인 루프 폴링: {poll_sec}s · SCHEDULER_POLL_SEC")

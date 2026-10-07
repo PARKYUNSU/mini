@@ -20,6 +20,8 @@
 | **morning_scraper** | **`MORNING_SCRAPER_SCHEDULE_AT`** (기본 **07:30**) | `PHASE35_SCHEDULE_ENABLED`≠0 (기본 **켜짐**) | `python -m apps.backfill.morning_scraper` **동기** `subprocess.run` | 스케줄러 표준출력 합류 |
 | **Phase35 YES 심사·브리핑** | **`PHASE35_CURATOR_SCHEDULE_AT`** (기본 **08:00**) | 동일 마스터 스위치 | `python -m apps.backfill.phase35_auto_curator` **자식 Popen** | `.cron/phase35_curator_stdout.log` |
 | **Boardroom** | **`BOARDROOM_SCHEDULE_AT`** (기본 **10:00**) · **매일(월~일)** 기본 | `BOARDROOM_SCHEDULE_ENABLED`≠0 (기본 **켜짐**) | `python -m apps.boardroom.swarm_meeting` **자식 Popen** | `.cron/boardroom_stdout.log`, PID: `.cron/boardroom_child.pid` |
+| **주일 찬양 제목 정리** | **수 08:35** | `NOTION_TOKEN` 있음, `CHURCH_LYRICS_SCHEDULE_ENABLED`≠0 | `python -m apps.church_lyrics rename` (스레드) | `.cron/church_lyrics_stdout.log`, `.cron/job_runs.jsonl` |
+| **주일 찬양 가사 게시** | **토 09:00** (콘티 없으면 **11:00** 재시도) | 동일 | `python -m apps.church_lyrics lyrics` (스레드) | 동일. 종료 코드 2 = 콘티 없음 → `.cron/church_lyrics_pending_*.marker` |
 
 08:00 심사 전에 **07:30 morning_scraper**가 직전에 돌도록 두 작업 모두 같은 마스터 스위치로 묶였습니다. arXiv 일일 수집은 기본 **새벽 01:00**입니다. 시스템 **crontab에 동일 명령이 있으면 중복 실행**되므로 제거하세요.
 
