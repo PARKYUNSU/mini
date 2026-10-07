@@ -8,8 +8,6 @@ from __future__ import annotations
 
 import json
 import os
-import time
-import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
@@ -26,20 +24,12 @@ class Candidate:
     lyrics: str
 
 
-def _post(url, body, headers, retries=4):
-    data = json.dumps(body).encode()
-    for attempt in range(retries):
-        req = urllib.request.Request(
-            url, data=data, method="POST", headers={"Content-Type": "application/json", **headers}
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=60) as res:
-                return json.load(res)
-        except urllib.error.HTTPError as e:
-            if e.code in (429, 500, 503) and attempt < retries - 1:
-                time.sleep(5 * (attempt + 1))
-                continue
-            raise RuntimeError(f"POST {url.split('?')[0]} -> {e.code}") from None
+def _tavily_key() -> str:
+    """저장소의 다른 Tavily 사용처와 같은 키·보정(vly- → tvly-)."""
+    raw = (os.getenv("TAVILY_API_KEY") or "").strip()
+    if raw.startswith("vly-"):
+        return "t" + raw
+    return raw
 
 
 def youtube_title(url: str) -> str | None:
@@ -53,11 +43,13 @@ def youtube_title(url: str) -> str | None:
 
 
 def search(query: str, max_results: int = 6) -> list[dict]:
-    res = _post(
-        "https://api.tavily.com/search",
-        {"query": query, "search_depth": "advanced", "include_raw_content": True,
-         "max_results": max_results},
-        {"Authorization": "Bearer " + os.environ["TAVILY_API_KEY"]},
+    from tavily import TavilyClient
+
+    res = TavilyClient(api_key=_tavily_key()).search(
+        query=query,
+        search_depth="advanced",
+        include_raw_content=True,
+        max_results=max_results,
     )
     return [r for r in res.get("results", []) if r.get("raw_content")]
 
@@ -75,17 +67,15 @@ def locate(title: str, hint: str | None, lines: list[str]) -> tuple[int, int] | 
         'JSON으로만 답한다: {"found": true 또는 false, "start": 정수, "end": 정수}\n\n'
         + numbered
     )
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-    res = _post(
-        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-        {"contents": [{"parts": [{"text": prompt}]}],
-         "generationConfig": {"temperature": 0, "responseMimeType": "application/json"}},
-        {"x-goog-api-key": os.environ["GEMINI_API_KEY_2"]},
-    )
+    # 저장소 공용 호출: 429 면 기존 방식대로 쿨다운 후 재시도. 이 작업은 GEMINI_API_KEY_2 만 쓴다.
+    from core.config.agent_config import GEMINI_MODEL
+    from core.llm.agent_gemini import gemini_sdk_generate_json
+
+    raw = gemini_sdk_generate_json([os.environ["GEMINI_API_KEY_2"]], GEMINI_MODEL, prompt)
     try:
-        answer = json.loads(res["candidates"][0]["content"]["parts"][0]["text"])
+        answer = json.loads(raw)
         start, end = int(answer["start"]), int(answer["end"])
-    except (KeyError, IndexError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError):
         return None
     if not answer.get("found") or not 0 <= start <= end < len(lines):
         return None
