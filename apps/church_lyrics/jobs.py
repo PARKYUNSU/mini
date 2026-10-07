@@ -81,7 +81,9 @@ def section_of(blocks):
         if block["type"].startswith("heading_") or block["type"] == "divider":
             break
         section.append(block)
-    return section, (section[-1]["id"] if section else blocks[start]["id"])
+    # 콘티 뒤에 남은 빈 줄 뒤가 아니라 마지막 내용 블록 바로 뒤에 붙입니다.
+    filled = [b for b in section if b["type"] != "paragraph" or notion.block_text(b).strip()]
+    return section, (filled[-1]["id"] if filled else blocks[start]["id"])
 
 
 def to_items(section):

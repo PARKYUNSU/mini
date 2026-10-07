@@ -34,6 +34,7 @@ def world(monkeypatch):
             block("callout", "여기 아래에 찬양 자료를 그냥 드래그해서 올려 주세요.", "c0"),
             block("numbered_list_item", "첫째 곡 (G)\nhttps://youtu.be/aaa", "n1"),
             block("bulleted_list_item", "파송찬양: 둘째 곡", "b1"),
+            block("paragraph", "", "empty"),   # 실제 페이지처럼 콘티 뒤 빈 줄
         ]},
         "appended": [],
         "saved": [],
@@ -96,7 +97,7 @@ def test_checked_lyrics_go_to_db_then_come_from_db(world):
     # 다음 주: 같은 곡이 가사 DB에 있으면 검색하지 않고 그대로 씁니다
     world["db"] = [{"id": "song2", "properties": {"곡명": {"type": "title", "title": rt("둘째곡")}}}]
     world["kids"]["song2"] = [block("code", "고친 가사")]
-    world["kids"]["p1"] = world["kids"]["p1"][:5] + [block("bulleted_list_item", "헌금찬양: 둘째 곡", "b2")]
+    world["kids"]["p1"] = world["kids"]["p1"][:5] + [block("bulleted_list_item", "헌금찬양: 둘째 곡", "b2"), block("paragraph", "", "empty")]
     world["appended"].clear()
     jobs.lyrics_job("2026-10-11")
     b = world["appended"][0][2][1]
