@@ -1,0 +1,51 @@
+{
+  "generated": "2026-10-07T09:02:19+09:00",
+  "model": "yunsur_v10",
+  "n": 192,
+  "fail": 0,
+  "fail_rate": 0.0,
+  "quality_fail": 91,
+  "strict_fail": 91,
+  "strict_fail_rate": 0.474,
+  "strict_fail_ci95": [
+    0.4045,
+    0.5444
+  ],
+  "fail_ci95": [
+    0.0,
+    0.0196
+  ],
+  "repeats": 3,
+  "one_liner": "고정 64문항 반복 포함 n=192, 로컬 1차만: hard 실패 0/192 = 0% · 품질 포함 91/192 = 47%",
+  "by_slot": {
+    "planner": {
+      "n": 192,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "fail_kinds": {
+        "ok": 192
+      },
+      "quality_fail": 91,
+      "quality_kinds": {
+        "constraint:max_chars_per_line": 65,
+        "constraint:must_exclude": 26
+      },
+      "strict_fail_rate": 0.474,
+      "strict_fail_ci95": [
+        0.4045,
+        0.5444
+      ],
+      "fail_ci95": [
+        0.0,
+        0.0196
+      ],
+      "elapsed_median_sec": 4.7,
+      "elapsed_max_sec": 16.1,
+      "out_chars_median": 125,
+      "out_chars_max": 197,
+      "unclosed_fence": 0,
+      "num_predict": 300
+    }
+  },
+  "results_path": ".cron/multi_adopt/t1.jsonl"
+}

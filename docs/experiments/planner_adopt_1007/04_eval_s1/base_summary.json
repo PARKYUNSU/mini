@@ -1,0 +1,52 @@
+{
+  "generated": "2026-10-07T09:40:08+09:00",
+  "model": "qwen3.5:9b",
+  "n": 192,
+  "fail": 25,
+  "fail_rate": 0.1302,
+  "quality_fail": 84,
+  "strict_fail": 109,
+  "strict_fail_rate": 0.5677,
+  "strict_fail_ci95": [
+    0.497,
+    0.6358
+  ],
+  "fail_ci95": [
+    0.0898,
+    0.1852
+  ],
+  "repeats": 3,
+  "one_liner": "고정 64문항 반복 포함 n=192, 로컬 1차만: hard 실패 25/192 = 13% · 품질 포함 109/192 = 57%",
+  "by_slot": {
+    "planner": {
+      "n": 192,
+      "fail": 25,
+      "fail_rate": 0.1302,
+      "fail_kinds": {
+        "ok": 167,
+        "parse_fail": 25
+      },
+      "quality_fail": 84,
+      "quality_kinds": {
+        "constraint:max_chars_per_line": 67,
+        "constraint:must_exclude": 17
+      },
+      "strict_fail_rate": 0.5677,
+      "strict_fail_ci95": [
+        0.497,
+        0.6358
+      ],
+      "fail_ci95": [
+        0.0898,
+        0.1852
+      ],
+      "elapsed_median_sec": 5.4,
+      "elapsed_max_sec": 16.7,
+      "out_chars_median": 140,
+      "out_chars_max": 396,
+      "unclosed_fence": 0,
+      "num_predict": 300
+    }
+  },
+  "results_path": ".cron/multi_adopt/base.jsonl"
+}

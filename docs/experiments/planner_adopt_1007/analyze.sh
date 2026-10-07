@@ -84,7 +84,9 @@ for line in (d / "models.txt").read_text().split("\n"):
         if not l.strip(): continue
         r = json.loads(l)
         if r.get("slot") != "planner" or not r.get("text"): continue
-        steps = [s for s in re.findall(r"^\s*\d+단계\s*:\s*(.+)$", r["text"], re.M)]
+        # base 는 `1 단계:` 처럼 숫자와 단계 사이에 공백을 넣고 v9/v10 은 붙여 쓴다 —
+        # 공백을 허용하지 않으면 base 표본이 192 → 26 으로 줄어 비교가 성립하지 않는다.
+        steps = [s for s in re.findall(r"^\s*\d+\s*단계\s*:\s*(.+)$", r["text"], re.M)]
         if steps: longest.append(max(len(s.strip()) for s in steps))
     if longest:
         print(f"  {name:<14} 최장 단계줄 중앙 {st.median(longest):5.1f}자  (n={len(longest)})")
