@@ -9,7 +9,7 @@
 - morning_scraper: 매일 **07:30** (기본) — ``MORNING_SCRAPER_SCHEDULE_AT`` (Phase35와 같은 마스터 스위치)
 - Boardroom(자율 R&D 회의): 기본 **매일(월~일)** 동일 시각 — ``BOARDROOM_SCHEDULE_DAILY=0`` 이면 **월~금만**
   - ``BOARDROOM_SCHEDULE_AT`` / ``BOARDROOM_SCHEDULE_ENABLED`` / ``BOARDROOM_SCHEDULE_SKIP_IF_NO_YES`` (swarm_meeting 자식)
-- 주일 찬양 가사(apps.church_lyrics): 수 08:35 ``rename`` · 토 09:00 ``lyrics`` (종료 코드 2=콘티 없음이면 토 11:00 한 번 더).
+- 주일 찬양 가사(apps.church_lyrics): 수 08:35 ``rename`` · 토 09:00 ``lyrics`` (종료 코드 2=콘티 없음이면 토 11:00 한 번 더) · 매시 10분 ``harvest``.
   ``NOTION_TOKEN`` 있고 ``CHURCH_LYRICS_SCHEDULE_ENABLED``≠0 일 때. 결과는 ``.cron/job_runs.jsonl`` (event=church_lyrics_run).
 - cron_engine: 1분마다 due job 체크 → LangGraph 트리거 → 텔레그램 선톡 (agent_bot 단독 실행 시에도 동일 worker 가 뜸, 락으로 중복 방지)
 - 메인 루프: ``SCHEDULER_POLL_SEC``(기본 30초) 간격으로 ``run_pending`` — 예약 시각 부근 재김이 더 촘촘함.
@@ -568,6 +568,11 @@ def run_church_lyrics() -> None:
     _spawn_church_lyrics("lyrics")
 
 
+def run_church_harvest() -> None:
+    """작업자가 '확인 완료'를 체크한 가사를 가사 DB에 옮김. 노션 읽기·쓰기만 하므로 매시간."""
+    _spawn_church_lyrics("harvest")
+
+
 def run_church_lyrics_retry() -> None:
     """같은 날 09:00 실행이 콘티 없음(종료 코드 2)이었을 때만 한 번 더."""
     m = _church_lyrics_pending_marker(_seoul_now().date())
@@ -616,6 +621,7 @@ def main() -> None:
         schedule.every().wednesday.at("08:35").do(run_church_rename)
         schedule.every().saturday.at("09:00").do(run_church_lyrics)
         schedule.every().saturday.at("11:00").do(run_church_lyrics_retry)
+        schedule.every().hour.at(":10").do(run_church_harvest)
 
     # cron_engine: 1분마다 due job 체크 (agent_bot 과 중복 시 파일 락으로 1곳만 실행)
     start_cron_worker_daemon(respect_agent_disable_env=False)
@@ -657,7 +663,7 @@ def main() -> None:
         print("   - Phase35/morning_scraper: PHASE35_SCHEDULE_ENABLED=0 — 등록 생략")
     if _church_lyrics_schedule_enabled():
         print(
-            "   - 주일 찬양: 수 08:35 제목 정리 · 토 09:00 가사 게시 (콘티 없으면 11:00 재시도, "
+            "   - 주일 찬양: 수 08:35 제목 정리 · 토 09:00 가사 게시 (콘티 없으면 11:00 재시도) · 매시 10분 체크된 가사 DB 저장 ("
             "로그: .cron/church_lyrics_stdout.log)"
         )
     else:
