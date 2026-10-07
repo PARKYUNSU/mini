@@ -83,3 +83,41 @@ def test_injected_chunks_carry_real_vector_distance_when_query_given():
     assert n == 1
     assert dists == [0.2, 0.5]
     assert docs[0].startswith("near")
+
+
+class _FakeEmbedCollection:
+    """배치 경로: `_embedding_function` + 임베딩째 get."""
+
+    def __init__(self, rows: list[tuple[str, str, list[float]]]):
+        self.rows = rows
+        self._embedding_function = lambda texts: [[1.0, 0.0]]
+        self.get_calls = 0
+
+    def get(self, where, include):
+        self.get_calls += 1
+        ok = set(where["paper_id"]["$in"])
+        hits = [r for r in self.rows if r[0] in ok]
+        return {
+            "documents": [d for _, d, _ in hits],
+            "metadatas": [{"paper_id": p} for p, _, _ in hits],
+            "embeddings": [e for _, _, e in hits],
+        }
+
+
+def test_batched_path_uses_one_get_and_picks_nearest_per_paper():
+    import core.rag.agent_chroma_rag as rag
+
+    col = _FakeEmbedCollection([
+        ("2409.09916v1", "far" * 50, [0.0, 1.0]),
+        ("2409.09916v1", "near" * 50, [1.0, 0.0]),
+        ("2512.22442v2", "mid" * 50, [0.6, 0.8]),
+    ])
+    docs, metas, dists, n = rag._merge_bm25_union_chunks(
+        col, [{"paper_id": "2409.09916"}, {"paper_id": "2512.22442"}], [], [], [],
+        top_m=10, chunks_per_paper=1, query_text="q",
+    )
+    assert col.get_calls == 1
+    assert n == 2
+    assert [m["paper_id"] for m in metas] == ["2409.09916v1", "2512.22442v2"]
+    assert docs[0].startswith("near")
+    assert dists[0] < 1e-9 and abs(dists[1] - 0.4) < 1e-9

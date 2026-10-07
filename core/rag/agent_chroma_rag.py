@@ -304,48 +304,102 @@ def _merge_bm25_union_chunks(
         for m in metas_clean
         if (m.get("paper_id") or "").strip()
     }
-    injected_papers = 0
+    new_pids: list[str] = []
     for h in bm25_hits[:top_m]:
         pid = _normalize_pid((h.get("paper_id") or "").strip())
-        if not pid or pid in existing:
-            continue
-        existing.add(pid)
-        try:
+        if pid and pid not in existing:
+            existing.add(pid)
+            new_pids.append(pid)
+    if not new_pids:
+        return docs_clean, metas_clean, dists_clean, 0
+
+    picked = None
+    if query_text:
+        picked = _nearest_chunks_per_paper_batched(collection, new_pids, query_text, chunks_per_paper)
+    if picked is None:
+        picked = {}
+        for pid in new_pids:
             where = {"paper_id": {"$in": _paper_id_version_candidates(pid)}}
-            if query_text:
-                res = collection.query(
-                    query_texts=[query_text],
-                    where=where,
-                    n_results=chunks_per_paper,
-                    include=["documents", "metadatas", "distances"],
-                )
-                b_docs, b_metas, b_dists = _parse_chroma_query_result_row(res)
-            else:
-                bm25_extra = collection.get(
-                    where=where,
-                    include=["documents", "metadatas"],
-                    limit=chunks_per_paper,
-                )
-                b_docs = bm25_extra.get("documents") or []
-                b_metas = bm25_extra.get("metadatas") or []
-                b_dists = [None] * len(b_docs)
-            added = 0
-            for bd, bm, bdist in zip(b_docs, b_metas, b_dists):
-                if bd and len(bd) >= min_doc_chars:
-                    docs_clean.append(bd if isinstance(bd, str) else str(bd))
-                    metas_clean.append(
-                        {str(k): ("" if v is None else str(v)) for k, v in (bm or {}).items()}
-                        if isinstance(bm, dict)
-                        else {}
+            try:
+                if query_text:
+                    # 배치 경로를 못 쓸 때만: 논문마다 필터 벡터 검색 (질의당 ~97회, 느림 — §9.1)
+                    res = collection.query(
+                        query_texts=[query_text],
+                        where=where,
+                        n_results=chunks_per_paper,
+                        include=["documents", "metadatas", "distances"],
                     )
-                    if dists_clean is not None:
-                        dists_clean.append(bdist)
-                    added += 1
-            if added > 0:
-                injected_papers += 1
-        except Exception as exc:
-            print(f"[ChromaRAG TRACE] BM25 union get failed for {pid}: {exc}", flush=True)
+                    picked[pid] = list(zip(*_parse_chroma_query_result_row(res)))
+                else:
+                    got = collection.get(where=where, include=["documents", "metadatas"], limit=chunks_per_paper)
+                    b_docs = got.get("documents") or []
+                    picked[pid] = list(zip(b_docs, got.get("metadatas") or [], [None] * len(b_docs)))
+            except Exception as exc:
+                print(f"[ChromaRAG TRACE] BM25 union get failed for {pid}: {exc}", flush=True)
+
+    injected_papers = 0
+    for pid in new_pids:
+        added = 0
+        for bd, bm, bdist in picked.get(pid, []):
+            if bd and len(bd) >= min_doc_chars:
+                docs_clean.append(bd if isinstance(bd, str) else str(bd))
+                metas_clean.append(
+                    {str(k): ("" if v is None else str(v)) for k, v in (bm or {}).items()}
+                    if isinstance(bm, dict)
+                    else {}
+                )
+                if dists_clean is not None:
+                    dists_clean.append(bdist)
+                added += 1
+        if added > 0:
+            injected_papers += 1
     return docs_clean, metas_clean, dists_clean, injected_papers
+
+
+def _nearest_chunks_per_paper_batched(
+    collection,
+    pids: list[str],
+    query_text: str,
+    k: int,
+) -> dict[str, list[tuple[str, dict, float]]] | None:
+    """주입 논문 전체의 청크를 **한 번에** 임베딩째 가져와 질의 코사인 거리로 논문별 상위 k개.
+
+    논문마다 필터 검색을 하면 질의당 61s 였다 (§9.1). 컬렉션 공간이 cosine 이라 거리는
+    Chroma 와 같은 1 - cos 로 계산한다. 임베딩 함수를 못 찾거나 조회가 실패하면 None
+    (호출자가 논문별 경로로 떨어진다).
+    """
+    import numpy as np
+
+    ef = getattr(collection, "_embedding_function", None)
+    if ef is None:
+        return None
+    try:
+        cands = [c for pid in pids for c in _paper_id_version_candidates(pid)]
+        got = collection.get(
+            where={"paper_id": {"$in": cands}},
+            include=["documents", "metadatas", "embeddings"],
+        )
+        embs = got.get("embeddings")
+        if embs is None or len(embs) == 0:
+            return {}
+        q = np.asarray(ef([query_text])[0], dtype=np.float64)
+        x = np.asarray(embs, dtype=np.float64)
+        dist = 1.0 - (x @ q) / (np.linalg.norm(x, axis=1) * np.linalg.norm(q) + 1e-12)
+    except Exception as exc:
+        print(f"[ChromaRAG TRACE] BM25 union batched get failed: {exc}", flush=True)
+        return None
+
+    by_pid: dict[str, list[tuple[float, int]]] = {}
+    for i, m in enumerate(got.get("metadatas") or []):
+        pid = _normalize_pid(((m or {}).get("paper_id") or "").strip())
+        by_pid.setdefault(pid, []).append((float(dist[i]), i))
+    docs = got.get("documents") or []
+    metas = got.get("metadatas") or []
+    out: dict[str, list[tuple[str, dict, float]]] = {}
+    for pid, rows in by_pid.items():
+        rows.sort(key=lambda r: r[0])
+        out[pid] = [(docs[i], metas[i], d) for d, i in rows[:k]]
+    return out
 
 
 _PAPER_ID_MAX_VERSION = 20
