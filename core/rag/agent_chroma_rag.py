@@ -290,16 +290,23 @@ def _merge_bm25_union_chunks(
     Returns:
         (docs_clean, metas_clean, dists_clean, bm25_only_paper_count)
     """
-    existing = {(m.get("paper_id") or "").strip() for m in metas_clean if (m.get("paper_id") or "").strip()}
+    # Chroma 는 JSONL 원본 ID(버전 접미사 포함, 예 2005.14165v4)를, BM25 는 정규화 ID 를 쓴다.
+    # 둘 다 정규화해 비교하고, 조회는 버전 후보를 $in 으로 묶는다 — 정확 일치로 조회하던 동안
+    # 주입이 한 번도 일어나지 않았다 (docs/experiments/retrieval_eval_1007/05_conclusion.md §7).
+    existing = {
+        _normalize_pid((m.get("paper_id") or "").strip())
+        for m in metas_clean
+        if (m.get("paper_id") or "").strip()
+    }
     injected_papers = 0
     for h in bm25_hits[:top_m]:
-        pid = (h.get("paper_id") or "").strip()
+        pid = _normalize_pid((h.get("paper_id") or "").strip())
         if not pid or pid in existing:
             continue
         existing.add(pid)
         try:
             bm25_extra = collection.get(
-                where={"paper_id": pid},
+                where={"paper_id": {"$in": _paper_id_version_candidates(pid)}},
                 include=["documents", "metadatas"],
                 limit=chunks_per_paper,
             )
@@ -319,9 +326,18 @@ def _merge_bm25_union_chunks(
                     added += 1
             if added > 0:
                 injected_papers += 1
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"[ChromaRAG TRACE] BM25 union get failed for {pid}: {exc}", flush=True)
     return docs_clean, metas_clean, dists_clean, injected_papers
+
+
+_PAPER_ID_MAX_VERSION = 20
+
+
+def _paper_id_version_candidates(pid: str) -> list[str]:
+    """정규화 ID → Chroma 에 저장됐을 수 있는 ID 들 (무버전 + v1..v20)."""
+    base = _normalize_pid(pid)
+    return [base] + [f"{base}v{i}" for i in range(1, _PAPER_ID_MAX_VERSION + 1)]
 
 
 def _parse_chroma_query_result_row(results: object) -> tuple[list[str], list[dict[str, str]], list[float | None]]:
