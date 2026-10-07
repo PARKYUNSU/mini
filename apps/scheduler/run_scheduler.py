@@ -528,7 +528,7 @@ def _run_church_lyrics_sync(cmd: str) -> None:
             logf.flush()
             rc = subprocess.run(
                 argv, cwd=PROJECT_ROOT, env=_subprocess_env(), stdout=logf, stderr=subprocess.STDOUT,
-                timeout=3 * 3600, **_SUBPROCESS_KWARGS,
+                timeout=12 * 3600, **_SUBPROCESS_KWARGS,  # 무료 키 하루 한도면 리셋(16~17시 KST)까지 기다림
             ).returncode
     except Exception as e:
         error = f"{type(e).__name__}: {e}"
