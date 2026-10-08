@@ -21,6 +21,7 @@ DATE_PROPERTY = "실제 주일 날짜"
 CHECKED_PROPERTY = "확인일"
 SECTION = "02찬양"
 MARK = "[자동 가사] "
+MAX_ISSUES = 10  # 콜아웃에 보여 줄 '확인할 줄' 최대 개수
 TODO_TEXT = "확인 완료 (악보와 대조하고, 틀린 곳은 위 가사를 고친 뒤 체크)"
 
 
@@ -193,23 +194,28 @@ def build(song, index):
     if not found:
         return callout(song, "❌", "red_background", "가사를 찾지 못함. 직접 붙여넣고 체크", "")
 
-    result = compare.compare([c.lyrics for c in found])
-    notes = [notion.text("출처: ") + [r for i, c in enumerate(found)
-                                     for r in notion.text(f"[{i + 1}] ", c.url)]]
-    for line, other in result.issues:
+    result = compare.compare([c.lyrics for c in found], song.title)
+    notes = [notion.text("출처: ") + [r for i in result.used for r in notion.text(f"[{i + 1}] ", found[i].url)]]
+    if result.excluded:
+        notes.append(notion.text("다른 곡으로 보여 뺀 출처: ")
+                     + [r for i in result.excluded for r in notion.text(f"[{i + 1}] ", found[i].url)])
+    for line, other in result.issues[:MAX_ISSUES]:
         notes.append(notion.text(f"확인할 줄: {line}\n다른 출처: {other or '(해당 줄 없음)'}"))
+    if len(result.issues) > MAX_ISSUES:
+        notes.append(notion.text(f"외 {len(result.issues) - MAX_ISSUES}줄"))
     lines = len([ln for ln in result.lyrics.splitlines() if ln.strip()])
     if result.status == "differ" and len(result.issues) * 2 > lines:
         status = f"확인 필요: 출처끼리 가사가 대부분 달라 다른 곡일 수 있음 ({len(result.issues)}/{lines}줄)"
     elif result.status == "differ":
         status = f"확인 필요: {len(result.issues)}줄이 출처마다 다름"
     elif result.status == "single":
-        status = "확인 필요: 출처가 1곳뿐"
+        status = "확인 필요: 출처가 1곳뿐" + (
+            f" (다른 곡으로 보이는 출처 {len(result.excluded)}곳 제외)" if result.excluded else "")
     elif not song.url:
         status = "확인 필요: 링크 없는 곡이라 같은 제목의 다른 곡일 수 있음"
     else:
         return callout(song, "✅", "green_background",
-                       f"출처 {len(found)}곳 일치. 사용 후 체크하면 가사 DB에 저장", result.lyrics, notes)
+                       f"출처 {len(result.used)}곳 일치. 사용 후 체크하면 가사 DB에 저장", result.lyrics, notes)
     return callout(song, "⚠️", "yellow_background", status, result.lyrics, notes)
 
 

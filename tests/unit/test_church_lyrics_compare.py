@@ -43,3 +43,16 @@ def test_single_and_empty():
     assert compare([A]).status == "single"
     with pytest.raises(ValueError):
         compare(["", "  "])
+
+
+def test_source_sharing_nothing_is_excluded():
+    other_song = "완전히 다른 노래\n전혀 겹치지 않는\n세 번째 줄"
+    result = compare([A, other_song, tidy(A)])
+    assert result.status == "agree" and result.used == [0, 2] and result.excluded == [1]
+
+
+def test_two_unrelated_sources_keep_the_one_with_the_title():
+    song = "자유를 선포해\n난 용납되었네\n정죄함은 없네"
+    result = compare(["완전히 다른 노래\n전혀 겹치지 않는", song], title="자유를 선포해")
+    assert result.status == "single" and result.base == 1 and result.excluded == [0]
+    assert compare(["가 나 다\n라 마 바", "사 아 자\n차 카 타"]).base == 0  # 제목이 둘 다 없으면 검색 순위

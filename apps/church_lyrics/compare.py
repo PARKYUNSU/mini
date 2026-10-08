@@ -40,12 +40,17 @@ def tidy(text: str) -> str:
     return "\n".join(out).strip()
 
 
+OTHER_SONG = 0.3  # 다른 출처와 겹치는 줄이 이 비율보다 적으면 다른 곡(또는 가사 없는 페이지)으로 봅니다
+
+
 @dataclass
 class Result:
     status: str                      # 'agree' | 'differ' | 'single'
     lyrics: str                      # 기준으로 고른 가사
-    base: int = 0                    # 기준 출처의 번호
+    base: int = 0                    # 기준 출처의 번호(입력 순서)
     issues: list[tuple[str, str | None]] = field(default_factory=list)  # (기준 줄, 다른 출처의 비슷한 줄)
+    used: list[int] = field(default_factory=list)      # 대조에 쓴 출처 번호
+    excluded: list[int] = field(default_factory=list)  # 다른 곡으로 보여 뺀 출처 번호
 
 
 def _issues(base: str, others: list[str]):
@@ -63,16 +68,33 @@ def _issues(base: str, others: list[str]):
     return out
 
 
-def compare(sources: list[str]) -> Result:
-    """기준 가사의 각 줄이 다른 출처에도 있는지 봅니다(줄바꿈 위치가 달라도 일치로 봅니다)."""
-    sources = [s for s in (tidy(s) for s in sources) if s]
-    if not sources:
+def overlap(a: str, b: str) -> float:
+    """a 의 줄 가운데 b 에도 있는 줄의 비율(줄바꿈·띄어쓰기 차이는 무시)."""
+    lines = {key(ln) for ln in a.splitlines() if key(ln)}
+    blob = key(b)
+    return sum(k in blob for k in lines) / len(lines) if lines else 0.0
+
+
+def compare(sources: list[str], title: str = "") -> Result:
+    """기준 가사의 각 줄이 다른 출처에도 있는지 봅니다(줄바꿈 위치가 달라도 일치로 봅니다).
+
+    다른 어느 출처와도 거의 겹치지 않는 출처는 다른 곡으로 보고 대조에서 뺍니다. 전부 서로 다르면
+    가사에 곡 제목이 들어 있는 출처 하나(없으면 검색 순위가 높은 것)만 씁니다.
+    """
+    texts = {i: t for i, t in ((i, tidy(s)) for i, s in enumerate(sources)) if t}
+    if not texts:
         raise ValueError("가사가 없습니다")
-    if len(sources) == 1:
-        return Result("single", sources[0])
+    ids = list(texts)
+    kept = [i for i in ids if len(ids) == 1
+            or max(overlap(texts[i], texts[j]) for j in ids if j != i) >= OTHER_SONG]
+    if not kept:
+        kept = [next((i for i in ids if title and key(title) in key(texts[i])), ids[0])]
+    excluded = [i for i in ids if i not in kept]
+    if len(kept) == 1:
+        return Result("single", texts[kept[0]], kept[0], used=kept, excluded=excluded)
     best = None
-    for i, base in enumerate(sources):
-        issues = _issues(base, sources[:i] + sources[i + 1:])
+    for i in kept:
+        issues = _issues(texts[i], [texts[j] for j in kept if j != i])
         if best is None or len(issues) < len(best.issues):
-            best = Result("differ" if issues else "agree", base, i, issues)
+            best = Result("differ" if issues else "agree", texts[i], i, issues, kept, excluded)
     return best

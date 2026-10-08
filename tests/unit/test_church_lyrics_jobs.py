@@ -130,12 +130,28 @@ def test_skip_list_leaves_fixed_songs_out(world, monkeypatch):
     assert [header(b).split(" · ")[0] for b in world["appended"][0][2]] == ["[자동 가사] 첫째 곡"]
 
 
-def test_mostly_different_sources_are_flagged_as_maybe_other_song(world, monkeypatch):
+def test_completely_different_source_is_set_aside_not_listed(world, monkeypatch):
     monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
         sources.Candidate("https://a.example/1", LYRICS),
         sources.Candidate("https://b.example/2", "전혀 다른 노래의\n가사 두 줄")])
     jobs.lyrics_job("2026-10-11")
-    assert "다른 곡일 수 있음" in header(world["appended"][0][2][0])
+    b = world["appended"][0][2][0]
+    assert "출처가 1곳뿐 (다른 곡으로 보이는 출처 1곳 제외)" in header(b)
+    texts = [k["paragraph"]["rich_text"] for k in b["callout"]["children"] if k["type"] == "paragraph"]
+    assert [notion.plain([{"plain_text": r["text"]["content"]} for r in t]) for t in texts] == [
+        "출처: [1] ", "다른 곡으로 보여 뺀 출처: [2] "]
+
+
+def test_issue_list_is_capped(world, monkeypatch):
+    base = "\n".join(f"같은 줄 {i}" for i in range(20))
+    other = "\n".join(f"같은 줄 {i}" for i in range(8)) + "\n" + "\n".join(f"바뀐 줄 {i}" for i in range(12))
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+        sources.Candidate("https://a.example/1", base), sources.Candidate("https://b.example/2", other)])
+    jobs.lyrics_job("2026-10-11")
+    kids = world["appended"][0][2][0]["callout"]["children"]
+    paras = [k for k in kids if k["type"] == "paragraph"]
+    assert len(paras) == 1 + jobs.MAX_ISSUES + 1
+    assert paras[-1]["paragraph"]["rich_text"][0]["text"]["content"] == "외 2줄"
 
 
 def test_setlist_memo_is_shown_in_the_callout(world):
