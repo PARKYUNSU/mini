@@ -165,14 +165,14 @@ def test_setlist_memo_is_shown_in_the_callout(world):
     assert memo == "콘티 메모: 후렴만"
 
 
-def test_spacing_fix_is_applied_and_shown(world):
+def test_spacing_fix_is_applied_silently(world):
     world["spacing"] = [("나는 일어나 길을 나서네", "나는 일어나 길을나서네")]
     jobs.lyrics_job("2026-10-11")
     kids = world["appended"][0][2][0]["callout"]["children"]
     code = [k for k in kids if k["type"] == "code"][0]["code"]["rich_text"][0]["text"]["content"]
     assert code.splitlines()[1] == "나는 일어나 길을나서네"
     notes = [k["paragraph"]["rich_text"][0]["text"]["content"] for k in kids if k["type"] == "paragraph"]
-    assert "띄어쓰기 교정: 나는 일어나 길을 나서네 → 나는 일어나 길을나서네" in notes
+    assert not any("띄어쓰기" in n for n in notes)   # 고친 것은 따로 남기지 않음
 
 
 def test_typo_suspects_are_flagged_not_applied(world, monkeypatch):
@@ -197,10 +197,3 @@ def test_lyrics_with_too_many_typos_are_dropped(world):
     assert b["callout"]["icon"]["emoji"] == "❌" and "오탈자 의심 1/2줄이라 버림" in header(b)
     code = [k for k in b["callout"]["children"] if k["type"] == "code"][0]["code"]["rich_text"]
     assert code == []
-
-
-def test_spacing_notes_show_original_to_final():
-    pairs = [("주님 사랑 다시고백", "주님사랑 다시고백"), ("주님사랑 다시고백", "주님 사랑 다시 고백"),
-             ("가나 다", "가 나다"), ("가 나다", "가나 다")]   # 제자리로 돌아온 것은 뺌
-    assert jobs.chain(pairs) == [("주님 사랑 다시고백", "주님 사랑 다시 고백"),
-                                 ("주님사랑 다시고백", "주님 사랑 다시 고백")]

@@ -182,19 +182,6 @@ def callout(song, icon, color, status, lyrics, notes=(), todo=True):
     }}
 
 
-def chain(pairs):
-    """띄어쓰기 교정을 '원래 표기 → 최종 표기' 로만 보여 줍니다(a→b, b→c 는 a→c, b→c)."""
-    step = dict(pairs)
-
-    def final(x):
-        seen = set()
-        while x in step and x not in seen:
-            seen.add(x)
-            x = step[x]
-        return x
-    return list(dict.fromkeys((a, final(a)) for a, _ in pairs if final(a) != a))
-
-
 def build(song, index):
     saved = index.get(setlist.norm(song.title))
     if saved and saved != "dry-run":
@@ -213,7 +200,7 @@ def build(song, index):
         spacing, typos = sources.proofread(result.lyrics, song.title)
     except Exception:  # 검증이 실패해도 가사 게시는 계속
         spacing, typos = [], []
-    result.lyrics = sources.apply_respace(result.lyrics, spacing)
+    result.lyrics = sources.apply_respace(result.lyrics, spacing)  # 띄어쓰기는 메모 없이 바로 고칩니다
     lines = len([ln for ln in result.lyrics.splitlines() if ln.strip()])
     if len(typos) * TYPO_LIMIT > lines:  # 실황 받아쓰기·자동 자막처럼 쓸 수 없는 가사
         return callout(song, "❌", "red_background",
@@ -223,9 +210,6 @@ def build(song, index):
     if result.excluded:
         notes.append(notion.text("다른 곡으로 보여 뺀 출처: ")
                      + [r for i in result.excluded for r in notion.text(f"[{i + 1}] ", found[i].url)])
-    respaced = chain(result.respaced + spacing)
-    if respaced:
-        notes.append(notion.text("띄어쓰기 교정: " + " · ".join(f"{a} → {b}" for a, b in respaced)))
     for line, suggest in typos[:MAX_ISSUES]:
         notes.append(notion.text(f"오탈자 의심: {line}\n제안: {suggest}"))
     for line, other in result.issues[:MAX_ISSUES]:
