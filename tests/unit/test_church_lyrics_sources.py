@@ -66,3 +66,26 @@ def test_youtube_pages_are_never_sources(fake, monkeypatch):
         {"url": "https://youtu.be/z", "raw_content": PAGE}])
     assert sources.candidates("첫째 곡") == []
     assert fake["keys"] == []
+
+
+def test_proofread_spacing_must_keep_letters_and_typos_are_separate(fake):
+    lyrics = "구원 하심이 보좌에 앉으신\n우리 하나님과 어린 양께 있도다\n\n함께 모여 친트 열어요"
+    fake["answer"] = (
+        '{"spacing": [{"line": 0, "text": "구원하심이 보좌에 앉으신"},'
+        ' {"line": 1, "text": "우리 하나님과 어린양께 있도다"},'
+        ' {"line": 1, "text": "우리 하나님과 어린양께 있나이다"},'   # 글자가 바뀐 띄어쓰기 제안은 버림
+        ' {"line": 9, "text": "없는 줄"}, {"line": "x"}],'
+        ' "typos": [{"line": 3, "suggest": "함께 모여 잔치 열어요"},'
+        ' {"line": 0, "suggest": "구원하심이 보좌에 앉으신"}]}')   # 띄어쓰기뿐인 오탈자 제안은 버림
+    spacing, typos = sources.proofread(lyrics, "비전")
+    assert spacing == [("구원 하심이 보좌에 앉으신", "구원하심이 보좌에 앉으신"),
+                       ("우리 하나님과 어린 양께 있도다", "우리 하나님과 어린양께 있도다")]
+    assert typos == [("함께 모여 친트 열어요", "함께 모여 잔치 열어요")]
+    assert sources.apply_respace(lyrics, spacing).splitlines()[:2] == [
+        "구원하심이 보좌에 앉으신", "우리 하나님과 어린양께 있도다"]
+
+
+def test_proofread_bad_answer_changes_nothing(fake):
+    for answer in ("not json", "[]", '{"spacing": "x", "typos": null}'):
+        fake["answer"] = answer
+        assert sources.proofread("아무 가사") == ([], [])

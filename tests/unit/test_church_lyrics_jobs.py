@@ -53,6 +53,8 @@ def world(monkeypatch):
     monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
         sources.Candidate("https://a.example/1", LYRICS),
         sources.Candidate("https://b.example/2", LYRICS)])
+    monkeypatch.setattr(sources, "proofread", lambda lyrics, title="": (w["spacing"], w["typos"]))
+    w["spacing"], w["typos"] = [], []
     return w
 
 
@@ -161,3 +163,25 @@ def test_setlist_memo_is_shown_in_the_callout(world):
     assert [header(b).split(" · ")[0] for b in blocks] == ["[자동 가사] 입례", "[자동 가사] 첫째 곡", "[자동 가사] 둘째 곡"]
     memo = blocks[1]["callout"]["children"][0]["paragraph"]["rich_text"][0]["text"]["content"]
     assert memo == "콘티 메모: 후렴만"
+
+
+def test_spacing_fix_is_applied_and_shown(world):
+    world["spacing"] = [("나는 일어나 길을 나서네", "나는 일어나 길을나서네")]
+    jobs.lyrics_job("2026-10-11")
+    kids = world["appended"][0][2][0]["callout"]["children"]
+    code = [k for k in kids if k["type"] == "code"][0]["code"]["rich_text"][0]["text"]["content"]
+    assert code.splitlines()[1] == "나는 일어나 길을나서네"
+    notes = [k["paragraph"]["rich_text"][0]["text"]["content"] for k in kids if k["type"] == "paragraph"]
+    assert "띄어쓰기 교정: 나는 일어나 길을 나서네 → 나는 일어나 길을나서네" in notes
+
+
+def test_typo_suspects_are_flagged_not_applied(world):
+    world["typos"] = [("나는 일어나 길을 나서네", "나는 일어나 길을 떠나네")]
+    jobs.lyrics_job("2026-10-11")
+    b = world["appended"][0][2][0]
+    assert b["callout"]["icon"]["emoji"] == "⚠️" and "오탈자 의심 1줄" in header(b)
+    kids = b["callout"]["children"]
+    code = [k for k in kids if k["type"] == "code"][0]["code"]["rich_text"][0]["text"]["content"]
+    assert "길을 나서네" in code   # 가사는 그대로
+    notes = [k["paragraph"]["rich_text"][0]["text"]["content"] for k in kids if k["type"] == "paragraph"]
+    assert "오탈자 의심: 나는 일어나 길을 나서네\n제안: 나는 일어나 길을 떠나네" in notes

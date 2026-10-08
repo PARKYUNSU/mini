@@ -125,3 +125,51 @@ def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int 
         if 4 <= len([ln for ln in lyrics.splitlines() if ln]) <= 150:
             out.append(Candidate(page_url, lyrics))
     return out[:want]
+
+
+def proofread(lyrics: str, title: str = "") -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
+    """오탈자 검증. (띄어쓰기 교정, 오탈자 의심)을 돌려줍니다.
+
+    - 띄어쓰기 교정 (전, 후): 공백을 뺀 글자가 원래 줄과 완전히 같은 제안만 받습니다. 바로 반영해도 글자는 그대로입니다.
+    - 오탈자 의심 (줄, 제안): 글자가 틀려 보이는 줄. 가사에 반영하지 않고 작업자에게 보여 주기만 합니다.
+    """
+    lines = lyrics.splitlines()
+    numbered = "\n".join(f"{i}| {ln}" for i, ln in enumerate(lines) if ln.strip())
+    if not numbered:
+        return [], []
+    prompt = (
+        f"아래는 찬양 '{title}'의 가사에 줄 번호를 붙인 것이다. 자막에 쓰기 전에 두 가지를 검사하라.\n"
+        "1. spacing: 표준 맞춤법의 띄어쓰기에 어긋난 줄. 글자는 하나도 바꾸지 말고 공백만 고친 줄을 준다.\n"
+        "   같은 가사가 반복되면 모두 같게 고친다. 성경·찬양에서 한 단어로 쓰는 말(어린양 등)은 붙여 쓴다.\n"
+        "2. typos: 글자가 틀려 보이는 줄(받아쓰기 오류, 오타, 문맥에 맞지 않는 낱말). 맞을 것 같은 줄을 제안한다.\n"
+        "- 맞는 줄은 답에 넣지 않는다. 확실하지 않으면 넣지 않는다.\n"
+        'JSON으로만 답한다: {"spacing": [{"line": 줄 번호, "text": "고친 줄"}], '
+        '"typos": [{"line": 줄 번호, "suggest": "맞을 것 같은 줄"}]}\n\n' + numbered
+    )
+    from core.config.agent_config import GEMINI_MODEL
+    from core.llm.agent_gemini import gemini_sdk_generate_json
+
+    try:
+        answer = json.loads(gemini_sdk_generate_json(gemini_keys(), GEMINI_MODEL, prompt))
+        spacing_raw, typos_raw = answer.get("spacing") or [], answer.get("typos") or []
+    except (AttributeError, TypeError, ValueError):
+        return [], []
+
+    def pick(items, field):
+        for item in items if isinstance(items, list) else []:
+            try:
+                old, new = lines[int(item["line"])].strip(), " ".join(str(item[field]).split())
+            except (KeyError, TypeError, ValueError, IndexError):
+                continue
+            if old and new and new != old:
+                yield old, new
+
+    spacing = list(dict.fromkeys((o, n) for o, n in pick(spacing_raw, "text") if n.replace(" ", "") == o.replace(" ", "")))
+    typos = list(dict.fromkeys((o, n) for o, n in pick(typos_raw, "suggest") if n.replace(" ", "") != o.replace(" ", "")))
+    return spacing, typos
+
+
+def apply_respace(lyrics: str, fixes: list[tuple[str, str]]) -> str:
+    """같은 줄은 반복돼도 모두 같게 고칩니다."""
+    table = dict(fixes)
+    return "\n".join(table.get(ln.strip(), ln) for ln in lyrics.splitlines())
