@@ -73,4 +73,10 @@ def test_spacing_is_unified_to_a_variant_that_exists():
 
 
 def test_english_contractions_keep_apostrophe():
-    assert tidy("You're here with me\n'할렐루야' Lord’s love") == "You're here with me\n할렐루야 Lord's love"
+    assert tidy("주님 You're my king\n'할렐루야' Lord’s love") == "주님 You're my king\n할렐루야 Lord's love"
+
+
+def test_english_lyric_lines_are_dropped_but_mixed_and_short_lines_stay():
+    raw = ("Here I am again just looking\n내 마음을 가득 채운\nfor the words that help me say that\n"
+           "주 향한 찬양과 사랑\nHallelujah\nOh Lord\n주님 You are my king")
+    assert tidy(raw) == "내 마음을 가득 채운\n주 향한 찬양과 사랑\nHallelujah\nOh Lord\n주님 You are my king"

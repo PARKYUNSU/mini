@@ -15,6 +15,8 @@ _REPEAT = re.compile(r"\s*[(\[]?\s*[x×*]\s*\d+\s*[)\]]?\s*$", re.I)
 _MARKUP = re.compile(r"[*_#`>]+")
 _BULLET = re.compile(r"^[-•·]\s+")
 _TIMESTAMP = re.compile(r"[\[(]?\b\d{1,2}:\d{2}(:\d{2})?\b[\])]?")  # 유튜브 본문의 [0:31]
+_HANGUL = re.compile(r"[가-힣]")
+_ENGLISH_WORD = re.compile(r"[A-Za-z]+(?:'[A-Za-z]+)?")
 # 영어 축약형(You're)의 아포스트로피는 남깁니다
 _PUNCT = re.compile(r"[,.!?;:…~\"“”、。，．！？；：]+|(?<![A-Za-z])['‘’]|['‘’](?![A-Za-z])")
 
@@ -25,7 +27,7 @@ def key(s: str) -> str:
 
 
 def tidy(text: str) -> str:
-    """마크다운 표시(**)·문장부호(, .)·구간 표시([후렴], 1절)·반복 표시(x2)를 지우고 빈 줄을 하나로 줄입니다.
+    """마크다운 표시(**)·문장부호(, .)·구간 표시([후렴], 1절)·반복 표시(x2)·영어 가사 줄을 지우고 빈 줄을 하나로 줄입니다.
 
     글자를 지우기만 하고 바꾸거나 더하지는 않습니다.
     """
@@ -36,6 +38,8 @@ def tidy(text: str) -> str:
         if _LABEL.match(line):
             line = ""
         line = re.sub(r"\s+", " ", _PUNCT.sub(" ", line.replace("’", "'"))).strip()
+        if not _HANGUL.search(line) and len(_ENGLISH_WORD.findall(line)) >= 3:
+            continue  # 영어 가사 줄은 쓰지 않습니다(한국어 줄 속 영어, Hallelujah 같은 짧은 줄은 남김). 빈 줄도 남기지 않음
         if line or (out and out[-1]):
             out.append(line)
     return "\n".join(out).strip()
