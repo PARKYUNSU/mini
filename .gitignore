@@ -63,6 +63,12 @@ chat_memory.db
 *.log
 morning_cache.json
 
+# 기전 라운드가 만든 일회성 체크포인트 Modelfile (checkpoint_1004 · template_collapse_1006).
+# FROM 줄만 빼면 추적 중인 Modelfile.v5~v11 과 **바이트 동일**하다 — TEMPLATE/PARAMETER
+# 라는 측정 조건은 이미 그쪽에 담겨 있으므로 11개를 더 추적해도 얻는 것이 없다.
+Modelfile.ckpt*
+Modelfile.s0*
+
 # macOS
 .DS_Store
 
