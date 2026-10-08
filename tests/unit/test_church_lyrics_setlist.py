@@ -38,3 +38,25 @@ def test_parse_typed_numbers_and_duplicates():
 
 def test_empty_setlist():
     assert parse([("other", "여기 아래에 찬양 자료를 그냥 드래그해서 올려 주세요.", [])]) == []
+
+
+def test_parse_leader_names_medley_and_bulleted_songs():
+    """10-11 페이지 모양: 키 뒤 인도자 이름, '입례 + 곡' 메들리, 미정 자리, 글머리 목록의 곡."""
+    items = [
+        ("other", "<10월 11일_ 드림 주일 예배_ 셀브 앗싸!>", []),
+        ("numbered", "입례(E->F) + 날 향한 계획 (F, 후렴만): 인화\nhttps://youtu.be/a", []),
+        ("numbered", "자유를 선포해 (B): 인화\nhttps://youtu.be/b", []),
+        ("numbered", "주님을 바라보는 자 ( G ): 찬영\nhttps://youtu.be/c", []),
+        ("numbered", "비전 ( G -> A ): 찬영\nhttps://youtu.be/d", []),
+        ("bulleted", "헌금찬양: 내 영혼은 안전합니다\n*말씀 후 찬양: 미정\n*파송찬양", []),
+        ("bulleted", "내 아버지 집에는 기쁨이 넘쳐나네 (F): 인화\n*인터2: 건반 솔로 X, 일렉솔로8마디만\nhttps://youtu.be/e", []),
+        ("bulleted", "인트로 참고\nhttps://youtu.be/f", []),
+    ]
+    assert parse(items) == [
+        Song("날 향한 계획", "https://youtu.be/a"),
+        Song("자유를 선포해", "https://youtu.be/b"),
+        Song("주님을 바라보는 자", "https://youtu.be/c"),
+        Song("비전", "https://youtu.be/d"),
+        Song("내 영혼은 안전합니다", None, "헌금찬양"),
+        Song("내 아버지 집에는 기쁨이 넘쳐나네", "https://youtu.be/e"),
+    ]
