@@ -122,6 +122,9 @@ def execute_graph_turn(
                         "execution_result": "",
                         "retry_count": 0,
                         "error_hint": "",
+                        # 체크포인트가 같은 thread 로 이어지므로 비우지 않으면, 라우터가 하드룰로 빠지는 턴에서
+                        # 이전 턴의 검색 결과가 그대로 답변에 쓰인다 (2026-10-08 운영 확인에서 발견).
+                        "rag_context": "",
                     }
                     if image_base64:
                         init_state["image_base64"] = image_base64
