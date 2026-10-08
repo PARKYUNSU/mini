@@ -167,7 +167,8 @@ def code_block(lyrics):
 
 
 def callout(song, icon, color, status, lyrics, notes=(), todo=True):
-    kids = [paragraph(rich) for rich in notes] + [code_block(lyrics)]
+    memo = [notion.text(f"콘티 메모: {song.note}")] if song.note else []
+    kids = [paragraph(rich) for rich in memo + list(notes)] + [code_block(lyrics)]
     if todo:
         kids.append({"object": "block", "type": "to_do",
                      "to_do": {"rich_text": notion.text(TODO_TEXT), "checked": False}})

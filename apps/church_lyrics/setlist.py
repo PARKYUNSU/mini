@@ -6,11 +6,11 @@ from dataclasses import dataclass
 
 _KEY = r"[A-G][#b♭♯]?m?"
 # 키 표기만 떼어냅니다: (G), ( G -> A ), (A→B), (F, 후렴만)
-_KEY_PAREN = re.compile(rf"\s*[(（]\s*{_KEY}(\s*(->|=>|→|-|~|>)\s*{_KEY})*\s*([,，/][^)）]*)?[)）]")
+_KEY_PAREN = re.compile(rf"\s*[(（]\s*{_KEY}(\s*(->|=>|→|-|~|>)\s*{_KEY})*\s*(?:[,，/]([^)）]*))?[)）]")
 # 키 표기 뒤의 인도자 이름: "곡명 (B): 인화"
 _LEADER = re.compile(r"([)）])\s*[:：]\s*[^\s:：()（）]{1,10}\s*$")
-# 곡이 아닌 것: '입례(E->F) + 곡명' 의 입례, 아직 정하지 않은 자리
-_NOT_SONG = {"입례", "인트로", "전주", "간주", "미정", "tbd", "추후공지"}
+# 곡이 아닌 것: 연주 구간, 아직 정하지 않은 자리
+_NOT_SONG = {"인트로", "전주", "간주", "미정", "tbd", "추후공지"}
 _URL = re.compile(r"https?://\S+")
 _NUMBERED = re.compile(r"^\s*\d+\s*[.)]\s*(.+)$")
 _ROLE = re.compile(
@@ -23,6 +23,7 @@ class Song:
     title: str
     url: str | None = None
     role: str = "찬양"
+    note: str = ""        # 키 표기 안의 메모: (F, 후렴만) → '후렴만'
 
 
 def clean_title(raw: str) -> str:
@@ -32,10 +33,16 @@ def clean_title(raw: str) -> str:
     return title.strip(" \t-·*")
 
 
-def titles(raw: str) -> list[str]:
-    """한 줄에서 곡명들: '입례(E->F) + 날 향한 계획 (F, 후렴만): 인화' → ['날 향한 계획']."""
-    out = [clean_title(part) for part in raw.split("+")]
-    return [t for t in out if t and norm(t) not in {norm(x) for x in _NOT_SONG}]
+def titles(raw: str) -> list[tuple[str, str]]:
+    """한 줄에서 (곡명, 메모)들. '+' 는 이어 부르는 곡:
+    '입례(E->F) + 날 향한 계획 (F, 후렴만): 인화' → [('입례', ''), ('날 향한 계획', '후렴만')]."""
+    out = []
+    for part in raw.split("+"):
+        title = clean_title(part)
+        if title and norm(title) not in {norm(x) for x in _NOT_SONG}:
+            notes = [m.group(3).strip() for m in _KEY_PAREN.finditer(_URL.sub("", part)) if m.group(3)]
+            out.append((title, ", ".join(n for n in notes if n)))
+    return out
 
 
 def norm(title: str) -> str:
@@ -48,9 +55,8 @@ def parse(items) -> list[Song]:
     songs: list[Song] = []
 
     def add(raw, url, role="찬양"):
-        names = titles(raw)
-        for name in names:
-            songs.append(Song(name, url if len(names) == 1 else None, role))
+        for name, note in titles(raw):  # 이어 부르는 곡들은 같은 영상 링크를 참고로 함께 씁니다
+            songs.append(Song(name, url, role, note))
 
     for kind, text, urls in items:
         lines = [ln.strip() for ln in text.splitlines() if ln.strip()]

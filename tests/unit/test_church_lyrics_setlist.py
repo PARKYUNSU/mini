@@ -41,7 +41,7 @@ def test_empty_setlist():
 
 
 def test_parse_leader_names_medley_and_bulleted_songs():
-    """10-11 페이지 모양: 키 뒤 인도자 이름, '입례 + 곡' 메들리, 미정 자리, 글머리 목록의 곡."""
+    """10-11 페이지 모양: 키 뒤 인도자 이름, 이어 부르는 두 곡(+)과 메모, 미정 자리, 글머리 목록의 곡."""
     items = [
         ("other", "<10월 11일_ 드림 주일 예배_ 셀브 앗싸!>", []),
         ("numbered", "입례(E->F) + 날 향한 계획 (F, 후렴만): 인화\nhttps://youtu.be/a", []),
@@ -53,7 +53,8 @@ def test_parse_leader_names_medley_and_bulleted_songs():
         ("bulleted", "인트로 참고\nhttps://youtu.be/f", []),
     ]
     assert parse(items) == [
-        Song("날 향한 계획", "https://youtu.be/a"),
+        Song("입례", "https://youtu.be/a"),
+        Song("날 향한 계획", "https://youtu.be/a", note="후렴만"),
         Song("자유를 선포해", "https://youtu.be/b"),
         Song("주님을 바라보는 자", "https://youtu.be/c"),
         Song("비전", "https://youtu.be/d"),

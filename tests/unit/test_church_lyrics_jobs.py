@@ -136,3 +136,12 @@ def test_mostly_different_sources_are_flagged_as_maybe_other_song(world, monkeyp
         sources.Candidate("https://b.example/2", "전혀 다른 노래의\n가사 두 줄")])
     jobs.lyrics_job("2026-10-11")
     assert "다른 곡일 수 있음" in header(world["appended"][0][2][0])
+
+
+def test_setlist_memo_is_shown_in_the_callout(world):
+    world["kids"]["p1"][4] = block("numbered_list_item", "입례(E->F) + 첫째 곡 (F, 후렴만): 인화\nhttps://youtu.be/aaa", "n1")
+    jobs.lyrics_job("2026-10-11")
+    blocks = world["appended"][0][2]
+    assert [header(b).split(" · ")[0] for b in blocks] == ["[자동 가사] 입례", "[자동 가사] 첫째 곡", "[자동 가사] 둘째 곡"]
+    memo = blocks[1]["callout"]["children"][0]["paragraph"]["rich_text"][0]["text"]["content"]
+    assert memo == "콘티 메모: 후렴만"
