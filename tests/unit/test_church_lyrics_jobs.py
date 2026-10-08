@@ -128,3 +128,11 @@ def test_skip_list_leaves_fixed_songs_out(world, monkeypatch):
     monkeypatch.setenv("CHURCH_LYRICS_SKIP", "둘째곡, 없는 곡")
     jobs.lyrics_job("2026-10-11")
     assert [header(b).split(" · ")[0] for b in world["appended"][0][2]] == ["[자동 가사] 첫째 곡"]
+
+
+def test_mostly_different_sources_are_flagged_as_maybe_other_song(world, monkeypatch):
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+        sources.Candidate("https://a.example/1", LYRICS),
+        sources.Candidate("https://b.example/2", "전혀 다른 노래의\n가사 두 줄")])
+    jobs.lyrics_job("2026-10-11")
+    assert "다른 곡일 수 있음" in header(world["appended"][0][2][0])

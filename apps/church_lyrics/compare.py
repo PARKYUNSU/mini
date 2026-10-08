@@ -14,6 +14,7 @@ _REPEAT = re.compile(r"\s*[(\[]?\s*[x×*]\s*\d+\s*[)\]]?\s*$", re.I)
 # 자막에 쓰지 않는 것: 마크다운 강조·제목·인용 표시와 줄 앞 글머리, 문장부호·따옴표
 _MARKUP = re.compile(r"[*_#`>]+")
 _BULLET = re.compile(r"^[-•·]\s+")
+_TIMESTAMP = re.compile(r"[\[(]?\b\d{1,2}:\d{2}(:\d{2})?\b[\])]?")  # 유튜브 본문의 [0:31]
 _PUNCT = re.compile(r"[,.!?;:…~\"'“”‘’、。，．！？；：]+")
 
 
@@ -29,7 +30,7 @@ def tidy(text: str) -> str:
     """
     out: list[str] = []
     for raw in text.replace("\r", "").split("\n"):
-        line = _BULLET.sub("", _MARKUP.sub("", raw).strip())
+        line = _BULLET.sub("", _MARKUP.sub("", _TIMESTAMP.sub("", raw)).strip())
         line = _REPEAT.sub("", line)
         if _LABEL.match(line):
             line = ""

@@ -197,7 +197,10 @@ def build(song, index):
                                      for r in notion.text(f"[{i + 1}] ", c.url)]]
     for line, other in result.issues:
         notes.append(notion.text(f"확인할 줄: {line}\n다른 출처: {other or '(해당 줄 없음)'}"))
-    if result.status == "differ":
+    lines = len([ln for ln in result.lyrics.splitlines() if ln.strip()])
+    if result.status == "differ" and len(result.issues) * 2 > lines:
+        status = f"확인 필요: 출처끼리 가사가 대부분 달라 다른 곡일 수 있음 ({len(result.issues)}/{lines}줄)"
+    elif result.status == "differ":
         status = f"확인 필요: {len(result.issues)}줄이 출처마다 다름"
     elif result.status == "single":
         status = "확인 필요: 출처가 1곳뿐"

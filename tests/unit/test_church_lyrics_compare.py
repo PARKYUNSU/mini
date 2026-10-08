@@ -15,6 +15,7 @@ def test_tidy_removes_markdown_and_punctuation():
     raw = "**내게로 부터 눈을 들어**\n\n**주를 보기 시작할 때\n주의 일을 보겠네**\n아버지, 당신 같은 분은 없네.\n- “할렐루야!” 주님…"
     assert tidy(raw) == "내게로 부터 눈을 들어\n\n주를 보기 시작할 때\n주의 일을 보겠네\n아버지 당신 같은 분은 없네\n할렐루야 주님"
     assert tidy("**[후렴]**\n주님을 볼 때 (x2)") == "주님을 볼 때"
+    assert tidy("[0:31] 매일의 삶을 살다가\n1:02:15 보면") == "매일의 삶을 살다가\n보면"
 
 
 def test_agree_despite_line_breaks_and_spacing():
