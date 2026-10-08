@@ -58,6 +58,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--label", required=True)
     ap.add_argument("--ids", default="", help="쉼표 구분 — 일부 문항만 (파일럿용)")
+    ap.add_argument("--paper-mode", action="store_true", help="/paper ON 상태로 잰다 (README §7)")
     args = ap.parse_args()
 
     items = load_items()
@@ -67,7 +68,7 @@ def main() -> int:
     print(f"측정 {len(items)}문항")
 
     import core.graph.agent_nodes as N
-    from core.session.agent_session import clear_session
+    from core.session.agent_session import clear_session, set_paper_mode
 
     real_extract = N._extract_english_rag_query
     real_invoke = N._invoke_llm_with_fallback
@@ -79,6 +80,7 @@ def main() -> int:
         for k, it in enumerate(items, 1):
             chat_id = f"e2e_eval_{args.label}_{it['id']}"
             clear_session(chat_id)
+            set_paper_mode(chat_id, args.paper_mode)
             queries: list[str] = []
             captured: list[str] = []
             doc_ids: list[str] = []
