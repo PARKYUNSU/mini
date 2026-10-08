@@ -56,3 +56,13 @@ def test_two_unrelated_sources_keep_the_one_with_the_title():
     result = compare(["완전히 다른 노래\n전혀 겹치지 않는", song], title="자유를 선포해")
     assert result.status == "single" and result.base == 1 and result.excluded == [0]
     assert compare(["가 나 다\n라 마 바", "사 아 자\n차 카 타"]).base == 0  # 제목이 둘 다 없으면 검색 순위
+
+
+def test_spacing_is_unified_to_a_variant_that_exists():
+    vision = "구원 하심이 보좌에 앉으신\n우리 하나님과 어린 양께 있도다\n구원하심이 보좌에 앉으신\n우리 하나님과 어린 양께 있도다"
+    result = compare([vision])
+    assert result.lyrics.splitlines()[0] == result.lyrics.splitlines()[2] == "구원하심이 보좌에 앉으신"
+    assert result.respaced == [("구원 하심이 보좌에 앉으신", "구원하심이 보좌에 앉으신")]
+    # 출처 여럿이면 많이 쓰인 표기: 띄어 쓴 쪽이 2:1 이면 띄어 쓴 쪽
+    other = vision.replace("구원하심이", "구원 하심이")
+    assert compare([vision, other]).lyrics.splitlines()[2] == "구원 하심이 보좌에 앉으신"

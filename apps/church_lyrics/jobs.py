@@ -199,6 +199,8 @@ def build(song, index):
     if result.excluded:
         notes.append(notion.text("다른 곡으로 보여 뺀 출처: ")
                      + [r for i in result.excluded for r in notion.text(f"[{i + 1}] ", found[i].url)])
+    if result.respaced:
+        notes.append(notion.text("띄어쓰기 통일: " + " · ".join(f"{a} → {b}" for a, b in result.respaced)))
     for line, other in result.issues[:MAX_ISSUES]:
         notes.append(notion.text(f"확인할 줄: {line}\n다른 출처: {other or '(해당 줄 없음)'}"))
     if len(result.issues) > MAX_ISSUES:

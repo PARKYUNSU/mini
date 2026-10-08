@@ -51,6 +51,7 @@ class Result:
     issues: list[tuple[str, str | None]] = field(default_factory=list)  # (기준 줄, 다른 출처의 비슷한 줄)
     used: list[int] = field(default_factory=list)      # 대조에 쓴 출처 번호
     excluded: list[int] = field(default_factory=list)  # 다른 곡으로 보여 뺀 출처 번호
+    respaced: list[tuple[str, str]] = field(default_factory=list)  # 띄어쓰기를 맞춘 줄 (전, 후)
 
 
 def _issues(base: str, others: list[str]):
@@ -75,6 +76,27 @@ def overlap(a: str, b: str) -> float:
     return sum(k in blob for k in lines) / len(lines) if lines else 0.0
 
 
+def unify_spacing(lyrics: str, sources: list[str]) -> tuple[str, list[tuple[str, str]]]:
+    """띄어쓰기만 다른 같은 줄을 한 표기로 맞춥니다. 새 표기를 만들지 않고, 출처들에 실제로 있는 표기 가운데
+    가장 많이 쓰인 것을 고릅니다(동점이면 붙여 쓴 쪽)."""
+    variants: dict[str, dict[str, int]] = {}
+    for text in sources:
+        for ln in text.splitlines():
+            if key(ln):
+                counts = variants.setdefault(key(ln), {})
+                counts[ln.strip()] = counts.get(ln.strip(), 0) + 1
+    out, changed = [], []
+    for ln in lyrics.splitlines():
+        counts = variants.get(key(ln), {})
+        best = max(counts, key=lambda v: (counts[v], -v.count(" ")), default=ln.strip()) if key(ln) else ln
+        if key(ln) and best != ln.strip():
+            if (ln.strip(), best) not in changed:
+                changed.append((ln.strip(), best))
+            ln = best
+        out.append(ln)
+    return "\n".join(out), changed
+
+
 def compare(sources: list[str], title: str = "") -> Result:
     """기준 가사의 각 줄이 다른 출처에도 있는지 봅니다(줄바꿈 위치가 달라도 일치로 봅니다).
 
@@ -91,10 +113,12 @@ def compare(sources: list[str], title: str = "") -> Result:
         kept = [next((i for i in ids if title and key(title) in key(texts[i])), ids[0])]
     excluded = [i for i in ids if i not in kept]
     if len(kept) == 1:
-        return Result("single", texts[kept[0]], kept[0], used=kept, excluded=excluded)
-    best = None
-    for i in kept:
-        issues = _issues(texts[i], [texts[j] for j in kept if j != i])
-        if best is None or len(issues) < len(best.issues):
-            best = Result("differ" if issues else "agree", texts[i], i, issues, kept, excluded)
+        best = Result("single", texts[kept[0]], kept[0], used=kept, excluded=excluded)
+    else:
+        best = None
+        for i in kept:
+            issues = _issues(texts[i], [texts[j] for j in kept if j != i])
+            if best is None or len(issues) < len(best.issues):
+                best = Result("differ" if issues else "agree", texts[i], i, issues, kept, excluded)
+    best.lyrics, best.respaced = unify_spacing(best.lyrics, [texts[i] for i in kept])
     return best
