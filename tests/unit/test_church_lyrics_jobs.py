@@ -7,7 +7,7 @@ from apps.church_lyrics import jobs, notion, sources
 
 pytestmark = pytest.mark.unit
 
-LYRICS = "아침 햇살이 창을 두드리면\n나는 일어나 길을 나서네"
+LYRICS = "아침 햇살이 창을 두드리면\n나는 일어나 길을 나서네\n함께 걷는 이 길 위에서\n노래하리 오늘도"
 
 
 def rt(s):
@@ -176,7 +176,7 @@ def test_spacing_fix_is_applied_silently(world):
 
 
 def test_typo_suspects_are_flagged_not_applied(world, monkeypatch):
-    four = LYRICS + "\n함께 걷는 이 길 위에서\n노래하리 오늘도"
+    four = LYRICS
     monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
         sources.Candidate("https://a.example/1", four), sources.Candidate("https://b.example/2", four)])
     world["typos"] = [("나는 일어나 길을 나서네", "나는 일어나 길을 떠나네")]   # 4줄 중 1줄: 버리지 않음
@@ -191,9 +191,27 @@ def test_typo_suspects_are_flagged_not_applied(world, monkeypatch):
 
 
 def test_lyrics_with_too_many_typos_are_dropped(world):
-    world["typos"] = [("아침 햇살이 창을 두드리면", "?")]   # 2줄 중 1줄 > 1/3
+    world["typos"] = [("아침 햇살이 창을 두드리면", "?"), ("노래하리 오늘도", "?")]   # 4줄 중 2줄 > 1/3
     jobs.lyrics_job("2026-10-11")
     b = world["appended"][0][2][0]
-    assert b["callout"]["icon"]["emoji"] == "❌" and "오탈자 의심 1/2줄이라 버림" in header(b)
+    assert b["callout"]["icon"]["emoji"] == "❌" and "오탈자 의심 2/4줄이라 버림" in header(b)
     code = [k for k in b["callout"]["children"] if k["type"] == "code"][0]["code"]["rich_text"]
     assert code == []
+
+
+def test_one_line_source_verifies_but_multi_line_source_is_posted(world, monkeypatch):
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+        sources.Candidate("https://bugs.example/1", " ".join(LYRICS.splitlines())),   # 줄바꿈 없는 가사 사이트
+        sources.Candidate("https://blog.example/2", LYRICS)])
+    jobs.lyrics_job("2026-10-11")
+    b = world["appended"][0][2][0]
+    assert "출처 2곳 일치" in header(b)
+    code = [k for k in b["callout"]["children"] if k["type"] == "code"][0]["code"]["rich_text"][0]["text"]["content"]
+    assert code == LYRICS
+
+
+def test_only_one_line_source_is_posted_with_a_warning(world, monkeypatch):
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+        sources.Candidate("https://bugs.example/1", " ".join(LYRICS.splitlines()))])
+    jobs.lyrics_job("2026-10-11")
+    assert "줄바꿈이 없어 줄을 직접 나눠야 함" in header(world["appended"][0][2][0])

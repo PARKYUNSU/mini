@@ -202,7 +202,7 @@ def build(song, index):
         spacing, typos = [], []
     result.lyrics = sources.apply_respace(result.lyrics, spacing)  # 띄어쓰기는 메모 없이 바로 고칩니다
     lines = len([ln for ln in result.lyrics.splitlines() if ln.strip()])
-    if len(typos) * TYPO_LIMIT > lines:  # 실황 받아쓰기·자동 자막처럼 쓸 수 없는 가사
+    if lines >= compare.MIN_LINES and len(typos) * TYPO_LIMIT > lines:  # 실황 받아쓰기·자동 자막처럼 쓸 수 없는 가사
         return callout(song, "❌", "red_background",
                        f"가사를 찾지 못함 (찾은 가사에 오탈자 의심 {len(typos)}/{lines}줄이라 버림). 직접 붙여넣고 체크", "",
                        [notion.text("버린 출처: ") + [r for i in result.used for r in notion.text(f"[{i + 1}] ", found[i].url)]])
@@ -216,7 +216,9 @@ def build(song, index):
         notes.append(notion.text(f"확인할 줄: {line}\n다른 출처: {other or '(해당 줄 없음)'}"))
     if len(result.issues) > MAX_ISSUES:
         notes.append(notion.text(f"외 {len(result.issues) - MAX_ISSUES}줄"))
-    if typos:
+    if lines < compare.MIN_LINES:
+        status = "확인 필요: 출처에 줄바꿈이 없어 줄을 직접 나눠야 함"
+    elif typos:
         status = f"확인 필요: 오탈자 의심 {len(typos)}줄" + (
             f", {len(result.issues)}줄이 출처마다 다름" if result.issues else "")
     elif result.status == "differ" and len(result.issues) * 2 > lines:

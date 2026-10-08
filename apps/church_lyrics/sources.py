@@ -12,7 +12,7 @@ import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 
-from .compare import tidy
+from .compare import key, tidy
 
 # 유튜브 페이지 본문은 자동 생성 자막(음성 인식)이라 '잔치→친트' 같은 오타가 섞입니다. 출처로 쓰지 않습니다.
 EXCLUDED_DOMAINS = ("youtube.com", "youtu.be")
@@ -122,7 +122,8 @@ def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int 
         if not span:
             continue
         lyrics = tidy("\n".join(lines[span[0]:span[1] + 1]))
-        if 4 <= len([ln for ln in lyrics.splitlines() if ln]) <= 150:
+        # 줄바꿈 없이 한 줄로 붙은 가사도 대조용으로 받습니다(너무 짧은 조각만 버림)
+        if len(key(lyrics)) >= 15 and len(lyrics.splitlines()) <= 150:
             out.append(Candidate(page_url, lyrics))
     return out[:want]
 
@@ -141,7 +142,9 @@ def proofread(lyrics: str, title: str = "") -> tuple[list[tuple[str, str]], list
         f"아래는 찬양 '{title}'의 가사에 줄 번호를 붙인 것이다. 자막에 쓰기 전에 두 가지를 검사하라.\n"
         "1. spacing: 표준 맞춤법의 띄어쓰기에 어긋난 줄. 글자는 하나도 바꾸지 말고 공백만 고친 줄을 준다.\n"
         "   같은 가사가 반복되면 모두 같게 고친다. 성경·찬양에서 한 단어로 쓰는 말(어린양 등)은 붙여 쓴다.\n"
-        "2. typos: 글자가 틀려 보이는 줄(받아쓰기 오류, 오타, 문맥에 맞지 않는 낱말). 맞을 것 같은 줄을 제안한다.\n"
+        "2. typos: 사전에 없는 낱말이나 소리만 비슷하게 잘못 받아 적은 낱말이 있는 줄(예: 잔치→친트, 수치→주치,\n"
+        "   새 옷을 입히시고→태옷들이 피시고). 맞을 것 같은 줄을 제안한다.\n"
+        "- 가사는 시적 표현이다. 어미·조사·어순·표현을 다듬는 제안은 하지 않는다(살다가 보면, 찬양하며, 변함이 없는 은 그대로 맞다).\n"
         "- 박자에 맞춘 줄임말(잔칠, 날 위해 등)과 영어 가사는 오탈자가 아니다.\n"
         "- 맞는 줄은 답에 넣지 않는다. 확실하지 않으면 넣지 않는다.\n"
         'JSON으로만 답한다: {"spacing": [{"line": 줄 번호, "text": "고친 줄"}], '

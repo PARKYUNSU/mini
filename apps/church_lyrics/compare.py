@@ -74,6 +74,13 @@ def _issues(base: str, others: list[str]):
     return out
 
 
+MIN_LINES = 4  # 이보다 줄이 적으면 출처에서 줄바꿈이 사라진 것으로 봅니다
+
+
+def lines_of(text: str) -> int:
+    return len([ln for ln in text.splitlines() if key(ln)])
+
+
 def overlap(a: str, b: str) -> float:
     """a 의 줄 가운데 b 에도 있는 줄의 비율(줄바꿈·띄어쓰기 차이는 무시)."""
     lines = {key(ln) for ln in a.splitlines() if key(ln)}
@@ -112,8 +119,9 @@ def compare(sources: list[str], title: str = "") -> Result:
     if not texts:
         raise ValueError("가사가 없습니다")
     ids = list(texts)
+    # 양쪽으로 봅니다: 줄바꿈 없이 한 줄로 붙은 출처는 그 줄이 남에게 통째로 들어 있지 않아도, 남의 줄들을 품고 있습니다
     kept = [i for i in ids if len(ids) == 1
-            or max(overlap(texts[i], texts[j]) for j in ids if j != i) >= OTHER_SONG]
+            or max(max(overlap(texts[i], texts[j]), overlap(texts[j], texts[i])) for j in ids if j != i) >= OTHER_SONG]
     if not kept:
         kept = [next((i for i in ids if title and key(title) in key(texts[i])), ids[0])]
     excluded = [i for i in ids if i not in kept]
@@ -121,7 +129,8 @@ def compare(sources: list[str], title: str = "") -> Result:
         best = Result("single", texts[kept[0]], kept[0], used=kept, excluded=excluded)
     else:
         best = None
-        for i in kept:
+        # 게시할 기준은 줄바꿈이 살아 있는 출처에서 고르고, 한 줄짜리 출처는 대조에만 씁니다
+        for i in [i for i in kept if lines_of(texts[i]) >= MIN_LINES] or kept:
             issues = _issues(texts[i], [texts[j] for j in kept if j != i])
             if best is None or len(issues) < len(best.issues):
                 best = Result("differ" if issues else "agree", texts[i], i, issues, kept, excluded)
