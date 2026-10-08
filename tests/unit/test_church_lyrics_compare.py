@@ -63,6 +63,10 @@ def test_spacing_is_unified_to_a_variant_that_exists():
     result = compare([vision])
     assert result.lyrics.splitlines()[0] == result.lyrics.splitlines()[2] == "구원하심이 보좌에 앉으신"
     assert result.respaced == [("구원 하심이 보좌에 앉으신", "구원하심이 보좌에 앉으신")]
-    # 출처 여럿이면 많이 쓰인 표기: 띄어 쓴 쪽이 2:1 이면 띄어 쓴 쪽
+    # 한 출처 안에서 반복된 표기가 더 많아도 한 번으로 셈 → 동점 → 붙여 쓴 쪽
+    repeated = vision + "\n구원 하심이 보좌에 앉으신\n구원 하심이 보좌에 앉으신"
+    assert set(compare([repeated]).lyrics.splitlines()) >= {"구원하심이 보좌에 앉으신"}
+    assert "구원 하심이 보좌에 앉으신" not in compare([repeated]).lyrics
+    # 출처 여럿이면 더 많은 출처가 쓴 표기: 띄어 쓴 쪽만 쓴 출처가 하나 더 있으면 띄어 쓴 쪽
     other = vision.replace("구원하심이", "구원 하심이")
-    assert compare([vision, other]).lyrics.splitlines()[2] == "구원 하심이 보좌에 앉으신"
+    assert compare([vision, other, other]).lyrics.splitlines()[2] == "구원 하심이 보좌에 앉으신"

@@ -57,3 +57,12 @@ def test_no_model_call_when_no_page_has_the_title(fake, monkeypatch):
     monkeypatch.setattr(sources, "search", lambda q: [{"url": "https://c.example/1", "raw_content": "다른 곡"}])
     assert sources.candidates("첫째 곡") == []
     assert fake["keys"] == []
+
+
+def test_youtube_pages_are_never_sources(fake, monkeypatch):
+    monkeypatch.setattr(sources, "search", lambda q: [
+        {"url": "https://www.youtube.com/watch?v=x", "raw_content": PAGE},
+        {"url": "https://m.youtube.com/watch?v=y", "raw_content": PAGE},
+        {"url": "https://youtu.be/z", "raw_content": PAGE}])
+    assert sources.candidates("첫째 곡") == []
+    assert fake["keys"] == []

@@ -14,6 +14,8 @@ from dataclasses import dataclass
 
 from .compare import tidy
 
+# 유튜브 페이지 본문은 자동 생성 자막(음성 인식)이라 '잔치→친트' 같은 오타가 섞입니다. 출처로 쓰지 않습니다.
+EXCLUDED_DOMAINS = ("youtube.com", "youtu.be")
 MAX_LINES = 500
 MAX_CHARS = 20000
 
@@ -105,6 +107,8 @@ def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int 
     for hit in search(f"{title} 가사 찬양 CCM"):
         domain = urllib.parse.urlparse(hit["url"]).netloc
         text = hit["raw_content"][:MAX_CHARS]
+        if domain.endswith(EXCLUDED_DOMAINS):
+            continue
         if domain in domains or norm(title) not in norm(text):  # 곡명이 없는 페이지는 모델에 보내지 않음
             continue
         domains.add(domain)

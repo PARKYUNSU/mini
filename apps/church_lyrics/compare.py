@@ -78,13 +78,13 @@ def overlap(a: str, b: str) -> float:
 
 def unify_spacing(lyrics: str, sources: list[str]) -> tuple[str, list[tuple[str, str]]]:
     """띄어쓰기만 다른 같은 줄을 한 표기로 맞춥니다. 새 표기를 만들지 않고, 출처들에 실제로 있는 표기 가운데
-    가장 많이 쓰인 것을 고릅니다(동점이면 붙여 쓴 쪽)."""
+    더 많은 출처가 쓴 것을 고릅니다(동점이면 붙여 쓴 쪽). 한 출처 안의 반복은 한 번으로 셉니다 —
+    반복 구간이 많은 쪽 표기가 이기지 않도록."""
     variants: dict[str, dict[str, int]] = {}
     for text in sources:
-        for ln in text.splitlines():
-            if key(ln):
-                counts = variants.setdefault(key(ln), {})
-                counts[ln.strip()] = counts.get(ln.strip(), 0) + 1
+        for ln in {ln.strip() for ln in text.splitlines() if key(ln)}:
+            counts = variants.setdefault(key(ln), {})
+            counts[ln] = counts.get(ln, 0) + 1
     out, changed = [], []
     for ln in lyrics.splitlines():
         counts = variants.get(key(ln), {})
