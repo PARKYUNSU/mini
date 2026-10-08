@@ -333,8 +333,17 @@ Recent context:
         if len(out) >= 5:
             break
     if len(out) < 3:
+        # 로컬 모델은 쉼표 없이 공백으로만 이어 쓰는 경우가 많다 (2026-10-08 재현 6/6). 그 한 덩어리는
+        # 위에서 '5단어 초과'로 버려져 한국어 원문으로 떨어지고, 영어 전용 임베딩·BM25 검색이 정답을
+        # 놓쳤다. 영어 단어가 충분하면 그 줄을 그대로 검색어로 쓴다.
+        words = re.sub(r"[,/\n]+", " ", cleaned).split()
+        if len(words) >= 3:
+            return " ".join(words[:_RAG_QUERY_MAX_WORDS]).lower()
         return req
     return ", ".join(out[:5])
+
+
+_RAG_QUERY_MAX_WORDS = 12
 
 
 def _paper_knowledge_heuristic(user_request: str, req_lower: str) -> bool:
