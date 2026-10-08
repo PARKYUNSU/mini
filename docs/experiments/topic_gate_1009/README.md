@@ -58,3 +58,23 @@
 - `eval_route_contamination.py --label gate_off` — 예상: chat·planner 의 B 경로가 `on`(9·8)보다 훨씬 적은 **0~2**. 대신 OFF 에서 Tavily 로 가던 14개는 계속 Tavily 로 간다(게이트가 비학술로 판정).
 
 **반영 조건**: e2e 가 `prod_r1` 대비 짝지은 McNemar p<0.05 로 우세하고, chat 의 B 경로가 사전 규칙(e2e_ko_1008 §8, 흔들림 0 + 2) 이하.
+
+## 8. 반영 전 확인 결과 (2026-10-09)
+
+| | `prod_r1` (게이트 없음) | **`gate_r1`** | `paper_r1` (논문 모드 ON) |
+|---|---|---|---|
+| 끝단 컨텍스트 적중 (162) | 0.074 | **0.302** | 0.716 |
+| 잡담 48 → RAG | 0 | **0** (`gate_off`) | 9 |
+| 계획 64 → RAG | 0 | **0** | 8 |
+
+- e2e `gate_r1` vs `prod_r1`: **37 : 0** (p=1.5e-11). 오염: chat B 0 (문턱 2 이하).
+- **반영 조건 둘 다 통과 → 반영한다.**
+- 그러나 **예상(0.6 이상)은 틀렸다** — `paper_r1` 대비 3 : 70. 162문항 중 **89개가 라우터 1단계 하드룰에서 Tavily 로** 간다: `not paper_mode and is_factual_lookup(q) and search_intent != "rag"` → `tavily_search_tool` ([`agent_router_rules.py`](../../../core/graph/agent_router_rules.py) `router_step1_hard_rules`). 이 규칙은 `is_rag_allowed` 를 거치지 않으므로 게이트가 닿지 않는다. 게이트가 살린 것은 B→잡담(A) 오버라이드로 버려지던 문항(48 → 2)이다.
+
+## 9. 두 번째 게이트 지점 — 1단계 Tavily 하드룰 (사전 선언)
+
+**조치**: 위 하드룰에 `and not is_academic_query(q)` 를 더한다 (학술 질문은 Tavily 로 직행하지 않고 다음 단계로). 게이트 함수·단어 목록은 그대로다.
+
+**측정** (논문 모드 OFF): `eval_e2e_ko.py --label gate2_r1` · `eval_route_contamination.py --label gate2_off`.
+
+**판정 (결과 전 고정)**: e2e `gate2_r1` vs `gate_r1` 짝지은 p<0.05 우세 **그리고** chat 의 B 경로 ≤ 2 → 반영. 예상: 0.302 → 0.6 이상, chat B 0~2. 1단계에서 Tavily 로 가던 일상 요청 14개는 게이트가 비학술로 판정하므로 계속 Tavily 로 간다(§6 오탐 0/61).
