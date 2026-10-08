@@ -21,6 +21,7 @@ DATE_PROPERTY = "실제 주일 날짜"
 CHECKED_PROPERTY = "확인일"
 SECTION = "02찬양"
 MARK = "[자동 가사] "
+TYPO_LIMIT = 3   # 오탈자 의심이 전체 줄의 1/3 을 넘으면 그 가사는 버립니다
 MAX_ISSUES = 10  # 콜아웃에 보여 줄 '확인할 줄' 최대 개수
 TODO_TEXT = "확인 완료 (악보와 대조하고, 틀린 곳은 위 가사를 고친 뒤 체크)"
 
@@ -200,6 +201,11 @@ def build(song, index):
     except Exception:  # 검증이 실패해도 가사 게시는 계속
         spacing, typos = [], []
     result.lyrics = sources.apply_respace(result.lyrics, spacing)
+    lines = len([ln for ln in result.lyrics.splitlines() if ln.strip()])
+    if len(typos) * TYPO_LIMIT > lines:  # 실황 받아쓰기·자동 자막처럼 쓸 수 없는 가사
+        return callout(song, "❌", "red_background",
+                       f"가사를 찾지 못함 (찾은 가사에 오탈자 의심 {len(typos)}/{lines}줄이라 버림). 직접 붙여넣고 체크", "",
+                       [notion.text("버린 출처: ") + [r for i in result.used for r in notion.text(f"[{i + 1}] ", found[i].url)]])
     notes = [notion.text("출처: ") + [r for i in result.used for r in notion.text(f"[{i + 1}] ", found[i].url)]]
     if result.excluded:
         notes.append(notion.text("다른 곡으로 보여 뺀 출처: ")
@@ -212,7 +218,6 @@ def build(song, index):
         notes.append(notion.text(f"확인할 줄: {line}\n다른 출처: {other or '(해당 줄 없음)'}"))
     if len(result.issues) > MAX_ISSUES:
         notes.append(notion.text(f"외 {len(result.issues) - MAX_ISSUES}줄"))
-    lines = len([ln for ln in result.lyrics.splitlines() if ln.strip()])
     if typos:
         status = f"확인 필요: 오탈자 의심 {len(typos)}줄" + (
             f", {len(result.issues)}줄이 출처마다 다름" if result.issues else "")

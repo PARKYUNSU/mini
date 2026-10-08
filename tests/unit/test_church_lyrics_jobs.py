@@ -175,8 +175,11 @@ def test_spacing_fix_is_applied_and_shown(world):
     assert "띄어쓰기 교정: 나는 일어나 길을 나서네 → 나는 일어나 길을나서네" in notes
 
 
-def test_typo_suspects_are_flagged_not_applied(world):
-    world["typos"] = [("나는 일어나 길을 나서네", "나는 일어나 길을 떠나네")]
+def test_typo_suspects_are_flagged_not_applied(world, monkeypatch):
+    four = LYRICS + "\n함께 걷는 이 길 위에서\n노래하리 오늘도"
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+        sources.Candidate("https://a.example/1", four), sources.Candidate("https://b.example/2", four)])
+    world["typos"] = [("나는 일어나 길을 나서네", "나는 일어나 길을 떠나네")]   # 4줄 중 1줄: 버리지 않음
     jobs.lyrics_job("2026-10-11")
     b = world["appended"][0][2][0]
     assert b["callout"]["icon"]["emoji"] == "⚠️" and "오탈자 의심 1줄" in header(b)
@@ -185,3 +188,12 @@ def test_typo_suspects_are_flagged_not_applied(world):
     assert "길을 나서네" in code   # 가사는 그대로
     notes = [k["paragraph"]["rich_text"][0]["text"]["content"] for k in kids if k["type"] == "paragraph"]
     assert "오탈자 의심: 나는 일어나 길을 나서네\n제안: 나는 일어나 길을 떠나네" in notes
+
+
+def test_lyrics_with_too_many_typos_are_dropped(world):
+    world["typos"] = [("아침 햇살이 창을 두드리면", "?")]   # 2줄 중 1줄 > 1/3
+    jobs.lyrics_job("2026-10-11")
+    b = world["appended"][0][2][0]
+    assert b["callout"]["icon"]["emoji"] == "❌" and "오탈자 의심 1/2줄이라 버림" in header(b)
+    code = [k for k in b["callout"]["children"] if k["type"] == "code"][0]["code"]["rich_text"]
+    assert code == []
