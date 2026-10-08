@@ -115,3 +115,20 @@ RAG 경로 안에서: 컨텍스트 1편인 62문항 적중 41 (66%) · 여러 �
 ### 7.3 해석
 
 RAG 경로 자체는 끝단에서 0.72 를 낸다. 지금 운영(논문 모드 OFF 기본, 재시작마다 꺼짐)은 0.07 이다. **가장 큰 레버는 검색 품질이 아니라 정책이다.** 그다음은 `prefer_single_hit` (20문항) — 요약·설명 요청에서 상위 1편만 남기는 규칙이 C2(고전 논문) 0.500 의 주원인이다.
+
+## 8. 논문 모드가 잡담·계획을 오염시키는가 (사전 선언, 2026-10-08)
+
+§7 로 논문 모드 ON 이 RAG 끝단을 0.074 → 0.716 으로 올린다는 것을 확인했다. 기본값으로 켜기 전에 반대쪽 비용을 잰다.
+
+**문항**: [`tests/fixtures/local_llm_failure_eval.jsonl`](../../../tests/fixtures/local_llm_failure_eval.jsonl) 의 chat 48 · planner 64 (= 112, 논문과 무관한 일상·작업 요청).
+
+**측정** ([`scripts/eval_route_contamination.py`](../../../scripts/eval_route_contamination.py), 라우터만): `off_a` · `off_b` (모드 OFF 두 번 — 라우터 3단계 LLM 분류의 흔들림 크기) · `on` (모드 ON).
+
+**오염의 정의**: 라우터가 `direct_answer/B` (RAG) 로 보낸 문항. B 로 가면 답변이 논문 컨텍스트와 RAG 템플릿으로 만들어진다.
+
+**판정 (결과 전 고정)**:
+- 주: `on` vs `off_a` 의 짝지은 McNemar — 문항별 "B 로 감" 여부.
+- 권고 규칙: chat 48 에서 ON 이 B 로 새로 보내는 문항이 **`off_a`–`off_b` 사이 흔들림 수 + 2 이하**이면 "논문 모드 기본 ON" 을 권고한다. 넘으면 기본 ON 대신 (a) 모드를 디스크에 저장만 하거나 (b) 논문 모드 편향 규칙(`_apply_paper_mode_router_bias`)을 좁히는 쪽을 권고한다.
+- planner 64 는 같은 방식으로 보고하되, 계획 슬롯 채택 측정(`planner_adopt_1007`)과 무관하다 — 이 측정은 라우팅만 본다.
+
+**예상**: `_apply_paper_mode_router_bias` 는 A→B 를 `is_factual_lookup`·`_paper_knowledge_heuristic`("요약"·"설명" 등) 일 때만 바꾼다. chat 문항 중 "설명해줘"·"알려줘" 류가 걸려 **3~8개**가 B 로 갈 것이다 → 권고 규칙상 기본 ON 은 어려울 가능성이 크다.
