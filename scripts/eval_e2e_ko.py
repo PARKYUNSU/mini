@@ -33,6 +33,8 @@ EXPECT_SHA = "7fc27b9d5bc9"
 EXCLUDED = {"A026", "A057"}  # retrieval_eval_1007 §3.1 — 정답이 Chroma 에 없음
 
 HANGUL_RE = re.compile(r"[가-힣]")
+# 답변에 펼쳐진 arXiv ID (fix_citations 가 [문서 N] 을 ID 로 바꾼다)
+ANSWER_ID_RE = re.compile(r"(?<![\d.])(\d{4}\.\d{4,5})(?:v\d+)?(?!\d)")
 
 
 def load_items() -> list[dict]:
@@ -59,6 +61,7 @@ def main() -> int:
     ap.add_argument("--label", required=True)
     ap.add_argument("--ids", default="", help="쉼표 구분 — 일부 문항만 (파일럿용)")
     ap.add_argument("--paper-mode", action="store_true", help="/paper ON 상태로 잰다 (README §7)")
+    ap.add_argument("--answer", action="store_true", help="답변 LLM 을 실제로 돌려 답변이 정답 논문을 인용하는지도 잰다")
     args = ap.parse_args()
 
     items = load_items()
@@ -97,6 +100,8 @@ def main() -> int:
 
             def _invoke(messages, *a, **kw):
                 captured.append("\n".join(str(getattr(m, "content", m)) for m in messages))
+                if args.answer:
+                    return real_invoke(messages, *a, **kw)
                 return "평가용 스텁 답변"
 
             N._extract_english_rag_query = _extract
@@ -105,6 +110,7 @@ def main() -> int:
             state = {"user_request": it["question"], "route_type": "", "rag_context": ""}
             t0 = time.time()
             err = ""
+            answer = ""
             try:
                 r = N.router_node(state, config=cfg)
                 state.update(r or {})
@@ -112,7 +118,8 @@ def main() -> int:
                 choice = state.get("router_choice", "")
                 if route == "direct_answer" and choice == "B":
                     N._invoke_llm_with_fallback = _invoke
-                    N.direct_answer_node(state, config=cfg)
+                    out = N.direct_answer_node(state, config=cfg) or {}
+                    answer = out.get("direct_response") or ""
             except Exception as exc:  # 평가는 계속한다
                 err = f"{type(exc).__name__}: {exc}"[:300]
                 route = state.get("route_type", "")
@@ -150,6 +157,10 @@ def main() -> int:
                 "route": f"{route}/{choice}",
                 "rag_queries": queries,
                 "context_papers": seen,
+                **({"answer_ok": any(m in gold for m in ANSWER_ID_RE.findall(answer)),
+                    "answer_first_ok": bool(ANSWER_ID_RE.findall(answer)) and ANSWER_ID_RE.findall(answer)[0] in gold,
+                    "answer_papers": sorted(set(ANSWER_ID_RE.findall(answer))),
+                    "answer_len": len(answer), "answer": answer[:2000]} if args.answer else {}),
                 "elapsed": round(elapsed, 1),
                 "error": err,
             }
@@ -164,7 +175,8 @@ def main() -> int:
     for s in ["all", "A", "C1", "C2"]:
         xs = [r for r in rows if s == "all" or r["slot"] == s]
         if xs:
-            print(f"{s:<4} n={len(xs):>3} 컨텍스트에 정답 {sum(r['ok'] for r in xs) / len(xs):.3f}")
+            extra = f" · 답변이 정답 인용 {sum(r.get('answer_ok', False) for r in xs) / len(xs):.3f}" if args.answer else ""
+            print(f"{s:<4} n={len(xs):>3} 컨텍스트에 정답 {sum(r['ok'] for r in xs) / len(xs):.3f}{extra}")
     print("실패 원인:", dict(Counter(r["fail"] for r in rows if r["fail"])))
     print("경로:", dict(Counter(r["route"] for r in rows)))
     print(f"저장: {out_path}")

@@ -187,9 +187,15 @@ def _prefer_single_hit_rag_context(user_request: str, *, wants_depth: bool) -> b
         return False
     if wants_depth:
         return True
-    if len(u) <= 44 and ("요약" in u or "알려줘" in u or "설명해" in u):
+    # 짧은 요약·설명 요청을 Top-1 로 묶던 규칙. 끝단 평가에서 RAG 경로 141문항 중 53문항이
+    # 이 규칙으로 1편만 받아 정답을 놓쳤다 (docs/experiments/single_hit_1009). 막연한 요청
+    # ("아무거나 하나") 과 심층 모드는 위에서 여전히 1편으로 묶는다. 비교용으로만 되살린다.
+    if _SINGLE_HIT_SHORT_QUERY and len(u) <= 44 and ("요약" in u or "알려줘" in u or "설명해" in u):
         return True
     return False
+
+
+_SINGLE_HIT_SHORT_QUERY = (os.getenv("RAG_SINGLE_HIT_SHORT_QUERY") or "0").strip() in ("1", "true", "yes", "on")
 
 
 def _rag_context_first_hit_only(rag_context: str, *, max_chars: int = 5500) -> str:
