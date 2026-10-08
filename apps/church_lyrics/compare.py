@@ -15,7 +15,8 @@ _REPEAT = re.compile(r"\s*[(\[]?\s*[x×*]\s*\d+\s*[)\]]?\s*$", re.I)
 _MARKUP = re.compile(r"[*_#`>]+")
 _BULLET = re.compile(r"^[-•·]\s+")
 _TIMESTAMP = re.compile(r"[\[(]?\b\d{1,2}:\d{2}(:\d{2})?\b[\])]?")  # 유튜브 본문의 [0:31]
-_PUNCT = re.compile(r"[,.!?;:…~\"'“”‘’、。，．！？；：]+")
+# 영어 축약형(You're)의 아포스트로피는 남깁니다
+_PUNCT = re.compile(r"[,.!?;:…~\"“”、。，．！？；：]+|(?<![A-Za-z])['‘’]|['‘’](?![A-Za-z])")
 
 
 def key(s: str) -> str:
@@ -34,7 +35,7 @@ def tidy(text: str) -> str:
         line = _REPEAT.sub("", line)
         if _LABEL.match(line):
             line = ""
-        line = re.sub(r"\s+", " ", _PUNCT.sub(" ", line)).strip()
+        line = re.sub(r"\s+", " ", _PUNCT.sub(" ", line.replace("’", "'"))).strip()
         if line or (out and out[-1]):
             out.append(line)
     return "\n".join(out).strip()

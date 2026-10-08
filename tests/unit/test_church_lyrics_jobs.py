@@ -197,3 +197,10 @@ def test_lyrics_with_too_many_typos_are_dropped(world):
     assert b["callout"]["icon"]["emoji"] == "❌" and "오탈자 의심 1/2줄이라 버림" in header(b)
     code = [k for k in b["callout"]["children"] if k["type"] == "code"][0]["code"]["rich_text"]
     assert code == []
+
+
+def test_spacing_notes_show_original_to_final():
+    pairs = [("주님 사랑 다시고백", "주님사랑 다시고백"), ("주님사랑 다시고백", "주님 사랑 다시 고백"),
+             ("가나 다", "가 나다"), ("가 나다", "가나 다")]   # 제자리로 돌아온 것은 뺌
+    assert jobs.chain(pairs) == [("주님 사랑 다시고백", "주님 사랑 다시 고백"),
+                                 ("주님사랑 다시고백", "주님 사랑 다시 고백")]

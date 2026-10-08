@@ -70,3 +70,7 @@ def test_spacing_is_unified_to_a_variant_that_exists():
     # 출처 여럿이면 더 많은 출처가 쓴 표기: 띄어 쓴 쪽만 쓴 출처가 하나 더 있으면 띄어 쓴 쪽
     other = vision.replace("구원하심이", "구원 하심이")
     assert compare([vision, other, other]).lyrics.splitlines()[2] == "구원 하심이 보좌에 앉으신"
+
+
+def test_english_contractions_keep_apostrophe():
+    assert tidy("You're here with me\n'할렐루야' Lord’s love") == "You're here with me\n할렐루야 Lord's love"
