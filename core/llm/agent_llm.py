@@ -150,10 +150,15 @@ def get_llm_debate_scheduler_llm():
 
 
 def get_rag_query_rewrite_llm():
-    """Chroma standalone 검색어 재작성: 짧은 출력, 비-thinking."""
+    """Chroma standalone 검색어 재작성: 짧은 출력, 비-thinking.
+
+    결정적(temperature 0, seed 고정)이다. 0.2 였을 때 같은 질문이 실행마다 다른 영어 키워드를 내서
+    끝단 적중이 한쪽으로만 7문항씩 흔들렸다 (docs/experiments/query_determinism_1009).
+    """
     return ChatOllama(
         **ollama_kwargs(
-            temperature=0.2,
+            temperature=0.0,
+            seed=0,
             top_p=0.8,
             repeat_penalty=1.18,
             reasoning=False,
