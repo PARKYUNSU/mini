@@ -274,7 +274,20 @@ def is_factual_lookup(user_request: str) -> bool:
     if any(k in r for k in ("도구", "스케줄", "예약", "job", "chromadb", "논문 목록")):
         return False
     patterns = ("알고 있어", "알아?", "뭐야?", "뭐야 ", "설명해", "알려줘", "알려 줘")
-    return any(p in r for p in patterns)
+    if not any(p in r for p in patterns):
+        return False
+    # 출력 형식을 정해 준 요청·요령/방법/절차 같은 조언형 요청은 웹검색 사실 조회가 아니라 직접
+    # 답할 일이다. 잡담 7·계획 7 문항이 이 규칙으로 Tavily 에 갔다 (docs/experiments/route_fix_1009).
+    if _OUTPUT_CONSTRAINT_RE.search(r) or any(k in r for k in _ADVICE_MARKERS):
+        return False
+    return True
+
+
+_OUTPUT_CONSTRAINT_RE = re.compile(
+    r"(\d+\s*줄|\d+\s*자\s*(이내|안|제한|한도|까지|넘)|\d+\s*가지만|'[^']+'\s*(는|은|을|를|이라는|라는|로)|"
+    r"쓰지\s*마|빼고|금지|넣지\s*말)"
+)
+_ADVICE_MARKERS = ("요령", "방법을", "말투", "계획", "절차", "차례", "단계", "왜 ")
 
 
 def _agent_tool_py_exists(agent_tools_dir: Path, stem: str) -> bool:
@@ -536,6 +549,28 @@ def is_weather_tool_request(user_request: str) -> bool:
     return True
 
 
+def _names_paper_topic(user_request: str) -> bool:
+    """'논문' 이라는 말을 빼고도 학술 주제가 남는가 — 남으면 목록 요청이 아니라 주제 질문이다.
+
+    "환각을 분류한 벤치마크 논문 알려줘" 는 주제 질문(RAG), "최근 논문 알려줘" 는 목록 요청이다.
+    '논문 + 알려줘' 만으로 저장 논문 목록 도구로 가던 문항 5개 (docs/experiments/route_fix_1009).
+    """
+    stripped = re.sub(r"(논문|연구|paper|chromadb)", " ", user_request or "", flags=re.IGNORECASE)
+    if is_academic_query(stripped):
+        return True
+    # 게이트 어휘가 못 잡는 주제 질문(예: "노이즈를 거꾸로 학습해 이미지를 생성하는 논문")도 있다.
+    # 목록 요청은 짧고 막연하다 — 요청어·조사를 빼고도 내용이 길게 남으면 주제 질문이다.
+    content = _INVENTORY_FILLER_RE.sub(" ", stripped.lower())
+    return len(re.sub(r"[^가-힣a-z0-9]", "", content)) >= _TOPIC_MIN_CONTENT_CHARS
+
+
+_INVENTORY_FILLER_RE = re.compile(
+    r"(db|저장된|저장돼\s*있는|최근|최신|요즘|목록|리스트|알려\s*줘|보여\s*줘|뭐\s*있어|있어|조회|좀|해줘|"
+    r"에서|에|의|은|는|이|가|을|를|들|어떤|무슨)"
+)
+_TOPIC_MIN_CONTENT_CHARS = 12
+
+
 def match_whitelisted_tool(
     user_request: str,
     req_lower: str,
@@ -601,7 +636,7 @@ def match_whitelisted_tool(
             return "schedule_add_job"
 
     # 주제 검색(찾아/검색 등)은 RAG — '목록+알려줘'만으로 인벤토리 화이트리스트에 걸리지 않게 함.
-    _paper_topic_search = any(w in req_lower for w in ("검색", "요약", "설명", "찾아"))
+    _paper_topic_search = any(w in req_lower for w in ("검색", "요약", "설명", "찾아")) or _names_paper_topic(user_request)
     if (
         not _paper_topic_search
         and ("chromadb" in req_lower or "논문" in user_request or "db에" in req_lower or "db 목록" in req_lower)
@@ -751,7 +786,9 @@ def router_step1_hard_rules(
         if any(kw in user_request for kw in schedule_keywords) and (d / "schedule_add_job.py").exists():
             return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "schedule_add_job"}
     # 주제·조건이 있는 논문 찾기/검색은 RAG(B) — '목록으로 알려줘'만 있는 문장이 인벤토리보다 먼저 걸리지 않게 순서 우선.
-    if ("chromadb" in req_lower or "논문" in user_request) and any(w in req_lower for w in ("검색", "요약", "설명", "찾아")):
+    if ("chromadb" in req_lower or "논문" in user_request) and (
+        any(w in req_lower for w in ("검색", "요약", "설명", "찾아")) or _names_paper_topic(user_request)
+    ):
         return {"route_type": "direct_answer", "router_choice": "B"}
     paper_list_actions = ("목록", "알려줘", "뭐 있어", "뭐있어", "조회", "보여")
     if ("chromadb" in req_lower or "논문" in user_request) and any(w in req_lower for w in paper_list_actions):
