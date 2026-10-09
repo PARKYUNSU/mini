@@ -44,7 +44,14 @@ def main() -> int:
     total = src_col.count()
     os.makedirs(args.out, exist_ok=True)
     dst = chromadb.PersistentClient(path=args.out, settings=Settings(anonymized_telemetry=False))
-    dst_col = dst.get_or_create_collection("arxiv_papers", metadata={"hnsw:space": "cosine"})
+    # 임베딩 함수를 컬렉션 설정에 남긴다 — 없으면 "default" 로 저장돼, 운영 코드가 sentence-transformer
+    # 함수를 넘겨 get_collection 할 때 Chroma 가 충돌로 거부한다 (2026-10-09 첫 실행에서 실제로 막혔다).
+    from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+
+    ef = SentenceTransformerEmbeddingFunction(model_name=args.model, device="cpu", normalize_embeddings=True)
+    dst_col = dst.get_or_create_collection(
+        "arxiv_papers", metadata={"hnsw:space": "cosine"}, embedding_function=ef
+    )
     print(f"원본 {total:,} 청크 → {args.out} (이미 {dst_col.count():,})", flush=True)
 
     target = min(total, args.limit) if args.limit else total
