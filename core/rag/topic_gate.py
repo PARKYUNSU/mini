@@ -57,3 +57,41 @@ def is_academic_query(text: str) -> bool:
     if _TASK_HINT.search(t):
         return hits >= 2
     return True
+
+
+# ── 2단계: 어휘 규칙이 아니라고 할 때만 묻는 LLM 판정 ──────────────────────────────
+# 어휘 규칙은 분야 용어가 약한 응용 질문("웹캠으로 표정 감정을 인식해서 음악을 트는 시스템")을
+# 놓친다 (test 미탐 7/90). 단어 목록은 test 판정 때문에 고정이므로, 대신 결정적 LLM 에 한 번 더
+# 묻는다. 판정: docs/experiments/topic_gate_llm_1010.
+
+_LLM_PROMPT = """You decide whether a user's message should be answered from a library of research papers (AI, machine learning, computer science, and other sciences).
+
+Answer YES if the user asks about a research method, model, system, benchmark, technique, or findings — something a research paper would describe, even if the word "paper" is not used.
+Answer NO for everyday life, personal advice, writing or messaging tasks, plans or step-by-step procedures for the user's own files or chores, coding tasks the user wants done, weather, news, or prices.
+
+Message:
+{q}
+
+Answer with exactly one word: YES or NO."""
+
+
+def is_academic_query_llm(text: str) -> bool:
+    """결정적 LLM(temperature 0) 판정. 실패하면 False (기존 동작 유지)."""
+    t = (text or "").strip()
+    if not t:
+        return False
+    try:
+        from langchain_core.messages import HumanMessage
+
+        from core.llm.agent_llm import get_rag_query_rewrite_llm
+
+        resp = get_rag_query_rewrite_llm().invoke([HumanMessage(content=_LLM_PROMPT.format(q=t[:600]))])
+        out = str(getattr(resp, "content", resp) or "").strip().upper()
+    except Exception:
+        return False
+    return out.startswith("YES")
+
+
+def is_academic_query_full(text: str) -> bool:
+    """어휘 규칙 → (아니면) LLM. 운영 진입점."""
+    return is_academic_query(text) or is_academic_query_llm(text)
