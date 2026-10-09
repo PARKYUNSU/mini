@@ -24,7 +24,7 @@ def main() -> int:
     ap.add_argument("--model", required=True)
     ap.add_argument("--out", required=True, help="새 PersistentClient 경로")
     ap.add_argument("--batch", type=int, default=2000, help="운영 DB 에서 한 번에 읽을 청크 수")
-    ap.add_argument("--encode-batch", type=int, default=128)
+    ap.add_argument("--encode-batch", type=int, default=32)
     ap.add_argument("--limit", type=int, default=0, help="앞에서 N 청크만 (시험용)")
     args = ap.parse_args()
 
