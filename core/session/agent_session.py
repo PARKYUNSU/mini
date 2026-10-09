@@ -331,12 +331,12 @@ def is_rag_allowed(chat_id: str, user_request: str) -> bool:
     # 학술 주제 게이트: '논문' 이라는 말 없이 물은 논문 질문도 RAG 로 보낸다.
     # 논문 모드는 기본 OFF·재시작마다 꺼져서 그런 질문 139개가 RAG 에 0번 갔다
     # (docs/experiments/e2e_ko_1008 §6). 판정: docs/experiments/topic_gate_1009.
-    from core.rag.topic_gate import is_academic_query
+    from core.rag.topic_gate import is_academic_query_full
 
     return (
         get_paper_mode(chat_id)
         or _has_explicit_paper_intent(user_request)
-        or is_academic_query(user_request)
+        or is_academic_query_full(user_request)
     )
 
 

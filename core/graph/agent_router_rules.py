@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Literal, Optional
 
-from core.rag.topic_gate import is_academic_query
+from core.rag.topic_gate import is_academic_query, is_academic_query_full
 
 # ----- 주입: 채팅별 논문 모드·최근 도구 (agent_bot에서 제공) -----
 
@@ -711,7 +711,7 @@ def router_step1_hard_rules(
         and get_search_intent(user_request, req_lower) != "rag"
         # 학술 질문은 웹검색으로 직행시키지 않는다 — 이 규칙이 is_rag_allowed 를 거치지 않아
         # 논문 질문 162개 중 89개가 여기서 Tavily 로 샜다 (docs/experiments/topic_gate_1009 §8).
-        and not is_academic_query(user_request)
+        and not is_academic_query_full(user_request)
         and (d / "tavily_search_tool.py").exists()
     ):
         return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "tavily_search_tool"}

@@ -398,6 +398,27 @@ def _apply_paper_mode_router_bias(chat_id: str, user_request: str, result: dict)
     return result
 
 
+def _revert_academic_misroute(user_request: str, req_lower: str, result: dict) -> dict:
+    """3단계 LLM 이 학술 질문을 잡담(A)·계획(C)으로 보낸 경우 RAG(B)로 되돌린다.
+
+    끝단 평가에서 학술 질문 6개가 이렇게 샜다 (docs/experiments/topic_gate_llm_1010). 판정은 비용 0 인
+    어휘 게이트만 쓴다 — 잡담·계획 오탐 0/61. 명시적 코딩 요청은 계획 경로를 그대로 둔다.
+    """
+    from core.rag.topic_gate import is_academic_query
+
+    if not (
+        (result.get("route_type") == "direct_answer" and result.get("router_choice") == "A")
+        or result.get("route_type") == "planner"
+    ):
+        return result
+    if is_explicit_python_coding_request(user_request, req_lower):
+        return result
+    if not is_academic_query(user_request):
+        return result
+    print("[DEBUG] Router: 학술 질문 오분류 되돌림 → RAG(B)", flush=True)
+    return {"route_type": "direct_answer", "router_choice": "B"}
+
+
 def _dedupe_preserve_order(items: list[str]) -> list[str]:
     seen: set[str] = set()
     out: list[str] = []
@@ -612,6 +633,7 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
             user_request, session_context, rag_context, tools_context, tools_list_str, chat_id
         )
         result = _apply_paper_mode_router_bias(chat_id, user_request, result)
+        result = _revert_academic_misroute(user_request, req_lower, result)
         print(f"[DEBUG] Router: 3단계 LLM 분류 → {result.get('route_type')} (features={features})")
         # 스케줄 작업: planner는 승인 대기로 멈추므로, direct_answer로 강제 우회
         if is_scheduled and result.get("route_type") in ("planner", "code_run"):
