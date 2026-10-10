@@ -1,0 +1,60 @@
+{"idx": 0, "src_pid": "2407.12814", "ok": true, "note": "정직: 서베이 존재만 확인, 발췌에 내용 없다고 밝힘", "judge": "claude-opus-5-5"}
+{"idx": 1, "src_pid": "2504.10982", "ok": true, "note": "정확, 결론 마지막 문장 약한 추론 허용", "judge": "claude-opus-5-5"}
+{"idx": 2, "src_pid": "2605.26046", "ok": false, "note": "정답 없음 밝혔으나 결론에서 문서 3을 '두 실패 모드'로 억지 연결", "judge": "claude-opus-5-5"}
+{"idx": 3, "src_pid": "2604.05839", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 4, "src_pid": "2406.00605", "ok": false, "note": "결론이 LIFT 등까지 '20만+ 처리 설계'로 일반화", "judge": "claude-opus-5-5"}
+{"idx": 5, "src_pid": "2412.14056", "ok": false, "note": "서론 '정리한 내용 제한적' 근거 없음, 리뷰 논문임을 제시 못함", "judge": "claude-opus-5-5"}
+{"idx": 6, "src_pid": "2407.09544", "ok": true, "note": "정직: 유전 알고리즘 언급 없음을 밝힘", "judge": "claude-opus-5-5"}
+{"idx": 7, "src_pid": "2503.22589", "ok": true, "note": "정확, 이슈 추이 분석은 없다고 밝힘", "judge": "claude-opus-5-5"}
+{"idx": 8, "src_pid": "2604.04133", "ok": false, "note": "Caron(자연 이미지) 결과를 CT 인코더로 귀속, 결론에 '분할' 질문 묘사 섞음", "judge": "claude-opus-5-5"}
+{"idx": 9, "src_pid": "2503.20241", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 10, "src_pid": "2503.21406", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 11, "src_pid": "2601.05051", "ok": true, "note": "대체로 정확(항목 2 라벨이 다소 부정확)", "judge": "claude-opus-5-5"}
+{"idx": 12, "src_pid": "2412.19999", "ok": true, "note": "서베이 내용 그대로", "judge": "claude-opus-5-5"}
+{"idx": 13, "src_pid": "2605.04039", "ok": true, "note": "정확, 결론 마지막 당위 문장은 약함", "judge": "claude-opus-5-5"}
+{"idx": 14, "src_pid": "2412.11652", "ok": true, "note": "정확, 증강 언급 없음을 밝힘", "judge": "claude-opus-5-5"}
+{"idx": 15, "src_pid": "2407.00117", "ok": true, "note": "근거 있음(항목 2 이름은 지어낸 라벨)", "judge": "claude-opus-5-5"}
+{"idx": 16, "src_pid": "2503.22353", "ok": true, "note": "항목은 근거 있음, 결론 연결은 약하게 과장", "judge": "claude-opus-5-5"}
+{"idx": 17, "src_pid": "2403.04256", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 18, "src_pid": "2412.20212", "ok": false, "note": "인용된 선행연구(ParsBERT)를 정답 연구로 제시, 결론 '성능 향상 입증' 근거 없음", "judge": "claude-opus-5-5"}
+{"idx": 19, "src_pid": "2503.01859", "ok": false, "note": "제목·참고문헌 줄뿐인 블록에 질문의 '순위 재조정' 묘사를 옮김, 결론 과장", "judge": "claude-opus-5-5"}
+{"idx": 20, "src_pid": "2509.18054", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 21, "src_pid": "2604.05116", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 22, "src_pid": "2604.06203", "ok": false, "note": "본론을 영어 원문 그대로 붙임(한국어 규칙 위반), 결론에 질문 묘사(허위 정보·편향) 섞음", "judge": "claude-opus-5-5"}
+{"idx": 23, "src_pid": "2302.11550", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 24, "src_pid": "2603.17169", "ok": true, "note": "정확(미세튜닝 효과 없음까지)", "judge": "claude-opus-5-5"}
+{"idx": 25, "src_pid": "2503.20084", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 26, "src_pid": "2412.15004", "ok": false, "note": "결론이 Vul-RAG의 지식 증류를 리뷰 논문의 내용인 것처럼 귀속", "judge": "claude-opus-5-5"}
+{"idx": 27, "src_pid": "2603.23085", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 28, "src_pid": "2412.12881", "ok": false, "note": "정답 없음 밝혔으나 결론에서 문서들이 질문의 방법을 구현한다고 연결", "judge": "claude-opus-5-5"}
+{"idx": 29, "src_pid": "2507.07847", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 30, "src_pid": "2407.00474", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 31, "src_pid": "2412.17432", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 32, "src_pid": "2403.19867", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 33, "src_pid": "2402.10496", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 34, "src_pid": "2403.01193", "ok": true, "note": "정답 없음 밝히고 문서 내용대로", "judge": "claude-opus-5-5"}
+{"idx": 35, "src_pid": "2601.02023", "ok": true, "note": "정답 없음 밝히고 문서 내용대로", "judge": "claude-opus-5-5"}
+{"idx": 36, "src_pid": "2503.24016", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 37, "src_pid": "2309.12132", "ok": false, "note": "본론을 영어로 씀(한국어 규칙 위반)", "judge": "claude-opus-5-5"}
+{"idx": 38, "src_pid": "2412.20024", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 39, "src_pid": "2603.15586", "ok": false, "note": "무관한 Decision Mamba를 억지로 연결, 결론 과장", "judge": "claude-opus-5-5"}
+{"idx": 40, "src_pid": "2412.11867", "ok": true, "note": "대체로 정확", "judge": "claude-opus-5-5"}
+{"idx": 41, "src_pid": "2502.09212", "ok": false, "note": "SEAL의 관련연구 서술(초기 KBQA)을 SEAL 기여로 귀속", "judge": "claude-opus-5-5"}
+{"idx": 42, "src_pid": "2603.27148", "ok": true, "note": "정확(용어 혼용 약간)", "judge": "claude-opus-5-5"}
+{"idx": 43, "src_pid": "2503.23402", "ok": true, "note": "정답 없음 밝히고 문서 내용대로", "judge": "claude-opus-5-5"}
+{"idx": 44, "src_pid": "2412.12432", "ok": false, "note": "'기본 모델로 초기화'·'GPU 메모리 우회'를 질문에서 옮김, 결론 효율 향상 근거 없음", "judge": "claude-opus-5-5"}
+{"idx": 45, "src_pid": "2503.19823", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 46, "src_pid": "2504.00286", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 47, "src_pid": "2412.13050", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 48, "src_pid": "2412.18043", "ok": true, "note": "대체로 정확(결론 '평가 개선'은 약한 과장)", "judge": "claude-opus-5-5"}
+{"idx": 49, "src_pid": "2412.12883", "ok": false, "note": "결론에 '구조적·비구조적'(질문 묘사) 섞고 '정량 평가 가능 확인' 과장", "judge": "claude-opus-5-5"}
+{"idx": 50, "src_pid": "2603.11820", "ok": false, "note": "결론에서 문서들이 질문의 클러스터링→필터→검증 흐름을 구현한다고 과장", "judge": "claude-opus-5-5"}
+{"idx": 51, "src_pid": "2412.12039", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 52, "src_pid": "2503.20981", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 53, "src_pid": "2412.16409", "ok": true, "note": "대체로 정확", "judge": "claude-opus-5-5"}
+{"idx": 54, "src_pid": "2501.14679", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}
+{"idx": 55, "src_pid": "2504.00289", "ok": false, "note": "네 가설 중 '귀무가설'을 연구 결과인 것처럼 결론 — 날조", "judge": "claude-opus-5-5"}
+{"idx": 56, "src_pid": "2512.00663", "ok": false, "note": "결론에서 세 문서 모두 인간 진단·피드백 워크플로우를 구현한다고 과장", "judge": "claude-opus-5-5"}
+{"idx": 57, "src_pid": "2407.00429", "ok": true, "note": "정확, 엔트로피 어닐링 없음 밝힘", "judge": "claude-opus-5-5"}
+{"idx": 58, "src_pid": "2412.10509", "ok": true, "note": "대체로 정확", "judge": "claude-opus-5-5"}
+{"idx": 59, "src_pid": "2511.05549", "ok": true, "note": "정확", "judge": "claude-opus-5-5"}

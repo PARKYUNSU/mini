@@ -1,0 +1,27 @@
+{
+  "version": "v12",
+  "samples": 1100,
+  "slot_dist": {
+    "chat": 300,
+    "planner": 400,
+    "rag": 400
+  },
+  "rag_pool": 671,
+  "rag_gold_in_context": 370,
+  "rag_stage": {
+    "verified_llm": 168,
+    "repaired": 118,
+    "repaired_auto2": 16,
+    "repaired2": 62,
+    "repaired3": 25,
+    "repaired_auto": 11
+  },
+  "change": {
+    "kind": "replace_slot",
+    "slot": "rag",
+    "rows": 400,
+    "from": "v9 RAG 400 (문서 없음, 기억 에세이)",
+    "to": "운영 프롬프트(문서 5편) + gpt-oss-120b 교사 + 근거 검증"
+  },
+  "note": "max_seq_length 3072 로 학습 (MAX_SEQ_LENGTH) — RAG 입력+답이 2048 을 넘는다 (표본 25건 중 16건, 최대 2372)."
+}

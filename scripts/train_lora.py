@@ -85,6 +85,22 @@ def resolve_learning_rate(raw: str | None, default: float) -> tuple[float, dict]
     return lr, {"learning_rate": {"default": default, "used": lr}}
 
 
+def resolve_max_seq_length(raw: str | None, default: int) -> tuple[int, dict]:
+    """``MAX_SEQ_LENGTH`` 환경변수로 최대 길이만 덮어쓴다 (yunsur_v12: 문서 5편이 든 RAG 입력이 2048 을 넘는다).
+
+    더 긴 샘플이 잘리지 않게 할 뿐, 원래 2048 안에 들던 샘플의 학습은 바꾸지 않는다.
+    """
+    if raw is None or not str(raw).strip():
+        return default, {}
+    try:
+        n = int(str(raw).strip())
+    except ValueError:
+        raise SystemExit(f"MAX_SEQ_LENGTH 를 정수로 읽을 수 없다: {raw!r}")
+    if n < default:
+        raise SystemExit(f"MAX_SEQ_LENGTH({n}) 는 기본값({default}) 이상이어야 한다 — 줄이면 기존 샘플이 잘린다")
+    return n, ({"max_seq_length": {"default": default, "used": n}} if n != default else {})
+
+
 # ---------------------------------------------------------------- 0) 환경 검증 (노트북 셀 4)
 def resolve_save_steps(raw: str | None, total_hint: int = 138) -> int | None:
     """``SAVE_STEPS`` 환경변수를 검증해 중간 체크포인트 간격을 돌려준다 (없으면 None).
@@ -194,12 +210,17 @@ def main() -> int:
     save_steps = resolve_save_steps(os.environ.get("SAVE_STEPS"))
     save_steps_max = resolve_save_steps_max(os.environ.get("SAVE_STEPS_MAX"))
     H["learning_rate"] = lr
+    msl, msl_override = resolve_max_seq_length(os.environ.get("MAX_SEQ_LENGTH"), HPARAMS["max_seq_length"])
+    H["max_seq_length"] = msl
+    hparam_overrides = {**hparam_overrides, **msl_override}
+    if msl_override:
+        log(f"  하이퍼파라미터 오버라이드: max_seq_length {HPARAMS['max_seq_length']} -> {msl} (잘림 방지)")
     if hparam_overrides:
         log("=" * 66)
         log(f"  하이퍼파라미터 오버라이드: learning_rate {HPARAMS['learning_rate']} -> {lr}")
         log("  라운드 노트에 사유가 적혀 있어야 한다 (docs/experiments/).")
         log("=" * 66)
-    log(f"learning_rate = {lr} ({'LEARNING_RATE 오버라이드' if hparam_overrides else 'HPARAMS 기본값'})")
+    log(f"learning_rate = {lr} ({'LEARNING_RATE 오버라이드' if 'learning_rate' in hparam_overrides else 'HPARAMS 기본값'})")
     dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
 
     # 2) 모델 로드 (셀 9)

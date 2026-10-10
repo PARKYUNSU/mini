@@ -21,16 +21,18 @@ import requests
 D = Path(__file__).resolve().parent.parent / "finetune_datasets" / "v12"
 MODEL = "openai/gpt-oss-120b"
 
-PROMPT = """너는 학습 데이터 품질 검사관이다. [답변]이 [참고 문서]만으로 쓰였는지 아래 네 가지를 엄격히 검사하라.
+PROMPT = """너는 학습 데이터 품질 검사관이다. [답변]이 [참고 문서]에 근거했는지 아래 네 가지 '심각한 문제'만 검사하라.
+가벼운 마무리 문장("~에 기여한다", "유용한 기반을 제공한다", "중요하다"), 질문의 일반 주제어를 다시 쓰는 것, 본론 항목 제목을 짧게 붙인 라벨은 문제로 보지 않는다.
 
-A. 결론 과장: '### 결론'에 본론에 쓰지 않은 새 사실·평가·일반화가 있는가? 특히 "문서들이 질문의 방법/흐름을 구현한다", "모두 ~하도록 설계되었다", "~를 확인했다/입증했다"처럼 문서가 말하지 않은 연결·단정을 하는가?
-B. 질문 묘사 끼워넣기: [사용자] 질문 문장에만 있고 참고 문서 블록에는 없는 표현·주장(방법 이름, 수치, 구성 요소, 효과)을 서론이 아닌 본론·결론에서 사실처럼 쓰는가? (서론에서 질문을 다시 말하는 것은 괜찮다)
-C. 관련 연구 귀속: 문서 블록 중 관련 연구·참고문헌·다른 논문을 소개하는 부분(예: "X et al. proposed ...", 인용 목록)을 그 블록 논문의 기여인 것처럼 썼는가?
+A. 결론의 잘못된 사실·연결: 결론이 본론·문서에 없는 **구체적 사실**(방법 구성, 수치, 실험 결과, '~을 확인/입증했다')을 주장하거나, 문서가 질문이 찾는 그 방법을 다루지 않는데 "문서들이 질문의 방법/흐름을 구현한다", "모두 ~하도록 설계되었다"처럼 **잘못 연결**하는가?
+B. 질문 속 기술 내용의 이식: 질문 문장에만 있고 문서 블록에 없는 **구체적 기술 내용**(특정 모듈·기법·수치·효과)을 본론·결론에서 문서의 사실처럼 쓰는가?
+C. 관련 연구 귀속: 문서 블록이 다른 논문을 소개하는 부분(관련 연구, "X et al. proposed", 참고문헌)을 그 블록 논문의 기여처럼 썼는가?
 D. 가설·목표를 결과로: 문서가 가설·질문·계획으로 제시한 것을 연구 결과처럼 썼는가?
+E. 억지 연결: 질문과 주제가 다른 문서(예: 의사결정 아키텍처 논문을 '심성' 질문에)를 질문의 답인 것처럼 본론·결론에서 엮는가? 또는 결론이 한 문서(예: 다른 논문 Vul-RAG)의 내용을 다른 문서(예: 리뷰 논문)의 내용인 것처럼 섞는가?
+F. 빈 블록 채우기: 제목·저자·참고문헌 줄뿐이라 내용이 거의 없는 문서 블록을 인용하면서, 질문 문장에 있던 기술 내용(예: '순위 재조정', '두 모듈')으로 그 논문을 설명하는가? (제목에 있는 말은 써도 된다)
 
-하나라도 해당하면 ok=false. JSON 하나만 출력하라:
-{{"A": true|false, "B": true|false, "C": true|false, "D": true|false, "reason": "<해당 항목과 근거를 짧게>", "ok": true|false}}
-(A~D 는 '문제가 있다' 면 true)
+JSON 하나만 출력하라 (A~F 는 '심각한 문제가 있다' 면 true):
+{{"A": true|false, "B": true|false, "C": true|false, "D": true|false, "E": true|false, "F": true|false, "reason": "<해당 항목과 근거를 짧게>", "ok": true|false}}
 
 [참고 문서와 질문]
 {user}
@@ -63,15 +65,18 @@ def main() -> int:
     print(f"엄격 검증 대상 {len(todo)}", flush=True)
 
     def one(a: dict) -> None:
-        body = {"model": MODEL, "temperature": 0.0, "max_tokens": 4000, "reasoning_effort": "high",
+        body = {"model": MODEL, "temperature": 0.0, "max_tokens": 4000, "reasoning_effort": "medium",
                 "messages": [{"role": "user", "content": PROMPT.format(user=P[a["src_pid"]]["user"], answer=a["answer"])}]}
         for attempt in range(4):
             try:
                 r = requests.post(url, json=body, timeout=600)
                 r.raise_for_status()
                 txt = r.json()["choices"][0]["message"].get("content") or ""
-                v = json.loads(re.search(r"\{.*\}", txt, re.S).group(0))
-                ok = not any(v.get(k) for k in "ABCD")
+                m = re.search(r"\{.*\}", txt, re.S)
+                if not m:
+                    raise ValueError("JSON 없음")
+                v = json.loads(m.group(0))
+                ok = not any(v.get(k) for k in "ABCDEF")
                 with lock, out_path.open("a", encoding="utf-8") as w:
                     w.write(json.dumps({"src_pid": a["src_pid"], "ok": ok, "verdict": v}, ensure_ascii=False) + "\n")
                 return

@@ -44,6 +44,9 @@ finetune_datasets/v4/raw/
 finetune_datasets/v5/raw/
 !finetune_datasets/v6/
 !finetune_datasets/v9/
+!finetune_datasets/v12/
+# 운영 프롬프트 원본(7MB) — 쓰인 400건은 train_data_v12.jsonl 에 그대로 들어 있다
+finetune_datasets/v12/prompts.jsonl
 chroma_db/
 chroma_db_backup_*/
 # 점(.) 구분자라 chroma_db_backup_* 에 걸리지 않는다 — 마이그레이션 전 스냅샷
