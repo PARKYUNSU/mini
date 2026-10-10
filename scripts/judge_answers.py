@@ -65,6 +65,8 @@ def load_corpus() -> dict[str, dict]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--label", required=True)
+    ap.add_argument("--resume", action="store_true", help="기존 출력에서 판정되지 않은 문항만 다시")
+    ap.add_argument("--pace", type=float, default=3.0, help="호출 사이 대기(초) — Groq 분당 한도")
     args = ap.parse_args()
 
     from core.llm.agent_llm import GROQ_CODING_MODEL, get_coding_groq_llm, normalize_ai_message_content
@@ -78,8 +80,17 @@ def main() -> int:
 
     EXP.mkdir(parents=True, exist_ok=True)
     out_path = EXP / f"judged_{args.label}.jsonl"
-    with out_path.open("w", encoding="utf-8") as w:
+    prev: dict[str, dict] = {}
+    if args.resume and out_path.exists():
+        prev = {x["id"]: x for x in map(json.loads, out_path.read_text(encoding="utf-8").splitlines())}
+    # 임시 파일에 쓰고 끝에서 교체한다 — 중간에 멈추면 이미 판정한 행을 잃던 문제(2026-10-10).
+    tmp_path = out_path.with_suffix(".jsonl.tmp")
+    with tmp_path.open("w", encoding="utf-8") as w:
         for k, r in enumerate(rows, 1):
+            old = prev.get(r["id"])
+            if old and (old.get("judged") or old.get("reason")):
+                w.write(json.dumps(old, ensure_ascii=False) + "\n")
+                continue
             res: dict = {"id": r["id"], "slot": r["slot"], "route": r["route"], "ctx_ok": r["ok"]}
             answer = (r.get("answer") or "").strip()
             if r["route"] != "direct_answer/B" or not answer:
@@ -92,7 +103,8 @@ def main() -> int:
                 prompt = PROMPT.format(question=questions[r["id"]], pid=pid, title=p.get("title", ""),
                                        abstract=(p.get("abstract") or "")[:2000], answer=answer[:4000])
                 verdict = None
-                for attempt in range(3):
+                time.sleep(args.pace)
+                for attempt in range(5):
                     try:
                         raw = normalize_ai_message_content(llm.invoke(prompt))
                         m = re.search(r"\{.*\}", raw, re.S)
@@ -100,12 +112,15 @@ def main() -> int:
                         if verdict:
                             break
                     except Exception as exc:  # 재시도
-                        print(f"  재시도 {r['id']}: {type(exc).__name__}", flush=True)
-                        time.sleep(5 * (attempt + 1))
+                        print(f"  재시도 {r['id']}: {type(exc).__name__}: {str(exc)[:160]}", flush=True)
+                        time.sleep(30 * (attempt + 1))
                 res.update({"judged": verdict is not None, "gold_judged": pid, **(verdict or {})})
+                if verdict is None:
+                    res["reason"] = "judge_error"  # --resume 이 다시 붙잡지 않게 남긴다
             w.write(json.dumps(res, ensure_ascii=False) + "\n")
             w.flush()
             print(f"[{k}/{len(rows)}] {r['id']} {res.get('description', res.get('reason', '?'))}", flush=True)
+    tmp_path.replace(out_path)
     print(f"저장: {out_path}")
     return 0
 
