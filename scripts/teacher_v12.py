@@ -50,7 +50,13 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--pace", type=float, default=25.0, help="호출 사이 대기(초) — 분당 8K 토큰 한도")
+    ap.add_argument("--base-url", default="", help="OpenAI 호환 서버(vLLM 등). 주면 Groq 대신 이것을 쓴다")
+    ap.add_argument("--key-file", default="", help="서버 API 키가 든 파일 경로(키를 명령줄에 남기지 않는다)")
+    ap.add_argument("--workers", type=int, default=24)
+    ap.add_argument("--follow", action="store_true", help="캡처가 끝날 때까지 새 프롬프트를 따라가며 처리")
     args = ap.parse_args()
+    if args.base_url:
+        return run_openai(args)
 
     import core.config.agent_config  # noqa: F401  (.env 로드)
     from langchain_core.messages import HumanMessage, SystemMessage
@@ -97,6 +103,76 @@ def main() -> int:
             w.flush()
             print(f"[{k}/{len(todo)}] {r['src_pid']} tok={usage.get('total_tokens')} len={len(text)}", flush=True)
             time.sleep(args.pace)
+    return 0
+
+
+def build_messages(r: dict) -> tuple[list[dict], list[int]]:
+    gold_nums = [i + 1 for i, p in enumerate(r["context_pids"]) if p == r["src_pid"]]
+    hint = (f"\n\n[정답 힌트] 질문이 찾는 논문은 {''.join(f'[문서 {n}]' for n in gold_nums)} 이다."
+            if gold_nums else "\n\n[정답 힌트] 질문이 찾는 논문은 제공된 문서에 없다.")
+    return [{"role": "system", "content": r["system"] + TEACHER_RULES + hint},
+            {"role": "user", "content": r["user"]}], gold_nums
+
+
+def run_openai(args) -> int:
+    """vLLM 등 OpenAI 호환 서버로 병렬 생성 (RunPod H100 gpt-oss-120b)."""
+    import subprocess
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+
+    import requests
+
+    key = Path(args.key_file).read_text().strip() if args.key_file else ""
+    headers = {"Authorization": f"Bearer {key}"} if key else {}
+    url = args.base_url.rstrip("/") + "/chat/completions"
+    lock = threading.Lock()
+
+    def done_ids() -> set:
+        if not OUT.exists():
+            return set()
+        return {json.loads(l)["src_pid"] for l in OUT.read_text().splitlines() if l.strip()}
+
+    def one(r: dict) -> None:
+        msgs, gold_nums = build_messages(r)
+        body = {"model": MODEL, "messages": msgs, "temperature": 0.3, "max_tokens": 6000, "reasoning_effort": "medium"}
+        for attempt in range(4):
+            try:
+                t0 = time.time()
+                resp = requests.post(url, json=body, headers=headers, timeout=600)
+                resp.raise_for_status()
+                j = resp.json()
+                msg = j["choices"][0]["message"]
+                text = (msg.get("content") or "").strip()
+                if not text:
+                    raise ValueError(f"빈 응답 finish={j['choices'][0].get('finish_reason')}")
+                row = {"src_pid": r["src_pid"], "gold_nums": gold_nums, "answer": text,
+                       "tokens": (j.get("usage") or {}).get("total_tokens"),
+                       "elapsed": round(time.time() - t0, 1), "teacher": f"{MODEL}@vllm"}
+                with lock:
+                    with OUT.open("a", encoding="utf-8") as w:
+                        w.write(json.dumps(row, ensure_ascii=False) + "\n")
+                print(f"  {r['src_pid']} tok={row['tokens']} {row['elapsed']}s", flush=True)
+                return
+            except Exception as exc:
+                print(f"  재시도 {r['src_pid']} ({attempt + 1}): {str(exc)[:160]}", flush=True)
+                time.sleep(10 * (attempt + 1))
+
+    while True:
+        rows = [json.loads(l) for l in PIN.read_text().splitlines() if l.strip()]
+        rows = [r for r in rows if r.get("route") == "direct_answer/B" and r.get("user") and not r.get("eval_leak")]
+        have = done_ids()
+        todo = [r for r in rows if r["src_pid"] not in have]
+        if args.limit:
+            todo = todo[: args.limit]
+        capturing = subprocess.run(["pgrep", "-f", "capture_v12_prompts"], capture_output=True).returncode == 0
+        print(f"[{time.strftime('%H:%M:%S')}] 대상 {len(rows)} · 완료 {len(have)} · 이번 {len(todo)} · 캡처중={capturing}", flush=True)
+        if todo:
+            with ThreadPoolExecutor(max_workers=args.workers) as ex:
+                list(ex.map(one, todo))
+        if not args.follow or (not capturing and not todo):
+            break
+        if not todo:
+            time.sleep(60)
     return 0
 
 
