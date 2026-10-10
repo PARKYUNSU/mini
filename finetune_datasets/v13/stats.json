@@ -1,0 +1,18 @@
+{
+  "version": "v13",
+  "samples": 1100,
+  "slot_dist": {
+    "chat": 300,
+    "planner": 400,
+    "rag": 400
+  },
+  "change": {
+    "kind": "replace_rows",
+    "rows": 30,
+    "replaced_prompts": 7,
+    "from": "v12 정답 없는 RAG 30 (서론만 '없다', 결론 9/30 만 '없다')",
+    "to": "서론·본론(관련 연구)·결론 모두 '없다' 형식, 근거 검증 통과"
+  },
+  "unchanged_rows": 1070,
+  "note": "MAX_SEQ_LENGTH=3072, 하이퍼파라미터 v12 와 동일"
+}

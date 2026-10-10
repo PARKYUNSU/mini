@@ -45,6 +45,7 @@ finetune_datasets/v5/raw/
 !finetune_datasets/v6/
 !finetune_datasets/v9/
 !finetune_datasets/v12/
+!finetune_datasets/v13/
 # 운영 프롬프트 원본(7MB) — 쓰인 400건은 train_data_v12.jsonl 에 그대로 들어 있다
 finetune_datasets/v12/prompts.jsonl
 chroma_db/
