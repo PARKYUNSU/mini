@@ -98,3 +98,30 @@ Claude 가 130문항을 gpt-oss 판정을 보지 않고 판정한 뒤(`judged_cl
 - `ok` 불일치 16건 중 15건은 **Claude 가 더 너그러운 쪽**(gpt-oss wrong/absent → Claude partial). 주로 정답 ID 에 다른 논문 내용이 섞였지만 이름으로는 맞게 설명한 경우, 핵심이 빠진 모호한 설명.
 - **correct/partial 경계는 크게 다르다**: gpt-oss partial 21건을 Claude 는 correct 로 봤다(Claude correct 25 vs gpt-oss 5). 그래서 절대 correct 비율은 판정자마다 다르다 — 2단계는 사전 등록대로 **`ok` 짝 비교만** 주 지표로 쓰고, correct 는 같은 판정자 안에서만 비교한다.
 - 결론: 2단계(base vs v9) 판정은 Claude 가 한다. Groq 한도를 쓰지 않는다.
+
+### 6.2 보충 — 측정 전에 덧붙임 (2026-10-10, base 생성 중·결과 보기 전)
+
+- **눈가림의 한계**: Claude 는 1단계에서 v9 답변 130개를 이미 읽었다. 이름을 가려도 문체로 v9 답변을 알아볼 수 있다. 그래서 v9 답변도 새로 판정하고(1단계 판정을 재사용하지 않는다), **같은 v9 답변에 대한 1단계 판정과 2단계 판정의 일치도**(재판정 일관성)를 함께 보고한다. 일관성이 낮으면(ok 일치 < 0.85) 결론을 보류하고 gpt-oss 로 표본 교차 판정한다.
+- 짝 입력은 [`scripts/build_blind_pairs.py`](../../../scripts/build_blind_pairs.py) 로 만든다: 두 답변을 X·Y 로 두고 순서는 문항 ID 해시로 정한다. 판정이 끝날 때까지 `blind_key_*.json` 은 열지 않는다.
+- 기준 논문은 두 답변 중 하나라도 인용한 정답(없으면 목록 첫 번째)으로 양쪽에 같게 둔다.
+
+### 6.2 결과 — base vs v9 (2026-10-10): **base 가 압도적으로 낫다**
+
+생성: `RAG_ANSWER_MODEL=qwen3.5:9b` 로 `ans_base` 162문항(운영 `.env` 무변경). **RAG 로 간 159문항 모두 `context_papers` 가 v9 실행과 같았다**(결정적 검색어 확인). 비교 대상: 둘 다 RAG·컨텍스트에 정답 → **138쌍**. Claude 가 X/Y 로 가린 채 판정([`judged_claude_blind_ans_full_vs_ans_base.jsonl`](judged_claude_blind_ans_full_vs_ans_base.jsonl)) 후 [`scripts/analyze_blind_pairs.py`](../../../scripts/analyze_blind_pairs.py) 로 풀었다.
+
+| 138쌍 | v9 (`ans_full`) | base (`ans_base`) |
+|---|---|---|
+| **ok (correct+partial)** | 79 (57%) | **126 (91%)** |
+| correct | 32 | **66** |
+| wrong | 29 | **7** |
+| absent | 30 | **5** |
+| 날조 | 65 (47%) | **36 (26%)** |
+| ID 맞고 내용 틀림 | 26 | **7** |
+
+- **ok 짝: v9 만 2 · base 만 49 → McNemar 정확 p < 0.0001.** 날조 짝: v9 만 39 · base 만 10, p < 0.0001.
+- **재판정 일관성**(같은 v9 답변, 1단계 판정 vs 눈가림 판정, n=113): ok 일치 0.991 → 기준 0.85 통과, gpt-oss 교차 판정은 규칙상 필요 없다. 단 v9 문체를 알아볼 수 있었으므로 이 일치도는 기억의 영향도 포함한다 — 차이가 49:2 라 판정자 편향으로 설명될 크기는 아니라고 본다.
+- **형식·속도 (RAG 159문항 전체)**: 서론/본론/결론 v9 159 · base 158, literal `\n` 둘 다 0, 빈 답·폴백 0. 답변 시간 중앙값 v9 50.1초 · **base 41.9초**. 답변이 정답 ID 를 인용한 비율 v9 0.591 · **base 0.836**.
+
+**판정 (§6.2 규칙)**: base 가 유의하게 낫다 → **v9 파인튜닝이 내용 정확도를 해친다.** v9 는 형식 실패율로만 채택됐고 내용을 잰 적이 없었다. 템플릿 이탈도 v9 쪽이 크다([`../template_collapse_1006/`](../template_collapse_1006/)). 예상("유의차 없음, 교차 귀속은 컨텍스트 형식 탓")은 **틀렸다** — 교차 귀속(ID 맞고 내용 틀림)이 26 → 7 로 모델만 바꿔도 대부분 사라진다.
+
+**제안 (운영 변경, 사용자 승인 필요)**: `.env` 의 `RAG_ANSWER_MODEL` 을 `yunsur_v9` → `qwen3.5:9b` 로. 남은 개선 후보(컨텍스트 형식·템플릿)는 base 위에서 다시 잰다.
