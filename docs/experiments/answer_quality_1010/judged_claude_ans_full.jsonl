@@ -1,0 +1,130 @@
+{"id": "A001", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "MTW SOS 취지는 맞으나 '음수 성분 제거'로 왜곡, 같은 ID에 Geodesic Sinkhorn 붙임"}
+{"id": "A002", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "역설은 맞으나 원인을 다중공선성으로 지어냄"}
+{"id": "A003", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "정답 논문 언급 없음"}
+{"id": "A004", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "시각 데이터로 이슈 해결 — 핵심 맞음"}
+{"id": "A005", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "마스킹·잔차 병합·20% 지어냄, induction head 역할 반대로 설명"}
+{"id": "A006", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "라우팅 표류 해결은 맞으나 토큰 할당 빠짐, 백본 적용 세부 지어냄"}
+{"id": "A007", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "클리핑은 맞으나 저주파 soft clipping 빠짐, 계산 효율 주장 근거 없음"}
+{"id": "A009", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "과제 정렬 검증 맞음 (본론 ID는 다른 논문)"}
+{"id": "A010", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "코드 환각 분류·첫 벤치마크 맞음"}
+{"id": "A011", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "INRAExplorer 정확"}
+{"id": "A012", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "CorpusQA 언급 없음"}
+{"id": "A013", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "JSCDS 취지 맞으나 ID 틀림, 정답 ID에 SALN 내용"}
+{"id": "A014", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "협력 전략 샘플 복잡도 상·하한 맞음"}
+{"id": "A015", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 GOD(다국어 편향) 내용 — 리뷰·16시나리오 평가 아님"}
+{"id": "A016", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "MG-GNN 취지 맞으나 ID 틀림, 정답 ID에 Neural ODE 내용, 물리 제약 지어냄"}
+{"id": "A017", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "DRKL을 엔트로피 항으로 설명(초록은 비표적 그래디언트 제거), 정답 ID에 RDM"}
+{"id": "A018", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "리뷰 논문 언급 없음"}
+{"id": "A019", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "중국 K12 멀티모달 수학은 맞으나 환각 탐지 지어냄"}
+{"id": "A020", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "ERL을 다중 에이전트 협력·경쟁으로 설명, 소크라테스 튜터·POMDP 없음"}
+{"id": "A021", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": true, "note": "결정나무로 주진단 식별 맞음, 이탈리아 의무 세부는 초록에 없음"}
+{"id": "A022", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "visual trace prompting으로 궤적을 시각 인코딩 — 맞음"}
+{"id": "A023", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "XEUS 없음, MERaLiON 설명"}
+{"id": "A024", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "적응 OFDM+RL 맞으나 age of updates 빠짐, 다중 안테나 지어냄"}
+{"id": "A025", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "정답 ID로 EDL 일반 배경만, plug-in loss 기여 빠짐"}
+{"id": "A027", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "정답 인용하나 '아무 코퍼스로 합성' 핵심 빠짐, 환각 억제 주장 근거 없음"}
+{"id": "A028", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "NDAI 논문 없음"}
+{"id": "A029", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "MOOC Graph RAG 없음"}
+{"id": "A030", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "모델 무관 잔차 정책으로 온라인 정제 — 맞음"}
+{"id": "A031", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "CoCoOp 없음"}
+{"id": "A032", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 HybridRAG(벡터+KG) 붙임, DAKS·정렬 그래프 없음"}
+{"id": "A033", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "SumAutoEval 없음"}
+{"id": "A034", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "독일 법학 논문 없음"}
+{"id": "A035", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "계층 필터링 맞으나 두 번 생성(Flash/Pro) 빠짐"}
+{"id": "A036", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "LAKE 없음"}
+{"id": "A037", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "가중 순차 패턴은 맞으나 불확실·증분 DB 핵심 분리됨"}
+{"id": "A038", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "베이즈+인지 위계 결합은 맞으나 의미 불확실성 빠짐, 협력 궤적 주장 지어냄"}
+{"id": "A039", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "RU·함정 질문 없음"}
+{"id": "A040", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "레딧·2층 RAG는 맞으나 교차 모델 정렬 지어냄, 요약 2단 구조 빠짐"}
+{"id": "A041", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "KG로 비용 없이 테스트셋 맞으나 100만(실제 1천만), judge 모델 빠짐"}
+{"id": "A042", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "Glue pizza 논문 없음"}
+{"id": "A043", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 '안정성 수학적 검증' 붙임 — 전이학습 관점 리뷰 아님"}
+{"id": "A044", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "KnowGPT 없음"}
+{"id": "A045", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 LLMLIFT·FreqKV(메모리 4배) 붙임"}
+{"id": "A047", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "1,000개 일상 활동 벤치마크 맞음"}
+{"id": "A048", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "지상 진실 활용·데이터 부족 환경이라 함 — 초록과 반대"}
+{"id": "A049", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 SceneRAG 붙임"}
+{"id": "A050", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "토큰 시각 의존도 희소 맞으나 advantage 재조정 빠짐"}
+{"id": "A051", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "DCC 이름만, 미분 가능 카디널리티·다항 시간 핵심 빠짐"}
+{"id": "A052", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "LiDM 언급, VQ-VAE·메모리 세부 지어냄, 곡선 압축 등 핵심 빠짐"}
+{"id": "A053", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 이중 트리거 공격 붙임 — 편향 주입 아님"}
+{"id": "A054", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 FreqKV 256K 붙임"}
+{"id": "A055", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": true, "note": "SSM+LNP 로컬 특징 맞음, 정답 ID에 PMG 붙임"}
+{"id": "A056", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "코퍼스·추가 추론 없이 토큰 임베딩으로 검색 여부 — 맞음"}
+{"id": "A058", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "TrimLLM 없음"}
+{"id": "A059", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "앙상블 언급만, 정보 엔트로피 이론·파이프라인/모듈 분석 빠짐"}
+{"id": "A060", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "SafeRAG 공격 분류·데이터셋 맞음"}
+{"id": "A061", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "ACC-RAG 없음"}
+{"id": "A062", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "HiRAG 없음"}
+{"id": "A063", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "SFR-RAG 없음"}
+{"id": "A064", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "학습 없는 야코비안 편집은 맞으나 영역 마스크 직교 투영 빠짐"}
+{"id": "A065", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "Wikontic 없음"}
+{"id": "A066", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": true, "note": "성숙도 인증+UQ 측정 맞음, 불확실성-오류 상관 분석은 초록에 없음"}
+{"id": "A067", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "탐색+개선으로 지연 감소 맞으나 ReST 빠짐"}
+{"id": "A069", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 RAGSmith·FreqKV 붙임"}
+{"id": "A070", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "사회적 의미 근거 논문 없음"}
+{"id": "A071", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "분류 리포트로 식별 불가, HalluMat·HALoGEN 설명"}
+{"id": "A072", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "온톨로지 정렬 구조화 맞으나 LLM 추출 핵심 빠짐"}
+{"id": "A073", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "분산 최소 팔 선택은 맞으나 다항 시간 수렴 지어냄, 두 표본 추정 빠짐"}
+{"id": "A074", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "RAG-WM 이름은 맞으나 ID 틀림, 정답 ID에 WARD 붙임"}
+{"id": "A075", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": true, "note": "CtRL-Sim 정확, 정답 ID에 Human-Regularized PPO도 붙임"}
+{"id": "A076", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "정답 ID는 결론에 붙기만, 연구 내용 설명 없음"}
+{"id": "A077", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "자유에너지·상태 집계 언급, '자유에너지 최소화'로 왜곡, 공간 선택 메커니즘 빠짐"}
+{"id": "A078", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": true, "note": "ViT 근육층 분할·PIR 맞음, U-Net 비교는 초록에 없음"}
+{"id": "A079", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "SHAP 확장 지지 논문 없음"}
+{"id": "A080", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "방언 편향·RAG 번역·RLAIF 맞으나 측정이 아니라 개선 프레임워크라 함"}
+{"id": "A081", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 MA-RAG 다중 에이전트 붙임"}
+{"id": "A082", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": true, "note": "웹캠 감정 인식→재생목록 맞음, 3초마다는 초록에 없음"}
+{"id": "A083", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "정답 인용하나 DRC 데이터셋 증류 핵심 빠짐"}
+{"id": "A084", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "kernel SHAP으로 확률적 ICP 출력 설명 — 맞음"}
+{"id": "A085", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "QUAG 없음"}
+{"id": "A086", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "소유권·출처 논문 없음"}
+{"id": "A087", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "WebMap 의미 링크 유도 언급, 연구 지원 기능(클러스터·이정표·추적) 빠짐"}
+{"id": "A088", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 '다국어 어텐션 마스킹'·검색 검증 붙임, 의존 구문·집합 합 빠짐"}
+{"id": "A089", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "4GB·QLoRA·아랍어 파인튜닝 맞음"}
+{"id": "A090", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "LLM vs 인간 비교 틀은 맞으나 결과(에너지 이득 없음) 빠짐, 언어 영향 분석 붙임"}
+{"id": "A091", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 LLMLIFT 붙임, LLM4TR 4역할 없음"}
+{"id": "A092", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "IRCAN 없음"}
+{"id": "A093", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "어텐션 표류·동적 관리 맞으나 헤드 이질성·CPU 검색 빠짐"}
+{"id": "A094", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "GPT-4 MR 생성 분석 맞으나 평가 기준·9 SUT·GPT-3.5 비교 빠짐"}
+{"id": "A095", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "유용 유닛 보호는 맞으나 덜 유용 유닛 섭동 빠짐, 계산 비용 주장 근거 없음"}
+{"id": "A096", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "LiteLSTM 없음"}
+{"id": "A097", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "저비용 자율 실험은 맞으나 '에이전트 간 신뢰 관계' 지어냄, 3대 기여 빠짐"}
+{"id": "A098", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "GemFilter 없음"}
+{"id": "A099", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "역과제 합성은 서론에 맞게 있으나 OS-Genesis 항목에 MVPO 지어냄"}
+{"id": "A100", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "KG 기반 긴 스펙 추론 맞음"}
+{"id": "A101", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "시간+공간 정상성 학습 맞음"}
+{"id": "A102", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "검색·생성 통합 경사 공격 맞으나 '오염 문제 해결·견고성'으로 방어처럼 서술"}
+{"id": "A103", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "논리 규칙 기반 감지 맞으나 인간 선호도 지어냄, 온톨로지+LLM 플래너 빠짐"}
+{"id": "A104", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "정답 논문 없음"}
+{"id": "A105", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "커리큘럼+집단 셀프플레이 맞으나 어닐링·Elo 매칭 빠짐"}
+{"id": "A106", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "RAC3 없음"}
+{"id": "A107", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "USV 센서 데이터 LSTM 파도 방향 예측 맞음"}
+{"id": "A108", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "RetroRAG 없음"}
+{"id": "A109", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "시공간 무질서 문제는 맞으나 방법을 동역학 디코딩·잔여 병합·파라미터 2배로 지어냄"}
+{"id": "A110", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "QEDG를 '쿼리가 쉽게 식별됨'으로 설명, 손실·무질의 증강 없음"}
+{"id": "A111", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "'별도 사전학습 없이 BERT' — 초록(인용 전용 사전학습 BART)과 반대"}
+{"id": "A112", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "MetRag 없음"}
+{"id": "A113", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "정답 논문 없음"}
+{"id": "A114", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "RAGBench 활용도·완결성 지표 맞으나 100k 데이터셋·TRACe 틀 빠짐"}
+{"id": "A115", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "C2 확장·결정트리로 GNN 증류 맞음"}
+{"id": "A116", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "VS+KG 결합은 맞으나 ID 틀림, 텐서 분해 핵심 빠짐"}
+{"id": "A117", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": false, "note": "DPP로 밀도·다양성 집합 수준 선택 — 맞음"}
+{"id": "A119", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "'잔여 병합·재학습 없이' — 초록(MoA+마지막 층 미세조정)과 반대"}
+{"id": "A120", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "RAG 기반 규정 준수는 맞으나 다단계 질의 정제·RAPTOR 빠짐"}
+{"id": "C1_02", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "GraphRAG 서베이 인용 없음"}
+{"id": "C1_04", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "정적 파이프라인 대비 에이전틱이라는 취지만, 두 체계 분류 빠짐"}
+{"id": "C1_06", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "신뢰 RAG 서베이로 식별 불가"}
+{"id": "C1_08", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": true, "note": "자율 에이전트 일반론만, 추론·행동·상호작용 분류 빠짐, 평가·메모리 결론 붙임"}
+{"id": "C1_09", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 '시각·추론 복잡성 누적' 주장만, 서베이 내용 없음"}
+{"id": "C1_11", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 MoBA·잔차 디코딩 붙임"}
+{"id": "C1_13", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 DeltaKV 처리량 2배 붙임"}
+{"id": "C1_15", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 FreqScout 4배 붙임"}
+{"id": "C1_17", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 Gecko 경량화 결론 붙임, 3가지 주제 분류 없음"}
+{"id": "C1_18", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "MoE 추론 서베이 없음"}
+{"id": "C1_20", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "partial", "fabrication": false, "note": "상호작용 기반 생성·LLM 추천은 맞으나 멀티모달 빠짐"}
+{"id": "C1_22", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "wrong", "fabrication": true, "note": "정답 ID에 AS-RAG 에이전트 붙임"}
+{"id": "C1_24", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "Text-to-SQL 리뷰로 식별 불가"}
+{"id": "C2_01", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": true, "note": "순환 없이 어텐션만 맞음, 정답 ID에 잔차·저주파 내용도 붙임"}
+{"id": "C2_03", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": false, "description": "absent", "fabrication": false, "note": "GPT-3 없음"}
+{"id": "C2_05", "judged": true, "judge": "claude-opus-5-5", "identifies_paper": true, "description": "correct", "fabrication": true, "note": "분류 손실·샘플링 불필요 맞음, 다국어 공정성 보장 주장 근거 없음"}

@@ -73,3 +73,28 @@ Groq 판정은 운영 코딩과 하루 한도를 같이 쓰므로, 판정을 **C
   - 유의차 없음 → 모델이 아니라 컨텍스트 형식·답변 템플릿을 고친다(§5 다음 후보).
   - v9 가 유의하게 낫다 → v9 유지, 같은 결론.
 - 예상: 둘 다 낮다(correct < 15%). v9 와 base 의 `ok` 차이는 유의하지 않을 것 — 교차 귀속은 모델보다 컨텍스트 형식 탓이라고 본다.
+
+### 6.1 결과 — 판정자 일치도 (2026-10-10): **통과**
+
+Claude 가 130문항을 gpt-oss 판정을 보지 않고 판정한 뒤(`judged_claude_ans_full.jsonl`) [`scripts/compare_judges.py`](../../../scripts/compare_judges.py) 로 맞췄다.
+
+| 지표 | 일치율 | κ | 기준 |
+|---|---|---|---|
+| **`ok` (correct+partial)** | **0.877** | **0.756** | ≥ 0.85 · ≥ 0.60 ✅ |
+| fabrication | 0.862 | 0.716 | ≥ 0.75 ✅ |
+| identifies_paper | 0.900 | 0.778 | — |
+| description 4분류 | 0.677 | 0.552 | — |
+
+혼동표 (행 gpt-oss · 열 Claude):
+
+| | correct | partial | wrong | absent |
+|---|---|---|---|---|
+| correct | 4 | 0 | 1 | 0 |
+| partial | **21** | 28 | 0 | 0 |
+| wrong | 0 | 9 | 19 | 0 |
+| absent | 0 | 6 | 5 | 37 |
+
+**읽은 것**
+- `ok` 불일치 16건 중 15건은 **Claude 가 더 너그러운 쪽**(gpt-oss wrong/absent → Claude partial). 주로 정답 ID 에 다른 논문 내용이 섞였지만 이름으로는 맞게 설명한 경우, 핵심이 빠진 모호한 설명.
+- **correct/partial 경계는 크게 다르다**: gpt-oss partial 21건을 Claude 는 correct 로 봤다(Claude correct 25 vs gpt-oss 5). 그래서 절대 correct 비율은 판정자마다 다르다 — 2단계는 사전 등록대로 **`ok` 짝 비교만** 주 지표로 쓰고, correct 는 같은 판정자 안에서만 비교한다.
+- 결론: 2단계(base vs v9) 판정은 Claude 가 한다. Groq 한도를 쓰지 않는다.
