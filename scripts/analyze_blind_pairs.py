@@ -56,12 +56,35 @@ def main() -> int:
     fb = sum(per[b][i]["fabrication"] and not per[a][i]["fabrication"] for i in ids)
     print(f"날조 짝: {a}만 {fa} · {b}만 {fb} · p={mcnemar_exact(fa, fb):.4f}")
 
-    # 재판정 일관성: 1단계(눈가림 아님) Claude 판정 vs 이번 판정, 같은 v9 답변
-    first = {json.loads(l)["id"]: json.loads(l) for l in (EXP / f"judged_claude_{a}.jsonl").read_text().splitlines()}
-    both = [i for i in ids if i in first]
-    agree = sum((first[i]["description"] in ("correct", "partial")) == ok[a][i] for i in both)
-    agree4 = sum(first[i]["description"] == per[a][i]["description"] for i in both)
-    print(f"\n재판정 일관성 ({a}, n={len(both)}): ok 일치 {agree / len(both):.3f} · 4분류 일치 {agree4 / len(both):.3f}")
+    # 재판정 일관성: 같은 모델 답변을 이전 판정(눈가림 아님 또는 다른 눈가림 짝)과 비교. 이전 판정이 없으면 건너뛴다.
+    for m in (a, b):
+        for prev in sorted(EXP.glob("judged_claude_*.jsonl")):
+            if prev.name == f"judged_claude_blind_{tag}.jsonl":
+                continue
+            if prev.name == f"judged_claude_{m}.jsonl":
+                first = {json.loads(l)["id"]: json.loads(l) for l in prev.read_text().splitlines()}
+            elif prev.name.startswith("judged_claude_blind_"):
+                ptag = prev.name[len("judged_claude_blind_"):-len(".jsonl")]
+                pkey_path = EXP / f"blind_key_{ptag}.json"
+                if m not in ptag.split("_vs_") or not pkey_path.exists():
+                    continue
+                pkey = json.loads(pkey_path.read_text())
+                first = {}
+                for l in prev.read_text().splitlines():
+                    j = json.loads(l)
+                    for slot in ("X", "Y"):
+                        if pkey[j["id"]][slot] == m:
+                            first[j["id"]] = j[slot]
+            else:
+                continue
+            both = [i for i in ids if i in first]
+            if not both:
+                continue
+            agree = sum((first[i]["description"] in ("correct", "partial")) == ok[m][i] for i in both)
+            agree4 = sum(first[i]["description"] == per[m][i]["description"] for i in both)
+            agree_f = sum(first[i]["fabrication"] == per[m][i]["fabrication"] for i in both)
+            print(f"\n재판정 일관성 ({m} vs {prev.name}, n={len(both)}): ok 일치 {agree / len(both):.3f} · "
+                  f"4분류 일치 {agree4 / len(both):.3f} · 날조 일치 {agree_f / len(both):.3f}")
     return 0
 
 
