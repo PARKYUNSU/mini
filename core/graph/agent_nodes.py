@@ -45,6 +45,7 @@ from core.llm.agent_llm import (
     get_rag_answer_llm,
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
+from core.llm.answer_fix import drop_contradicted_no_doc
 from core.llm.citation_fix import fix_citations, number_context_papers
 from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
@@ -971,6 +972,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     f"dropped={_cit['dropped']} unknown={_cit['unknown_ids']} "
                     f"bad_refs={_cit['bad_refs']}"
                 )
+            # 서론의 "문서에 없다"가 결론과 모순되면 지운다 — v12 가 정답을 받고도 31% 에서
+            # 그렇게 쓴 뒤 본론·결론에서는 찾았다고 했다 (docs/experiments/yunsur_v12/README.md §4.5).
+            answer, _nd = drop_contradicted_no_doc(answer)
+            if _nd:
+                print("[DEBUG] DirectAnswer: 서론의 모순된 '문서에 없다' 문장 제거")
             # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_MULTI_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
