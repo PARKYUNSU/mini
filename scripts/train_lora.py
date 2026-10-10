@@ -213,11 +213,12 @@ def main() -> int:
     msl, msl_override = resolve_max_seq_length(os.environ.get("MAX_SEQ_LENGTH"), HPARAMS["max_seq_length"])
     H["max_seq_length"] = msl
     hparam_overrides = {**hparam_overrides, **msl_override}
-    if msl_override:
-        log(f"  하이퍼파라미터 오버라이드: max_seq_length {HPARAMS['max_seq_length']} -> {msl} (잘림 방지)")
     if hparam_overrides:
         log("=" * 66)
-        log(f"  하이퍼파라미터 오버라이드: learning_rate {HPARAMS['learning_rate']} -> {lr}")
+        if "learning_rate" in hparam_overrides:
+            log(f"  하이퍼파라미터 오버라이드: learning_rate {HPARAMS['learning_rate']} -> {lr}")
+        if msl_override:
+            log(f"  하이퍼파라미터 오버라이드: max_seq_length {HPARAMS['max_seq_length']} -> {msl} (잘림 방지)")
         log("  라운드 노트에 사유가 적혀 있어야 한다 (docs/experiments/).")
         log("=" * 66)
     log(f"learning_rate = {lr} ({'LEARNING_RATE 오버라이드' if 'learning_rate' in hparam_overrides else 'HPARAMS 기본값'})")
