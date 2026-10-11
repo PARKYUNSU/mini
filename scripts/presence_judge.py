@@ -18,23 +18,12 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
 RES = ROOT / "docs" / "experiments" / "e2e_ko_1008" / "results"
 EXP = ROOT / "docs" / "experiments" / "presence_judge_1011"
 
 # 측정 전에 고정 (README §2). 바꾸면 새 측정으로 기록한다.
-PROMPT = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 **특정한 연구 하나**를 찾고 있다.
-
-질문이 묘사하는 바로 그 연구가 참고 문서 중에 있으면 그 문서 번호를, 없으면 `없음`을 답하라.
-- 주제만 비슷하고 질문이 묘사하는 방법·대상·결과와 맞지 않으면 `없음`이다.
-- 같은 논문이 여러 번호에 나뉘어 있으면 가장 앞 번호 하나만 적는다.
-
-출력은 정확히 한 줄: `답: 문서 N` 또는 `답: 없음`
-
-[질문]
-{question}
-
-[참고 문서]
-{context}"""
+from core.llm.presence_judge import PROMPT  # noqa: E402  (운영과 같은 글자)
 
 ANS = re.compile(r"답\s*[:：]\s*(?:\[?\s*문서\s*(\d{1,2})\s*\]?|(없음))")
 
