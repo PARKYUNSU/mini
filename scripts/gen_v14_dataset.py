@@ -21,7 +21,7 @@ D = ROOT / "finetune_datasets" / "v14"
 
 def main() -> int:
     P = {json.loads(l)["src_pid"]: json.loads(l) for l in (V12 / "prompts.jsonl").read_text().splitlines() if l.strip()}
-    by_user = {p["user"]: p for p in P.values()}
+    by_user = {p["user"]: p for p in P.values() if p.get("user")}
     new = [json.loads(l) for l in (D / "nogold.jsonl").read_text().splitlines() if l.strip()]
     assert len(new) == 30, len(new)
     lines = [l for l in (V13 / "train_data_v13.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]

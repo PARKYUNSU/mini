@@ -1,0 +1,20 @@
+{
+  "version": "v14",
+  "samples": 1100,
+  "slot_dist": {
+    "chat": 300,
+    "planner": 400,
+    "rag": 400
+  },
+  "rag_nogold": 60,
+  "rag_gold": 340,
+  "change": {
+    "kind": "ratio",
+    "from": "v13 정답 없음 30/400 (7.5%)",
+    "to": "정답 없음 60/400",
+    "replaced_gold_rows": 30,
+    "new_prompts_replaced": 9
+  },
+  "unchanged_rows": 1070,
+  "note": "MAX_SEQ_LENGTH=3072, 하이퍼파라미터 v13 과 동일"
+}
