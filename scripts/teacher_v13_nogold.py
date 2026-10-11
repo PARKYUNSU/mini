@@ -117,16 +117,20 @@ def call(llm, msgs) -> str:
 
 
 def main() -> int:
+    global D, BASE_URL
     ap = argparse.ArgumentParser()
     ap.add_argument("--pids", default=str(D / "v12_nogold_pids.json"))
     ap.add_argument("--tries", type=int, default=3)
+    ap.add_argument("--out-dir", default=str(D), help="출력 폴더 (v14 는 finetune_datasets/v14)")
+    ap.add_argument("--exclude", default="", help="예비에서 뺄 src_pid 목록 JSON (이미 쓴 프롬프트)")
     ap.add_argument("--pace", type=float, default=20.0)
     ap.add_argument("--base-url", default="", help="vLLM /v1 — 주면 Groq 대신 병렬로 돈다")
     ap.add_argument("--workers", type=int, default=16)
     args = ap.parse_args()
 
+    D = Path(args.out_dir)
+    D.mkdir(parents=True, exist_ok=True)
     if args.base_url:
-        global BASE_URL
         BASE_URL = args.base_url
         return run_parallel(args)
 
@@ -198,8 +202,9 @@ def run_parallel(args) -> int:
 
     P = {json.loads(l)["src_pid"]: json.loads(l) for l in (V12 / "prompts.jsonl").read_text().splitlines() if l.strip()}
     targets = json.loads(Path(args.pids).read_text())
+    excl = set(json.loads(Path(args.exclude).read_text())) if args.exclude else set()
     spares = sorted(p for p, r in P.items() if r.get("route") == "direct_answer/B" and r.get("user")
-                    and not r.get("eval_leak") and not r["gold_in_context"] and p not in targets)
+                    and not r.get("eval_leak") and not r["gold_in_context"] and p not in targets and p not in excl)
     random.Random(0).shuffle(spares)
     out_p, log_p = D / "nogold.jsonl", D / "nogold_log.jsonl"
     done = {json.loads(l)["src_pid"] for l in out_p.read_text().splitlines()} if out_p.exists() else set()
