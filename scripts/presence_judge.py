@@ -72,7 +72,8 @@ def main() -> int:
                "format_ok": m is not None, "raw": raw[:200], "sec": round(dt, 2)}
         out.append(row)
         print(f"[{k}/{len(ids)}] {i} gold={gold_nums} pick={pick} {dt:.1f}s", flush=True)
-    path = EXP / f"judge_{args.model.replace(':', '_')}.jsonl"
+    suffix = "" if args.ctx == "ctx_1011" else f"_{args.ctx}"  # 기본 컨텍스트 외에는 이름을 달리해 덮어쓰지 않는다
+    path = EXP / f"judge_{args.model.replace(':', '_')}{suffix}.jsonl"
     path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in out), encoding="utf-8")
 
     g = [r for r in out if r["gold_in_context"]]
