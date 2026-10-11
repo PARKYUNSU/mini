@@ -2006,6 +2006,27 @@ def hybrid_retrieve_context_for_debate(
     return _format_debate_context_blocks(docs_out, metas_out)
 
 
+# 청크 검색은 정답 논문을 방법론·관련 연구·저자 목록 같은 발췌로만 넣는 일이 많다(정답 블록의 78%
+# 에 초록이 없었다 — docs/experiments/presence_judge_1011 §6.5). 켜면 블록마다 그 논문의 초록을 붙인다.
+# docs/experiments/abstract_context_1011 측정 동안은 기본 꺼짐.
+_ABSTRACT_CHARS = 800
+
+
+def _context_abstract_enabled() -> bool:
+    return os.getenv("RAG_CONTEXT_ABSTRACT", "0").strip() == "1"
+
+
+def _with_abstract(body: str, abstract: str) -> str:
+    """발췌에 초록이 이미 들어 있지 않으면 ``[초록] …`` 을 앞에 붙인다."""
+    abstract = re.sub(r"\s+", " ", abstract or "").strip()
+    if not abstract:
+        return body
+    norm_body = re.sub(r"\s+", " ", body).lower()
+    if abstract[:80].lower() in norm_body:
+        return body
+    return f"[초록] {abstract[:_ABSTRACT_CHARS]}\n\n{body}" if body else f"[초록] {abstract[:_ABSTRACT_CHARS]}"
+
+
 def _format_chroma_hits(
     docs: list[str],
     metas: list[dict[str, str]],
@@ -2022,6 +2043,8 @@ def _format_chroma_hits(
         title = meta.get("title", "")
         header = f"[{pid}] {title}\n" if (pid or title) else ""
         body = doc[:1200] if doc else ""
+        if _context_abstract_enabled():
+            body = _with_abstract(body, meta.get("abstract") or "")
         prefix = f"{pub}\n" if pub else ""
         block = f"{dist_line}{prefix}{header}{body}".strip() if body else f"{dist_line}{prefix}{header}".strip()
         if block:
