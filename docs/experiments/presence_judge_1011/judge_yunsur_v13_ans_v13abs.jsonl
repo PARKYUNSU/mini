@@ -1,0 +1,159 @@
+{"id": "A001", "gold_in_context": true, "gold_nums": [1, 4], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 10.73}
+{"id": "A002", "gold_in_context": true, "gold_nums": [1, 2], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 5.28}
+{"id": "A003", "gold_in_context": true, "gold_nums": [2], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 11.56}
+{"id": "A004", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 8.58}
+{"id": "A005", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 9.85}
+{"id": "A006", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.7}
+{"id": "A007", "gold_in_context": true, "gold_nums": [3], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 11.96}
+{"id": "A009", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.3}
+{"id": "A010", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 10.53}
+{"id": "A011", "gold_in_context": true, "gold_nums": [3], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 10.73}
+{"id": "A012", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 10.4}
+{"id": "A013", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.72}
+{"id": "A014", "gold_in_context": true, "gold_nums": [3], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 8.01}
+{"id": "A015", "gold_in_context": true, "gold_nums": [1, 4], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 8.8}
+{"id": "A016", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.52}
+{"id": "A017", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 9.16}
+{"id": "A018", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.14}
+{"id": "A019", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.1}
+{"id": "A020", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.11}
+{"id": "A021", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.49}
+{"id": "A022", "gold_in_context": true, "gold_nums": [5], "pick": 5, "format_ok": true, "raw": "답: 문서 5", "sec": 11.11}
+{"id": "A023", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 5.04}
+{"id": "A024", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.35}
+{"id": "A025", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.53}
+{"id": "A027", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.93}
+{"id": "A028", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.01}
+{"id": "A029", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.11}
+{"id": "A030", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 8.06}
+{"id": "A031", "gold_in_context": true, "gold_nums": [4], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 10.6}
+{"id": "A032", "gold_in_context": true, "gold_nums": [3, 5], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 11.35}
+{"id": "A033", "gold_in_context": false, "gold_nums": [], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 9.8}
+{"id": "A034", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.12}
+{"id": "A035", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.53}
+{"id": "A036", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.91}
+{"id": "A037", "gold_in_context": true, "gold_nums": [1, 4], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 10.69}
+{"id": "A038", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.7}
+{"id": "A039", "gold_in_context": false, "gold_nums": [], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.14}
+{"id": "A040", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.68}
+{"id": "A041", "gold_in_context": true, "gold_nums": [4], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 9.02}
+{"id": "A042", "gold_in_context": false, "gold_nums": [], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 11.14}
+{"id": "A043", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.53}
+{"id": "A044", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 8.87}
+{"id": "A045", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 9.23}
+{"id": "A047", "gold_in_context": true, "gold_nums": [2, 5], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 11.7}
+{"id": "A048", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.75}
+{"id": "A049", "gold_in_context": true, "gold_nums": [4], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 11.5}
+{"id": "A050", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.57}
+{"id": "A051", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.39}
+{"id": "A052", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.08}
+{"id": "A053", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 8.07}
+{"id": "A054", "gold_in_context": true, "gold_nums": [4], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 10.63}
+{"id": "A055", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.87}
+{"id": "A056", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.12}
+{"id": "A058", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 9.48}
+{"id": "A059", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.44}
+{"id": "A060", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.08}
+{"id": "A061", "gold_in_context": false, "gold_nums": [], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 11.23}
+{"id": "A062", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 10.06}
+{"id": "A063", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 10.83}
+{"id": "A064", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.78}
+{"id": "A065", "gold_in_context": false, "gold_nums": [], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 11.38}
+{"id": "A066", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.39}
+{"id": "A067", "gold_in_context": true, "gold_nums": [3], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 10.04}
+{"id": "A069", "gold_in_context": true, "gold_nums": [1, 2], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 5.55}
+{"id": "A070", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.49}
+{"id": "A071", "gold_in_context": true, "gold_nums": [3], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 11.67}
+{"id": "A072", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.05}
+{"id": "A073", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.9}
+{"id": "A074", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.88}
+{"id": "A075", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.63}
+{"id": "A076", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 9.65}
+{"id": "A077", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.56}
+{"id": "A078", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.18}
+{"id": "A079", "gold_in_context": true, "gold_nums": [3], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 11.74}
+{"id": "A080", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.21}
+{"id": "A081", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.24}
+{"id": "A082", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.6}
+{"id": "A083", "gold_in_context": true, "gold_nums": [1, 4], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 11.29}
+{"id": "A084", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.38}
+{"id": "A085", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 12.87}
+{"id": "A086", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 11.64}
+{"id": "A087", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 9.28}
+{"id": "A088", "gold_in_context": true, "gold_nums": [2, 5], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 11.08}
+{"id": "A089", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.48}
+{"id": "A090", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.61}
+{"id": "A091", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.46}
+{"id": "A092", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 9.45}
+{"id": "A093", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.27}
+{"id": "A094", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.58}
+{"id": "A095", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.33}
+{"id": "A096", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.51}
+{"id": "A097", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.65}
+{"id": "A098", "gold_in_context": true, "gold_nums": [3], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 10.45}
+{"id": "A099", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.46}
+{"id": "A100", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.27}
+{"id": "A101", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 10.82}
+{"id": "A102", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.65}
+{"id": "A103", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 9.99}
+{"id": "A104", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.99}
+{"id": "A105", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.61}
+{"id": "A106", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 10.24}
+{"id": "A107", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.29}
+{"id": "A108", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 11.33}
+{"id": "A109", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.86}
+{"id": "A110", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 8.89}
+{"id": "A111", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 10.92}
+{"id": "A112", "gold_in_context": false, "gold_nums": [], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.48}
+{"id": "A113", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.64}
+{"id": "A114", "gold_in_context": true, "gold_nums": [4], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 11.76}
+{"id": "A115", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.28}
+{"id": "A116", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.34}
+{"id": "A117", "gold_in_context": true, "gold_nums": [2, 5], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 10.96}
+{"id": "A118", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.84}
+{"id": "A119", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.58}
+{"id": "A120", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.23}
+{"id": "C1_01", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.33}
+{"id": "C1_02", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 11.85}
+{"id": "C1_03", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.09}
+{"id": "C1_04", "gold_in_context": true, "gold_nums": [2, 3], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 11.01}
+{"id": "C1_05", "gold_in_context": true, "gold_nums": [2, 5], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 10.13}
+{"id": "C1_06", "gold_in_context": false, "gold_nums": [], "pick": 5, "format_ok": true, "raw": "답: 문서 5", "sec": 10.03}
+{"id": "C1_07", "gold_in_context": true, "gold_nums": [2], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 11.24}
+{"id": "C1_08", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 13.48}
+{"id": "C1_09", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 9.62}
+{"id": "C1_10", "gold_in_context": true, "gold_nums": [1, 5], "pick": 5, "format_ok": true, "raw": "답: 문서 5", "sec": 10.16}
+{"id": "C1_11", "gold_in_context": true, "gold_nums": [3, 5], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 11.9}
+{"id": "C1_12", "gold_in_context": true, "gold_nums": [1, 2], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.61}
+{"id": "C1_13", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.95}
+{"id": "C1_14", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.37}
+{"id": "C1_15", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.2}
+{"id": "C1_16", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.14}
+{"id": "C1_17", "gold_in_context": true, "gold_nums": [2, 5], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 12.52}
+{"id": "C1_18", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.02}
+{"id": "C1_19", "gold_in_context": true, "gold_nums": [3], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 11.76}
+{"id": "C1_20", "gold_in_context": true, "gold_nums": [2, 5], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 12.03}
+{"id": "C1_21", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.44}
+{"id": "C1_22", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.88}
+{"id": "C1_23", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.9}
+{"id": "C1_24", "gold_in_context": true, "gold_nums": [1, 4], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.17}
+{"id": "C2_01", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.01}
+{"id": "C2_02", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 10.65}
+{"id": "C2_03", "gold_in_context": true, "gold_nums": [2], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 12.12}
+{"id": "C2_04", "gold_in_context": true, "gold_nums": [5], "pick": 5, "format_ok": true, "raw": "답: 문서 5", "sec": 11.25}
+{"id": "C2_05", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.35}
+{"id": "C2_06", "gold_in_context": true, "gold_nums": [4], "pick": 4, "format_ok": true, "raw": "답: 문서 4", "sec": 11.21}
+{"id": "C2_07", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.42}
+{"id": "C2_08", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 11.93}
+{"id": "C2_09", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 11.31}
+{"id": "C2_10", "gold_in_context": false, "gold_nums": [], "pick": 5, "format_ok": true, "raw": "답: 문서 5", "sec": 11.79}
+{"id": "C2_11", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 9.12}
+{"id": "C2_12", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.66}
+{"id": "C2_13", "gold_in_context": true, "gold_nums": [2], "pick": 2, "format_ok": true, "raw": "답: 문서 2", "sec": 11.5}
+{"id": "C2_14", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 11.6}
+{"id": "C2_15", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 9.74}
+{"id": "C2_16", "gold_in_context": false, "gold_nums": [], "pick": "없음", "format_ok": true, "raw": "답: 없음", "sec": 5.82}
+{"id": "C2_17", "gold_in_context": true, "gold_nums": [1, 2], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 5.92}
+{"id": "C2_18", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 12.42}
+{"id": "C2_19", "gold_in_context": true, "gold_nums": [3], "pick": 3, "format_ok": true, "raw": "답: 문서 3", "sec": 10.64}
+{"id": "C2_20", "gold_in_context": true, "gold_nums": [1], "pick": 1, "format_ok": true, "raw": "답: 문서 1", "sec": 10.84}
