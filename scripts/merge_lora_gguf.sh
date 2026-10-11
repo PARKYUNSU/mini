@@ -114,6 +114,6 @@ head -5 "$MODELFILE"
 step "9. Ollama 등록·스모크"
 ollama create "$TAG" -f "$MODELFILE"
 ollama list | grep -E "yunsur|qwen3.5" || true
-ollama run "$TAG" "너 누구야? 한 문장으로." 2>/dev/null | head -5
+ollama run "$TAG" "너 누구야? 한 문장으로." 2>/dev/null | head -5 || true  # head 가 먼저 닫으면 SIGPIPE — pipefail 로 스크립트가 실패로 끝나던 것
 
 echo; echo "✅ 완료. 중간 파일 정리(선택): rm \"$MERGED_GGUF\""
