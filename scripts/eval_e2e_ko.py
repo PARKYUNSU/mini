@@ -62,6 +62,8 @@ def main() -> int:
     ap.add_argument("--ids", default="", help="쉼표 구분 — 일부 문항만 (파일럿용)")
     ap.add_argument("--paper-mode", action="store_true", help="/paper ON 상태로 잰다 (README §7)")
     ap.add_argument("--answer", action="store_true", help="답변 LLM 을 실제로 돌려 답변이 정답 논문을 인용하는지도 잰다")
+    ap.add_argument("--save-context", action="store_true",
+                    help="답변 LLM 에 건네진 번호 붙은 컨텍스트를 행에 저장 (presence_judge_1011)")
     args = ap.parse_args()
 
     items = load_items()
@@ -87,10 +89,12 @@ def main() -> int:
             queries: list[str] = []
             captured: list[str] = []
             doc_ids: list[str] = []
+            numbered: list[str] = []
 
             def _number(ctx, *a, **kw):
                 out_ctx, ids = real_number(ctx, *a, **kw)
                 doc_ids[:] = [ids[k] for k in sorted(ids)]
+                numbered[:] = [out_ctx]
                 return out_ctx, ids
 
             def _extract(*a, **kw):
@@ -161,6 +165,8 @@ def main() -> int:
                     "answer_first_ok": bool(ANSWER_ID_RE.findall(answer)) and ANSWER_ID_RE.findall(answer)[0] in gold,
                     "answer_papers": sorted(set(ANSWER_ID_RE.findall(answer))),
                     "answer_len": len(answer), "answer": answer[:2000]} if args.answer else {}),
+                **({"numbered_context": numbered[0] if numbered else "",
+                    "doc_ids": [re.sub(r"v\d+$", "", (p or "").strip()) for p in doc_ids]} if args.save_context else {}),
                 "elapsed": round(elapsed, 1),
                 "error": err,
             }
