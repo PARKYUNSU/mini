@@ -37,14 +37,14 @@ HANGUL_RE = re.compile(r"[가-힣]")
 ANSWER_ID_RE = re.compile(r"(?<![\d.])(\d{4}\.\d{4,5})(?:v\d+)?(?!\d)")
 
 
-def load_items() -> list[dict]:
-    raw = QUESTIONS.read_bytes()
+def load_items(questions: Path = QUESTIONS, gold_path: Path = GOLD) -> list[dict]:
+    raw = questions.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()[:12]
-    print(f"질문 집합 sha256={digest}")
-    if digest != EXPECT_SHA:
+    print(f"질문 집합 {questions.name} sha256={digest}")
+    if questions == QUESTIONS and digest != EXPECT_SHA:
         print(f"❌ sha256 불일치 (기대 {EXPECT_SHA}) — 측정 중단")
         sys.exit(1)
-    gold = {json.loads(l)["id"]: json.loads(l) for l in GOLD.read_text(encoding="utf-8").splitlines() if l.strip()}
+    gold = {json.loads(l)["id"]: json.loads(l) for l in gold_path.read_text(encoding="utf-8").splitlines() if l.strip()}
     items = []
     for line in raw.decode("utf-8").splitlines():
         if not line.strip():
@@ -62,11 +62,13 @@ def main() -> int:
     ap.add_argument("--ids", default="", help="쉼표 구분 — 일부 문항만 (파일럿용)")
     ap.add_argument("--paper-mode", action="store_true", help="/paper ON 상태로 잰다 (README §7)")
     ap.add_argument("--answer", action="store_true", help="답변 LLM 을 실제로 돌려 답변이 정답 논문을 인용하는지도 잰다")
+    ap.add_argument("--questions", default=str(QUESTIONS), help="질문 TSV (id\t질문). 기본은 고정 162문항")
+    ap.add_argument("--gold", default=str(GOLD), help="정답 JSONL (id, stratum, relevant_papers)")
     ap.add_argument("--save-context", action="store_true",
                     help="답변 LLM 에 건네진 번호 붙은 컨텍스트를 행에 저장 (presence_judge_1011)")
     args = ap.parse_args()
 
-    items = load_items()
+    items = load_items(Path(args.questions), Path(args.gold))
     if args.ids:
         want = set(args.ids.split(","))
         items = [it for it in items if it["id"] in want]

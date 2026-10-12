@@ -1,0 +1,40 @@
+{"id": "H001", "stratum": "H", "relevant_papers": ["2606.30616"], "title": "Scaling the Horizon, Not the Parameters: Reaching Trillion-Parameter Performance with a 35B Agent"}
+{"id": "H002", "stratum": "H", "relevant_papers": ["2606.12364"], "title": "On Subquadratic Architectures: From Applications to Principles"}
+{"id": "H003", "stratum": "H", "relevant_papers": ["2606.26025"], "title": "In-Context World Modeling for Robotic Control"}
+{"id": "H004", "stratum": "H", "relevant_papers": ["2606.13673"], "title": "SpatialClaw: Rethinking Action Interface for Agentic Spatial Reasoning"}
+{"id": "H005", "stratum": "H", "relevant_papers": ["2605.29707"], "title": "Domino: Decoupling Causal Modeling from Autoregressive Drafting in Speculative Decoding"}
+{"id": "H006", "stratum": "H", "relevant_papers": ["2606.07326"], "title": "AnchorWorld: Embodied Egocentric World Simulation with View-based Evolution Customization"}
+{"id": "H007", "stratum": "H", "relevant_papers": ["2606.17030"], "title": "Qwen-RobotWorld Technical Report: Unifying Embodied World Modeling through Language-Conditioned Video Generation"}
+{"id": "H008", "stratum": "H", "relevant_papers": ["2606.16281"], "title": "Who Should Lead Decoding Now? Tracking Reliable Trajectories for Ensembling Masked Diffusion Language Models"}
+{"id": "H009", "stratum": "H", "relevant_papers": ["2606.13392"], "title": "MiniMax Sparse Attention"}
+{"id": "H010", "stratum": "H", "relevant_papers": ["2606.26790"], "title": "OPID: On-Policy Skill Distillation for Agentic Reinforcement Learning"}
+{"id": "H011", "stratum": "H", "relevant_papers": ["2606.09730"], "title": "SearchSwarm: Towards Delegation Intelligence in Agentic LLMs for Long-Horizon Deep Research"}
+{"id": "H012", "stratum": "H", "relevant_papers": ["2606.15932"], "title": "Beyond NL2Code: A Structured Survey of Multimodal Code Intelligence"}
+{"id": "H013", "stratum": "H", "relevant_papers": ["2606.11926"], "title": "Toward Generalist Autonomous Research via Hypothesis-Tree Refinement"}
+{"id": "H014", "stratum": "H", "relevant_papers": ["2606.18558"], "title": "MolmoMotion: Forecasting Point Trajectories in 3D with Language Instruction"}
+{"id": "H015", "stratum": "H", "relevant_papers": ["2606.06036"], "title": "Memory is Reconstructed, Not Retrieved: Graph Memory for LLM Agents"}
+{"id": "H016", "stratum": "H", "relevant_papers": ["2606.16993"], "title": "DreamX-World 1.0: A General-Purpose Interactive World Model"}
+{"id": "H017", "stratum": "H", "relevant_papers": ["2606.03890"], "title": "OVO-S-Bench: A Hierarchical Benchmark for Streaming Spatial Intelligence in Multimodal LLMs"}
+{"id": "H018", "stratum": "H", "relevant_papers": ["2606.09076"], "title": "Z-Reward: Beyond Scalar Rewards by Internalizing Reasoning into Score Distributions"}
+{"id": "H019", "stratum": "H", "relevant_papers": ["2606.28057"], "title": "MultiHashFormer: Hash-based Generative Language Models"}
+{"id": "H020", "stratum": "H", "relevant_papers": ["2606.25763"], "title": "ShutterMuse: Capture-Time Photography Guidance with MLLMs"}
+{"id": "H021", "stratum": "H", "relevant_papers": ["2606.01311"], "title": "SkillAdaptor: Self-Adapting Skills for LLM Agents from Trajectories"}
+{"id": "H022", "stratum": "H", "relevant_papers": ["2606.19419"], "title": "Playful Agentic Robot Learning"}
+{"id": "H023", "stratum": "H", "relevant_papers": ["2606.07229"], "title": "MMAE: A Massive Multitask Audio Editing Benchmark"}
+{"id": "H024", "stratum": "H", "relevant_papers": ["2606.17682"], "title": "From Trainee to Trainer: LLM-Designed Training Environment for RL with Multi-Agent Reasoning"}
+{"id": "H025", "stratum": "H", "relevant_papers": ["2606.23679"], "title": "Semantic Browsing: Controllable Diversity for Image Generation"}
+{"id": "H026", "stratum": "H", "relevant_papers": ["2606.19195"], "title": "Moebius: 0.2B Lightweight Image Inpainting Framework with 10B-Level Performance"}
+{"id": "H027", "stratum": "H", "relevant_papers": ["2606.03979"], "title": "Language Models Need Sleep: Learning to Self-Modify and Consolidate Memories"}
+{"id": "H028", "stratum": "H", "relevant_papers": ["2606.09828"], "title": "Latent Spatial Memory for Video World Models"}
+{"id": "H029", "stratum": "H", "relevant_papers": ["2606.02060"], "title": "Where Do Deep-Research Agents Go Wrong? Span-Level Error Localization in Agent Trajectories"}
+{"id": "H030", "stratum": "H", "relevant_papers": ["2606.24775"], "title": "Are We Ready For An Agent-Native Memory System?"}
+{"id": "H031", "stratum": "H", "relevant_papers": ["2605.31268"], "title": "Mellum2 Technical Report"}
+{"id": "H032", "stratum": "H", "relevant_papers": ["2606.22807"], "title": "Lychee-Reranker: Fast but Not Late Interaction for Compressed Document Reranking"}
+{"id": "H033", "stratum": "H", "relevant_papers": ["2606.10917"], "title": "Role-Agent: Bootstrapping LLM Agents via Dual-Role Evolution"}
+{"id": "H034", "stratum": "H", "relevant_papers": ["2606.15641"], "title": "Distilling Examples into Task Instructions: Enhanced In-Context Learning for Real-World B2B Conversations"}
+{"id": "H035", "stratum": "H", "relevant_papers": ["2606.18216"], "title": "Zone of Proximal Policy Optimization: Teacher in Prompts, Not Gradients"}
+{"id": "H036", "stratum": "H", "relevant_papers": ["2606.24876"], "title": "FLAT: Feedforward Latent Triangle Splatting for Geometrically Accurate Scene Generation"}
+{"id": "H037", "stratum": "H", "relevant_papers": ["2606.11683"], "title": "Reason, Then Re-reason: Cross-view Revisiting Improves Spatial Reasoning"}
+{"id": "H038", "stratum": "H", "relevant_papers": ["2606.14066"], "title": "FastContext: Training Efficient Repository Explorer for Coding Agents"}
+{"id": "H039", "stratum": "H", "relevant_papers": ["2606.09967"], "title": "ABot-Earth 0.5: Generative 3D Earth Model"}
+{"id": "H040", "stratum": "H", "relevant_papers": ["2606.19341"], "title": "Native Active Perception as Reasoning for Omni-Modal Understanding"}
