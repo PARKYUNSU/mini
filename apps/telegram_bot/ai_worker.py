@@ -167,6 +167,9 @@ def main() -> None:
     conn = sqlite3.connect(CHECKPOINT_DB_PATH, check_same_thread=False)
     graph = build_graph(checkpointer=SqliteSaver(conn))
     start_cron_worker_daemon(respect_agent_disable_env=True)
+    from apps.telegram_bot.ingest_watchdog import start_ingest_watchdog
+
+    start_ingest_watchdog()
 
     print("🧪 ai_worker 루프 시작 (브리지 큐 폴링)", flush=True)
     while True:
