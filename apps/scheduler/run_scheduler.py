@@ -407,6 +407,30 @@ def run_arxiv_pipeline() -> None:
         **_SUBPROCESS_KWARGS,
     )
     _touch_arxiv_ok_marker()
+    _run_hf_daily()
+
+
+def _run_hf_daily() -> None:
+    """HF Daily Papers 상위 N편 (docs/experiments/hf_coverage_1012). ``ARXIV_HF_DAILY_TOP`` 이 0 이면 끔.
+
+    01:00 KST 는 UTC 전날 16:00 이라 '어제' 목록이 아직 차는 중이다 — 그제·어제 둘 다 보고 중복은 건너뛴다.
+    실패해도 cs.AI 수집 성공 마커는 그대로 둔다(따로 로그만).
+    """
+    top = int((os.getenv("ARXIV_HF_DAILY_TOP") or "0").strip() or 0)
+    if top <= 0:
+        return
+    today = _seoul_now().date()
+    d0, d1 = (today - timedelta(days=2)).isoformat(), (today - timedelta(days=1)).isoformat()
+    print(f"📚 [스케줄] HF Daily Papers {d0}~{d1} 상위 {top}편", flush=True)
+    r = subprocess.run(
+        [sys.executable, "-m", "pipelines.ingest.hf_daily", "--from", d0, "--to", d1, "--top", str(top)],
+        cwd=PROJECT_ROOT,
+        env=_subprocess_env(),
+        check=False,
+        **_SUBPROCESS_KWARGS,
+    )
+    if r.returncode != 0:
+        print(f"⚠️ HF Daily 수집 rc={r.returncode}", flush=True)
 
 
 def _spawn_llm_debate_batch_background(duration_sec: int) -> None:

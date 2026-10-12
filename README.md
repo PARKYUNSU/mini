@@ -88,7 +88,12 @@ python -m apps.backfill.run_backfill -s 2024-06-01 -e 2024-12-31 -b 20  # 20개�
 | `TELEGRAM_TOKEN` | 메인 봇 | ✅ |
 | `ALLOWED_CHAT_ID` | 접근 허용 Chat ID (쉼표 구분) | ✅ |
 | `LOCAL_LLM_MODEL` | 로컬 LLM 모델명 (기본값: `qwen3.5:9b`) | |
-| `RAG_ANSWER_MODEL` | RAG 답변(B) 전용 로컬 모델 (기본: `LOCAL_LLM_MODEL`). 현재 `yunsur_v9` — [실험 노트](docs/experiments/yunsur_v9/) | |
+| `RAG_ANSWER_MODEL` | RAG 답변(B) 전용 로컬 모델 (기본: `LOCAL_LLM_MODEL`). 현재 `yunsur_v13` (+ 초록 컨텍스트·정답 유무 판정·중국어 재생성) — [실험 노트 지도](docs/experiments/README.md) | |
+| `RAG_CONTEXT_ABSTRACT` | `1` 이면 검색 블록마다 논문 초록 800자를 붙인다 — [abstract_context_1011](docs/experiments/abstract_context_1011/) | `0` |
+| `RAG_PRESENCE_JUDGE` | `1` 이면 답변 전 정답 유무를 따로 묻고 '없음'이면 정답 없음 형식을 지시 — [presence_integration_1012](docs/experiments/presence_integration_1012/) | `0` |
+| `RAG_HANZI_RETRY` | `1` 이면 답변에 중국어가 섞일 때 1회 재생성 — [hanzi_retry_1012](docs/experiments/hanzi_retry_1012/) | `0` |
+| `ARXIV_HF_DAILY_TOP` | 일일 수집에 HF Daily Papers 상위 N편 추가(0 = 끔) — [hf_coverage_1012](docs/experiments/hf_coverage_1012/) | `0` |
+| `INGEST_WATCHDOG` | `0` 이면 논문 수집 누락 감시(매일 03:30) 끔 | `1` |
 | `E2B_API_KEY` | Agent 코드 실행 (E2B 샌드박스) | Agent 봇 사용 시 |
 | `E2B_SANDBOX_ENV_MODE` | `full`(기본): 호스트 환경 전부를 샌드박스에 전달. `minimal`: LANG·UTF-8 등만 전달(`.env` 역슬래시·unicodeescape 이슈 완화) | |
 | `E2B_SANDBOX_EXTRA_KEYS` | `minimal`일 때 추가로 넘길 키 목록(쉼표 구분), 예: `WEATHER_API_KEY,TAVILY_API_KEY` | |

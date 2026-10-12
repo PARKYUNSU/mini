@@ -110,8 +110,12 @@ def ingest(papers, fetcher, parser, storage, rag_processor, known: set[str] | No
                     continue
                 saved += 1
                 known.add(base)
-                n = rag_processor.add_paper(markdown_content=md, title=paper.title, published=paper.published,
-                                            pdf_url=paper.pdf_url, paper_id=paper.paper_id, abstract=paper.abstract)
+                from core.config.chroma_lock import chroma_write_lock
+
+                with chroma_write_lock():  # 백필 스크립트들과 같은 쓰기 잠금
+                    n = rag_processor.add_paper(markdown_content=md, title=paper.title, published=paper.published,
+                                                pdf_url=paper.pdf_url, paper_id=paper.paper_id,
+                                                abstract=paper.abstract)
                 print(f"  💾 저장 · Chroma {n}청크", flush=True)
             except Exception as e:  # 한 편 실패가 전체를 멈추지 않게
                 print(f"  ❌ {type(e).__name__}: {str(e)[:160]}", flush=True)
