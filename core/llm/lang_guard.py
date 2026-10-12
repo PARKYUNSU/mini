@@ -78,3 +78,14 @@ KOREAN_RETRY_NUDGE = (
     "'Reasoning', 'Self-Reflection', 'Step 0' 같은 영어 제목·자기점검 섹션은 절대 넣지 말고, "
     "첫 글자부터 답변 본문으로 시작하세요. 고유명사·제품명·코드 식별자만 영어 허용."
 )
+
+
+# ── 중국어 섞임 (docs/experiments/hanzi_retry_1012) ───────────────────────────────
+# Qwen 계열 답변 모델은 한국어 답에 `检索`·`扩散` 같은 중국어 단어를 섞는다(평가 159문항 중 2~8%).
+# 같은 메시지로 한 번 다시 생성하면 생성당 섞임이 22% 라 대부분 고쳐진다.
+_HANZI = re.compile(r"[\u4e00-\u9fff]")
+
+
+def hanzi_count(text: str) -> int:
+    """CJK 통합 한자 글자 수."""
+    return len(_HANZI.findall(text or ""))

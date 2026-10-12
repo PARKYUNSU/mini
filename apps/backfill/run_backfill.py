@@ -47,8 +47,10 @@ DEBATE_INDEX_PATH = Path("./finetune_datasets/debated_paper_ids.jsonl")
 DEFAULT_START_DATE = "2024-01-01"
 DEFAULT_END_DATE = "2024-12-31"
 DEFAULT_BATCH_SIZE = 1000
-MIN_DELAY = 60
-MAX_DELAY = 120
+# 기본은 보수적(60~120초). arXiv 규칙(요청 간 3초 이상, 연결 하나) 안에서 줄이려면
+# BACKFILL_MIN_DELAY / BACKFILL_MAX_DELAY 로 덮어쓴다. PDF 가 403·429 를 받으면 fetcher 가 60~120초로 되돌린다.
+MIN_DELAY = max(3.0, float(os.getenv("BACKFILL_MIN_DELAY", "60")))
+MAX_DELAY = max(MIN_DELAY, float(os.getenv("BACKFILL_MAX_DELAY", "120")))
 
 # arXiv search_query AND 조건: 제목·초록에 RAG 또는 Retrieval-Augmented Generation (하이픈/공백 변형 포함)
 RAG_TARGET_EXTRA_QUERY = (

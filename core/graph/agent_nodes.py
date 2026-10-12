@@ -31,6 +31,7 @@ from core.config.agent_config import (
 )
 from core.llm.code_extract import extract_python_code
 from core.llm.lang_guard import (
+    hanzi_count,
     KOREAN_RETRY_NUDGE,
     needs_korean_retry,
     strip_english_meta_sections,
@@ -955,12 +956,21 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             else:
                 rag_timeout = max(_da_timeout, RAG_OLLAMA_TIMEOUT_SEC)
             _da_trace("before _invoke_llm_with_fallback", f"B RAG answer timeout={rag_timeout}")
+            _rag_msgs = [SystemMessage(content=system_prompt), HumanMessage(content=content)]
             answer = _invoke_llm_with_fallback(
-                [SystemMessage(content=system_prompt), HumanMessage(content=content)],
+                _rag_msgs,
                 timeout_sec=rag_timeout,
                 getters=(get_rag_answer_llm, get_executor_llm),
             )
             _da_trace("after _invoke_llm_with_fallback", "B RAG answer")
+            # 중국어가 섞이면 한 번 다시 생성하고 덜 섞인 쪽을 쓴다 (docs/experiments/hanzi_retry_1012).
+            if os.getenv("RAG_HANZI_RETRY", "0").strip() == "1" and hanzi_count(answer):
+                retry = _invoke_llm_with_fallback(
+                    _rag_msgs, timeout_sec=rag_timeout, getters=(get_rag_answer_llm, get_executor_llm)
+                )
+                print(f"[DEBUG] DirectAnswer: 중국어 섞임 재생성 {hanzi_count(answer)} → {hanzi_count(retry)}")
+                if retry and hanzi_count(retry) < hanzi_count(answer):
+                    answer = retry
 
         _da_trace("before telegram / structure", f"answer_len={len(answer)}")
         print(f"[DEBUG] DirectAnswer: 답변 생성 완료 ({len(answer)}자), 텔레그램 전송 시도")

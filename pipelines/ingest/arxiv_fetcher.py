@@ -315,6 +315,11 @@ class ArxivFetcher:
                     f.write(chunk)
             return True
         except requests.RequestException as e:
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            if status in (403, 429) and self.max_delay < 60:
+                # 차단 신호 — 이 실행의 나머지는 느린 대기(60~120초)로 되돌린다.
+                self.min_delay, self.max_delay = 60.0, 120.0
+                print(f"  ⚠️ arXiv {status} — 다운로드 대기를 60~120초로 되돌립니다")
             print(f"  ❌ PDF 다운로드 실패: {e}")
             return False
         except OSError as e:

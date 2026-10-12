@@ -87,3 +87,11 @@ def test_strip_keeps_normal_korean_headers():
 def test_strip_returns_original_if_everything_removed():
     t = "### [Self-Reflection]\n1. Role Adherence: ok"
     assert strip_english_meta_sections(t) == t
+
+
+def test_hanzi_count():
+    from core.llm.lang_guard import hanzi_count
+
+    assert hanzi_count("긴 컨텍스트와检索 능력") == 2
+    assert hanzi_count("한국어만 있는 답변 [2601.05262v1]") == 0
+    assert hanzi_count("") == 0
