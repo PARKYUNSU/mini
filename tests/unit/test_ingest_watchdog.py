@@ -34,3 +34,16 @@ def test_dead_scheduler_alerts_even_with_marker(tmp_path):
 def test_once_per_day(tmp_path):
     (tmp_path / "ingest_watchdog_alert_2026-10-13.marker").write_text("x")
     assert check_ingest(NOW, tmp_path, False) is None
+
+
+def test_disk_problem_alerts_even_when_ingest_ok(tmp_path):
+    (tmp_path / "arxiv_pipeline_ok_2026-10-13.marker").write_text("x")
+    msg = check_ingest(NOW, tmp_path, True, disks=["내장 디스크 여유 1GB (0%) — 10% 미만입니다."])
+    assert msg and "내장 디스크" in msg
+
+
+def test_disk_problems_threshold(tmp_path):
+    from apps.telegram_bot.ingest_watchdog import disk_problems
+
+    assert disk_problems({"x": str(tmp_path)}, min_free_ratio=0.0) == []
+    assert disk_problems({"x": str(tmp_path)}, min_free_ratio=1.01)

@@ -7,6 +7,7 @@
 매일 ``INGEST_WATCHDOG_AT``(기본 03:30, 서울) 이후 한 번:
 - 오늘자 ``.cron/arxiv_pipeline_ok_YYYY-MM-DD.marker`` 가 없으면 알림 (01:00 수집 실패/미실행)
 - 스케줄러 데몬 프로세스가 없으면 알림
+- 내장·T7 디스크 여유가 10% 미만이면 알림 (2026-10-13 디스크 가득 참 사고)
 하루 한 번만 보낸다(``.cron/ingest_watchdog_alert_YYYY-MM-DD.marker``). ``INGEST_WATCHDOG=0`` 이면 끈다.
 """
 
@@ -27,7 +28,23 @@ _CRON = _ROOT / ".cron"
 _TZ = ZoneInfo("Asia/Seoul")
 
 
-def check_ingest(now: datetime, cron_dir: Path, scheduler_alive: bool, at: str = "03:30") -> str | None:
+def disk_problems(paths: dict[str, str], min_free_ratio: float = 0.10) -> list[str]:
+    """남은 공간이 ``min_free_ratio`` 미만인 디스크. 2026-10-13 내장 디스크가 가득 차 Chroma 인덱스가 깨졌다."""
+    import shutil
+
+    out = []
+    for label, path in paths.items():
+        try:
+            u = shutil.disk_usage(path)
+        except OSError:
+            continue
+        if u.free / u.total < min_free_ratio:
+            out.append(f"{label} 디스크 여유 {u.free / 2**30:.0f}GB ({u.free / u.total:.0%}) — 10% 미만입니다.")
+    return out
+
+
+def check_ingest(now: datetime, cron_dir: Path, scheduler_alive: bool, at: str = "03:30",
+                 disks: list[str] | None = None) -> str | None:
     """알릴 내용이 있으면 메시지, 없으면 None. 순수 함수(파일 존재만 본다)."""
     hh, mm = (int(x) for x in at.split(":"))
     if (now.hour, now.minute) < (hh, mm):
@@ -40,6 +57,7 @@ def check_ingest(now: datetime, cron_dir: Path, scheduler_alive: bool, at: str =
         problems.append(f"오늘({day}) arXiv 수집 성공 기록이 없습니다 (01:00 수집 실패 또는 미실행).")
     if not scheduler_alive:
         problems.append("스케줄러 데몬(apps.scheduler.run_scheduler)이 떠 있지 않습니다.")
+    problems.extend(disks or [])
     if not problems:
         return None
     return "🚨 논문 수집 점검\n" + "\n".join(f"- {p}" for p in problems) + \
@@ -61,7 +79,8 @@ def _loop(poll_sec: float) -> None:
     while True:
         try:
             now = datetime.now(_TZ)
-            msg = check_ingest(now, _CRON, _scheduler_alive(), at=at)
+            disks = disk_problems({"내장": str(Path.home()), "T7": str(_ROOT)})
+            msg = check_ingest(now, _CRON, _scheduler_alive(), at=at, disks=disks)
             if msg:
                 _send_telegram_notification(msg)
                 (_CRON / f"ingest_watchdog_alert_{now.date().isoformat()}.marker").write_text(now.isoformat())
