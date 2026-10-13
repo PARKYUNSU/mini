@@ -54,6 +54,7 @@ from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
     DIRECT_ANSWER_PYTHON_EXAMPLE_SYSTEM,
     DIRECT_ANSWER_RAG_SYSTEM_BASE,
+    RAG_DETAIL_HINT,
     RAG_OUTPUT_TEMPLATE_MULTI_STRICT,
     EXECUTOR_INTENTIONAL_SYNTAX_BLOCK,
     EXECUTOR_SYSTEM_CODE_RUN,
@@ -915,6 +916,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             _da_trace("after session.get_last_assistant_response()", f"last_ai_len={len(last_ai)}")
 
             system_prompt = DIRECT_ANSWER_RAG_SYSTEM_BASE
+            if os.getenv("RAG_ANSWER_DETAIL", "0").strip() == "1":
+                system_prompt = system_prompt + RAG_DETAIL_HINT
             # 심층 모드에 **프롬프트 지시를 붙이지 않는다** (2026-10-07). 길이 지시는
             # 짝지은 36시행에서 효과가 없었다 — 컨텍스트가 1.8배(527→952)로 늘어도
             # 답변이 길어진 쌍은 3/6, p=1.000. 재료가 없어서가 아니라 모델이 길이
