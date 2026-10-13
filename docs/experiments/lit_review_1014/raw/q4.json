@@ -1,0 +1,98 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2608.27394",
+    "title": "RATIO: A Benchmark for Retrieval Across Typed Ideation Operations in Scientific Literature",
+    "abstract": "Retrieved scientific literature can serve as inspiration for both human and AI scientists. Inspiration can take different forms: prior work may directly suggest how to address a problem, or surface directions at different levels of abstraction - zooming out to a more general view or zooming in to a concrete realization. We introduce RATIO (Retrieval Across Typed Ideation Operations), a large-scale benchmark in which relevance is defined by three operations which we name ideation moves: Address retrieves potential approaches for stated problems, Broaden retrieves more general formulations, and Specify retrieves concrete instantiations. RATIO is constructed from millions of full-text scientific papers across CS literature via a general recipe that extends discourse-marker distant supervision - previously used only for classification - to corpus-scale retrieval, combined with extensive LLM and human vetting. Experiments show that operation-specific fine-tuning substantially boosts retrievers but leaves much room for further improvements. RATIO provides a scalable training and evaluation framework for retrieval components that support literature-grounded ideation, opening up new research avenues on scientific inspiration retrieval.",
+    "publicationDate": "2026-08-27T17:24:58.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.26670",
+    "title": "Scientific Knowledge Discovery in the Age of Large Language Models",
+    "abstract": "The rapid growth of scholarly literature has made identifying relevant publications increasingly difficult, and conventional search systems still depend heavily on manually formulated queries and effortful manual inspection. Generative large language models (LLMs) offer a more flexible alternative, supporting literature retrieval and the screening of candidate studies against eligibility criteria. This chapter surveys 34 peer-reviewed papers applying generative LLMs to these two tasks, identified via a Boolean search over the OpenAIRE Graph (1,589 records screened to 34 inclusions). Reviewed studies are characterised by LLMs employed, model access and adaptation, prompting and architectural techniques, ground-truth sources, and evaluation metrics.",
+    "publicationDate": "2026-07-29T09:25:55.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.18425",
+    "title": "RVR: Retrieve-Verify-Retrieve for Comprehensive Question Answering",
+    "abstract": "Comprehensively retrieving diverse documents is crucial to address queries that admit a wide range of valid answers. We introduce retrieve-verify-retrieve (RVR), a multi-round retrieval framework designed to maximize answer coverage. Initially, a retriever takes the original query and returns a candidate document set, followed by a verifier that identifies a high-quality subset. For subsequent rounds, the query is augmented with previously verified documents to uncover answers that are not yet covered in previous rounds. RVR is effective even with off-the-shelf retrievers, and fine-tuning retrievers for our inference procedure brings further gains. Our method outperforms baselines, including agentic search approaches, achieving at least 10% relative and 3% absolute gain in complete recall percentage on a multi-answer retrieval dataset (QAMPARI). We also see consistent gains on two out-of-domain datasets (QUEST and WebQuestionsSP) across different base retrievers. Our work presents a promising iterative approach for comprehensive answer recall leveraging a verifier and adapting retrievers to a new inference scenario.",
+    "publicationDate": "2026-02-20T18:48:05.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.11116",
+    "title": "PaperRegister: Boosting Flexible-grained Paper Search via Hierarchical Register Indexing",
+    "abstract": "As researchers delve more deeply into their work, paper search requirements may become more flexible, sometimes involving specific details such as module configuration rather than being limited to coarse-grained topics. However, previous paper search systems are unable to meet these flexible-grained requirements, as previous systems mainly collect paper abstract to construct corpus index, which lacks detailed information to support retrieval by some finer-grained queries. In this work, we propose PaperRegister, which transforms traditional abstract-based index into a hierarchical index tree, thereby supporting queries at flexible granularity. Experiments on paper search tasks across a range of granularity demonstrate that PaperRegister achieves the SOTA performance, and particularly excels in the fine-grained scenarios, highlighting good potential as an effective solution for flexible-grained paper search in real-world applications. this https URL.",
+    "publicationDate": "2025-08-14T23:43:46.000Z",
+    "votes": 32
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.07759",
+    "title": "A Survey of Long-Document Retrieval in the PLM and LLM Era",
+    "abstract": "The proliferation of long-form documents presents a fundamental challenge to information retrieval (IR), as their length, dispersed evidence, and complex structures demand specialized methods beyond standard passage-level techniques. This survey provides the first comprehensive treatment of long-document retrieval (LDR), consolidating methods, challenges, and applications across three major eras. We systematize the evolution from classical lexical and early neural models to modern pre-trained (PLM) and large language models (LLMs), covering key paradigms like passage aggregation, hierarchical encoding, efficient attention, and the latest LLM-driven re-ranking and retrieval techniques. Beyond the models, we review domain-specific applications, specialized evaluation resources, and outline critical open challenges such as efficiency trade-offs, multimodal alignment, and faithfulness. This survey aims to provide both a consolidated reference and a forward-looking agenda for advancing long-document retrieval in the era of foundation models.",
+    "publicationDate": "2025-09-09T13:57:53.000Z",
+    "votes": 17
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2507.10057",
+    "title": "Chain of Retrieval: Multi-Aspect Iterative Search Expansion and Post-Order Search Aggregation for Full Paper Retrieval",
+    "abstract": "Scientific paper retrieval, particularly framed as document-to-document retrieval, aims to identify relevant papers in response to a long-form query paper, rather than a short query string. Previous approaches to this task have focused exclusively on abstracts, embedding them into dense vectors as surrogates for full documents and calculating similarity between them. Yet, abstracts offer only sparse and high-level summaries, and such methods primarily optimize one-to-one similarity, overlooking the dynamic relations that emerge across relevant papers during the retrieval process. To address this, we propose Chain of Retrieval(COR), a novel iterative framework for full-paper retrieval. Specifically, COR decomposes each query paper into multiple aspect-specific views, matches them against segmented candidate papers, and iteratively expands the search by promoting top-ranked results as new queries, thereby forming a tree-structured retrieval process. The resulting retrieval tree is then aggregated in a post-order manner: descendants are first combined at the query level, then recursively merged with their parent nodes, to capture hierarchical relations across iterations. To validate this, we present SCIFULLBENCH, a large-scale benchmark providing both complete and segmented contexts of full papers for queries and candidates, and results show that COR significantly outperforms existing retrieval baselines. Our code and dataset is available at this https URL.",
+    "publicationDate": "2025-07-14T08:41:53.000Z",
+    "votes": 11
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2410.12837",
+    "title": "A Comprehensive Survey of Retrieval-Augmented Generation (RAG): Evolution, Current Landscape and Future Directions",
+    "abstract": "This paper presents a comprehensive study of Retrieval-Augmented Generation (RAG), tracing its evolution from foundational concepts to the current state of the art. RAG combines retrieval mechanisms with generative language models to enhance the accuracy of outputs, addressing key limitations of LLMs. The study explores the basic architecture of RAG, focusing on how retrieval and generation are integrated to handle knowledge-intensive tasks. A detailed review of the significant technological advancements in RAG is provided, including key innovations in retrieval-augmented language models and applications across various domains such as question-answering, summarization, and knowledge-based tasks. Recent research breakthroughs are discussed, highlighting novel methods for improving retrieval efficiency. Furthermore, the paper examines ongoing challenges such as scalability, bias, and ethical concerns in deployment. Future research directions are proposed, focusing on improving the robustness of RAG models, expanding the scope of application of RAG models, and addressing societal implications. This survey aims to serve as a foundational resource for researchers and practitioners in understanding the potential of RAG and its trajectory in natural language processing.",
+    "publicationDate": "2024-10-03T22:29:47.000Z",
+    "votes": 64
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.14802",
+    "title": "Graph-Based Re-ranking in Information Retrieval and Beyond: A Survey",
+    "abstract": "The two-stage information retrieval (IR) framework, also known as the retrieve-then-re-rank pipeline, has empowered numerous AI paradigms, including retrieval-augmented generation (RAG) and question-answering (QA) systems that leverage ad hoc knowledge to address the rapidly expanding information landscape. In this setting, graph structures have emerged as a promising mechanism for context augmentation, further enhancing re-ranking frameworks through structured relational modeling, semantic dependency representation, and adaptive retrieval strategies. Consequently, graph representation learning techniques have been actively explored alongside leading IR paradigms. Despite increased research interest in graph-based re-ranking methods, a comprehensive study that connects existing approaches and provides a clear overview of this paradigm remains absent. In this survey, we provide an in-depth review of graph-based re-ranking models, tracing their history, evolution, and state-of-the-art development. To facilitate a clear understanding of this paradigm, we introduce an intuitive taxonomy that organizes graph-based re-ranking models by application domain and methodological characteristics. We also present a chronological timeline that illustrates the evolution of graph-based re-ranking methods. In addition, we analyze the experimental setups of representative studies and provide detailed insight into their findings. We conclude by providing recommendations on future research based on community-wide challenges and opportunities.",
+    "publicationDate": "2025-03-19T00:28:54.000Z",
+    "votes": 29
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.08752",
+    "title": "Patience is all you need! An agentic system for performing scientific  literature review",
+    "abstract": "Large language models (LLMs) have grown in their usage to provide support for\nquestion answering across numerous disciplines. The models on their own have\nalready shown promise for answering basic questions, however fail quickly where\nexpert domain knowledge is required or the question is nuanced. Scientific\nresearch often involves searching for relevant literature, distilling pertinent\ninformation from that literature and analysing how the findings support or\ncontradict one another. The information is often encapsulated in the full text\nbody of research articles, rather than just in the abstracts. Statements within\nthese articles frequently require the wider article context to be fully\nunderstood. We have built an LLM-based system that performs such search and\ndistillation of information encapsulated in scientific literature, and we\nevaluate our keyword based search and information distillation system against a\nset of biology related questions from previously released literature\nbenchmarks. We demonstrate sparse retrieval methods exhibit results close to\nstate of the art without the need for dense retrieval, with its associated\ninfrastructure and complexity overhead. We also show how to increase the\ncoverage of relevant documents for literature review generation.",
+    "publicationDate": "2025-03-28T08:08:46.000Z",
+    "votes": 35
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2301.08801",
+    "title": "Information Retrieval: Recent Advances and Beyond",
+    "abstract": "In this paper, we provide a detailed overview of the models used for\ninformation retrieval in the first and second stages of the typical processing\nchain. We discuss the current state-of-the-art models, including methods based\non terms, semantic retrieval, and neural. Additionally, we delve into the key\ntopics related to the learning process of these models. This way, this survey\noffers a comprehensive understanding of the field and is of interest for for\nresearchers and practitioners entering/working in the information retrieval\ndomain.",
+    "publicationDate": "2023-01-20T21:00:39.000Z",
+    "votes": 16
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2406.01197",
+    "title": "A Survey of Generative Information Retrieval",
+    "abstract": "Generative Retrieval (GR) is an emerging paradigm in information retrieval that leverages generative models to directly map queries to relevant document identifiers (DocIDs) without the need for traditional query processing or document reranking. This survey provides a comprehensive overview of GR, highlighting key developments, indexing and retrieval strategies, and challenges. We discuss various document identifier strategies, including numerical and string-based identifiers, and explore different document representation methods. Our primary contribution lies in outlining future research directions that could profoundly impact the field: improving the quality of query generation, exploring learnable document identifiers, enhancing scalability, and integrating GR with multi-task learning frameworks. By examining state-of-the-art GR techniques and their applications, this survey aims to provide a foundational understanding of GR and inspire further innovations in this transformative approach to information retrieval. We also make the complementary materials such as paper collection publicly available at this https URL",
+    "publicationDate": "2024-06-03T10:59:33.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2409.18110",
+    "title": "Open-World Evaluation for Retrieving Diverse Perspectives",
+    "abstract": "We study retrieving a set of documents that covers various perspectives on a\ncomplex and contentious question (e.g., will ChatGPT do more harm than good?).\nWe curate a Benchmark for Retrieval Diversity for Subjective questions (BERDS),\nwhere each example consists of a question and diverse perspectives associated\nwith the question, sourced from survey questions and debate websites. On this\ndata, retrievers paired with a corpus are evaluated to surface a document set\nthat contains diverse perspectives. Our framing diverges from most retrieval\ntasks in that document relevancy cannot be decided by simple string matches to\nreferences. Instead, we build a language model-based automatic evaluator that\ndecides whether each retrieved document contains a perspective. This allows us\nto evaluate the performance of three different types of corpus (Wikipedia, web\nsnapshot, and corpus constructed on the fly with retrieved pages from the\nsearch engine) paired with retrievers. Retrieving diverse documents remains\nchallenging, with the outputs from existing retrievers covering all\nperspectives on only 40% of the examples. We further study the effectiveness of\nquery expansion and diversity-focused reranking approaches and analyze\nretriever sycophancy.",
+    "publicationDate": "2024-09-26T17:52:57.000Z",
+    "votes": 13
+  }
+]

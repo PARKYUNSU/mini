@@ -1,0 +1,98 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2608.22381",
+    "title": "GRAFT: Graph-Distilled Generative Retrieval for Facet-Aware Scientific Literature Exploration",
+    "abstract": "Scientific papers may relate by problem, method, result, or contribution, but document-level retrievers collapse these into a single similarity score without saying why they are related. Citation- and similarity-based retrieval alone also confines search to the neighbourhood of what is already known, whereas generative retrieval generates document identifiers directly, enabling the exploratory retrieval that scientific discovery depends on. We connect papers in a graph whose edges are typed by these four facets, derived from facet items and citation signals, and distil it into a generative retriever whose identifiers are the papers' own facet text. Two graph properties do not survive naive distillation. First, because every training pair is an edge, naive enumeration indexes just 84% of the corpus. Coverage-aware distillation makes every paper learnable through a reverse-neighbour fallback, a minimum-coverage threshold, and edge-importance weighting. Second, constrained decoding guarantees that every generated identifier is a valid paper, but not that the graph connects it to the query. Graph-weighted reciprocal rank fusion scales each candidate's rank term by its query-candidate edge weight, dropping unsupported ones. On LitWeave, our constructed corpus of 11,359 NLP papers, Graft recovers 91% of its graph teacher's Recall@20 with no nearest-neighbour index or encoder at inference, and outperforms the graph teacher on query papers outside the corpus. It reproduces the graph's own facet labels at 0.922 precision, so every returned paper arrives labelled with the facet that surfaced it rather than an opaque score.",
+    "publicationDate": "2026-08-23T12:07:00.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.28766",
+    "title": "Beyond Vector Search: Comparing Classical RAG with Hybrid GraphRAG for Climate Science Q\\&A",
+    "abstract": "Traditional Retrieval-Augmented Generation (RAG) systems treat documents in isolation, failing to capture hierarchical relationships between concepts in complex scientific corpora. This limitation compromises answer quality in specialized domains such as climatology, where conceptual dependencies frequently traverse multiple articles. We propose a hybrid architecture that integrates vector search with GraphRAG, Leiden community detection, and cross-encoder re-ranking, achieving gains of 160\\% in contextual relevance and 177\\% in contextual recall compared to classical RAG. These results demonstrate that unifying local and global retrieval significantly outperforms text-span isolation, paving the way for more effective question-answering systems over dispersed scientific literature.",
+    "publicationDate": "2026-08-28T18:12:00.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.03860",
+    "title": "SciRet: A Compute-Aware Empirical Study of Retrieval and Reranking for Scientific RAG",
+    "abstract": "We introduce SciRet, a compute-aware empirical study of retrieval-augmented generation for scientific question answering over CORD-19. Rather than proposing a new model, we evaluate a fixed scientific RAG pipeline across three corpus scales: 1,034 chunks (1K papers), 5,160 chunks (5K papers), and 15,480 chunks (15K papers). The pipeline combines sentence-window chunking, BM25, BGE-M3 dense retrieval, reciprocal rank fusion, optional cross-encoder reranking, and grounded answer generation. Across these settings, hybrid retrieval is more robust than either sparse-only or dense-only retrieval in our setting, reaching Recall@10 of 1.000 at 1K and 15K. In contrast, an MS MARCO-trained cross-encoder reranker reduces precision on the scientific corpus, suggesting that domain mismatch can outweigh the benefits of stronger query-passage interaction. Generation faithfulness measured with RAGAS increases with corpus scale in our setup. Retrieval evaluation uses pseudo-relevance labels derived from the hybrid system, so we treat the results as controlled comparative evidence rather than a benchmark claim. We release code, indexes, and evaluation outputs to support replication and follow-up studies.",
+    "publicationDate": "2026-08-04T16:04:07.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.16918",
+    "title": "Sparse Coverage: Semantic Center Representations for Patent Prior-Art Retrieval",
+    "abstract": "Patent prior-art retrieval is a recall-oriented search task over long and highly structured technical documents. Dense retrieval improves semantic matching, but single-vector representations may compress multiple technical components, functions, and constraints into a single embedding. We propose Sparse Coverage, an unsupervised semantic retrieval framework that maps local span embeddings to a sparse vocabulary of embedding-space centers. The centers are selected with a coverage-oriented k-center objective, and spans activate nearby centers to produce sparse representations compatible with inverted-index retrieval. Experiments on CLEF-IP 2013 show that Sparse Coverage matches or exceeds the document-level recall of strong dense patent encoders in several configurations, while remaining competitive for passage-level retrieval. By combining local semantic evidence with sparse inverted-index search, Sparse Coverage provides an effective first-stage retrieval approach for patent search.",
+    "publicationDate": "2026-07-31T09:41:42.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.04088",
+    "title": "Submitted and Diagnostic Analysis of Full-Text Temporal Retrieval for LongEval-Sci",
+    "abstract": "LongEval-Sci evaluates scientific retrieval under collection change, where a system should be effective on the current corpus and remain usable as documents accumulate over time. This paper reports both official Task 1 results and development diagnostics for LongEval-Sci 2026. We compare the official PyTerrier BM25 and Qwen3 dense baselines with full-text BM25, additive and router variants, temporal full-text retrieval, temporal+citation retrieval, RM3 query expansion, cross-encoder reranking, and reciprocal rank fusion (RRF). In the official DCTR evaluation, the temporalized full-text runs are our strongest submissions: FT BM25+temporal and FT BM25+temporal+citation obtain the best ARP on all three snapshots (0.285, 0.267, and 0.180 nDCG@10) and reduce snapshot-3 relative change from 0.481 for the BM25 pivot to 0.368. Citation features match the temporal-only variant but do not provide a measurable additional gain in the official summary. Our internal snapshot-1 diagnostics show a complementary pattern: full-text BM25 is the strongest single development retriever (DCTR nDCG@10 = 0.3302, MAP = 0.2853), RRF gives the best deep recall (Recall@1000 = 0.9667), and some uncalibrated overlays can sharply degrade top-rank quality. We therefore conclude that full-text retrieval is the strongest foundation, temporal integration can improve official longitudinal effectiveness when applied to that foundation, and citation evidence still requires cleaner ablation and calibration. Beyond ranking, we also report a qualitative weekly IR-system update-monitoring analysis based on ingestion velocity and stale-coverage drift.",
+    "publicationDate": "2026-07-05T02:52:30.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.30237",
+    "title": "GRASP: Plan-Guided Graph Retrieval with Adaptive Fusion and Reranking on Semi-Structured Knowledge Bases",
+    "abstract": "Semi-structured knowledge bases (SKBs) embed textual documents in a typed graph of entities and relations, and underpin applications such as product search, academic paper search, and precision-medicine inquiries. Existing hybrid retrieval systems on SKBs either use the graph only for query expansion, mix textual and structural branches under a global weighting, or rely on fine-tuned graph-traversal generators. We present GRASP, a three-stage SKB retrieval framework unifying plan-based graph retrieval, plan-conditioned fusion with a dense retriever, and a fine-tuned reranker over the fused candidates. GRASP substantially advances the state of the art on every metric across the three STaRK benchmarks, lifting average Hit@1 from 62.0 to 73.9. Ablation and sensitivity studies further confirm the effectiveness and robustness of GRASP.",
+    "publicationDate": "2026-05-28T17:07:32.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.13728",
+    "title": "Hybrid Retrieval for COVID-19 Literature: Comparing Rank Fusion and Projection Fusion with Diversity Reranking",
+    "abstract": "We present a hybrid retrieval system for COVID-19 scientific literature, evaluated on the TREC-COVID benchmark (171,332 papers, 50 expert queries). The system implements six retrieval configurations spanning sparse (SPLADE), dense (BGE), rank-level fusion (RRF), and a projection-based vector fusion (B5) approach. RRF fusion achieves the best relevance (nDCG@10 = 0.828), outperforming dense-only by 6.1% and sparse-only by 14.9%. Our projection fusion variant reaches nDCG@10 = 0.678 on expert queries while being 33% faster (847 ms vs. 1271 ms) and producing 2.2x higher ILD@10 than RRF. Evaluation across 400 queries -- including expert, machine-generated, and three paraphrase styles -- shows that B5 delivers the largest relative gain on keyword-heavy reformulations (+8.8%), although RRF remains best in absolute nDCG@10. On expert queries, MMR reranking increases intra-list diversity by 23.8-24.5% at a 20.4-25.4% nDCG@10 cost. Both fusion pipelines evaluated for latency remain below the sub-2 s target across all query sets. The system is deployed as a Streamlit web application backed by Pinecone serverless indices.",
+    "publicationDate": "2026-04-15T11:05:46.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.11229",
+    "title": "RECIPER: A Dual-View Retrieval Pipeline for Procedure-Oriented Materials Question Answering",
+    "abstract": "Retrieving procedure-oriented evidence from materials science papers is difficult because key synthesis details are often scattered across long, context-heavy documents and are not well captured by paragraph-only dense retrieval. We present RECIPER, a dual-view retrieval pipeline that indexes both paragraph-level context and compact large language model-extracted procedural summaries, then combines the two candidate streams with lightweight lexical reranking. Across four dense retrieval backbones, RECIPER consistently improves early-rank retrieval over paragraph-only dense retrieval, achieving average gains of +3.73 in Recall@1, +2.85 in nDCG@10, and +3.13 in MRR. With BGE-large-en-v1.5, it reaches 86.82%, 97.07%, and 97.85% on Recall@1, Recall@5, and Recall@10, respectively. We further observe improved downstream question answering under automatic metrics, suggesting that procedural summaries can serve as a useful complementary retrieval signal for procedure-oriented materials question answering. Code and data are available at this https URL.",
+    "publicationDate": "2026-04-13T09:29:55.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.11116",
+    "title": "PaperRegister: Boosting Flexible-grained Paper Search via Hierarchical Register Indexing",
+    "abstract": "As researchers delve more deeply into their work, paper search requirements may become more flexible, sometimes involving specific details such as module configuration rather than being limited to coarse-grained topics. However, previous paper search systems are unable to meet these flexible-grained requirements, as previous systems mainly collect paper abstract to construct corpus index, which lacks detailed information to support retrieval by some finer-grained queries. In this work, we propose PaperRegister, which transforms traditional abstract-based index into a hierarchical index tree, thereby supporting queries at flexible granularity. Experiments on paper search tasks across a range of granularity demonstrate that PaperRegister achieves the SOTA performance, and particularly excels in the fine-grained scenarios, highlighting good potential as an effective solution for flexible-grained paper search in real-world applications. this https URL.",
+    "publicationDate": "2025-08-14T23:43:46.000Z",
+    "votes": 32
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.00367",
+    "title": "Breaking It Down: Domain-Aware Semantic Segmentation for Retrieval Augmented Generation",
+    "abstract": "Document chunking is a crucial component of Retrieval-Augmented Generation (RAG), as it directly affects the retrieval of relevant and precise context. Conventional fixed-length and recursive splitters often produce arbitrary, incoherent segments that fail to preserve semantic structure. Although semantic chunking has gained traction, its influence on generation quality remains underexplored. This paper introduces two efficient semantic chunking methods, Projected Similarity Chunking (PSC) and Metric Fusion Chunking (MFC), trained on PubMed data using three different embedding models. We further present an evaluation framework that measures the effect of chunking on both retrieval and generation by augmenting PubMedQA with full-text PubMed Central articles. Our results show substantial retrieval improvements (24x with PSC) in MRR and higher Hits@k on PubMedQA. We provide a comprehensive analysis, including statistical significance and response-time comparisons with common chunking libraries. Despite being trained on a single domain, PSC and MFC also generalize well, achieving strong out-of-domain generation performance across multiple datasets. Overall, our findings confirm that our semantic chunkers, especially PSC, consistently deliver superior performance.",
+    "publicationDate": "2025-11-29T07:30:37.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2109.10086",
+    "title": "SPLADE v2: Sparse Lexical and Expansion Model for Information Retrieval",
+    "abstract": "In neural Information Retrieval (IR), ongoing research is directed towards improving the first retriever in ranking pipelines. Learning dense embeddings to conduct retrieval using efficient approximate nearest neighbors methods has proven to work well. Meanwhile, there has been a growing interest in learning \\emph{sparse} representations for documents and queries, that could inherit from the desirable properties of bag-of-words models such as the exact matching of terms and the efficiency of inverted indexes. Introduced recently, the SPLADE model provides highly sparse representations and competitive results with respect to state-of-the-art dense and sparse approaches. In this paper, we build on SPLADE and propose several significant improvements in terms of effectiveness and/or efficiency. More specifically, we modify the pooling mechanism, benchmark a model solely based on document expansion, and introduce models trained with distillation. We also report results on the BEIR benchmark. Overall, SPLADE is considerably improved with more than $9$\\% gains on NDCG@10 on TREC DL 2019, leading to state-of-the-art results on the BEIR benchmark.",
+    "publicationDate": "2021-09-21T10:43:42.000Z",
+    "votes": 18
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.13394",
+    "title": "CASPER: Concept-integrated Sparse Representation for Scientific Retrieval",
+    "abstract": "Identifying relevant research concepts is crucial for effective scientific search. However, primary sparse retrieval methods often lack concept-aware representations. To address this, we propose CASPER, a sparse retrieval model for scientific search that utilizes both tokens and keyphrases as representation units (i.e., dimensions in the sparse embedding space). This enables CASPER to represent queries and documents via research concepts and match them at both granular and conceptual levels. Furthermore, we construct training data by leveraging abundant scholarly references (including titles, citation contexts, author-assigned keyphrases, and co-citations), which capture how research concepts are expressed in diverse settings. Empirically, CASPER outperforms strong dense and sparse retrieval baselines across eight scientific retrieval benchmarks. We also explore the effectiveness-efficiency trade-off via representation pruning and demonstrate CASPER's interpretability by showing that it can serve as an effective and efficient keyphrase generation model.",
+    "publicationDate": "2025-08-18T23:00:57.000Z",
+    "votes": 7
+  }
+]

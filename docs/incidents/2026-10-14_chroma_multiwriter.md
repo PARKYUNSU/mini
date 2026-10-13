@@ -27,7 +27,7 @@
 
 - 01:5x HF 백필 일시정지(`kill -STOP 34449`).
 - 01:5x `scripts/rebuild_chroma.py --src mini-chroma-rebuild --dst mini-chroma-rebuild2 --device cpu`(원본 읽기 전용) 시작 — 10-13 과 같은 절차, 약 3.5시간.
-- 완료 후: 컬렉션 embedding function 설정을 원본과 같게(`{}`) → 검색 평가 가드(162문항 적중 138 기준) → **사용자 승인 후** `.env` `CHROMA_DB_PATH` 교체 · 봇/스케줄러 재시작.
+- 완료 후: 컬렉션 schema 의 embedding function 을 원본과 같게(`sentence_transformer`) → 검색 평가 가드(162문항 적중 138 기준) → **사용자 승인 후** `.env` `CHROMA_DB_PATH` 교체 · 봇/스케줄러 재시작.
 
 ## 재발 방지 (제안, 미적용)
 
