@@ -36,7 +36,8 @@
 | [`abstract_context_1011/`](abstract_context_1011/) | 검색 블록에 논문 초록 800자 붙이기 (`RAG_CONTEXT_ABSTRACT`) | **채택·운영** — ok 127:112 (p 0.006), 날조 22:40 (p 0.011), correct 16 → 48. 지금까지 가장 큰 개선 |
 | [`presence_integration_1012/`](presence_integration_1012/) | 답변 전 정답 유무 판정 → '없음'이면 형식 힌트 (`RAG_PRESENCE_JUDGE`) | **채택·운영** — 정답 없음 고지 0 → 12/21 (p 0.0005), 거짓 부정 2/133, ok·날조 무변화, 지연 +11s |
 | [`hanzi_retry_1012/`](hanzi_retry_1012/) | 답변에 중국어 섞이면 1회 재생성 (`RAG_HANZI_RETRY`) | **채택·운영** — 생성당 섞임 22% (기준 ≤ 25%). 고정형(A034)은 남음 |
-| [`hf_coverage_1012/`](hf_coverage_1012/) | 수집원에 HF Daily Papers 추가, 수집 공백(05-29~10-06) 백필 | **진행 중** — 기준선 hf_june40 적중 0/40 |
+| [`hf_coverage_1012/`](hf_coverage_1012/) | 수집원에 HF Daily Papers 추가, 수집 공백(05-29~10-06) 백필 | **채택·운영** — hf_june40 적중 0 → 29/40 (p 4e-9), 기존 138 → 138. 공백 백필 진행 중 |
+| [`upper_bound_1013/`](upper_bound_1013/) | 같은 파이프라인에서 답변 모델만 gpt-oss-120b 로 (위치 측정) | v13 은 120B 대비 **ok 96% · correct 78%** (correct 짝 3:15, p 0.0075), 날조는 v13 이 적음 (4 vs 11, p 0.065) |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -105,7 +106,8 @@
 - **잡담·계획:** base(`qwen3.5:9b`, `LOCAL_LLM_MODEL`) · **코딩:** Groq.
 - **RAG 답변 평가:** 162문항(`e2e_ko_1008/ko_questions.tsv`) · gpt-oss-120b 단일 답변 판정(`scripts/judge_answers.py`, RunPod H100) · 자동 지표(`scripts/nogold_metrics.py`).
 - **v12~v14 의 교훈:** 파인튜닝보다 **컨텍스트(초록)와 판단 분리**가 더 크게 움직였다 — 다음 학습 라운드는 초록이 붙은 운영 프롬프트로 교사 데이터를 다시 만드는 것이 후보.
-- **수집:** 스케줄러 데몬이 2026-05-29~10-06 멈춰 있었다 → 매일 03:30 누락 감시(`apps/telegram_bot/ingest_watchdog.py`). HF Daily Papers 수집원 측정 중([`hf_coverage_1012/`](hf_coverage_1012/)).
+- **수집:** 스케줄러 데몬이 2026-05-29~10-06 멈춰 있었다 → 매일 03:30 누락 감시(`apps/telegram_bot/ingest_watchdog.py`). HF Daily Papers 수집원 채택(하루 HF 20 + cs.AI 10, [`hf_coverage_1012/`](hf_coverage_1012/)).
+- **상한선 (2026-10-13):** 답변 모델만 gpt-oss-120b 로 바꾸면 correct 는 오르지만(43 → 55/79) 날조도 는다(4 → 11). 9B 의 격차는 '덜 자세함' — 다음 후보는 답변 지시 보강(핵심 기여·결과 명시, 서베이 질문)([`upper_bound_1013/`](upper_bound_1013/)).
 
 <details><summary>이전 상태 (2026-09-28)</summary>
 
@@ -142,7 +144,8 @@ docs/experiments/
 ├─ abstract_context_1011/  ← 초록 컨텍스트 (운영)
 ├─ presence_integration_1012/ ← 판정 → 힌트 (운영)
 ├─ hanzi_retry_1012/       ← 중국어 재생성 (운영)
-├─ hf_coverage_1012/       ← HF Daily Papers 수집원 (진행 중)
+├─ hf_coverage_1012/       ← HF Daily Papers 수집원 (운영)
+├─ upper_bound_1013/       ← 120B 대비 위치(상한선) 측정
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 

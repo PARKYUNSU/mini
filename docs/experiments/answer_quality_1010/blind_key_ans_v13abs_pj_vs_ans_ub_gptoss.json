@@ -1,0 +1,318 @@
+{
+ "A001": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A007": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A010": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A014": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A015": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A016": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A020": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A021": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A027": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A028": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A029": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A030": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A031": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A032": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A036": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A037": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A040": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A041": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A050": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A051": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A052": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A054": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A055": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A056": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A059": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A060": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A062": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A066": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A067": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A069": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A071": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A072": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A075": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A076": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A077": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A078": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A080": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A081": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A083": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A086": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A087": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A088": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A089": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A090": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A091": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A094": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A095": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A096": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A097": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A100": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A101": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A105": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A110": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A111": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A114": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A115": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "A116": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A117": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "A118": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C1_01": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C1_05": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C1_07": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C1_10": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C1_11": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C1_15": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C1_16": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C1_18": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C1_20": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C1_23": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C1_24": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C2_04": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C2_05": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C2_06": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C2_07": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C2_08": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C2_12": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C2_13": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ },
+ "C2_15": {
+  "X": "ans_ub_gptoss",
+  "Y": "ans_v13abs_pj"
+ },
+ "C2_17": {
+  "X": "ans_v13abs_pj",
+  "Y": "ans_ub_gptoss"
+ }
+}
