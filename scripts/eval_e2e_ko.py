@@ -37,6 +37,26 @@ HANGUL_RE = re.compile(r"[가-힣]")
 ANSWER_ID_RE = re.compile(r"(?<![\d.])(\d{4}\.\d{4,5})(?:v\d+)?(?!\d)")
 
 
+def _openai_answer(messages) -> str:
+    """RAG 답변 호출만 OpenAI 호환 서버(vLLM gpt-oss-120b)로 보낸다. 실패하면 빈 답."""
+    import requests
+
+    role = {"system": "system", "human": "user", "ai": "assistant"}
+    body = {"model": os.getenv("EVAL_ANSWER_OPENAI_MODEL", "openai/gpt-oss-120b"),
+            "messages": [{"role": role.get(getattr(m, "type", "human"), "user"), "content": str(m.content)}
+                         for m in messages],
+            "temperature": 0.2, "max_tokens": 6000, "reasoning_effort": "medium"}
+    url = os.getenv("EVAL_ANSWER_OPENAI_URL", "").rstrip("/") + "/chat/completions"
+    for attempt in range(4):
+        try:
+            r = requests.post(url, json=body, timeout=600)
+            return (r.json()["choices"][0]["message"]["content"] or "").strip()
+        except Exception as exc:
+            print(f"  상한선 답변 재시도 {attempt + 1}: {str(exc)[:120]}", flush=True)
+            time.sleep(15 * (attempt + 1))
+    return ""
+
+
 def load_items(questions: Path = QUESTIONS, gold_path: Path = GOLD) -> list[dict]:
     raw = questions.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()[:12]
@@ -106,6 +126,8 @@ def main() -> int:
 
             def _invoke(messages, *a, **kw):
                 captured.append("\n".join(str(getattr(m, "content", m)) for m in messages))
+                if args.answer and os.getenv("EVAL_ANSWER_OPENAI_URL"):
+                    return _openai_answer(messages)  # 상한선 비교 (docs/experiments/upper_bound_1013)
                 if args.answer:
                     return real_invoke(messages, *a, **kw)
                 return "평가용 스텁 답변"
