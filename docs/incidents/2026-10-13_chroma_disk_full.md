@@ -20,4 +20,4 @@
 
 - 수집 누락 감시(`apps/telegram_bot/ingest_watchdog.py`)에 **디스크 여유 10% 미만 경고**(내장·T7) 추가.
 - 새 DB 크기를 지켜본다 — `link_lists.bin` 이 다시 비정상적으로 커지면 Chroma HNSW 문제로 보고 따로 조사.
-- 남은 일: 텔레그램 봇을 launchd 에 등록(재부팅 자동 기동, T7 마운트 대기).
+- 텔레그램 봇 launchd 등록 완료(2026-10-13, `ops/launchd/`) — 재부팅 후 T7·Ollama 준비를 기다려 자동 기동.
