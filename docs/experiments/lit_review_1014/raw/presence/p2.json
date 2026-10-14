@@ -1,0 +1,98 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.17709",
+    "title": "One Size Does Not Fit All! Dynamic Retriever and Generator Selection for RAG",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems typically employ fixed retriever and generator configurations across queries, despite substantial differences in query complexity and information needs, leading to inefficient allocation of computational resources. While retrieval and generation adaptivity have been studied independently, their joint effect on end-to-end RAG performance remains underexplored. We systematically analyze how retriever and generator complexity interacts across factoid and multi-hop question answering (QA), including bridge and composition reasoning tasks. Our analysis shows that stronger retrieval generally yields larger gains than increased generation effort, but both exhibit diminishing and non-monotonic returns, indicating that higher-complexity configurations are not uniformly better across queries. Motivated by these findings, we introduce DRAG, a query-adaptive framework for selecting retriever-generator configurations. We first propose DRAG$_\\text{QPP}$, a training-free routing approach that uses Query Performance Prediction (QPP) signals to guide retriever selection and perplexity-based measures over retrieved context to guide generator selection. We further introduce DRAG$_\\text{SFT}$, a supervised routing approach that fine-tunes an LLM to jointly predict retriever-generator configurations. Across three LLM families and four QA benchmarks, \\qpprag~achieves performance comparable to strong static RAG baselines while substantially reducing inference latency, whereas DRAG$_\\text{SFT}$ consistently improves effectiveness over static and training-free adaptive baselines. Overall, DRAG demonstrates that jointly adapting retrieval and generation achieves a more favorable effectiveness-efficiency trade-off than static RAG pipelines.",
+    "publicationDate": "2026-09-15T18:20:38.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.23056",
+    "title": "Bridging Static and Agentic RAG for Taiwanese Historical Question Answering",
+    "abstract": "Agentic retrieval-augmented generation (RAG) enables language models to adapt retrieval based on previously retrieved evidence, but it remains unclear whether such adaptive orchestration consistently outperforms well-designed static pipelines. We conduct a controlled comparison of agentic and static RAG for Taiwanese historical question answering, sharing the same generator and hybrid retrieval backend. Despite similar aggregate performance, the two pipelines differ on 70.83% of questions, with their advantages largely canceling out when averaged. An oracle that selects the better response per question improves the composite score by 0.2417 over the better individual pipeline, revealing substantial headroom for question-level selection. We therefore introduce a post-hoc selector that compares the two responses and their cited evidence, significantly outperforming either individual pipeline and recovering 60.34% of the oracle headroom. These results show that aggregate comparisons can obscure meaningful question-level differences between retrieval strategies, suggesting that exploiting their complementarity may be more fruitful than seeking a universally superior pipeline.",
+    "publicationDate": "2026-09-19T14:43:26.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.17012",
+    "title": "ORDER: Task-Conditioned Routing for Retrieval-Augmented Generation",
+    "abstract": "Retrieval-Augmented Generation (RAG) pipelines typically rely on a fixed indexing and retrieval configuration determined at preprocessing time. This one-size-fits-all design is ill-suited to domain-expert settings, where heterogeneous queries require different chunking granularities, metadata constraints, and source-selection strategies. As a result, configurations that are effective for one family of queries often perform poorly for others. In this paper, we introduce ORDER (Optimal Routing for Dynamic Evidence Retrieval), a query-conditioned RAG framework that jointly adapts indexing and retrieval to the incoming query. Our approach first discovers semantic clusters over a given set of questions associated to a corpus and learns, for each cluster, a chunking strategy together with a suited metadata filtering and reranking configuration. At inference time, queries are routed to the appropriate pre-built index through nearest-centroid assignment. To further improve retrieval, we propose a supervised query router (QRe) that predicts which collections are most likely to contain relevant evidence, coupled with a Uniform Multi-source Sampler (UMS) that allocates the retrieval budget evenly across the selected sources. We evaluate our framework on large-scale, heterogeneous historical archives and show that conditioning both indexing and retrieval on the query consistently outperforms both naive baselines and strong state-of-the-art RAG systems in complex expert-domain environments.",
+    "publicationDate": "2026-09-15T11:23:16.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.03454",
+    "title": "When Retrieval Helps: Selective Retrieval for Single-Turn Mental-Health QA",
+    "abstract": "Retrieval-augmented generation (RAG) can improve the specificity and grounding of large language model responses, but its effect is not uniformly beneficial in single-turn mental-health question answering, where user queries often combine emotional distress, treatment concerns, and safety-sensitive needs. We study when retrieval helps or hurts mental-health QA, and whether a lightweight selective retrieval policy can better control this trade-off. We operationalize retrieval need using three draft-conditioned utility dimensions: psychoeducational need, coping need, and response specificity, together with a rule-based safety trigger. Following psychotherapy-grounded RAG systems such as coTherapist, we construct a compact and controllable guideline corpus comprising coping-strategy, psychoeducational, and safety resources. We fine-tune an instruction-tuned generator on MentalChat16K using QLoRA and compare Closed-book, Always Retrieval, and Selective Retrieval settings on CounselBench-Eval and CounselBench-Adv. Experiments show that retrieval is not uniformly beneficial in this domain. Always Retrieval improves specificity but lowers overall quality and introduces additional safety-sensitive failures. Selective Retrieval preserves closed-book behavior for low-need cases while avoiding the additional degradation caused by unconditional retrieval, supporting the view that retrieval activation is a safety-sensitive control decision.",
+    "publicationDate": "2026-09-03T07:13:58.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.26192",
+    "title": "Comparing Chunking and Embedding Strategies for Turkish RAG Systems",
+    "abstract": "Retrieval-Augmented Generation conditions a language model on chunks retrieved from a document collection. Its accuracy is therefore limited by the chunking and embedding stages that determine what can be retrieved. We compare Turkish document question answering across three chunking strategies (fixed-length, semantic, and layout-aware Docling), five embedding models, and two LLMs, over three documents with contrasting layouts. Every configuration answers the same question set, which allows component effects to be separated by paired testing rather than inferred from separate benchmarks. The fully crossed design yields 9{,}000 graded question-answer evaluations, each scored by an independent judge model, and component comparisons are tested by paired McNemar tests under Holm correction. The three leading embedding models are statistically indistinguishable, so language specialization yields no measurable retrieval advantage. The faster LLM is not the more accurate one. The preferred configuration depends on content type, since layout-aware chunking helps table-heavy documents far more than text-heavy ones.",
+    "publicationDate": "2026-08-24T07:24:37.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.24010",
+    "title": "When Should Active RAG Retrieve? A Budget-Aware Evaluation of Utility, Calibration, and Cost",
+    "abstract": "Active RAG systems decide when to retrieve external knowledge during generation, making them a budget-sensitive case of agentic RAG and self-adaptive retrieval. Yet evaluations often leave the operating point underspecified: two systems may both claim a 50% evidence-usage budget while realizing different held-out usage rates, so higher accuracy can reflect a looser budget rather than a better retrieval policy. We study budget-aware evaluation for Active RAG by recasting active retrieval as utility estimation, where retrieval is valuable only through its marginal correctness change over a no-retrieval answer. This view separates three questions that single-point evaluations conflate: whether trigger scores rank useful retrieval decisions, whether thresholds calibrated on past data meet future budgets, and how trigger-side computation changes deployment cost. We operationalize these questions with exact top-k utility frontiers, deployable threshold frontiers, conservative budget frontiers, harm audits, and cost decompositions. Across knowledge-intensive multi-hop QA datasets and open instruction models, retrieval harm is non-negligible, router rankings change across datasets and budgets, nominal thresholds can miss target usage, and simple uncertainty or retrieval-score baselines often rival learned utility routers. Budget-aware Active RAG evaluations should therefore report frontiers, realized usage, threshold-transfer error, harm rates, and cost decompositions alongside accuracy.",
+    "publicationDate": "2026-07-27T05:17:06.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.02415",
+    "title": "Training-Free versus Training-Based Intent Classification in LLMs: Accuracy, Robustness, and Failure Modes",
+    "abstract": "Intent classification in Large Language Models (LLMs) involves categorizing user prompts into predefined classes. For instance, given a user prompt, the system must determine whether it primarily concerns mathematics, coding, or general text processing. Such classification enables routing prompts to specialized models optimized for specific domains, improving both accuracy and computational efficiency. In this work, we conduct a systematic study comparing training-free vs training-based approaches for intent classification. For this purpose, we consider two lightweight, training-free methods based on statistics of internal representations and compare them against MLP classifiers and linear probes. Our comprehensive empirical evaluation reveals that 1) Both training-free and training-based methods saturate easy benchmarks (mathematics vs. coding vs. natural language), 2) Training-based classifiers have an advantage on harder classification tasks (e.g. Java vs Python), and 3) Training-free methods are generally more robust to mixed-intent and adversarial prompts.",
+    "publicationDate": "2026-08-03T15:53:49.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.02894",
+    "title": "R$^{2}$Adapter: A Routing and Rewriting Adapter for Efficient Hybrid RAG",
+    "abstract": "Retrieval-Augmented Generation (RAG) has become a prevailing paradigm for enhancing Large Language Models (LLMs) with non-parametric knowledge. Vanilla RAG efficiently handles simple queries but struggles with relational or multi-hop reasoning. Graph-based RAG alleviates this issue but incurs higher inference complexity and latency. In practice, user queries can differ significantly in their complexity, rendering a fixed RAG strategy suboptimal. However, existing hybrid text-graph RAG methods typically rely on heuristic and LLM-based routing, resulting in unnecessary overhead and strong dependence on the underlying LLM. To address these challenges, we propose R$^{2}$Adapter, a lightweight plug-in Routing and Rewriting Adapter designed to allocate queries between vanilla and graph-based RAG dynamically. By routing only the queries that genuinely benefit from graph-based reasoning, R$^{2}$Adapter reduces unnecessary graph retrieval overhead. Additionally, uncertain graph-routed queries are rewritten to better expose their multi-hop reasoning requirements, improving retrieval quality without additional supervision. Extensive experiments on three multi-hop QA benchmarks demonstrate that R$^{2}$Adapter reduces graph-based RAG usage by up to 59% while maintaining comparable answer accuracy. This adapter is model-agnostic and can be seamlessly integrated into diverse vanilla and graph-based RAG pipelines, providing an efficient and adaptive solution for hybrid RAG systems.",
+    "publicationDate": "2026-07-01T09:08:03.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.00063",
+    "title": "A Survey of Reasoning-Intensive Retrieval: Progress and Challenges",
+    "abstract": "Reasoning-Intensive Retrieval (RIR) targets retrieval settings where relevance is mediated by latent inferential links between a query and supporting evidence, rather than semantic similarity. Motivated by the emergent reasoning abilities of Large Language Models (LLMs), recent work integrates these capabilities into the IR field, spanning the entire pipeline from benchmarks to retrievers and rerankers. Despite this progress, the field lacks a systematic framework to organize current efforts and articulate a clear path forward. To provide a clear roadmap for this rapidly growing yet fragmented area, this survey (1) systematizes existing RIR benchmarks by knowledge domains and modalities, providing a detailed analysis of the current landscape; (2) introduces a structured taxonomy that categorizes methods based on where and how reasoning is integrated into the retrieval pipeline, alongside an analysis of their trade-offs and practical applications; and (3) summarizes challenges and future directions to guide research in this evolving field.",
+    "publicationDate": "2026-04-30T08:35:06.000Z",
+    "votes": 20
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.15283",
+    "title": "Adaptive Retrieval Strategies for Biomedical Question Answering",
+    "abstract": "Biomedical question answering (QA) encompasses diverse question types, including yes/no, factoid, list, and summary questions, each requiring distinct forms of evidence and reasoning. However, most retrieval-augmented QA systems rely on a unified retrieval pipeline, regardless of the information needs of different question categories. This one-size-fits-all approach may limit the effectiveness of evidence acquisition and downstream answer generation. In this work, we propose an adaptive retrieval framework that selects retrieval and evidence aggregation strategies according to question type. The system combines query understanding, biomedical document retrieval, reranking, knowledge graph augmentation, document clustering, and large language model-based answer generation. For yes/no questions, it focuses on precise evidence retrieval; for factoid and list questions, it emphasizes entity-oriented retrieval and clustering; and for summary questions, it performs broader evidence collection and synthesis. We evaluate the proposed framework on the BioASQ benchmark and demonstrate that adaptive retrieval strategies improve evidence relevance and answer quality across multiple question types. Our results suggest that aligning retrieval mechanisms with question-specific information needs provides an effective direction for enhancing retrieval-augmented biomedical QA systems.",
+    "publicationDate": "2026-06-02T22:22:28.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.27164",
+    "title": "Query Symbolically or Retrieve Semantically? A Dataset and Method for Semi-Structured Question Answering",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems for question answering typically retrieve evidence by semantic similarity between the query and document chunks. While effective for unstructured text, this approach is less reliable on semi-structured corpora where answering may require exact filtering, aggregation, or exhaustive retrieval over structured attributes across multiple documents. Symbolic approaches support such operations, but they are often brittle on noisy natural-language corpora. We address this gap with DualGraph, a RAG framework that represents documents through two complementary views: a Textual Knowledge Graph for semantic retrieval and a Symbolic Knowledge Graph for symbolic querying over typed subject--predicate--object triples. Building on these two components, we provide multiple strategies for selecting or combining semantic and symbolic this http URL also introduce SpecsQA, a benchmark from a commercial shopping website with semi-structured product documents and manually curated questions spanning open-ended and specification-oriented retrieval. Experiments show that DualGraph consistently outperforms state-of-the-art dense-retrieval, GraphRAG, symbolic, and table-oriented baselines across question this http URL and data are available at this https URL.",
+    "publicationDate": "2026-05-26T15:22:42.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.03989",
+    "title": "An Agent-Oriented Pluggable Experience-RAG Skill for Experience-Driven Retrieval Strategy Orchestration",
+    "abstract": "Retrieval-augmented generation systems often assume that one fixed retrieval pipeline is sufficient across heterogeneous tasks, yet factoid question answering, multi-hop reasoning, and scientific verification exhibit different retrieval preferences. We present Experience-RAG Skill, an agent-oriented pluggable retrieval orchestration layer positioned between the agent and the retriever pool. The proposed skill analyzes the current scene, consults an experience memory, selects an appropriate retrieval strategy, and returns structured evidence to the agent. Under a fixed candidate pool, Experience-RAG Skill achieves an overall nDCG@10 of 0.8924 on BeIR/nq, BeIR/hotpotqa, and BeIR/scifact, outperforming fixed single-retriever baselines and remaining competitive with Adaptive-RAG-style routing. The results suggest that retrieval strategy selection can be productively encapsulated as a reusable agent skill rather than being hard-coded in the upper workflow.",
+    "publicationDate": "2026-05-05T17:10:25.000Z",
+    "votes": 7
+  }
+]

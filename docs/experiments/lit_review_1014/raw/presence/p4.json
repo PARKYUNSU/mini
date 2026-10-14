@@ -1,0 +1,98 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.23056",
+    "title": "Bridging Static and Agentic RAG for Taiwanese Historical Question Answering",
+    "abstract": "Agentic retrieval-augmented generation (RAG) enables language models to adapt retrieval based on previously retrieved evidence, but it remains unclear whether such adaptive orchestration consistently outperforms well-designed static pipelines. We conduct a controlled comparison of agentic and static RAG for Taiwanese historical question answering, sharing the same generator and hybrid retrieval backend. Despite similar aggregate performance, the two pipelines differ on 70.83% of questions, with their advantages largely canceling out when averaged. An oracle that selects the better response per question improves the composite score by 0.2417 over the better individual pipeline, revealing substantial headroom for question-level selection. We therefore introduce a post-hoc selector that compares the two responses and their cited evidence, significantly outperforming either individual pipeline and recovering 60.34% of the oracle headroom. These results show that aggregate comparisons can obscure meaningful question-level differences between retrieval strategies, suggesting that exploiting their complementarity may be more fruitful than seeking a universally superior pipeline.",
+    "publicationDate": "2026-09-19T14:43:26.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.13006",
+    "title": "EviReform: Evidence-Guided Query Reformulation for Multi-Hop Graph Retrieval",
+    "abstract": "Multi-hop retrieval must recover passages that provide sufficient evidence together. An initial passage often resolves an entity or relation implicit in the question, making the missing evidence easier to describe only after retrieval begins. Graph retrieval improves access to related evidence through stored corpus structure, but its retrieval signal is commonly derived from the original question. Complementary evidence must then be reached through stored relations even when an observed passage provides a more direct semantic cue. We introduce EviReform, which separates revising the retrieval request from aggregating evidence in the graph. Retrieved source passages formulate residual queries for the unresolved information need. The original and residual retrieval signals are normalized separately, combined, and propagated between propositions that share entities. On 2WikiMultiHopQA, HotpotQA, and MuSiQue, EviReform exceeds the strongest baseline by up to 5.59 Recall@5 points and 4.50 F1 points. These results show that observed evidence can guide graph retrieval toward the part of a supporting chain left underspecified by the original question. Code is available at this https URL.",
+    "publicationDate": "2026-08-13T09:25:39.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.24165",
+    "title": "Do Current Retrievers Cover All the Evidence? A Controlled Study of Conjunctive Cross-Page Retrieval",
+    "abstract": "Finding a long document relevant to a multi-part request is not the same as establishing that it contains every requested piece of evidence. We study this gap for conjunctive document retrieval, where two or three explicit conditions must be supported on different pages of one document. We use n-Clue as a controlled measurement instrument: 1{,}000 queries over 2{,}021 documents pair all-condition golds with naturally occurring documents that satisfy only a subset, and a complete-first success requires a top-10 gold to precede every released subset qrel. Across 70 configurations, condition-wise decomposition improves two dense backbones by 6.8--7.3 points and lexical--visual fusion adds 8.7, while four generic rerankers all reduce Gold-NDCG; these directions replicate on a four-source stress set. Scaling one dense family from 0.6B to 8B changes complete-first success by 0.0 points. The strongest displayed hybrid illustrates the resulting gap: it finds a gold for 81.1\\% of queries but succeeds complete-first on only 35.8\\%, and the gap persists across condition count, target length, candidate density, query rendering, and the four-source stress set. Finally, page-aware visual systems surface stored support for every condition on only 5.1--5.3\\% of queries. These results identify condition coverage, rather than gold discovery alone, as the central bottleneck.",
+    "publicationDate": "2026-07-27T08:46:27.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.08577",
+    "title": "When Should Queries Be Decomposed? A Stage-Aware Study of Query Decomposition for Multi-Condition Retrieval",
+    "abstract": "Multi-condition retrieval requires systems to identify documents that satisfy multiple distinct constraints, moving beyond mere topical relevance. While query decomposition is widely adopted as an intuitive remedy, its effectiveness across different retrieval pipeline stages remains underexplored. In this paper, we conduct a stage-aware empirical study and uncover a stark, stage-dependent effect: decomposition during initial retrieval frequently harms retrieval performance due to semantic dilution, yet substantially improves reranking by enabling more fine-grained constraint verification. Motivated by these insights, we propose a principled Stage-Aware Decomposition framework that retains the monolithic query during initial retrieval to preserve global semantic context, while employing sub-queries exclusively during reranking for fine-grained constraint matching. Extensive evaluations on the MultiConIR and SSRB benchmarks demonstrate that our framework consistently improves ranking performance for compositional queries across multiple retrieval and reranking models. We release our code at this https URL.",
+    "publicationDate": "2026-06-07T11:13:15.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.05712",
+    "title": "Scoring a Set, Not Summing Passage Scores: Effective and Efficient Set Retrieval",
+    "abstract": "Multi-hop question answering requires retrieving multiple evidence passages whose usefulness often depends on one another. Conventional retrievers either rank passages independently or construct evidence sequentially through locally supervised next-passage decisions. Sequential conditioning captures some cross-passage dependencies, but its local extension scores do not provide a common criterion for comparing complete evidence sets of different compositions and sizes. Existing multi-hop retrievers therefore avoid directly learning a query--set compatibility function over complete evidence sets, as the exponentially large set space is daunting to cover during learning and impractical to search at inference time. To overcome these challenges, we formulate multi-hop retrieval by directly ranking candidate evidence sets with an energy-based query--set compatibility score $s_\\theta(q,S)$, learned from informative contrasts without exhaustive coverage or normalization of the combinatorial set space. Given a gold evidence set, we automatically generate contrasts by adding, removing, or replacing passages, yielding rich set-level supervision without additional annotation. To make search over this combinatorial space practical at inference time, we introduce a novel retrieve-and-rerank framework over the set space: ParaSet, a lightweight scorer over precomputed passage representations for efficient set exploration, and SetCE, an expressive cross-encoder for set reranking. Our experiments show that set-level retrieval consistently provides a complementary signal to passage-level relevance, becoming relatively more effective when more hops are required to reach evidence from the query. Motivated by this complementarity, combining the two signals further improves downstream QA performance, outperforming both deeper passage-level retrieval and an ensemble of distinct passage-level retrievers.",
+    "publicationDate": "2026-07-07T00:37:45.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.00203",
+    "title": "DeSQ: Decomposition-based SPARQL Query Generation",
+    "abstract": "Dominant approaches to Knowledge Base Question Answering (KBQA) fall into two categories. First is the generation of a formal query that suffers from brittleness and limited explainability, and the second is direct answer retrieval through KB exploration that is computationally costly and prone to hallucination. To combine the strengths of both paradigms while mitigating their respective weaknesses, we introduce DeSQ (Decomposition-based SPARQL Query Generation), a KB-agnostic framework that operates in three stages. First, it decomposes complex questions into Atomic Constraints (ACs) that mirror the relational structure of the underlying KB. Second, it generates a two-part structured output: (a) Mapping of each AC to its corresponding SPARQL Fragment, using standardized variable and URIs placeholders, and (b) URIs Grounding block describing each placeholder. Third, it assembles these fragments into a complete SPARQL query. DeSQ surpasses state-of-the-art approaches on four out of five major benchmarks and demonstrates superior robustness to lexical variation. Beyond performance gains, our framework greatly simplifies evaluation by eliminating the need for a live KB endpoint, and its structured output enables fine-grained error analysis, allowing more targeted interventions for improvement.",
+    "publicationDate": "2026-05-29T17:29:15.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.27164",
+    "title": "Query Symbolically or Retrieve Semantically? A Dataset and Method for Semi-Structured Question Answering",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems for question answering typically retrieve evidence by semantic similarity between the query and document chunks. While effective for unstructured text, this approach is less reliable on semi-structured corpora where answering may require exact filtering, aggregation, or exhaustive retrieval over structured attributes across multiple documents. Symbolic approaches support such operations, but they are often brittle on noisy natural-language corpora. We address this gap with DualGraph, a RAG framework that represents documents through two complementary views: a Textual Knowledge Graph for semantic retrieval and a Symbolic Knowledge Graph for symbolic querying over typed subject--predicate--object triples. Building on these two components, we provide multiple strategies for selecting or combining semantic and symbolic this http URL also introduce SpecsQA, a benchmark from a commercial shopping website with semi-structured product documents and manually curated questions spanning open-ended and specification-oriented retrieval. Experiments show that DualGraph consistently outperforms state-of-the-art dense-retrieval, GraphRAG, symbolic, and table-oriented baselines across question this http URL and data are available at this https URL.",
+    "publicationDate": "2026-05-26T15:22:42.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.18425",
+    "title": "RVR: Retrieve-Verify-Retrieve for Comprehensive Question Answering",
+    "abstract": "Comprehensively retrieving diverse documents is crucial to address queries that admit a wide range of valid answers. We introduce retrieve-verify-retrieve (RVR), a multi-round retrieval framework designed to maximize answer coverage. Initially, a retriever takes the original query and returns a candidate document set, followed by a verifier that identifies a high-quality subset. For subsequent rounds, the query is augmented with previously verified documents to uncover answers that are not yet covered in previous rounds. RVR is effective even with off-the-shelf retrievers, and fine-tuning retrievers for our inference procedure brings further gains. Our method outperforms baselines, including agentic search approaches, achieving at least 10% relative and 3% absolute gain in complete recall percentage on a multi-answer retrieval dataset (QAMPARI). We also see consistent gains on two out-of-domain datasets (QUEST and WebQuestionsSP) across different base retrievers. Our work presents a promising iterative approach for comprehensive answer recall leveraging a verifier and adapting retrievers to a new inference scenario.",
+    "publicationDate": "2026-02-20T18:48:05.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.04618",
+    "title": "Adaptive Retrieval for Reasoning-Intensive Retrieval",
+    "abstract": "We study leveraging adaptive retrieval to ensure sufficient \"bridge\" documents are retrieved for reasoning-intensive retrieval. Bridge documents are those that contribute to the reasoning process yet are not directly relevant to the initial query. While existing reasoning-based reranker pipelines attempt to surface these documents in ranking, they suffer from bounded recall. Naive solution with adaptive retrieval into these pipelines often leads to planning error propagation. To address this, we propose REPAIR, a framework that bridges this gap by repurposing reasoning plans as dense feedback signals for adaptive retrieval. Our key distinction is enabling mid-course correction during reranking through selective adaptive retrieval, retrieving documents that support the pivotal plan. Experimental results on reasoning-intensive retrieval and complex QA tasks demonstrate that our method outperforms existing baselines by 5.6%pt.",
+    "publicationDate": "2026-01-08T05:46:50.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.07718",
+    "title": "SUBQRAG: Sub-Question Driven Dynamic Graph RAG",
+    "abstract": "Graph Retrieval-Augmented Generation (Graph RAG) effectively builds a knowledge graph (KG) to connect disparate facts across a large document corpus. However, this broad-view approach often lacks the deep structured reasoning needed for complex multi-hop question answering (QA), leading to incomplete evidence and error accumulation. To address these limitations, we propose SubQRAG, a sub-question-driven framework that enhances reasoning depth. SubQRAG decomposes a complex question into an ordered chain of verifiable sub-questions. For each sub-question, it retrieves relevant triples from the graph. When the existing graph is insufficient, the system dynamically expands it by extracting new triples from source documents in real time. All triples used in the reasoning process are aggregated into a \"graph memory,\" forming a structured and traceable evidence path for final answer generation. Experiments on three multi-hop QA benchmarks demonstrate that SubQRAG achieves consistent and significant improvements, especially in Exact Match scores.",
+    "publicationDate": "2025-10-09T02:55:58.000Z",
+    "votes": 10
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.18633",
+    "title": "Query Decomposition for RAG: Balancing Exploration-Exploitation",
+    "abstract": "Retrieval-augmented generation (RAG) systems address complex user requests by decomposing them into subqueries, retrieving potentially relevant documents for each, and then aggregating them to generate an answer. Efficiently selecting informative documents requires balancing a key trade-off: (i) retrieving broadly enough to capture all the relevant material, and (ii) limiting retrieval to avoid excessive noise and computational cost. We formulate query decomposition and document retrieval in an exploitation-exploration setting, where retrieving one document at a time builds a belief about the utility of a given sub-query and informs the decision to continue exploiting or exploring an alternative. We experiment with a variety of bandit learning methods and demonstrate their effectiveness in dynamically selecting the most informative sub-queries. Our main finding is that estimating document relevance using rank information and human judgments yields a 35% gain in document-level precision, 15% increase in {\\alpha}-nDCG, and better performance on the downstream task of long-form generation.",
+    "publicationDate": "2025-10-21T13:37:11.000Z",
+    "votes": 14
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.09755",
+    "title": "Transforming Questions and Documents for Semantically Aligned Retrieval-Augmented Generation",
+    "abstract": "We introduce a novel retrieval-augmented generation (RAG) framework tailored for multihop question answering. First, our system uses large language model (LLM) to decompose complex multihop questions into a sequence of single-hop subquestions that guide document retrieval. This decomposition mitigates the ambiguity inherent in multi-hop queries by clearly targeting distinct knowledge facets. Second, instead of embedding raw or chunked documents directly, we generate answerable questions from each document chunk using Qwen3-8B, embed these generated questions, and retrieve relevant chunks via question-question embedding similarity. During inference, the retrieved chunks are then fed along with the original question into the RAG pipeline. We evaluate on three multihop question datasets (MuSiQue, 2WikiMultiHopQa, HotpotQA) from LongBench. Our method improves RAG performacne compared to baseline systems. Our contributions highlight the benefits of using answerable-question embeddings for RAG, and the effectiveness of LLM-based query decomposition for multihop scenarios.",
+    "publicationDate": "2025-08-13T12:35:04.000Z",
+    "votes": 7
+  }
+]
