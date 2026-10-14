@@ -2,6 +2,8 @@
 
 arXiv 논문 수집·파싱, RAG, 파인튜닝 데이터 생성, 텔레그램 봇을 포함한 로컬 AI 파이프라인입니다.
 
+> **지금 상태 (2026-10-14)** — 운영 RAG 답변 모델 `yunsur_v13`(Qwen3.5-9B LoRA) + 초록 컨텍스트 · 정답 유무 판정 · 중국어 재생성 · 서론 모순 후처리. 벡터 DB 는 **Chroma 서버 한 개**(launchd `com.mini.chroma`, 포트 8001)로만 열고 봇·수집·평가는 모두 HTTP 로 접속한다. 실험·측정 기록은 [`docs/experiments/README.md`](docs/experiments/README.md), 운영 사고는 [`docs/incidents/`](docs/incidents/), 운영 설정은 [`ops/`](ops/).
+
 ### 레이아웃 (요약)
 
 | 경로 | 역할 |
@@ -92,6 +94,12 @@ python -m apps.backfill.run_backfill -s 2024-06-01 -e 2024-12-31 -b 20  # 20개�
 | `RAG_CONTEXT_ABSTRACT` | `1` 이면 검색 블록마다 논문 초록 800자를 붙인다 — [abstract_context_1011](docs/experiments/abstract_context_1011/) (기본 `0`) | 선택 |
 | `RAG_PRESENCE_JUDGE` | `1` 이면 답변 전 정답 유무를 따로 묻고 '없음'이면 정답 없음 형식을 지시 — [presence_integration_1012](docs/experiments/presence_integration_1012/) (기본 `0`) | 선택 |
 | `RAG_HANZI_RETRY` | `1` 이면 답변에 중국어가 섞일 때 1회 재생성 — [hanzi_retry_1012](docs/experiments/hanzi_retry_1012/) (기본 `0`) | 선택 |
+| `CHROMA_DB_PATH` | 운영 Chroma 폴더 (현재 T7 `mini-chroma-rebuild2`). 서버 모드에서는 서버(`com.mini.chroma`)가 이 폴더를 연다 | ✅ |
+| `CHROMA_SERVER_URL` | 있으면 운영 DB 는 이 Chroma 서버에 `HttpClient` 로 접속(`core/config/chroma_client.py`). 없으면 로컬 `PersistentClient` — **운영에서는 반드시 설정**(여러 프로세스가 폴더를 직접 열면 인덱스가 손상된다, [2026-10-14 사고](docs/incidents/2026-10-14_chroma_multiwriter.md)) | ✅ (운영) |
+| `RAG_HYPE` | `1` 이면 논문별 가상 질문 컬렉션(`paper_questions`)으로 검색 후보를 보강 — [hype_1014](docs/experiments/hype_1014/) **측정 중** (기본 `0`) | 실험 |
+| `RAG_PRESENCE_PROMPT` | `v2` 면 정답 유무 판정 프롬프트 v2 — [presence_judge_v2_1014](docs/experiments/presence_judge_v2_1014/) 기준 미달, 운영 미사용 (기본 `v1`) | 실험 |
+| `RAG_ANSWER_DETAIL` | `1` 이면 답변 지시 보강(핵심 구성요소·결과 명시) — [answer_detail_1013](docs/experiments/answer_detail_1013/) 채택 안 함 (기본 `0`) | 실험 |
+| `ARXIV_INGEST_TARGET_NEW` | 일일 수집 cs.AI 신규 목표 편수 (현재 `10`) | 선택 |
 | `ARXIV_HF_DAILY_TOP` | 일일 수집에 HF Daily Papers 상위 N편 추가(0 = 끔) — [hf_coverage_1012](docs/experiments/hf_coverage_1012/) (기본 `0`) | 선택 |
 | `INGEST_WATCHDOG` | `0` 이면 논문 수집 누락 감시(매일 03:30) 끔 (기본 `1`) | 선택 |
 | `E2B_API_KEY` | Agent 코드 실행 (E2B 샌드박스) | Agent 봇 사용 시 |
@@ -215,6 +223,22 @@ launchctl bootout gui/$(id -u)/com.mini.runscheduler
 rm ~/Library/LaunchAgents/com.mini.runscheduler.plist
 ```
 
+### Chroma 서버 · 텔레그램 봇 (launchd, 2026-10-14)
+
+| Label | 하는 일 | 로그 |
+|---|---|---|
+| `com.mini.chroma` | `chroma run --path $CHROMA_DB_PATH --host 127.0.0.1 --port 8001` — 운영 벡터 DB 를 여는 **유일한** 프로세스 | `~/Library/Logs/mini-chroma.log` |
+| `com.mini.telegrambot` | T7·venv·Ollama·Chroma 서버(heartbeat)가 준비되면 봇(receiver + ai_worker)을 기동 | `~/Library/Logs/mini-telegrambot-launcher.log` |
+| `com.mini.runscheduler` | 통합 스케줄러(일일 수집 01:00 등) | `~/Library/Logs/mini-runscheduler.log` |
+
+설정 원본과 설명: [`ops/launchd/`](ops/launchd/). launchd 가 실행한 `/bin/bash` 는 macOS 권한(TCC) 때문에 T7 파일을 못 읽어서, 런처는 `~/Library/Application Support/mini/` 에 두고 venv Python 으로 기동한다.
+
+```bash
+launchctl kickstart -k gui/$(id -u)/com.mini.chroma        # Chroma 서버 재시작
+curl -s http://127.0.0.1:8001/api/v2/heartbeat            # 서버 확인
+bash restart.sh                                            # 봇 수동 재시작
+```
+
 ### 메인 봇 (별도 프로세스)
 
 ```bash
@@ -309,6 +333,10 @@ python tests/unit/test_routing_golden.py
 - `.env`에 `TAVILY_API_KEY` 설정 (https://tavily.com 에서 발급)
 
 ---
+
+### 문헌 조사 도구 (OpenResearch `orx`)
+
+개선 라운드 사전 등록 전에 근거 논문을 찾을 때만 쓴다(맥미니 `~/orx/bin/orx discover …`). 운영 DB·봇에 붙이지 않는다 — [`ops/openresearch_policy.md`](ops/openresearch_policy.md).
 
 ## 7. 라이선스
 

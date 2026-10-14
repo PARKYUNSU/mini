@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.mini.chroma</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Volumes/T7 Shield/mini/.venv/bin/python</string>
+    <string>/Volumes/T7 Shield/mini/.venv/bin/chroma</string>
+    <string>run</string>
+    <string>--path</string><string>/Volumes/T7 Shield/mini-chroma-rebuild2</string>
+    <string>--host</string><string>127.0.0.1</string>
+    <string>--port</string><string>8001</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
+  <key>ThrottleInterval</key><integer>30</integer>
+  <key>EnvironmentVariables</key><dict><key>ANONYMIZED_TELEMETRY</key><string>False</string></dict>
+  <key>StandardOutPath</key><string>/Users/yunsupark/Library/Logs/mini-chroma.log</string>
+  <key>StandardErrorPath</key><string>/Users/yunsupark/Library/Logs/mini-chroma.log</string>
+</dict>
+</plist>
