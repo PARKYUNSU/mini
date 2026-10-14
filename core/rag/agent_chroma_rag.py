@@ -2072,12 +2072,17 @@ def _get_chroma_singleton() -> ChromaRAGTool:
 class ChromaRAGPublic:
     """어떤 스레드에서든 동일 인터페이스. Chroma는 싱글톤 + Lock으로 직렬화."""
 
-    def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "", wants_depth: bool = False) -> str:
+    def search(
+        self, query: str, top_k: int = RAG_TOP_K, session_context: str = "", wants_depth: bool = False,
+        light_rerank: bool = True,
+    ) -> str:
         if _vector_search_effective_disabled():
             print("[ChromaRAG TRACE] vector search skipped (disabled), jsonl only", flush=True)
             fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
             return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
-        return _get_chroma_singleton().search(query, top_k=top_k, session_context=session_context, wants_depth=wants_depth)
+        return _get_chroma_singleton().search(
+            query, top_k=top_k, session_context=session_context, wants_depth=wants_depth, light_rerank=light_rerank
+        )
 
     def list_papers(self) -> str:
         return list_stored_papers_text()
@@ -2229,7 +2234,10 @@ class ChromaRAGTool:
             print(f"[ChromaRAG TRACE] depth chunks fetch failed: {exc}", flush=True)
             return [], []
 
-    def search(self, query: str, top_k: int = RAG_TOP_K, session_context: str = "", wants_depth: bool = False) -> str:
+    def search(
+        self, query: str, top_k: int = RAG_TOP_K, session_context: str = "", wants_depth: bool = False,
+        light_rerank: bool = True,
+    ) -> str:
         if _vector_search_effective_disabled():
             fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
             return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
@@ -2428,7 +2436,7 @@ class ChromaRAGTool:
                     top_k_papers=max(top_k, 1),
                     title_query=_tbq,
                     chunks_per_paper_out=HYBRID_CHUNKS_PER_PAPER,
-                    light_rerank_query=_tbq,
+                    light_rerank_query=_tbq if light_rerank else "",  # light_rerank_gated_1015
                 )
 
             hits = _format_chroma_hits(docs_clean, metas_clean, dists_clean)

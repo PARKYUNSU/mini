@@ -48,7 +48,7 @@ from core.llm.agent_llm import (
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.answer_fix import drop_contradicted_no_doc
-from core.llm.presence_judge import NO_DOC_HINT, judge_presence, should_judge
+from core.llm.presence_judge import NO_DOC_HINT, gate_types, judge_presence, should_judge
 from core.llm.citation_fix import fix_citations, number_context_papers
 from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
@@ -899,7 +899,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 else:
                     session_ctx = session.get_recent_context(max_turns=2)
                     _da_trace("before rag.search()", f"top_k={top_k} wants_depth={wants_depth} (sync collection.query)")
-                    rag_context = rag.search(rag_query, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth)
+                    # 수치·비교·목록 질문은 논문 단위 light rerank 를 건너뛴다 (RAG_LIGHT_RERANK_GATED_OFF, docs/experiments/light_rerank_gated_1015)
+                    _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
+                    rag_context = rag.search(
+                        rag_query, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth, light_rerank=_lr
+                    )
                     _da_trace("after rag.search()", f"len={len(rag_context)}")
                 if prefer_single_hit and wants_depth:
                     rag_context = _rag_context_same_paper_all_chunks(rag_context)
