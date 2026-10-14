@@ -1,0 +1,14 @@
+C01	SLMQuant랑 Block-Sphere Vector Quantization은 양자화를 각각 어떤 목적으로 다뤄? 차이 알려줘
+C02	온폴리시 증류에서 Prefix Replay 방식이랑 BranchOPD는 뭐가 달라?
+C03	연합학습에서 희소 모델 찾는 엔트로피 정규화 확률 게이트 방법이랑 DeepFusion 차이가 뭐야?
+C04	LLM이 시계열 분석에 쓸모 있는지 본 연구랑 LeForecast 비교해줘
+C05	GNN 링크 예측에 컨포멀 예측 붙인 연구랑 Gegenbauer GNN은 각각 뭘 하는 거야?
+C06	에이전트 메모리에서 LRE 축출 방식이랑 decoupling·aggregation 검색 방식 차이 알려줘
+C07	MKEvolve랑 테스트·정적분석 피드백으로 LLM 코드 생성 개선하는 연구 비교해줘
+C08	UNITE랑 Context-Aware Tokenization 월드모델은 토크나이저를 각각 어떻게 다뤄?
+C09	World4RL이랑 가변 길이 잠재 월드모델 연구는 어떻게 달라?
+C10	Diffusion Transformer에서 레지스터 토큰 연구랑 LazyDiT 차이가 뭐야?
+C11	Factored Agents랑 긴 컨텍스트 LLM이 긴 인컨텍스트 학습에 약하다는 연구 비교해줘
+C12	CoT를 내재화하는 Masked Self-Distillation이랑 반지도 CoT 학습은 뭐가 달라?
+C13	OmniJARVIS랑 Xiaomi-Robotics-1 VLA 모델 비교해줘
+C14	flow matching 모델 동역학 워터마크랑 LLM 에이전트 행동 워터마크 차이 알려줘

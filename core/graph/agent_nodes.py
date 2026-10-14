@@ -278,6 +278,61 @@ def _rag_context_top_n_hits(rag_context: str, *, n: int = 5) -> str:
     return _RAG_HIT_SEP.join(blocks)
 
 
+_PID_IN_BLOCK = re.compile(r"\b(\d{4}\.\d{4,5})(?:v\d+)?\b")
+
+
+def _extract_comparison_targets(user_request: str) -> list[str]:
+    """비교 질문의 두 대상을 영어 검색어 두 줄로 뽑는다 (docs/experiments/compare_split_1015).
+
+    실패하거나 형식이 맞지 않으면 빈 목록 — 호출 쪽은 기존 검색만 쓴다.
+    """
+    prompt = f"""The user asks to compare two research methods, models, or papers.
+Return the two things being compared as two short English search queries for academic retrieval.
+Keep method names exactly as written (e.g. JetSpec, BlackMamba). If a side has no name, describe it in 4-8 English words.
+Return exactly two lines and nothing else:
+A: <query>
+B: <query>
+
+User question:
+{user_request}
+"""
+    for llm_getter in (get_rag_query_rewrite_llm, get_executor_llm):
+        try:
+            raw = (normalize_ai_message_content(llm_getter().invoke([HumanMessage(content=prompt)])) or "").strip()
+        except Exception:
+            continue
+        got = re.findall(r"^\s*[AB]\s*[:：]\s*(.+?)\s*$", raw, re.M)
+        got = [re.sub(r"[^A-Za-z0-9 .,+\-_/()]", " ", g).strip() for g in got][:2]
+        got = [re.sub(r"\s+", " ", g) for g in got if len(g) >= 3]
+        if len(got) == 2:
+            return got
+    return []
+
+
+def _merge_rag_blocks(primary: str, extras: list[str], *, per_extra: int = 2) -> str:
+    """각 대상 검색 상위 ``per_extra`` 블록을 앞에, 원래 검색 블록을 뒤에 — 같은 논문은 한 번만."""
+    seen: set[str] = set()
+    out: list[str] = []
+
+    def add(block: str) -> None:
+        m = _PID_IN_BLOCK.search(block)
+        key = m.group(1) if m else block[:80]
+        if key in seen:
+            return
+        seen.add(key)
+        out.append(block)
+
+    for ex in extras:
+        ex = (ex or "").strip()
+        if not ex or ex.startswith(("관련 문서 없음", "검색 오류")):
+            continue
+        for b in [x.strip() for x in ex.split(_RAG_HIT_SEP) if x.strip()][:per_extra]:
+            add(b)
+    for b in [x.strip() for x in (primary or "").split(_RAG_HIT_SEP) if x.strip()]:
+        add(b)
+    return _RAG_HIT_SEP.join(out) if out else primary
+
+
 def _da_trace(step: str, detail: str = "") -> None:
     """DirectAnswer 세그폴트 위치 추적: logger.debug + print(bot.log에 항상 남김)."""
     line = f"DirectAnswer TRACE | {step}"
@@ -904,6 +959,16 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     rag_context = rag.search(
                         rag_query, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth, light_rerank=_lr
                     )
+                    # 비교 질문: 두 대상을 각각 검색해 앞에 합친다 (RAG_COMPARE_SPLIT, docs/experiments/compare_split_1015)
+                    if os.getenv("RAG_COMPARE_SPLIT", "0").strip() == "1" and "cmp" in gate_types(user_request):
+                        _targets = _extract_comparison_targets(user_request)
+                        _da_trace("compare split targets", repr(_targets))
+                        if _targets:
+                            _extras = [
+                                rag.search(t, top_k=top_k, session_context=session_ctx, wants_depth=False, light_rerank=_lr)
+                                for t in _targets
+                            ]
+                            rag_context = _merge_rag_blocks(rag_context, _extras)
                     _da_trace("after rag.search()", f"len={len(rag_context)}")
                 if prefer_single_hit and wants_depth:
                     rag_context = _rag_context_same_paper_all_chunks(rag_context)
