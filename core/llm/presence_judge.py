@@ -9,9 +9,10 @@
 
 from __future__ import annotations
 
+import os
 import re
 
-__all__ = ["PROMPT", "NO_DOC_HINT", "parse_pick", "judge_presence"]
+__all__ = ["PROMPT", "PROMPT_V2", "active_prompt", "NO_DOC_HINT", "parse_pick", "judge_presence"]
 
 PROMPT = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 **특정한 연구 하나**를 찾고 있다.
 
@@ -26,6 +27,29 @@ PROMPT = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문
 
 [참고 문서]
 {context}"""
+
+# v2 (docs/experiments/presence_judge_v2_1014): v1 은 "특정한 연구 하나" 를 전제해 수치·비교·목록 질문에서
+# 거짓 '없음' 이 69% 였다(real_eval_1013 §5). `RAG_PRESENCE_PROMPT=v2` 일 때만 쓴다(기본 v1).
+PROMPT_V2 = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다.
+
+질문에 답하는 데 **직접 필요한 연구**가 참고 문서 중 하나라도 있으면 그 문서 번호를, 하나도 없으면 `없음`을 답하라.
+- 질문이 특정 연구를 찾으면: 질문이 묘사하는 방법·대상·문제와 맞는 그 연구가 있어야 한다. 주제만 비슷하면 `없음`이다.
+- 질문이 어떤 연구의 수치·결과·세부를 물으면: 그 연구가 있으면 번호를 답한다. 발췌에 그 수치나 세부가 보이지 않아도 `없음`이 아니다.
+- 질문이 두 연구의 비교나 여러 연구의 목록·동향을 물으면: 해당하는 연구가 하나라도 있으면 그 번호를 답한다.
+- 같은 논문이 여러 번호에 나뉘어 있으면 가장 앞 번호 하나만 적는다.
+
+출력은 정확히 한 줄: `답: 문서 N` 또는 `답: 없음`
+
+[질문]
+{question}
+
+[참고 문서]
+{context}"""
+
+
+def active_prompt() -> str:
+    return PROMPT_V2 if os.getenv("RAG_PRESENCE_PROMPT", "v1").strip().lower() == "v2" else PROMPT
+
 
 # v13 이 학습한 정답 없음 형식(yunsur_v13 README §2)을 그대로 지시한다.
 NO_DOC_HINT = """
@@ -54,7 +78,7 @@ def judge_presence(question: str, numbered_context: str, model: str) -> int | st
 
     llm = ChatOllama(**ollama_kwargs(model=model, temperature=0.0, seed=0, reasoning=False, num_predict=64))
     try:
-        raw = str(llm.invoke(PROMPT.format(question=question, context=numbered_context)).content or "")
+        raw = str(llm.invoke(active_prompt().format(question=question, context=numbered_context)).content or "")
     except Exception as exc:  # 판정이 실패해도 답변은 낸다
         print(f"[DEBUG] presence_judge 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return None
