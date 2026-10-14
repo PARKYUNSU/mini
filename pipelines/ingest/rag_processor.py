@@ -60,10 +60,9 @@ class RagProcessor:
             device="cpu",
             normalize_embeddings=True,
         )
-        self._client = chromadb.PersistentClient(
-            path=str(self.db_path),
-            settings=Settings(anonymized_telemetry=False),
-        )
+        from core.config.chroma_client import make_chroma_client
+
+        self._client = make_chroma_client(self.db_path)  # CHROMA_SERVER_URL 이면 서버 (2026-10-14)
         self._collection = self._client.get_or_create_collection(
             name=collection_name,
             embedding_function=self._embedding_fn,

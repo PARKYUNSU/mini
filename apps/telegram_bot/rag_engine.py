@@ -112,10 +112,9 @@ def _init_rag_stack_sync() -> None:
 
         embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
         # RagProcessor 등과 동일한 Chroma 설정이어야 SharedSystemClient가 같은 경로를 재사용한다.
-        chroma_client = chromadb.PersistentClient(
-            path=chroma_path,
-            settings=Settings(anonymized_telemetry=False),
-        )
+        from core.config.chroma_client import make_chroma_client
+
+        chroma_client = make_chroma_client(chroma_path)  # CHROMA_SERVER_URL 이면 서버 (2026-10-14)
         vectorstore = Chroma(
             client=chroma_client,
             persist_directory=chroma_path,
