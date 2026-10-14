@@ -96,7 +96,7 @@ python -m apps.backfill.run_backfill -s 2024-06-01 -e 2024-12-31 -b 20  # 20개�
 | `RAG_HANZI_RETRY` | `1` 이면 답변에 중국어가 섞일 때 1회 재생성 — [hanzi_retry_1012](docs/experiments/hanzi_retry_1012/) (기본 `0`) | 선택 |
 | `CHROMA_DB_PATH` | 운영 Chroma 폴더 (현재 T7 `mini-chroma-rebuild2`). 서버 모드에서는 서버(`com.mini.chroma`)가 이 폴더를 연다 | ✅ |
 | `CHROMA_SERVER_URL` | 있으면 운영 DB 는 이 Chroma 서버에 `HttpClient` 로 접속(`core/config/chroma_client.py`). 없으면 로컬 `PersistentClient` — **운영에서는 반드시 설정**(여러 프로세스가 폴더를 직접 열면 인덱스가 손상된다, [2026-10-14 사고](docs/incidents/2026-10-14_chroma_multiwriter.md)) | ✅ (운영) |
-| `RAG_HYPE` | `1` 이면 논문별 가상 질문 컬렉션(`paper_questions`)으로 검색 후보를 보강 — [hype_1014](docs/experiments/hype_1014/) **측정 중** (기본 `0`) | 실험 |
+| `RAG_HYPE` | `1` 이면 논문별 가상 질문 컬렉션(`paper_questions`)으로 검색 후보를 보강 — [hype_1014](docs/experiments/hype_1014/) 효과 0(162·HF40·real40 모두 짝 0:0), 운영 미사용 (기본 `0`) | 실험 |
 | `RAG_PRESENCE_PROMPT` | `v2` 면 정답 유무 판정 프롬프트 v2 — [presence_judge_v2_1014](docs/experiments/presence_judge_v2_1014/) 기준 미달, 운영 미사용 (기본 `v1`) | 실험 |
 | `RAG_ANSWER_DETAIL` | `1` 이면 답변 지시 보강(핵심 구성요소·결과 명시) — [answer_detail_1013](docs/experiments/answer_detail_1013/) 채택 안 함 (기본 `0`) | 실험 |
 | `ARXIV_INGEST_TARGET_NEW` | 일일 수집 cs.AI 신규 목표 편수 (현재 `10`) | 선택 |

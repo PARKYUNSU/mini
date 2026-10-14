@@ -39,7 +39,10 @@
 | [`hf_coverage_1012/`](hf_coverage_1012/) | 수집원에 HF Daily Papers 추가, 수집 공백(05-29~10-06) 백필 | **채택·운영** — hf_june40 적중 0 → 29/40 (p 4e-9), 기존 138 → 138. 공백 백필 진행 중 |
 | [`upper_bound_1013/`](upper_bound_1013/) | 같은 파이프라인에서 답변 모델만 gpt-oss-120b 로 (위치 측정) | v13 은 120B 대비 **ok 96% · correct 78%** (correct 짝 3:15, p 0.0075), 날조는 v13 이 적음 (4 vs 11, p 0.065) |
 | [`answer_detail_1013/`](answer_detail_1013/) | 답변 지시 보강: 핵심 구성요소·결과 명시 + 서베이 질문 (`RAG_ANSWER_DETAIL`) | **채택 안 함** — correct 85 → 93 (짝 4:12, p 0.077), 답 길이 무변화(지시 거의 무시). 날조·고지 무변화 |
-| [`real_eval_1013/`](real_eval_1013/) | 실제 사용형 평가셋 40문항(수치·비교·주제 목록·실제 질문) | 측정 중 |
+| [`real_eval_1013/`](real_eval_1013/) | 실제 사용형 평가셋 40문항(수치·비교·주제 목록·실제 질문) | 수치 정답 7/15, 비교 두 편 검색 3/11. **정답 유무 판정이 실제 사용형에서 `없음` 69%** |
+| [`presence_judge_v2_1014/`](presence_judge_v2_1014/) | 판정 프롬프트 v2 (수치·비교·목록 규칙) | **채택 안 함** — 실제 사용형 거짓 '없음' 15 → 11 (p 0.125) |
+| [`lit_review_1014/`](lit_review_1014/) | OpenResearch `orx` 문헌 조사 (검색·판정) | HyPE 1순위 → 효과 0, 판정은 질문 유형 게이트 1순위 |
+| [`hype_1014/`](hype_1014/) | 논문별 가상 질문 색인 갈래 (`RAG_HYPE`) | **채택 안 함 (효과 0)** — 놓친 24 중 16은 정답이 이미 후보 풀에 있음: 병목은 최종 논문 재순위 |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -150,6 +153,9 @@ docs/experiments/
 ├─ upper_bound_1013/       ← 120B 대비 위치(상한선) 측정
 ├─ answer_detail_1013/     ← 답변 지시 보강 (채택 안 함)
 ├─ real_eval_1013/         ← 실제 사용형 평가셋 40문항
+├─ presence_judge_v2_1014/ ← 판정 프롬프트 v2 (채택 안 함)
+├─ lit_review_1014/        ← OpenResearch 문헌 조사
+├─ hype_1014/              ← HyPE 가상 질문 색인 (효과 0)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
