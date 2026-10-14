@@ -288,7 +288,8 @@ def _extract_comparison_targets(user_request: str) -> list[str]:
     """
     prompt = f"""The user asks to compare two research methods, models, or papers.
 Return the two things being compared as two short English search queries for academic retrieval.
-Keep method names exactly as written (e.g. JetSpec, BlackMamba). If a side has no name, describe it in 4-8 English words.
+Use only names that appear in the user question, copied exactly (keep Latin-script names as is). Never add names that are not in the question.
+If a side has no name, describe it in 4-8 English words using only the question's content.
 Return exactly two lines and nothing else:
 A: <query>
 B: <query>
@@ -684,7 +685,8 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         session_context = session.get_recent_context(max_turns=2)
         rag = get_chroma_rag_tool()
         rag_query = _extract_english_rag_query(user_request, session_context=session_context)
-        rag_context = rag.search(rag_query, session_context=session_context)
+        _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
+        rag_context = rag.search(rag_query, session_context=session_context, light_rerank=_lr)
         _trs = get_tool_rag_store()
         tools_context = _trs.format_topk_block(user_request, k=TOOL_RAG_TOP_K)
         tools_list_str = _trs.format_router_tools_tag(user_request, k=TOOL_RAG_TOP_K)
@@ -959,17 +961,18 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     rag_context = rag.search(
                         rag_query, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth, light_rerank=_lr
                     )
-                    # 비교 질문: 두 대상을 각각 검색해 앞에 합친다 (RAG_COMPARE_SPLIT, docs/experiments/compare_split_1015)
-                    if os.getenv("RAG_COMPARE_SPLIT", "0").strip() == "1" and "cmp" in gate_types(user_request):
-                        _targets = _extract_comparison_targets(user_request)
-                        _da_trace("compare split targets", repr(_targets))
-                        if _targets:
-                            _extras = [
-                                rag.search(t, top_k=top_k, session_context=session_ctx, wants_depth=False, light_rerank=_lr)
-                                for t in _targets
-                            ]
-                            rag_context = _merge_rag_blocks(rag_context, _extras)
                     _da_trace("after rag.search()", f"len={len(rag_context)}")
+                # 비교 질문: 두 대상을 각각 검색해 앞에 합친다 — 라우터가 넘긴 컨텍스트에도 적용
+                # (RAG_COMPARE_SPLIT, docs/experiments/compare_split_1015)
+                if os.getenv("RAG_COMPARE_SPLIT", "0").strip() == "1" and "cmp" in gate_types(user_request):
+                    _targets = _extract_comparison_targets(user_request)
+                    _da_trace("compare split targets", repr(_targets))
+                    if _targets:
+                        _extras = [
+                            rag.search(t, top_k=top_k, session_context="", wants_depth=False, light_rerank=False)
+                            for t in _targets
+                        ]
+                        rag_context = _merge_rag_blocks(rag_context, _extras)
                 if prefer_single_hit and wants_depth:
                     rag_context = _rag_context_same_paper_all_chunks(rag_context)
                     _da_trace("rag_context same-paper merged (depth)", f"len={len(rag_context)}")
