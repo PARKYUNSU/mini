@@ -43,6 +43,8 @@
 | [`presence_judge_v2_1014/`](presence_judge_v2_1014/) | 판정 프롬프트 v2 (수치·비교·목록 규칙) | **채택 안 함** — 실제 사용형 거짓 '없음' 15 → 11 (p 0.125) |
 | [`lit_review_1014/`](lit_review_1014/) | OpenResearch `orx` 문헌 조사 (검색·판정) | HyPE 1순위 → 효과 0, 판정은 질문 유형 게이트 1순위 |
 | [`hype_1014/`](hype_1014/) | 논문별 가상 질문 색인 갈래 (`RAG_HYPE`) | **채택 안 함 (효과 0)** — 놓친 24 중 16은 정답이 이미 후보 풀에 있음: 병목은 최종 논문 재순위 |
+| [`presence_gate_1014/`](presence_gate_1014/) | 수치·비교·목록 질문은 판정 건너뜀 (`RAG_PRESENCE_GATE`) | **채택·운영 (10-14)** — 실제 사용형 '있는데 없다' 8 → 0 (p 0.0078), 대가: 비교 질문 부분 날조 1/11 |
+| [`light_rerank_1014/`](light_rerank_1014/) | 논문 단위 light rerank 끄기 재측정 | **채택 안 함** — real40+HF40 15:4 (p 0.019) 우세지만 162 18:7 (p 0.043) 악화. 찾기형엔 이롭고 수치·비교형엔 해롭다 → 유형별 적용 가설 |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -156,6 +158,8 @@ docs/experiments/
 ├─ presence_judge_v2_1014/ ← 판정 프롬프트 v2 (채택 안 함)
 ├─ lit_review_1014/        ← OpenResearch 문헌 조사
 ├─ hype_1014/              ← HyPE 가상 질문 색인 (효과 0)
+├─ presence_gate_1014/     ← 판정 질문 유형 게이트 (운영)
+├─ light_rerank_1014/      ← light rerank 끄기 (채택 안 함, 유형별 가설)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
