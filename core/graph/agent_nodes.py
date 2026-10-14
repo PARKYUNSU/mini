@@ -48,7 +48,7 @@ from core.llm.agent_llm import (
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.answer_fix import drop_contradicted_no_doc
-from core.llm.presence_judge import NO_DOC_HINT, judge_presence
+from core.llm.presence_judge import NO_DOC_HINT, judge_presence, should_judge
 from core.llm.citation_fix import fix_citations, number_context_papers
 from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
@@ -937,7 +937,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             rag_context, _doc_ids = number_context_papers(rag_context)
             _da_trace("rag_context numbered", f"docs={len(_doc_ids)}")
             # 정답 유무를 따로 묻고, '없음'이면 v13 의 정답 없음 형식을 지시한다 (docs/experiments/presence_integration_1012).
-            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids:
+            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request):
                 _pick = judge_presence(user_request, rag_context, RAG_ANSWER_MODEL)
                 print(f"[DEBUG] DirectAnswer: 정답 유무 판정 = {_pick}")
                 if _pick == "없음":

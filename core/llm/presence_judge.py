@@ -12,7 +12,7 @@ from __future__ import annotations
 import os
 import re
 
-__all__ = ["PROMPT", "PROMPT_V2", "active_prompt", "NO_DOC_HINT", "parse_pick", "judge_presence"]
+__all__ = ["PROMPT", "PROMPT_V2", "active_prompt", "gate_types", "should_judge", "NO_DOC_HINT", "parse_pick", "judge_presence"]
 
 PROMPT = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 **특정한 연구 하나**를 찾고 있다.
 
@@ -49,6 +49,25 @@ PROMPT_V2 = """아래 [참고 문서]는 사용자의 질문으로 검색한 논
 
 def active_prompt() -> str:
     return PROMPT_V2 if os.getenv("RAG_PRESENCE_PROMPT", "v1").strip().lower() == "v2" else PROMPT
+
+
+# 질문 유형 게이트 (docs/experiments/presence_gate_1014): 수치·비교·목록 질문은 "특정 연구 하나" 전제가
+# 맞지 않아 판정이 `없음` 을 남발한다(real_eval_1013 §5). `RAG_PRESENCE_GATE=1` 이면 이런 질문은 판정을 건너뛴다.
+_GATE_NUM = re.compile(r"몇\s*(%|퍼센트|배|개|점|명|위)|몇\s*%|얼마나|정확도가|성공률|수치|\d+\s*%")
+_GATE_CMP = re.compile(r"차이|비교|어떻게 달라|뭐가 달라|다른 거야|vs\.?|\S+(랑|이랑|와|과)\s+\S+.*(차이|비교|달라|다른)")
+_GATE_LIST = re.compile(r"논문들|연구들|동향|정리해|트렌드|\d+\s*개\s*(찾|알려)|목록|방향으로 가")
+
+
+def gate_types(question: str) -> list[str]:
+    """질문이 걸리는 유형 이름들(num·cmp·list). 비어 있으면 판정 대상."""
+    q = question or ""
+    return [n for n, r in (("num", _GATE_NUM), ("cmp", _GATE_CMP), ("list", _GATE_LIST)) if r.search(q)]
+
+
+def should_judge(question: str) -> bool:
+    if os.getenv("RAG_PRESENCE_GATE", "0").strip() != "1":
+        return True
+    return not gate_types(question)
 
 
 # v13 이 학습한 정답 없음 형식(yunsur_v13 README §2)을 그대로 지시한다.
