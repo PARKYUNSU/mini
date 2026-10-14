@@ -2,7 +2,7 @@
 
 arXiv 논문 수집·파싱, RAG, 파인튜닝 데이터 생성, 텔레그램 봇을 포함한 로컬 AI 파이프라인입니다.
 
-> **지금 상태 (2026-10-14)** — 운영 RAG 답변 모델 `yunsur_v13`(Qwen3.5-9B LoRA) + 초록 컨텍스트 · 정답 유무 판정(수치·비교·목록 질문은 건너뜀) · 중국어 재생성 · 서론 모순 후처리. 벡터 DB 는 **Chroma 서버 한 개**(launchd `com.mini.chroma`, 포트 8001)로만 열고 봇·수집·평가는 모두 HTTP 로 접속한다. 실험·측정 기록은 [`docs/experiments/README.md`](docs/experiments/README.md), 운영 사고는 [`docs/incidents/`](docs/incidents/), 운영 설정은 [`ops/`](ops/).
+> **지금 상태 (2026-10-15)** — 운영 RAG 답변 모델 `yunsur_v13`(Qwen3.5-9B LoRA) + 초록 컨텍스트 · 정답 유무 판정(수치·비교·목록 질문은 건너뜀) · 비교 질문은 두 대상을 각각 검색 · 중국어 재생성 · 서론 모순 후처리. 벡터 DB 는 **Chroma 서버 한 개**(launchd `com.mini.chroma`, 포트 8001)로만 열고 봇·수집·평가는 모두 HTTP 로 접속한다. 실험·측정 기록은 [`docs/experiments/README.md`](docs/experiments/README.md), 운영 사고는 [`docs/incidents/`](docs/incidents/), 운영 설정은 [`ops/`](ops/).
 
 ### 레이아웃 (요약)
 
@@ -98,6 +98,7 @@ python -m apps.backfill.run_backfill -s 2024-06-01 -e 2024-12-31 -b 20  # 20개�
 | `CHROMA_SERVER_URL` | 있으면 운영 DB 는 이 Chroma 서버에 `HttpClient` 로 접속(`core/config/chroma_client.py`). 없으면 로컬 `PersistentClient` — **운영에서는 반드시 설정**(여러 프로세스가 폴더를 직접 열면 인덱스가 손상된다, [2026-10-14 사고](docs/incidents/2026-10-14_chroma_multiwriter.md)) | ✅ (운영) |
 | `RAG_HYPE` | `1` 이면 논문별 가상 질문 컬렉션(`paper_questions`)으로 검색 후보를 보강 — [hype_1014](docs/experiments/hype_1014/) 효과 0(162·HF40·real40 모두 짝 0:0), 운영 미사용 (기본 `0`) | 실험 |
 | `RAG_PRESENCE_GATE` | `1` 이면 수치·비교·목록 질문은 정답 유무 판정을 건너뛴다 — [presence_gate_1014](docs/experiments/presence_gate_1014/) **운영 켬** (기본 `0`) | 선택 |
+| `RAG_COMPARE_SPLIT` | `1` 이면 비교 질문(게이트 `cmp`)에서 두 대상 이름을 따로 검색해 컨텍스트 앞에 붙인다 — [compare_split_1015](docs/experiments/compare_split_1015/) 두 편 모두 검색 5 → 19/22, **운영 켬** (비교 질문만 지연 +37s, 기본 `0`) | 선택 |
 | `RAG_PRESENCE_PROMPT` | `v2` 면 정답 유무 판정 프롬프트 v2 — [presence_judge_v2_1014](docs/experiments/presence_judge_v2_1014/) 기준 미달, 운영 미사용 (기본 `v1`) | 실험 |
 | `RAG_ANSWER_DETAIL` | `1` 이면 답변 지시 보강(핵심 구성요소·결과 명시) — [answer_detail_1013](docs/experiments/answer_detail_1013/) 채택 안 함 (기본 `0`) | 실험 |
 | `ARXIV_INGEST_TARGET_NEW` | 일일 수집 cs.AI 신규 목표 편수 (현재 `10`) | 선택 |

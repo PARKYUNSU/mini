@@ -46,7 +46,7 @@
 | [`presence_gate_1014/`](presence_gate_1014/) | 수치·비교·목록 질문은 판정 건너뜀 (`RAG_PRESENCE_GATE`) | **채택·운영 (10-14)** — 실제 사용형 '있는데 없다' 8 → 0 (p 0.0078), 대가: 비교 질문 부분 날조 1/11 |
 | [`light_rerank_1014/`](light_rerank_1014/) | 논문 단위 light rerank 끄기 재측정 | **채택 안 함** — real40+HF40 15:4 (p 0.019) 우세지만 162 18:7 (p 0.043) 악화. 찾기형엔 이롭고 수치·비교형엔 해롭다 → 유형별 적용 가설 |
 | [`real_eval2_1015/`](real_eval2_1015/) | 실제 사용형 평가셋 2 (34문항) + 게이트 질문만 light rerank 끄기 | **채택 안 함** (재측정 30 → 29). 1차는 처리가 라우터 경로에 미적용이라 무효 |
-| [`compare_split_1015/`](compare_split_1015/) | 비교 질문 두 대상 각각 검색 (`RAG_COMPARE_SPLIT`) | **사전 규칙상 채택** — 두 편 모두 검색 5 → 19/22 (0:14, p 0.0001), 한 편 이상 13 → 22. 대가 지연 +37s (비교 질문만) |
+| [`compare_split_1015/`](compare_split_1015/) | 비교 질문 두 대상 각각 검색 (`RAG_COMPARE_SPLIT`) | **채택 · 운영** — 두 편 모두 검색 5 → 19/22 (0:14, p 0.0001), 한 편 이상 13 → 22. 대가 지연 +37s (비교 질문만) |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -163,7 +163,7 @@ docs/experiments/
 ├─ presence_gate_1014/     ← 판정 질문 유형 게이트 (운영)
 ├─ light_rerank_1014/      ← light rerank 끄기 (채택 안 함, 유형별 가설)
 ├─ real_eval2_1015/        ← 실제 사용형 평가셋 2 (유형별 light rerank 채택 안 함)
-├─ compare_split_1015/     ← 비교 질문 두 대상 각각 검색 (채택 후보)
+├─ compare_split_1015/     ← 비교 질문 두 대상 각각 검색 (채택 · 운영)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
