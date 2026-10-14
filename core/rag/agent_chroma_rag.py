@@ -78,6 +78,14 @@ _log = logging.getLogger(__name__)
 _SEARCH_TIMEOUT_SEC = 600.0
 
 # ── Cross-encoder reranker (lazy singleton, 기본 비활성 — CHROMA_CROSS_ENCODER_RERANK=1 일 때만) ──
+HYPE_COLLECTION = os.getenv("HYPE_COLLECTION", "paper_questions")
+HYPE_TOP_PAPERS = int(os.getenv("HYPE_TOP_PAPERS", "5"))
+
+
+def _hype_enabled() -> bool:
+    return os.getenv("RAG_HYPE", "0").strip() == "1"
+
+
 _CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 _cross_encoder: object | None = None
 _cross_encoder_lock = threading.Lock()
@@ -2158,6 +2166,29 @@ class ChromaRAGTool:
     def _rewrite_query(self, query: str, session_context: str) -> str:
         return _rewrite_rag_query(query, session_context)
 
+    def _hype_paper_hits(self, query: str, top_papers: int) -> dict[str, float]:
+        """HyPE 갈래 (docs/experiments/hype_1014): 가상 질문 컬렉션에서 논문별 최소 거리."""
+        try:
+            if getattr(self, "_hype_col", None) is None:
+                self._hype_col = self._client.get_collection(
+                    name=HYPE_COLLECTION, embedding_function=self._embedding_fn
+                )
+            with self._db_lock:
+                r = self._hype_col.query(
+                    query_texts=[query], n_results=max(top_papers * 8, 20), include=["metadatas", "distances"]
+                )
+        except Exception as exc:  # 컬렉션이 없거나 서버 오류 → 갈래만 건너뜀
+            print(f"[ChromaRAG TRACE] hype skipped: {exc}", flush=True)
+            return {}
+        best: dict[str, float] = {}
+        for m, d in zip((r.get("metadatas") or [[]])[0], (r.get("distances") or [[]])[0]):
+            pid = (m or {}).get("paper_id") or ""
+            if pid and d is not None and (pid not in best or d < best[pid]):
+                best[pid] = float(d)
+        top = dict(sorted(best.items(), key=lambda kv: kv[1])[:top_papers])
+        print(f"[ChromaRAG TRACE] hype hits: {[(k, round(v, 3)) for k, v in top.items()]}", flush=True)
+        return top
+
     def _fetch_depth_chunks(
         self, paper_id: str, *, max_chunks: int = 15, max_chars: int = 6000
     ) -> tuple[list[str], list[dict[str, str]]]:
@@ -2275,6 +2306,28 @@ class ChromaRAGTool:
                     "paper-level MAX aggregation will apply",
                     flush=True,
                 )
+
+            # HyPE 갈래 (RAG_HYPE=1, 기본 꺼짐): 가상 질문과 가까운 논문을 후보에 넣거나 거리를 당긴다.
+            if _hype_enabled() and metas_clean is not None:
+                _hh = self._hype_paper_hits(search_query, HYPE_TOP_PAPERS)
+                if _hh:
+                    if dists_clean is None or len(dists_clean) != len(docs_clean):
+                        dists_clean = [None] * len(docs_clean)
+                    _pool = {}
+                    for _i, _m in enumerate(metas_clean):
+                        _pool.setdefault((_m.get("paper_id") or "").strip(), []).append(_i)
+                    for _pid, _dq in _hh.items():
+                        if _pid in _pool:
+                            for _i in _pool[_pid]:
+                                _d0 = dists_clean[_i]
+                                dists_clean[_i] = _dq if _d0 is None else min(_d0, _dq)
+                        else:
+                            _idocs, _imetas = self._fetch_depth_chunks(_pid, max_chunks=3, max_chars=3000)
+                            docs_clean = docs_clean + _idocs
+                            metas_clean = metas_clean + _imetas
+                            dists_clean = dists_clean + [_dq] * len(_idocs)
+                    pre_cs = None  # 거리가 바뀌었으니 하이브리드 점수를 다시 계산
+                    _retrieval_pool_len = -1
 
             # Title-first inject: 원본 쿼리와 search_query 모두로 제목 매칭 시도
             title_pid = _find_paper_by_title(original_query) or _find_paper_by_title(search_query)
