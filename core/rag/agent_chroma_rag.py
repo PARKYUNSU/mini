@@ -393,14 +393,34 @@ def _emb_cache_is_complete(collection, cache: dict[str, Any]) -> bool:
     return cache.get("_count") == want
 
 
+def _emb_cache_stamp(d: Path) -> float | None:
+    try:
+        return (d / "meta.json").stat().st_mtime
+    except OSError:
+        return None
+
+
 def _load_emb_cache() -> dict[str, Any] | None:
-    """``RAG_EMB_CACHE=1`` 이면 캐시를 한 번 열어 둔다 (memmap). 꺼져 있거나 없으면 None."""
+    """``RAG_EMB_CACHE=1`` 이면 캐시를 열어 둔다 (memmap). 꺼져 있거나 없으면 None.
+
+    5분마다 ``meta.json`` 시각을 보고, 매일 재생성(scripts/build_emb_cache.py)으로 바뀌었으면
+    다시 연다 — 봇을 재시작하지 않아도 새로 수집된 논문이 캐시 경로를 탄다. 다시 열기가 실패하면
+    예전 캐시를 그대로 쓴다(교체 도중 등).
+    """
     if os.getenv("RAG_EMB_CACHE", "0") != "1":
         return None
     d = emb_cache_dir()
+    now = time.time()
     with _emb_cache_lock:
-        if _emb_cache_state.get("dir") == str(d):
-            return _emb_cache_state.get("cache")
+        st = _emb_cache_state
+        if st.get("dir") == str(d):
+            if now - st.get("checked_at", 0.0) < _EMB_CACHE_COUNT_TTL_S:
+                return st.get("cache")
+            st["checked_at"] = now
+            stamp = _emb_cache_stamp(d)
+            if stamp is None or stamp == st.get("stamp"):
+                return st.get("cache")
+        stamp = _emb_cache_stamp(d)
         cache = None
         try:
             import numpy as np
@@ -417,10 +437,13 @@ def _load_emb_cache() -> dict[str, Any] | None:
                 "index": index,
                 "collection_rows": meta.get("collection_rows"),
             }
-            print(f"[ChromaRAG TRACE] emb cache loaded: {d} papers={len(index)} rows={cache['emb'].shape[0]}", flush=True)
+            print(f"[ChromaRAG TRACE] emb cache loaded: {d} papers={len(index)} rows={cache['emb'].shape[0]} "
+                  f"built_at={meta.get('built_at')}", flush=True)
         except Exception as exc:
             print(f"[ChromaRAG TRACE] emb cache unavailable ({d}): {exc}", flush=True)
-        _emb_cache_state.update(dir=str(d), cache=cache)
+            if st.get("dir") == str(d) and st.get("cache") is not None:
+                return st.get("cache")  # 교체 도중 등 — 예전 캐시 유지, 5분 뒤 다시 본다
+        st.update(dir=str(d), cache=cache, stamp=stamp, checked_at=now)
         return cache
 
 

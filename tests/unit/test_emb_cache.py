@@ -1,6 +1,7 @@
 """로컬 임베딩 캐시 경로는 현행 배치 get 경로와 결과가 같아야 한다 (docs/experiments/emb_cache_1015)."""
 
 import json
+import os
 
 import numpy as np
 
@@ -132,3 +133,17 @@ def test_grown_collection_still_falls_back(monkeypatch, tmp_path):
     got = m._nearest_chunks_per_paper_batched(fc, [f"2601.{i:05d}" for i in range(6)], "q", 2)
     assert fc.calls == [("ids", 10), ("where", 21)]  # 새 논문은 현행 경로로
     assert len(got) == 6
+
+
+def test_reloads_when_cache_rebuilt(monkeypatch, tmp_path):
+    rows = _rows(4)
+    _build_cache(tmp_path, rows[:10])  # 논문 0~1
+    _with_meta(tmp_path, 10)
+    _use_cache(monkeypatch, tmp_path)
+    assert len(m._load_emb_cache()["index"]) == 2
+    _build_cache(tmp_path, rows)  # 재생성: 논문 0~3
+    _with_meta(tmp_path, 20)
+    os.utime(tmp_path / "meta.json", (1e10, 1e10))
+    assert len(m._load_emb_cache()["index"]) == 2  # 5분 안에는 다시 보지 않는다
+    monkeypatch.setitem(m._emb_cache_state, "checked_at", 0.0)
+    assert len(m._load_emb_cache()["index"]) == 4  # meta.json 이 바뀌어 다시 연다

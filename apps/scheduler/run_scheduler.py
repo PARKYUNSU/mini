@@ -408,6 +408,43 @@ def run_arxiv_pipeline() -> None:
     )
     _touch_arxiv_ok_marker()
     _run_hf_daily()
+    _spawn_emb_cache_rebuild()
+
+
+def _spawn_emb_cache_rebuild() -> None:
+    """수집 뒤 로컬 임베딩 캐시 재생성 (docs/experiments/emb_cache_1015 §8). ``RAG_EMB_CACHE=1`` 일 때만.
+
+    ~46분 걸려 Popen 으로 띄우기만 한다(스케줄 루프를 막지 않게). Chroma 는 읽기만, 원자 교체.
+    봇은 5분 안에 새 캐시를 알아채 다시 연다. 이미 도는 중이면 생략.
+    """
+    if (os.getenv("RAG_EMB_CACHE") or "0").strip() != "1":
+        return
+    _CRON_DIR.mkdir(parents=True, exist_ok=True)
+    pid_path = _CRON_DIR / "emb_cache_build.pid"
+    try:
+        old = int(pid_path.read_text().strip())
+        os.kill(old, 0)
+        print(f"   ⏭️ 임베딩 캐시 재생성 이미 실행 중(pid={old}) — 생략", flush=True)
+        return
+    except (OSError, ValueError):
+        pass
+    log_path = _CRON_DIR / "emb_cache_build_stdout.log"
+    cmd = [sys.executable, "-u", "scripts/build_emb_cache.py"]
+    stamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    with open(log_path, "a", encoding="utf-8") as logf:
+        logf.write(f"\n{'=' * 60}\n[{stamp}] run_scheduler → Popen: {' '.join(cmd[2:])}\n")
+        logf.flush()
+        proc = subprocess.Popen(
+            cmd,
+            cwd=PROJECT_ROOT,
+            env=_subprocess_env(),
+            stdin=subprocess.DEVNULL,
+            stdout=logf,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+    pid_path.write_text(str(proc.pid))
+    print(f"   백그라운드 임베딩 캐시 재생성 PID={proc.pid} (로그: {log_path.relative_to(PROJECT_ROOT)})", flush=True)
 
 
 def _run_hf_daily() -> None:
