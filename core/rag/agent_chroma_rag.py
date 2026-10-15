@@ -383,12 +383,21 @@ def _nearest_chunks_per_paper_batched(
         return None
     try:
         cands = [c for pid in pids for c in _paper_id_version_candidates(pid)]
-        got = collection.get(
-            where={"paper_id": {"$in": cands}},
-            include=["documents", "metadatas", "embeddings"],
-        )
-        embs = got.get("embeddings")
-        if embs is None or len(embs) == 0:
+        # 서버 SQLite 변수 한도(too many SQL variables) — $in 을 나눠 가져와 합친다
+        got = {"documents": [], "metadatas": [], "embeddings": []}
+        for j in range(0, len(cands), _BATCHED_GET_MAX_IDS):
+            part = collection.get(
+                where={"paper_id": {"$in": cands[j : j + _BATCHED_GET_MAX_IDS]}},
+                include=["documents", "metadatas", "embeddings"],
+            )
+            p_embs = part.get("embeddings")
+            if p_embs is None or len(p_embs) == 0:
+                continue
+            got["documents"].extend(part.get("documents") or [])
+            got["metadatas"].extend(part.get("metadatas") or [])
+            got["embeddings"].extend(list(p_embs))
+        embs = got["embeddings"]
+        if len(embs) == 0:
             return {}
         q = np.asarray(ef([query_text])[0], dtype=np.float64)
         x = np.asarray(embs, dtype=np.float64)
@@ -411,6 +420,8 @@ def _nearest_chunks_per_paper_batched(
 
 
 _PAPER_ID_MAX_VERSION = 20
+# 배치 get 한 번에 넣는 paper_id 후보 수 (논문당 21개 → 38편)
+_BATCHED_GET_MAX_IDS = int(os.getenv("CHROMA_BATCHED_GET_MAX_IDS", "798"))
 
 
 def _paper_id_version_candidates(pid: str) -> list[str]:

@@ -968,10 +968,15 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     _targets = _extract_comparison_targets(user_request)
                     _da_trace("compare split targets", repr(_targets))
                     if _targets:
-                        _extras = [
-                            rag.search(t, top_k=top_k, session_context="", wants_depth=False, light_rerank=False)
-                            for t in _targets
-                        ]
+                        def _search_target(t: str) -> str:
+                            return rag.search(t, top_k=top_k, session_context="", wants_depth=False, light_rerank=False)
+
+                        # 두 대상 검색을 동시에 (RAG_COMPARE_SPLIT_PARALLEL) — 순서는 대상 순서 그대로
+                        if os.getenv("RAG_COMPARE_SPLIT_PARALLEL", "0").strip() == "1":
+                            with ThreadPoolExecutor(max_workers=len(_targets)) as _ex:
+                                _extras = list(_ex.map(_search_target, _targets))
+                        else:
+                            _extras = [_search_target(t) for t in _targets]
                         rag_context = _merge_rag_blocks(rag_context, _extras)
                 if prefer_single_hit and wants_depth:
                     rag_context = _rag_context_same_paper_all_chunks(rag_context)
