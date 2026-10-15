@@ -12,12 +12,12 @@ import sys
 import time
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from pipelines.ingest.rag_processor import RagProcessor
 
-JSONL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "raw_data_queue", "crawled_papers.jsonl")
-CHROMA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db")
+JSONL_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "raw_data_queue", "crawled_papers.jsonl")
+CHROMA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "chroma_db")
 
 def load_papers():
     papers = []

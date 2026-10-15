@@ -5,7 +5,7 @@ Recall@K, Precision@1, MRR 세 가지 지표로 평가.
 Baseline(벡터만) vs 레거시 Hybrid(min-max) vs **Production Hybrid**(RRF+논문+제목유사도) vs Hybrid+Rerank.
 
 Chroma 청크 파이프라인을 바꾼 경우 먼저 재인덱싱:
-    .venv/bin/python rebuild_chroma_clean.py --wipe-db
+    .venv/bin/python scripts/legacy/rebuild_chroma_clean.py --wipe-db
 
 사용법:
     cd "/Volumes/T7 Shield/mini"

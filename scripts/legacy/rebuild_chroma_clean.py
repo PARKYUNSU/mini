@@ -10,11 +10,11 @@
 권장 (프로덕션급 클린 빌드)::
 
     cd mini
-    .venv/bin/python rebuild_chroma_clean.py --wipe-db
+    .venv/bin/python scripts/legacy/rebuild_chroma_clean.py --wipe-db
 
 소량 테스트::
 
-    .venv/bin/python rebuild_chroma_clean.py --max-papers 20
+    .venv/bin/python scripts/legacy/rebuild_chroma_clean.py --max-papers 20
 
 재인덱싱 후 평가 (이전 수치와 비교)::
 
@@ -48,7 +48,7 @@ import chromadb
 from chromadb.config import Settings
 
 # 프로젝트 루트
-_ROOT = Path(__file__).resolve().parent
+_ROOT = Path(__file__).resolve().parents[2]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
@@ -231,7 +231,7 @@ def main() -> int:
                 print(
                     f"\n❌ Chroma 초기화 실패(읽기 전용 DB): {e}\n"
                     f"   {chroma_path} 를 통째로 지운 뒤 재실행하세요: "
-                    "`rm -rf chroma_db` → `python3 rebuild_chroma_clean.py --wipe-db`\n"
+                    "`rm -rf chroma_db` → `python3 scripts/legacy/rebuild_chroma_clean.py --wipe-db`\n"
                     "   잠긴 0바이트 chroma.sqlite3 이 남아 있으면 이 오류가 날 수 있습니다."
                 )
             raise

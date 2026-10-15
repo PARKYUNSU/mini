@@ -5,7 +5,7 @@ Recall@K, Precision@1, MRR 세 가지 지표로 ChromaDB 벡터 검색 품질을
 평가 데이터는 DB에 실제 존재하는 논문 paper_id를 기반으로 자동 생성합니다.
 
 청킹·노이즈 필터를 바꾼 뒤에는 반드시 재인덱싱 후 측정해야 수치가 의미 있다.
-    .venv/bin/python rebuild_chroma_clean.py --wipe-db
+    .venv/bin/python scripts/legacy/rebuild_chroma_clean.py --wipe-db
 
 사용법:
     cd /Volumes/T7\ Shield/mini

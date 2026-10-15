@@ -20,7 +20,7 @@ QUANTIZE="$HOME/llama.cpp/build/bin/llama-quantize"
 if ! ollama show yunsur_v3_q4 >/dev/null 2>&1; then
   echo "== yunsur_v3_q4 생성 (v3 f16 → q4_k_m) =="
   [[ -f "$V3_Q4" ]] || "$QUANTIZE" "$V3_F16" "$V3_Q4" Q4_K_M
-  sed "s|^FROM .*|FROM \"$V3_Q4\"|" Modelfile > /tmp/Modelfile.v3q4
+  sed "s|^FROM .*|FROM \"$V3_Q4\"|" ops/modelfiles/Modelfile > /tmp/Modelfile.v3q4
   ollama create yunsur_v3_q4 -f /tmp/Modelfile.v3q4
 fi
 

@@ -71,7 +71,7 @@ ls -lh "$Q4_GGUF"
 
 step "7. Ollama 등록"
 cd "$MINI"
-ollama create yunsur_v4 -f Modelfile.v4
+ollama create yunsur_v4 -f ops/modelfiles/Modelfile.v4
 ollama list | grep -E "yunsur|qwen3.5" || true
 
 step "8. 스모크"
