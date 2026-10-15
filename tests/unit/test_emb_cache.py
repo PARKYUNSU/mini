@@ -104,3 +104,31 @@ def test_cache_off_or_missing_dir(monkeypatch, tmp_path):
     fc = _FakeCollection(rows)
     got = m._nearest_chunks_per_paper_batched(fc, ["2601.00000"], "q", 2)
     assert fc.calls == [("where", 21)] and len(got) == 1
+
+
+def _with_meta(tmp_path, rows):
+    (tmp_path / "meta.json").write_text(json.dumps({"collection_rows": rows}))
+
+
+def test_complete_cache_skips_absent_paper(monkeypatch, tmp_path):
+    rows = _rows(5)
+    _build_cache(tmp_path, rows)
+    _with_meta(tmp_path, len(rows))
+    _use_cache(monkeypatch, tmp_path)
+    fc = _FakeCollection(rows)
+    fc.count = lambda: len(rows)
+    got = m._nearest_chunks_per_paper_batched(fc, ["2601.00000", "2699.99999"], "q", 2)
+    assert fc.calls == [("ids", 2)]  # Chroma 에 없는 논문은 0행 조회를 하지 않는다
+    assert list(got) == ["2601.00000"]
+
+
+def test_grown_collection_still_falls_back(monkeypatch, tmp_path):
+    rows = _rows(6)
+    _build_cache(tmp_path, rows[:25])
+    _with_meta(tmp_path, 25)
+    _use_cache(monkeypatch, tmp_path)
+    fc = _FakeCollection(rows)
+    fc.count = lambda: len(rows)  # 캐시 뒤 수집됨
+    got = m._nearest_chunks_per_paper_batched(fc, [f"2601.{i:05d}" for i in range(6)], "q", 2)
+    assert fc.calls == [("ids", 10), ("where", 21)]  # 새 논문은 현행 경로로
+    assert len(got) == 6

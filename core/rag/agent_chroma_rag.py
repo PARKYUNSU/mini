@@ -371,6 +371,26 @@ def emb_cache_dir() -> Path:
 
 _emb_cache_lock = threading.Lock()
 _emb_cache_state: dict[str, Any] = {}
+_EMB_CACHE_COUNT_TTL_S = 300.0
+
+
+def _emb_cache_is_complete(collection, cache: dict[str, Any]) -> bool:
+    """컬렉션 행 수가 캐시를 만들 때와 같으면 True — 캐시에 없는 논문은 Chroma 에도 없다.
+
+    BM25 인덱스(JSONL)에는 있고 Chroma 에는 없는 논문(10-15 기준 66편)을 현행 경로로 찾으면
+    결과 0행에 ~10s 씩 든다 (emb_cache_1015 §6). 행 수는 5분마다 다시 센다(수집 반영).
+    """
+    want = cache.get("collection_rows")
+    if not want:
+        return False
+    now = time.time()
+    if now - cache.get("_count_at", 0.0) > _EMB_CACHE_COUNT_TTL_S:
+        try:
+            cache["_count"] = collection.count()
+        except Exception:
+            cache["_count"] = None
+        cache["_count_at"] = now
+    return cache.get("_count") == want
 
 
 def _load_emb_cache() -> dict[str, Any] | None:
@@ -387,10 +407,15 @@ def _load_emb_cache() -> dict[str, Any] | None:
 
             with open(d / "paper_index.json") as f:
                 index = json.load(f)
+            meta: dict[str, Any] = {}
+            if (d / "meta.json").exists():
+                with open(d / "meta.json") as f:
+                    meta = json.load(f)
             cache = {
                 "emb": np.load(d / "emb.npy", mmap_mode="r"),
                 "ids": np.load(d / "ids.npy", mmap_mode="r"),
                 "index": index,
+                "collection_rows": meta.get("collection_rows"),
             }
             print(f"[ChromaRAG TRACE] emb cache loaded: {d} papers={len(index)} rows={cache['emb'].shape[0]}", flush=True)
         except Exception as exc:
@@ -469,6 +494,9 @@ def _nearest_chunks_per_paper_batched(
         except Exception as exc:
             print(f"[ChromaRAG TRACE] emb cache path failed: {exc}", flush=True)
             out, rest = {}, pids
+        if rest and _emb_cache_is_complete(collection, cache):
+            # 캐시가 컬렉션 전체와 같으면 색인에 없는 논문은 Chroma 에도 없다 — 0행 조회를 건너뛴다
+            rest = [p for p in rest if p in cache["index"]]
         if not rest:
             return out
         sub = _nearest_chunks_per_paper_batched_get(collection, rest, query_text, k, ef)
