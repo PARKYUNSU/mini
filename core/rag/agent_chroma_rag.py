@@ -383,19 +383,23 @@ def _nearest_chunks_per_paper_batched(
         return None
     try:
         cands = [c for pid in pids for c in _paper_id_version_candidates(pid)]
-        # 서버 SQLite 변수 한도(too many SQL variables) — $in 을 나눠 가져와 합친다
-        got = {"documents": [], "metadatas": [], "embeddings": []}
-        for j in range(0, len(cands), _BATCHED_GET_MAX_IDS):
-            part = collection.get(
-                where={"paper_id": {"$in": cands[j : j + _BATCHED_GET_MAX_IDS]}},
-                include=["documents", "metadatas", "embeddings"],
-            )
-            p_embs = part.get("embeddings")
-            if p_embs is None or len(p_embs) == 0:
-                continue
-            got["documents"].extend(part.get("documents") or [])
-            got["metadatas"].extend(part.get("metadatas") or [])
-            got["embeddings"].extend(list(p_embs))
+        inc = ["documents", "metadatas", "embeddings"]
+        try:
+            # 보통은 한 번에 (나눠 가져오면 호출마다 비용이 붙어 오히려 느리다 — compare_latency_1015 §6)
+            got = collection.get(where={"paper_id": {"$in": cands}}, include=inc)
+            got = {k: list(got.get(k) if got.get(k) is not None else []) for k in ("documents", "metadatas", "embeddings")}
+        except Exception as exc:
+            # 결과 행이 많으면 서버 SQLite 변수 한도(too many SQL variables) — 그때만 나눠 가져와 합친다
+            print(f"[ChromaRAG TRACE] batched get split after: {str(exc)[-60:]}", flush=True)
+            got = {"documents": [], "metadatas": [], "embeddings": []}
+            for j in range(0, len(cands), _BATCHED_GET_MAX_IDS):
+                part = collection.get(where={"paper_id": {"$in": cands[j : j + _BATCHED_GET_MAX_IDS]}}, include=inc)
+                p_embs = part.get("embeddings")
+                if p_embs is None or len(p_embs) == 0:
+                    continue
+                got["documents"].extend(part.get("documents") or [])
+                got["metadatas"].extend(part.get("metadatas") or [])
+                got["embeddings"].extend(list(p_embs))
         embs = got["embeddings"]
         if len(embs) == 0:
             return {}

@@ -38,7 +38,7 @@ def test_chunked_equals_single(monkeypatch):
     monkeypatch.setattr(m, "_BATCHED_GET_MAX_IDS", 798)
     fc = _FakeCollection(rows, max_ids=999)
     many = m._nearest_chunks_per_paper_batched(fc, pids, "q", 2)
-    assert fc.calls == 2  # 60 편 × 21 후보 = 1260 → 798 + 462
+    assert fc.calls == 3  # 한 번에(1260 > 999 실패) → 798 + 462
     assert one == many and len(many) == 60
 
 
@@ -47,3 +47,10 @@ def test_empty_part_skipped(monkeypatch):
     rows = _rows(1)
     out = m._nearest_chunks_per_paper_batched(_FakeCollection(rows), ["2601.00000", "2699.99999"], "q", 2)
     assert list(out) == ["2601.00000"]
+
+
+def test_single_call_when_it_fits(monkeypatch):
+    monkeypatch.setattr(m, "_BATCHED_GET_MAX_IDS", 21)
+    fc = _FakeCollection(_rows(5), max_ids=999)
+    out = m._nearest_chunks_per_paper_batched(fc, [f"2601.{i:05d}" for i in range(5)], "q", 2)
+    assert fc.calls == 1 and len(out) == 5  # 한도 안이면 나누지 않는다
