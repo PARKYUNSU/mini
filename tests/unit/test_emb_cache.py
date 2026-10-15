@@ -47,7 +47,7 @@ def _build_cache(tmp_path, rows):
     index = {}
     for row, i in enumerate(order):
         index.setdefault(pids[i], [row, row])[1] = row + 1
-    np.save(tmp_path / "emb.npy", np.array([rows[i][3] for i in order], dtype=np.float32))
+    np.save(tmp_path / "emb.npy", np.array([rows[i][3] for i in order], dtype=np.float64))
     np.save(tmp_path / "ids.npy", np.array([rows[i][0] for i in order], dtype="S"))
     (tmp_path / "paper_index.json").write_text(json.dumps(index))
 
