@@ -2,6 +2,7 @@
 """real_eval_1013 자동 채점 — 수치(N) 정답·주제 목록(T) 개수·검색 적중.
 
   .venv/bin/python scripts/score_real_eval.py real_v13 [real_v13_detail]
+  .venv/bin/python scripts/score_real_eval.py --set real_eval2_1015 now_real2   # 다른 평가셋(spec.jsonl 같은 형식)
 
 - N: 기대 수치 문자열이 모두 답에 등장 **그리고** 정답 논문을 인용(answer_papers).
 - C: 두 논문 모두 컨텍스트에 있음 / 한 편만 (검색). 답변 판정은 Claude 가 따로.
@@ -34,8 +35,8 @@ def wilson(k: int, n: int, z: float = 1.96) -> str:
     return f"{k}/{n} ({p:.0%}, {max(0, c - h):.0%}–{min(1, c + h):.0%})"
 
 
-def score(label: str) -> dict:
-    spec = {json.loads(l)["id"]: json.loads(l) for l in (D / "spec.jsonl").read_text(encoding="utf-8").splitlines()}
+def score(label: str, d: Path = D) -> dict:
+    spec = {json.loads(l)["id"]: json.loads(l) for l in (d / "spec.jsonl").read_text(encoding="utf-8").splitlines()}
     rows = {json.loads(l)["id"]: json.loads(l) for l in (RES / f"{label}.jsonl").read_text(encoding="utf-8").splitlines()}
     out: dict = {"N": [], "C": [], "T": []}
     for i, s in spec.items():
@@ -58,8 +59,12 @@ def score(label: str) -> dict:
 
 
 def main() -> int:
-    for label in sys.argv[1:]:
-        s = score(label)
+    args = sys.argv[1:]
+    d = D
+    if args[:1] == ["--set"]:
+        d, args = ROOT / "docs" / "experiments" / args[1], args[2:]
+    for label in args:
+        s = score(label, d)
         n, c, t = s["N"], s["C"], s["T"]
         print(f"== {label}")
         print("N 수치  검색", wilson(sum(x["retrieved"] for x in n), len(n)),

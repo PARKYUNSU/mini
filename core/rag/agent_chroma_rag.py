@@ -2194,6 +2194,17 @@ def hybrid_retrieve_context_for_debate(
 _ABSTRACT_CHARS = 800
 
 
+def context_abstract_chars() -> int:
+    """블록에 붙이는 초록 길이. ``RAG_ABSTRACT_CHARS`` (기본 800).
+
+    초록 끝쪽에 결과 수치가 있는 경우가 많아 800자에서 잘린다 — docs/experiments/abstract_full_1016.
+    """
+    try:
+        return max(0, int(os.getenv("RAG_ABSTRACT_CHARS", str(_ABSTRACT_CHARS))))
+    except ValueError:
+        return _ABSTRACT_CHARS
+
+
 def _context_abstract_enabled() -> bool:
     return os.getenv("RAG_CONTEXT_ABSTRACT", "0").strip() == "1"
 
@@ -2206,7 +2217,8 @@ def _with_abstract(body: str, abstract: str) -> str:
     norm_body = re.sub(r"\s+", " ", body).lower()
     if abstract[:80].lower() in norm_body:
         return body
-    return f"[초록] {abstract[:_ABSTRACT_CHARS]}\n\n{body}" if body else f"[초록] {abstract[:_ABSTRACT_CHARS]}"
+    n = context_abstract_chars()
+    return f"[초록] {abstract[:n]}\n\n{body}" if body else f"[초록] {abstract[:n]}"
 
 
 def _format_chroma_hits(

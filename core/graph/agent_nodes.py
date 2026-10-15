@@ -17,7 +17,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import interrupt
 
-from core.rag.agent_chroma_rag import get_chroma_rag_tool
+from core.rag.agent_chroma_rag import context_abstract_chars, get_chroma_rag_tool
 from core.config.agent_config import (
     RAG_ANSWER_MODEL,
     AGENT_TOOLS_DIR,
@@ -1008,6 +1008,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             # 항목 수 상한은 direct_answer_rag_user(doc_count=…) 가 넣는다.
             output_template = RAG_OUTPUT_TEMPLATE_MULTI_STRICT
             rag_max_chars = 8000 if (prefer_single_hit and wants_depth) else (5000 if prefer_single_hit else 8000)
+            # 초록을 800자보다 길게 붙이면 그만큼 상한도 늘린다 — 다른 논문 내용이 밀려 잘리지 않게
+            # (논문 5편 기준, docs/experiments/abstract_full_1016).
+            rag_max_chars += 5 * max(0, context_abstract_chars() - 800)
 
             # 번호 라벨은 **필터가 끝난 뒤** 붙인다 — 위 _rag_context_* 변환이 블록을
             # 걸러내므로 조립 시점에 매기면 [1],[3],[7] 처럼 구멍이 생긴다 (protocol §5.4).
