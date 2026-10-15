@@ -215,6 +215,13 @@ def fetch_outbound_for_receiver(limit: int = 20) -> list[dict[str, Any]]:
     return [dict(r) for r in rows]
 
 
+def get_job(job_id: int) -> dict[str, Any] | None:
+    """잡 한 건 (답변 피드백 기록용)."""
+    init_bridge_db()
+    row = _conn().execute("SELECT * FROM bridge_jobs WHERE id = ?", (job_id,)).fetchone()
+    return dict(row) if row else None
+
+
 def mark_delivered(job_id: int) -> None:
     init_bridge_db()
     con = _conn()

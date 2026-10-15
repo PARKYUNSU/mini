@@ -34,6 +34,7 @@ from core.bridge.agent_bridge_queue import (
     enqueue_job,
     fetch_outbound_for_receiver,
     get_approval_session,
+    get_job,
     init_bridge_db,
     mark_approval_sent,
     mark_delivered,
@@ -51,7 +52,7 @@ from apps.telegram_bot.agent_telegram import (
     safe_telegram_send,
     strip_wake_word,
 )
-from apps.telegram_bot import rag_engine
+from apps.telegram_bot import answer_feedback, rag_engine
 from apps.telegram_bot.paper_list_light import list_stored_papers_text as papers_list_stdlib
 
 
@@ -173,19 +174,24 @@ def _outbound_poller(bot: telebot.TeleBot, allowed_ids: list[str]) -> None:
                 if st == "completed":
                     body = row["result_text"] or ""
                     pm = row["result_parse_mode"]
+                    # 답변 👍/👎 — 마지막 메시지에만 (answer_feedback.py)
+                    fb = {}
+                    if answer_feedback.enabled() and row.get("job_kind") == "graph" and body.strip():
+                        fb = {"reply_markup": answer_feedback.markup(jid)}
                     if pm == "Markdown":
-                        if not safe_telegram_send(bot, chat_id, body[:4000], parse_mode="Markdown"):
-                            safe_telegram_send(bot, chat_id, body[:4000], parse_mode=None)
+                        if not safe_telegram_send(bot, chat_id, body[:4000], parse_mode="Markdown", **fb):
+                            safe_telegram_send(bot, chat_id, body[:4000], parse_mode=None, **fb)
                         if gap:
                             time.sleep(gap)
                     elif pm == "HTML":
-                        if not safe_telegram_send(bot, chat_id, body[:4000], parse_mode="HTML"):
-                            safe_telegram_send(bot, chat_id, body[:4000], parse_mode=None)
+                        if not safe_telegram_send(bot, chat_id, body[:4000], parse_mode="HTML", **fb):
+                            safe_telegram_send(bot, chat_id, body[:4000], parse_mode=None, **fb)
                         if gap:
                             time.sleep(gap)
                     else:
-                        for part in _split_telegram_chunks(body, 4000):
-                            safe_telegram_send(bot, chat_id, part, parse_mode=None)
+                        parts = _split_telegram_chunks(body, 4000)
+                        for k, part in enumerate(parts):
+                            safe_telegram_send(bot, chat_id, part, parse_mode=None, **(fb if k == len(parts) - 1 else {}))
                             if gap:
                                 time.sleep(gap)
                     mark_delivered(jid)
@@ -461,6 +467,25 @@ def main() -> None:
             job_kind="graph",
         )
         bot.reply_to(message, "⏳ 요청을 접수했습니다. AI 워커가 처리 중입니다…")
+
+    @bot.callback_query_handler(func=lambda c: answer_feedback.parse(c.data) is not None)
+    def on_answer_feedback(call):
+        chat_id = str(call.message.chat.id) if call.message else ""
+        if chat_id not in allowed_ids:
+            bot.answer_callback_query(call.id, "접근 권한이 없습니다.")
+            return
+        job_id, rating = answer_feedback.parse(call.data)
+        try:
+            answer_feedback.record(get_job(job_id), job_id, rating, chat_id)
+            bot.answer_callback_query(call.id, f"{answer_feedback.RATINGS[rating]} 기록했어요")
+            bot.edit_message_reply_markup(chat_id, call.message.message_id,
+                                          reply_markup=answer_feedback.markup(job_id, chosen=rating))
+        except Exception as e:
+            print(f"[answer_feedback] {e}\n{traceback.format_exc()}", flush=True)
+            try:
+                bot.answer_callback_query(call.id, "기록 실패")
+            except Exception:
+                pass
 
     print("📡 telegram_receiver 시작 (infinity_polling)", flush=True)
     bot.delete_webhook(drop_pending_updates=True)
