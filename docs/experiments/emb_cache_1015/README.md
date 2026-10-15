@@ -37,7 +37,7 @@
 ## 2. 바꾸는 것
 
 1. **캐시 파일** `<CHROMA_DB_DIR>_emb_cache/`(운영: `/Volumes/T7 Shield/mini-chroma-rebuild2_emb_cache/`, 약 1.9GB fp32 + 인덱스 수십 MB):
-   - `emb.f32` (memmap, 행 × 384) · `ids.npy` (청크 ID) · `paper_index.json` (정규화 paper_id → [시작, 끝) 행 범위, 논문별로 연속 배치) · `meta.json` (행 수·만든 시각·컬렉션 행 수).
+   - `emb.npy` (memmap, 행 × 384) · `ids.npy` (청크 ID) · `paper_index.json` (정규화 paper_id → [시작, 끝) 행 범위, 논문별로 연속 배치) · `meta.json` (행 수·만든 시각·컬렉션 행 수).
    - 만드는 스크립트 `scripts/build_emb_cache.py` — Chroma 서버에서 **읽기만**(페이지 단위 get), 컬렉션 쓰기 없음. 124만 행. 임시 폴더에 다 쓴 뒤 이름 바꾸기로 교체(쓰는 도중 검색이 반쯤 된 캐시를 읽지 않게).
 2. **검색 코드** `_nearest_chunks_per_paper_batched`: `RAG_EMB_CACHE=1` 이면
    - 캐시에 있는 논문 → memmap 에서 임베딩만 읽어 코사인 → 논문별 상위 k 의 **청크 ID 로** `get(ids=…, include=[documents, metadatas])` (~300행).

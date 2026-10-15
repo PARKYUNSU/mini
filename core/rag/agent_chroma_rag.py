@@ -364,6 +364,82 @@ def _merge_bm25_union_chunks(
     return docs_clean, metas_clean, dists_clean, injected_papers
 
 
+def emb_cache_dir() -> Path:
+    """로컬 임베딩 캐시 폴더 (scripts/build_emb_cache.py 가 만든다)."""
+    return Path(os.getenv("RAG_EMB_CACHE_DIR") or f"{CHROMA_DB_DIR}_emb_cache")
+
+
+_emb_cache_lock = threading.Lock()
+_emb_cache_state: dict[str, Any] = {}
+
+
+def _load_emb_cache() -> dict[str, Any] | None:
+    """``RAG_EMB_CACHE=1`` 이면 캐시를 한 번 열어 둔다 (memmap). 꺼져 있거나 없으면 None."""
+    if os.getenv("RAG_EMB_CACHE", "0") != "1":
+        return None
+    d = emb_cache_dir()
+    with _emb_cache_lock:
+        if _emb_cache_state.get("dir") == str(d):
+            return _emb_cache_state.get("cache")
+        cache = None
+        try:
+            import numpy as np
+
+            with open(d / "paper_index.json") as f:
+                index = json.load(f)
+            cache = {
+                "emb": np.load(d / "emb.npy", mmap_mode="r"),
+                "ids": np.load(d / "ids.npy", mmap_mode="r"),
+                "index": index,
+            }
+            print(f"[ChromaRAG TRACE] emb cache loaded: {d} papers={len(index)} rows={cache['emb'].shape[0]}", flush=True)
+        except Exception as exc:
+            print(f"[ChromaRAG TRACE] emb cache unavailable ({d}): {exc}", flush=True)
+        _emb_cache_state.update(dir=str(d), cache=cache)
+        return cache
+
+
+def _nearest_chunks_from_cache(
+    collection,
+    cache: dict[str, Any],
+    pids: list[str],
+    q,
+    k: int,
+) -> tuple[dict[str, list[tuple[str, dict, float]]], list[str]]:
+    """캐시에 있는 논문은 로컬 임베딩으로 상위 k 를 고르고 그 청크만 ID 로 가져온다.
+
+    Returns: (논문별 결과, 캐시로 못 한 논문 — 캐시에 없거나 ID 가 사라진 논문)
+    """
+    import numpy as np
+
+    index = cache["index"]
+    hit = [p for p in pids if p in index]
+    rest = [p for p in pids if p not in index]
+    if not hit:
+        return {}, rest
+    spans = [index[p] for p in hit]
+    rows = np.concatenate([np.arange(s, e) for s, e in spans])
+    x = np.asarray(cache["emb"][rows], dtype=np.float64)
+    dist = 1.0 - (x @ q) / (np.linalg.norm(x, axis=1) * np.linalg.norm(q) + 1e-12)
+    chosen: dict[str, list[tuple[float, str]]] = {}
+    pos = 0
+    for p, (s, e) in zip(hit, spans):
+        n = e - s
+        local = sorted((float(dist[pos + j]), j) for j in range(n))[:k]
+        chosen[p] = [(d, cache["ids"][s + j].decode()) for d, j in local]
+        pos += n
+    want = [cid for v in chosen.values() for _, cid in v]
+    got = collection.get(ids=want, include=["documents", "metadatas"])
+    by_id = {cid: (doc, meta) for cid, doc, meta in zip(got["ids"], got.get("documents") or [], got.get("metadatas") or [])}
+    out: dict[str, list[tuple[str, dict, float]]] = {}
+    for p, v in chosen.items():
+        if all(cid in by_id for _, cid in v):
+            out[p] = [(by_id[cid][0], by_id[cid][1], d) for d, cid in v]
+        else:
+            rest.append(p)  # 재수집 등으로 청크 ID 가 바뀌었다 → 현행 경로
+    return out, rest
+
+
 def _nearest_chunks_per_paper_batched(
     collection,
     pids: list[str],
@@ -375,12 +451,44 @@ def _nearest_chunks_per_paper_batched(
     논문마다 필터 검색을 하면 질의당 61s 였다 (§9.1). 컬렉션 공간이 cosine 이라 거리는
     Chroma 와 같은 1 - cos 로 계산한다. 임베딩 함수를 못 찾거나 조회가 실패하면 None
     (호출자가 논문별 경로로 떨어진다).
+
+    ``RAG_EMB_CACHE=1`` 이면 캐시에 있는 논문은 로컬 임베딩으로 고르고 고른 청크만 가져온다 —
+    배치 get 이 행 전부의 임베딩·메타데이터(100편에 ~169MB JSON)를 주고받던 비용을 없앤다
+    (docs/experiments/emb_cache_1015). 결과는 같다(같은 임베딩, 같은 식).
     """
     import numpy as np
 
     ef = getattr(collection, "_embedding_function", None)
     if ef is None:
         return None
+    cache = _load_emb_cache()
+    if cache is not None:
+        try:
+            q = np.asarray(ef([query_text])[0], dtype=np.float64)
+            out, rest = _nearest_chunks_from_cache(collection, cache, pids, q, k)
+        except Exception as exc:
+            print(f"[ChromaRAG TRACE] emb cache path failed: {exc}", flush=True)
+            out, rest = {}, pids
+        if not rest:
+            return out
+        sub = _nearest_chunks_per_paper_batched_get(collection, rest, query_text, k, ef)
+        if sub is None:
+            return None
+        out.update(sub)
+        return out
+    return _nearest_chunks_per_paper_batched_get(collection, pids, query_text, k, ef)
+
+
+def _nearest_chunks_per_paper_batched_get(
+    collection,
+    pids: list[str],
+    query_text: str,
+    k: int,
+    ef,
+) -> dict[str, list[tuple[str, dict, float]]] | None:
+    """현행 경로: 주입 논문 청크 전부를 임베딩째 get 해서 논문별 상위 k."""
+    import numpy as np
+
     try:
         cands = [c for pid in pids for c in _paper_id_version_candidates(pid)]
         inc = ["documents", "metadatas", "embeddings"]
