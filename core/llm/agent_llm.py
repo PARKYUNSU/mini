@@ -80,10 +80,20 @@ def normalize_ai_message_content(resp: Any) -> str:
     return str(raw)
 
 
+def _helper_model_kw() -> dict:
+    """보조 호출(라우터 분류·검색어 재작성) 모델. 비면 기본 모델 (docs/experiments/helper_model_1016).
+
+    답변 모델과 같게 두면 논문 질문 경로에서 Ollama 가 모델을 갈아 끼우지 않는다.
+    """
+    m = os.getenv("RAG_HELPER_MODEL", "").strip()
+    return {"model": m} if m else {}
+
+
 def get_router_llm():
     """라우터 3단계 분류: 안정적 샘플링, 사고 모드 끔."""
     return ChatOllama(
         **ollama_kwargs(
+            **_helper_model_kw(),
             temperature=0.2,
             top_p=0.8,
             repeat_penalty=1.18,
@@ -157,6 +167,7 @@ def get_rag_query_rewrite_llm():
     """
     return ChatOllama(
         **ollama_kwargs(
+            **_helper_model_kw(),
             temperature=0.0,
             seed=0,
             top_p=0.8,
