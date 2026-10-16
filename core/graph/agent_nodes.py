@@ -48,7 +48,14 @@ from core.llm.agent_llm import (
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.answer_fix import drop_contradicted_no_doc
-from core.llm.presence_judge import NO_DOC_HINT, gate_types, judge_presence, should_judge
+from core.llm.presence_judge import (
+    NO_DOC_HINT,
+    gate_types,
+    judge_presence,
+    judge_presence_shared,
+    shared_prefix_active,
+    should_judge,
+)
 from core.llm.citation_fix import fix_citations, number_context_papers
 from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
@@ -1072,12 +1079,6 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 output_template = list_slots_template(len(_doc_ids))
             _da_trace("rag_context numbered", f"docs={len(_doc_ids)}")
             # 정답 유무를 따로 묻고, '없음'이면 v13 의 정답 없음 형식을 지시한다 (docs/experiments/presence_integration_1012).
-            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request):
-                _pick = judge_presence(user_request, rag_context, RAG_ANSWER_MODEL)
-                print(f"[DEBUG] DirectAnswer: 정답 유무 판정 = {_pick}")
-                if _pick == "없음":
-                    system_prompt = system_prompt + NO_DOC_HINT
-
             prompt = direct_answer_rag_user(
                 session.get_context(),
                 rag_context,
@@ -1088,6 +1089,15 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 doc_count=len(_doc_ids),
                 list_mode=list_mode_active(user_request, prefer_single_hit=prefer_single_hit),
             )
+            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request):
+                # 답변과 같은 앞부분으로 판정하면 답변 호출이 컨텍스트를 다시 읽지 않는다 (docs/experiments/judge_cache_1017)
+                if shared_prefix_active() and not image_base64:
+                    _pick = judge_presence_shared(system_prompt, prompt, user_request, RAG_ANSWER_MODEL)
+                else:
+                    _pick = judge_presence(user_request, rag_context, RAG_ANSWER_MODEL)
+                print(f"[DEBUG] DirectAnswer: 정답 유무 판정 = {_pick}")
+                if _pick == "없음":
+                    system_prompt = system_prompt + NO_DOC_HINT
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
             if _da_timeout is None:

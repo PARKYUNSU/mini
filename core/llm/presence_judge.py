@@ -12,7 +12,8 @@ from __future__ import annotations
 import os
 import re
 
-__all__ = ["PROMPT", "PROMPT_V2", "active_prompt", "gate_types", "should_judge", "NO_DOC_HINT", "parse_pick", "judge_presence"]
+__all__ = ["PROMPT", "PROMPT_V2", "active_prompt", "gate_types", "should_judge", "NO_DOC_HINT", "parse_pick", "judge_presence",
+           "SHARED_TAIL", "shared_prefix_active", "shared_judge_messages", "judge_presence_shared"]
 
 PROMPT = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 **특정한 연구 하나**를 찾고 있다.
 
@@ -100,5 +101,55 @@ def judge_presence(question: str, numbered_context: str, model: str) -> int | st
         raw = str(llm.invoke(active_prompt().format(question=question, context=numbered_context)).content or "")
     except Exception as exc:  # 판정이 실패해도 답변은 낸다
         print(f"[DEBUG] presence_judge 실패: {type(exc).__name__}: {str(exc)[:120]}")
+        return None
+    return parse_pick(raw)
+
+
+# 답변과 같은 앞부분으로 판정 (docs/experiments/judge_cache_1017). 답변 프롬프트의 `[사용자]` 앞까지를
+# 그대로 두고 판정 지시만 뒤에 붙이면 Ollama 가 그 앞부분을 답변 호출에서 다시 쓴다.
+SHARED_TAIL = """
+[판정 요청 — 답변을 쓰지 말고 판정 한 줄만]
+위 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 **특정한 연구 하나**를 찾고 있다.
+
+질문이 묘사하는 바로 그 연구가 참고 문서 중에 있으면 그 문서 번호를, 없으면 `없음`을 답하라.
+- 주제만 비슷하고 질문이 묘사하는 방법·대상·결과와 맞지 않으면 `없음`이다.
+- 같은 논문이 여러 번호에 나뉘어 있으면 가장 앞 번호 하나만 적는다.
+
+출력은 정확히 한 줄: `답: 문서 N` 또는 `답: 없음`
+
+[질문]
+{question}"""
+
+_USER_MARK = "\n[사용자]\n"
+
+
+def shared_prefix_active() -> bool:
+    return os.getenv("RAG_JUDGE_SHARED_PREFIX", "0").strip() == "1"
+
+
+def shared_judge_messages(system_prompt: str, answer_prompt: str, question: str):
+    """답변 메시지와 같은 앞부분 + 판정 지시. 표지가 없으면 None (호출 쪽은 기존 판정)."""
+    from langchain_core.messages import HumanMessage, SystemMessage
+
+    cut = answer_prompt.rfind(_USER_MARK)
+    if cut < 0:
+        return None
+    return [SystemMessage(content=system_prompt), HumanMessage(content=answer_prompt[:cut] + "\n" + SHARED_TAIL.format(question=question))]
+
+
+def judge_presence_shared(system_prompt: str, answer_prompt: str, question: str, model: str) -> int | str | None:
+    """`judge_presence` 와 같은 설정(temperature 0, seed 0, 64토큰)으로 답변과 같은 앞부분을 보낸다."""
+    from langchain_ollama import ChatOllama
+
+    from core.config.agent_config import ollama_kwargs
+
+    msgs = shared_judge_messages(system_prompt, answer_prompt, question)
+    if msgs is None:
+        return None
+    llm = ChatOllama(**ollama_kwargs(model=model, temperature=0.0, seed=0, reasoning=False, num_predict=64))
+    try:
+        raw = str(llm.invoke(msgs).content or "")
+    except Exception as exc:
+        print(f"[DEBUG] presence_judge(shared) 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return None
     return parse_pick(raw)
