@@ -34,5 +34,6 @@ def test_skips_when_excerpt_already_has_abstract(monkeypatch):
 def test_truncates_abstract(monkeypatch):
     long_abs = "x " * 1000
     monkeypatch.setenv("RAG_CONTEXT_ABSTRACT", "1")
+    monkeypatch.delenv("RAG_ABSTRACT_CHARS", raising=False)  # 운영 .env(2000) 와 무관하게 기본 800
     out = R._format_chroma_hits(["body"], [{"paper_id": "1", "title": "t", "abstract": long_abs}], [0.3])
     assert len(out.split("[초록] ", 1)[1].split("\n\n", 1)[0]) == R._ABSTRACT_CHARS

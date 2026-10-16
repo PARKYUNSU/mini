@@ -162,6 +162,7 @@ def direct_answer_rag_user(
     rag_max_chars: int = 5000,
     last_ai_max: int = 800,
     doc_count: int | None = None,
+    list_mode: bool = False,
 ) -> str:
     ref = rag_context[:rag_max_chars] if rag_context != "관련 문서 없음" else "없음"
     empty_note = ""
@@ -189,6 +190,12 @@ def direct_answer_rag_user(
             if doc_count == 1
             else f"본론 항목은 **{min(doc_count, 4)}개를 넘기지 않는다** (문서가 {doc_count}편이므로)."
         )
+        if list_mode and doc_count > 1:
+            # 목록·동향 질문: 관련 문서마다 한 항목, 짧게 (docs/experiments/list_mode_1016)
+            cap = (
+                f"목록·동향 질문이므로 본론 항목은 **질문과 관련된 문서마다 하나씩, 최대 {min(doc_count, 8)}개**, "
+                "항목마다 1~2문장으로 핵심만 쓴다 (위 템플릿의 '2~4개' 대신 이 규칙을 따른다)."
+            )
         doc_note = (
             f"\n[참고 문서 수] **{doc_count}편**이다. 인용은 {rng} 중에서만 쓴다. {cap}\n"
             "⚠️ **본론 항목 번호와 문서 번호는 다르다.** 2번 항목이라고 [문서 2]가 아니다 — "

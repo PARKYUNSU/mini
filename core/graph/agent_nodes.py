@@ -278,6 +278,41 @@ def _rag_context_top_n_hits(rag_context: str, *, n: int = 5) -> str:
     return _RAG_HIT_SEP.join(blocks)
 
 
+def list_mode_active(user_request: str, *, prefer_single_hit: bool = False) -> bool:
+    """목록·동향 질문 모드 (RAG_LIST_MODE, docs/experiments/list_mode_1016) — list 게이트 질문만."""
+    if os.getenv("RAG_LIST_MODE", "0").strip() != "1" or prefer_single_hit:
+        return False
+    return "list" in gate_types(user_request)
+
+
+LIST_MODE_TOP_K = 10
+LIST_MODE_ABS_CHARS = 500
+
+
+def _compact_list_blocks(rag_context: str, *, abs_chars: int = LIST_MODE_ABS_CHARS) -> str:
+    """블록마다 머리(`[ID] 제목` 등) + 초록 앞 ``abs_chars`` 자만 남기고 본문 청크는 뺀다.
+
+    목록 질문은 논문 수가 중요하고 답변 모델 n_ctx 가 4,096 토큰이라 블록을 짧게 한다.
+    초록이 없는 블록은 본문 앞 ``abs_chars`` 자를 남긴다.
+    """
+    s = (rag_context or "").strip()
+    if not s or s == "관련 문서 없음":
+        return rag_context
+    out = []
+    for b in [x.strip() for x in s.split(_RAG_HIT_SEP) if x.strip()]:
+        if "[초록] " in b:
+            head, rest = b.split("[초록] ", 1)
+            abstract = rest.split("\n\n", 1)[0]
+            out.append(f"{head}[초록] {abstract[:abs_chars]}".strip())
+        else:
+            lines = b.split("\n")
+            k = next((i for i, l in enumerate(lines) if re.match(r"^\[\d{4}\.\d{4,5}", l)), -1)
+            head = "\n".join(lines[: k + 1]) if k >= 0 else ""
+            body = "\n".join(lines[k + 1 :]) if k >= 0 else b
+            out.append(f"{head}\n{body[:abs_chars]}".strip())
+    return _RAG_HIT_SEP.join(out)
+
+
 _PID_IN_BLOCK = re.compile(r"\b(\d{4}\.\d{4,5})(?:v\d+)?\b")
 
 
@@ -950,7 +985,16 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 _da_trace("after rag.list_papers()", f"len={len(rag_context)}")
             else:
                 cached_rag = (state.get("rag_context") or "").strip()
-                if cached_rag and cached_rag != "관련 문서 없음":
+                _list_mode = list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
+                if _list_mode:
+                    # 목록 질문: 라우터 컨텍스트(3편)를 쓰지 않고 10편 다시 검색 (docs/experiments/list_mode_1016)
+                    _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
+                    rag_context = rag.search(
+                        rag_query, top_k=LIST_MODE_TOP_K, session_context=session.get_recent_context(max_turns=2),
+                        wants_depth=False, light_rerank=_lr,
+                    )
+                    _da_trace("list mode search", f"len={len(rag_context)}")
+                elif cached_rag and cached_rag != "관련 문서 없음":
                     rag_context = cached_rag
                     _da_trace("rag_context reused from router", f"len={len(rag_context)}")
                 else:
@@ -984,6 +1028,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 elif prefer_single_hit:
                     rag_context = _rag_context_first_hit_only(rag_context)
                     _da_trace("rag_context top-1 only", f"len={len(rag_context)}")
+                elif _list_mode:
+                    rag_context = _compact_list_blocks(_rag_context_top_n_hits(rag_context, n=LIST_MODE_TOP_K))
+                    _da_trace("rag_context list mode (compact top-10)", f"len={len(rag_context)}")
                 else:
                     rag_context = _rag_context_top_n_hits(rag_context, n=5)
                     _da_trace("rag_context top-5 only", f"len={len(rag_context)}")
@@ -1031,6 +1078,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 output_template_strict=output_template,
                 rag_max_chars=rag_max_chars,
                 doc_count=len(_doc_ids),
+                list_mode=list_mode_active(user_request, prefer_single_hit=prefer_single_hit),
             )
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
