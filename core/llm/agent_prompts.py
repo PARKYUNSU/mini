@@ -153,6 +153,34 @@ RAG_OUTPUT_TEMPLATE_MULTI_STRICT = """[다중 문서 출력 템플릿 지시사�
 """
 
 
+def list_slots_template(doc_count: int) -> str:
+    """목록 질문 전용 출력 템플릿 — 문서마다 번호 칸 하나 (docs/experiments/list_slots_1016).
+
+    일반 템플릿의 예시 칸 3개·"2~4개" 규칙이 끝에 오면 9B 는 "최대 8개" 지시보다 그 뼈대를 따른다.
+    """
+    n = max(1, min(doc_count, 10))
+    slots = "\n".join(f"{k}. **{{핵심 접근·시스템 이름}}**: 무엇을 했고 결과가 무엇인지 1~2문장 [문서 {k}]" for k in range(1, n + 1))
+    return f"""[다중 문서 출력 템플릿 지시사항 - 목록 모드]
+아래 뼈대를 그대로 따라 값만 채우세요.
+
+[출력 템플릿]
+### 서론
+질문 주제와 지금 연구 흐름을 1~2문장. 핵심 용어는 **굵게**.
+
+### 본론
+{slots}
+
+### 결론
+위 항목들의 공통 흐름과 차이를 2~3문장으로 정리. 문서에 없는 처방을 지어내지 마세요.
+
+[규칙]
+- 본론의 k 번째 칸은 **[문서 k] 에 대한 항목**이다. 문서마다 한 칸이다.
+- [문서 k] 가 질문 주제와 관련 없으면 그 칸을 **통째로 뺀다**. 관련 있으면 빼지 않는다. 남은 칸의 번호는 1부터 이어 매기되 끝의 `[문서 k]` 는 그 문서 번호를 그대로 둔다.
+- 각 칸 끝의 근거는 `[문서 k]` **번호로만** 쓴다. **arXiv ID 를 옮겨 적지 마세요.**
+- 중괄호 안의 안내 문구는 출력 금지.
+"""
+
+
 def direct_answer_rag_user(
     session_context: str,
     rag_context: str,
@@ -190,7 +218,9 @@ def direct_answer_rag_user(
             if doc_count == 1
             else f"본론 항목은 **{min(doc_count, 4)}개를 넘기지 않는다** (문서가 {doc_count}편이므로)."
         )
-        if list_mode and doc_count > 1:
+        if list_mode and doc_count > 1 and "목록 모드]" in output_template_strict:
+            cap = "본론은 위 템플릿대로 **관련 문서마다 한 칸**이다."
+        elif list_mode and doc_count > 1:
             # 목록·동향 질문: 관련 문서마다 한 항목, 짧게 (docs/experiments/list_mode_1016)
             cap = (
                 f"목록·동향 질문이므로 본론 항목은 **질문과 관련된 문서마다 하나씩, 최대 {min(doc_count, 8)}개**, "

@@ -36,3 +36,17 @@ def test_prompt_cap():
     assert "최대 8개" in p and "4개를 넘기지" not in p
     p0 = direct_answer_rag_user("", "ctx", "", "q", doc_count=10)
     assert "4개를 넘기지" in p0
+
+
+def test_slots_template_one_per_doc():
+    from core.llm.agent_prompts import list_slots_template
+    t = list_slots_template(10)
+    assert "[문서 10]" in t and "11." not in t and "2~4" not in t
+    t15 = list_slots_template(15)
+    assert "10. **" in t15 and "11. **" not in t15  # 칸 상한 10
+
+
+def test_slots_template_replaces_cap():
+    from core.llm.agent_prompts import list_slots_template
+    p = direct_answer_rag_user("", "x", "", "q", output_template_strict=list_slots_template(6), doc_count=6, list_mode=True)
+    assert "최대 6개" not in p and "관련 문서마다 한 칸" in p and "[문서 6]" in p

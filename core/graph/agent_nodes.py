@@ -56,6 +56,7 @@ from core.llm.agent_prompts import (
     DIRECT_ANSWER_RAG_SYSTEM_BASE,
     RAG_DETAIL_HINT,
     RAG_OUTPUT_TEMPLATE_MULTI_STRICT,
+    list_slots_template,
     EXECUTOR_INTENTIONAL_SYNTAX_BLOCK,
     EXECUTOR_SYSTEM_CODE_RUN,
     EXECUTOR_SYSTEM_FULL,
@@ -1062,6 +1063,13 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             # 번호 라벨은 **필터가 끝난 뒤** 붙인다 — 위 _rag_context_* 변환이 블록을
             # 걸러내므로 조립 시점에 매기면 [1],[3],[7] 처럼 구멍이 생긴다 (protocol §5.4).
             rag_context, _doc_ids = number_context_papers(rag_context)
+            # 목록 질문: 문서마다 번호 칸 하나인 템플릿 (docs/experiments/list_slots_1016)
+            if (
+                os.getenv("RAG_LIST_SLOTS", "0").strip() == "1"
+                and len(_doc_ids) > 1
+                and list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
+            ):
+                output_template = list_slots_template(len(_doc_ids))
             _da_trace("rag_context numbered", f"docs={len(_doc_ids)}")
             # 정답 유무를 따로 묻고, '없음'이면 v13 의 정답 없음 형식을 지시한다 (docs/experiments/presence_integration_1012).
             if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request):
