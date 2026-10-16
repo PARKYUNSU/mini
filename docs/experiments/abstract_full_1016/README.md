@@ -91,3 +91,17 @@ real40 수치 오답 중 정답 논문은 찾았는데 **기대 수치가 컨텍
 
 반영: 운영 `.env` 에 `RAG_ABSTRACT_CHARS=2000` (백업 `.cron/env.bak.abstract.202610161528`), 봇 재시작(`restart.sh`). 확인: 수신기·워커 기동, 운영 `.env` 만 읽어 `context_abstract_chars()` = 2000. 되돌리기: 그 줄을 지우고 봇 재시작.
 
+
+## 7. 독립 재판정 — gpt-oss-120b (2026-10-16 15:40, 사용자 요청)
+
+§5 판정 한계(판정자가 가설·대조 답을 알았음)를 덜기 위해, 같은 답을 **gpt-oss-120b 단일 답변 판정**(`judge_answers.py --base-url`, answer_quality_1010 과 같은 PROMPT, temperature 0)으로 다시 쟀다. RunPod H100 SXM(Secure, $3.99/h) pod `tqsjai28fdg2ef` 에 vLLM v0.10.2, 약 10분 사용 후 삭제(목록 조회로 확인). 판정 결과 `answer_quality_1010/judged_gptoss_now_162.jsonl` · `judged_gptoss_ab1_162m.jsonl`, 비교 `.cron/judge/compare_gptoss.py`(맥미니).
+
+| Claude 눈가림 131쌍과 같은 문항 | 대조 `now_162` | 처리 `ab1_162m` | 짝 (대조만 : 처리만) | p |
+|---|---|---|---|---|
+| **correct** | 47 | **83** | 6 : 42 | < 0.0001 |
+| ok | 124 | 126 | 4 : 6 | 0.75 |
+| 날조 | 25 | 15 | 18 : 8 | 0.076 |
+
+- **독립 판정자도 같은 방향, 같은 크기로 확인했다** — correct 짝 6 : 42 (Claude 3 : 25). 날조도 처리 쪽이 적다(유의 경계).
+- gpt-oss 는 Claude 보다 엄격하다(절대 correct 47 vs 88, 날조 25 vs 5) — answer_quality_1010 §6.1 에서 본 경계 차이와 같다. 두 판정자 일치: ok 0.966 · correct 0.649 (n=262).
+- 결론: §5 의 채택 판단은 판정자 편향 때문이 아니다. 운영 유지.

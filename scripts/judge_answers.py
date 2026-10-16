@@ -160,7 +160,8 @@ def run_openai(args) -> int:
             try:
                 body = {"model": "openai/gpt-oss-120b", "messages": [{"role": "user", "content": prompt}],
                         "temperature": 0, "max_tokens": 4000, "reasoning_effort": "medium"}
-                raw = requests.post(url, json=body, timeout=600).json()["choices"][0]["message"]["content"] or ""
+                hdr = {"Authorization": f"Bearer {os.environ['JUDGE_API_KEY']}"} if os.getenv("JUDGE_API_KEY") else {}
+                raw = requests.post(url, json=body, headers=hdr, timeout=600).json()["choices"][0]["message"]["content"] or ""
                 m = re.search(r"\{.*\}", raw, re.S)
                 verdict = json.loads(m.group(0)) if m else None
                 if verdict:
