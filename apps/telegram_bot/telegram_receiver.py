@@ -48,7 +48,9 @@ from core.config.agent_config import (
 )
 from apps.telegram_bot.agent_telegram import (
     CANCEL_RESTART_CMDS,
+    linkify_arxiv_html,
     main_keyboard,
+    no_link_preview,
     safe_telegram_send,
     strip_wake_word,
 )
@@ -184,7 +186,11 @@ def _outbound_poller(bot: telebot.TeleBot, allowed_ids: list[str]) -> None:
                         if gap:
                             time.sleep(gap)
                     elif pm == "HTML":
-                        if not safe_telegram_send(bot, chat_id, body[:4000], parse_mode="HTML", **fb):
+                        # 인용한 arXiv ID 를 누르면 논문 페이지로 (전송 직전에만 링크 — 세션 기록은 그대로)
+                        linked = linkify_arxiv_html(body)
+                        if len(linked) > 4000:
+                            linked = body[:4000]
+                        if not safe_telegram_send(bot, chat_id, linked, parse_mode="HTML", **fb, **no_link_preview()):
                             safe_telegram_send(bot, chat_id, body[:4000], parse_mode=None, **fb)
                         if gap:
                             time.sleep(gap)

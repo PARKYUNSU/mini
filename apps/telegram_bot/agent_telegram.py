@@ -146,6 +146,21 @@ def rag_structured_lines_to_html(body: str) -> str:
     return "\n".join(out_lines)
 
 
+_ARXIV_CITE = re.compile(r"\[(\d{4}\.\d{4,5}(?:v\d+)?)\]")
+
+
+def linkify_arxiv_html(body: str) -> str:
+    """HTML 답변의 인용 ``[2412.19925v2]`` 를 arxiv.org 링크로 (전송 직전에만 — 세션 기록에는 넣지 않는다)."""
+    return _ARXIV_CITE.sub(lambda m: f'[<a href="https://arxiv.org/abs/{m.group(1)}">{m.group(1)}</a>]', body or "")
+
+
+def no_link_preview() -> dict:
+    """링크 미리보기 카드를 끈다 (답변 하나에 링크가 여러 개라 첫 링크 카드가 답을 가린다)."""
+    from telebot.types import LinkPreviewOptions
+
+    return {"link_preview_options": LinkPreviewOptions(is_disabled=True)}
+
+
 @retry_on_network_error
 def _telegram_send_impl(bot, chat_id: str, text: str, parse_mode=None, **kwargs) -> None:
     """네트워크 재시도 적용 전송 (일시적 에러만 1분→3분→5분 재시도)"""
