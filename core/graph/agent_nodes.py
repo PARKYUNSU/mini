@@ -286,6 +286,31 @@ def _rag_context_top_n_hits(rag_context: str, *, n: int = 5) -> str:
     return _RAG_HIT_SEP.join(blocks)
 
 
+# 이어지는 질문에만 대화 기록을 쓴다 (docs/experiments/history_gate_1019). 실제 사용에서 새 질문이 앞 대화의
+# 답을 베끼고(직전 답 복사) 검색어가 앞 주제로 끌려갔다. 애매하면 이어지는 질문으로 본다(= 지금과 같음).
+_FOLLOWUP_RE = re.compile(
+    r"(^|[\s,.(])(그|이|저|위|앞|해당)\s*(거|것|게|건|걸|중|논문|연구|방법|내용|답|모델|기법|결과|부분|항목|얘기|이야기|에서|에|분야)"
+    r"|(^|[\s,.(])(그거|그게|그건|그걸|그중|이거|이게|이건|저거|그러면|그럼)"
+    r"|방금|아까|위에서|앞에서|앞서"
+    r"|다른\s*(논문|연구|것|거|방법|예시|사례|건)"
+    r"|(더|좀\s*더)\s*(자세히|쉽게|알려|설명|찾아|추천|보여|있어)"
+    r"|(첫|두|세|네|다섯|마지막)\s*번째|\d+\s*번\s*(째|논문|연구|항목)?"
+    r"|이어서|계속해|추가로"
+)
+
+
+def is_followup(user_request: str) -> bool:
+    q = (user_request or "").strip()
+    return len(re.sub(r"\s", "", q)) <= 8 or bool(_FOLLOWUP_RE.search(q))
+
+
+def rag_history_allowed(user_request: str) -> bool:
+    """논문 질문에서 대화 기록(검색어 재작성 · 답변 프롬프트)을 쓸지. 게이트가 꺼져 있으면 항상 쓴다."""
+    if os.getenv("RAG_HISTORY_GATE", "0").strip() != "1":
+        return True
+    return is_followup(user_request)
+
+
 def list_mode_active(user_request: str, *, prefer_single_hit: bool = False) -> bool:
     """목록·동향 질문 모드 (RAG_LIST_MODE, docs/experiments/list_mode_1016) — list 게이트 질문만."""
     if os.getenv("RAG_LIST_MODE", "0").strip() != "1" or prefer_single_hit:
@@ -727,9 +752,10 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         session = get_session(chat_id)
         session_context = session.get_recent_context(max_turns=2)
         rag = get_chroma_rag_tool()
-        rag_query = _extract_english_rag_query(user_request, session_context=session_context)
+        _rag_hist = session_context if rag_history_allowed(user_request) else ""
+        rag_query = _extract_english_rag_query(user_request, session_context=_rag_hist)
         _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
-        rag_context = rag.search(rag_query, session_context=session_context, light_rerank=_lr)
+        rag_context = rag.search(rag_query, session_context=_rag_hist, light_rerank=_lr)
         _trs = get_tool_rag_store()
         tools_context = _trs.format_topk_block(user_request, k=TOOL_RAG_TOP_K)
         tools_list_str = _trs.format_router_tools_tag(user_request, k=TOOL_RAG_TOP_K)
@@ -970,7 +996,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             prefer_single_hit = _prefer_single_hit_rag_context(user_request, wants_depth=wants_depth)
             # 단일은 Top-1, 다중은 Top-5로 LLM 컨텍스트를 제한하기 때문에
             # Chroma query는 넉넉히 가져와도 되고, 최종 전달은 뒤에서 잘라냄
-            rag_query = _extract_english_rag_query(user_request, session_context=session.get_recent_context(max_turns=2))
+            _hist_ok = rag_history_allowed(user_request)
+            _recent_ctx = session.get_recent_context(max_turns=2) if _hist_ok else ""
+            rag_query = _extract_english_rag_query(user_request, session_context=_recent_ctx)
             if prefer_single_hit:
                 top_k = max(RAG_TOP_K * 4, 10) if wants_depth else RAG_TOP_K
             else:
@@ -998,7 +1026,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     # 목록 질문: 라우터 컨텍스트(3편)를 쓰지 않고 10편 다시 검색 (docs/experiments/list_mode_1016)
                     _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
                     rag_context = rag.search(
-                        rag_query, top_k=LIST_MODE_TOP_K, session_context=session.get_recent_context(max_turns=2),
+                        rag_query, top_k=LIST_MODE_TOP_K, session_context=_recent_ctx,
                         wants_depth=False, light_rerank=_lr,
                     )
                     _da_trace("list mode search", f"len={len(rag_context)}")
@@ -1006,7 +1034,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     rag_context = cached_rag
                     _da_trace("rag_context reused from router", f"len={len(rag_context)}")
                 else:
-                    session_ctx = session.get_recent_context(max_turns=2)
+                    session_ctx = _recent_ctx
                     _da_trace("before rag.search()", f"top_k={top_k} wants_depth={wants_depth} (sync collection.query)")
                     # 수치·비교·목록 질문은 논문 단위 light rerank 를 건너뛴다 (RAG_LIGHT_RERANK_GATED_OFF, docs/experiments/light_rerank_gated_1015)
                     _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
@@ -1044,8 +1072,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     _da_trace("rag_context top-5 only", f"len={len(rag_context)}")
 
             _da_trace("before session.get_last_assistant_response()", "")
-            last_ai = session.get_last_assistant_response()
-            _da_trace("after session.get_last_assistant_response()", f"last_ai_len={len(last_ai)}")
+            # 새 질문이면 직전 답·대화 맥락을 답변 프롬프트에 넣지 않는다 (RAG_HISTORY_GATE, docs/experiments/history_gate_1019)
+            last_ai = session.get_last_assistant_response() if _hist_ok else ""
+            _answer_session_ctx = session.get_context() if _hist_ok else "[최근 대화]\n"
+            _da_trace("after session.get_last_assistant_response()", f"last_ai_len={len(last_ai)} history={'on' if _hist_ok else 'off'}")
 
             system_prompt = DIRECT_ANSWER_RAG_SYSTEM_BASE
             if os.getenv("RAG_ANSWER_DETAIL", "0").strip() == "1":
@@ -1080,7 +1110,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             _da_trace("rag_context numbered", f"docs={len(_doc_ids)}")
             # 정답 유무를 따로 묻고, '없음'이면 v13 의 정답 없음 형식을 지시한다 (docs/experiments/presence_integration_1012).
             prompt = direct_answer_rag_user(
-                session.get_context(),
+                _answer_session_ctx,
                 rag_context,
                 last_ai,
                 user_request,

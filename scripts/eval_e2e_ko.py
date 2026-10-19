@@ -84,6 +84,8 @@ def main() -> int:
     ap.add_argument("--answer", action="store_true", help="답변 LLM 을 실제로 돌려 답변이 정답 논문을 인용하는지도 잰다")
     ap.add_argument("--questions", default=str(QUESTIONS), help="질문 TSV (id\t질문). 기본은 고정 162문항")
     ap.add_argument("--gold", default=str(GOLD), help="정답 JSONL (id, stratum, relevant_papers)")
+    ap.add_argument("--keep-session", action="store_true",
+                    help="문항 사이 대화 기록을 지우지 않고 한 대화로 이어 묻는다 (docs/experiments/history_gate_1019)")
     ap.add_argument("--save-context", action="store_true",
                     help="답변 LLM 에 건네진 번호 붙은 컨텍스트를 행에 저장 (presence_judge_1011)")
     args = ap.parse_args()
@@ -100,14 +102,19 @@ def main() -> int:
     real_extract = N._extract_english_rag_query
     real_invoke = N._invoke_llm_with_fallback
     real_number = N.number_context_papers
+    real_fix = N.fix_citations
+    if args.keep_session:
+        clear_session(f"e2e_eval_{args.label}_seq")
 
     out_path = EXP / "results" / f"{args.label}.jsonl"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as w:
         for k, it in enumerate(items, 1):
-            chat_id = f"e2e_eval_{args.label}_{it['id']}"
-            clear_session(chat_id)
+            chat_id = f"e2e_eval_{args.label}_seq" if args.keep_session else f"e2e_eval_{args.label}_{it['id']}"
+            if not args.keep_session:
+                clear_session(chat_id)
             set_paper_mode(chat_id, args.paper_mode)
+            cit: list[dict] = []
             queries: list[str] = []
             captured: list[str] = []
             doc_ids: list[str] = []
@@ -132,8 +139,14 @@ def main() -> int:
                     return real_invoke(messages, *a, **kw)
                 return "평가용 스텁 답변"
 
+            def _fix(*a, **kw):
+                out_fix = real_fix(*a, **kw)
+                cit.append({k: out_fix[1].get(k) for k in ("kept", "fixed", "dropped", "unknown_ids", "bad_refs")})
+                return out_fix
+
             N._extract_english_rag_query = _extract
             N.number_context_papers = _number
+            N.fix_citations = _fix
             cfg = {"configurable": {"chat_id": chat_id, "thread_id": chat_id, "bot": None}}
             state = {"user_request": it["question"], "route_type": "", "rag_context": ""}
             t0 = time.time()
@@ -156,7 +169,17 @@ def main() -> int:
                 N._extract_english_rag_query = real_extract
                 N._invoke_llm_with_fallback = real_invoke
                 N.number_context_papers = real_number
-                clear_session(chat_id)
+                N.fix_citations = real_fix
+                if not args.keep_session:
+                    clear_session(chat_id)
+            if args.keep_session:
+                # 운영 워커와 같은 순서로 대화 기록을 남긴다 (core/graph/agent_worker_runner.py — 답 앞 500자, 요약·저장)
+                from core.session.agent_session import get_session
+                sess = get_session(chat_id)
+                sess.add_turn(it["question"], "")
+                sess.recent_messages[-1] = (sess.recent_messages[-1][0], (answer or "")[:500])
+                sess.maybe_compress()
+                sess.save()
             elapsed = time.time() - t0
 
             # LLM 에 건네진 [문서 N] 번호표의 논문 ID (청크 본문에 인용된 ID 는 세지 않는다)
@@ -191,6 +214,7 @@ def main() -> int:
                     "answer_len": len(answer), "answer": answer[:2000]} if args.answer else {}),
                 **({"numbered_context": numbered[0] if numbered else "",
                     "doc_ids": [re.sub(r"v\d+$", "", (p or "").strip()) for p in doc_ids]} if args.save_context else {}),
+                **({"citation_fix": cit[-1]} if cit else {}),
                 "elapsed": round(elapsed, 1),
                 "error": err,
             }
