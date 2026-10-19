@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2407.01449",
+    "title": "ColPali: Efficient Document Retrieval with Vision Language Models",
+    "abstract": "Documents are visually rich structures that convey information through text,\nbut also figures, page layouts, tables, or even fonts. Since modern retrieval\nsystems mainly rely on the textual information they extract from document pages\nto index documents -often through lengthy and brittle processes-, they struggle\nto exploit key visual cues efficiently. This limits their capabilities in many\npractical document retrieval applications such as Retrieval Augmented\nGeneration (RAG). To benchmark current systems on visually rich document\nretrieval, we introduce the Visual Document Retrieval Benchmark ViDoRe,\ncomposed of various page-level retrieval tasks spanning multiple domains,\nlanguages, and practical settings. The inherent complexity and performance\nshortcomings of modern systems motivate a new concept; doing document retrieval\nby directly embedding the images of the document pages. We release ColPali, a\nVision Language Model trained to produce high-quality multi-vector embeddings\nfrom images of document pages. Combined with a late interaction matching\nmechanism, ColPali largely outperforms modern document retrieval pipelines\nwhile being drastically simpler, faster and end-to-end trainable. We release\nmodels, data, code and benchmarks under open licenses at this https URL",
+    "publicationDate": "2024-07-02T13:02:58.000Z",
+    "votes": 120
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.15253",
+    "title": "Scaling Beyond Context: A Survey of Multimodal Retrieval-Augmented Generation for Document Understanding",
+    "abstract": "Document understanding is critical for applications from financial analysis to scientific discovery. Current approaches, whether OCR-based pipelines feeding Large Language Models (LLMs) or native Multimodal LLMs (MLLMs), face key limitations: the former loses structural detail, while the latter struggles with context modeling. Retrieval-Augmented Generation (RAG) helps ground models in external data, but documents' multimodal nature, i.e., combining text, tables, charts, and layout, demands a more advanced paradigm: Multimodal RAG. This approach enables holistic retrieval and reasoning across all modalities, unlocking comprehensive document intelligence. Recognizing its importance, this paper presents a systematic survey of Multimodal RAG for document understanding. We propose a taxonomy based on domain, retrieval modality, and granularity, and review advances involving graph structures and agentic frameworks. We also summarize key datasets, benchmarks, applications and industry deployment, and highlight open challenges in efficiency, fine-grained representation, and robustness, providing a roadmap for future progress in document AI.",
+    "publicationDate": "2025-10-17T02:33:16.000Z",
+    "votes": 33
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.09795",
+    "title": "VDocRAG: Retrieval-Augmented Generation over Visually-Rich Documents",
+    "abstract": "We aim to develop a retrieval-augmented generation (RAG) framework that\nanswers questions over a corpus of visually-rich documents presented in mixed\nmodalities (e.g., charts, tables) and diverse formats (e.g., PDF, PPTX). In\nthis paper, we introduce a new RAG framework, VDocRAG, which can directly\nunderstand varied documents and modalities in a unified image format to prevent\nmissing information that occurs by parsing documents to obtain text. To improve\nthe performance, we propose novel self-supervised pre-training tasks that adapt\nlarge vision-language models for retrieval by compressing visual information\ninto dense token representations while aligning them with textual content in\ndocuments. Furthermore, we introduce OpenDocVQA, the first unified collection\nof open-domain document visual question answering datasets, encompassing\ndiverse document types and formats. OpenDocVQA provides a comprehensive\nresource for training and evaluating retrieval and question answering models on\nvisually-rich documents in an open-domain setting. Experiments show that\nVDocRAG substantially outperforms conventional text-based RAG and has strong\ngeneralization capability, highlighting the potential of an effective RAG\nparadigm for real-world documents.",
+    "publicationDate": "2025-04-14T01:50:33.000Z",
+    "votes": 54
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.20821",
+    "title": "MultiFinRAG: An Optimized Multimodal Retrieval-Augmented Generation (RAG) Framework for Financial Question Answering",
+    "abstract": "Financial documents--such as 10-Ks, 10-Qs, and investor presentations--span hundreds of pages and combine diverse modalities, including dense narrative text, structured tables, and complex figures. Answering questions over such content often requires joint reasoning across modalities, which strains traditional large language models (LLMs) and retrieval-augmented generation (RAG) pipelines due to token limitations, layout loss, and fragmented cross-modal context. We introduce MultiFinRAG, a retrieval-augmented generation framework purpose-built for financial QA. MultiFinRAG first performs multimodal extraction by grouping table and figure images into batches and sending them to a lightweight, quantized open-source multimodal LLM, which produces both structured JSON outputs and concise textual summaries. These outputs, along with narrative text, are embedded and indexed with modality-aware similarity thresholds for precise retrieval. A tiered fallback strategy then dynamically escalates from text-only to text+table+image contexts when necessary, enabling cross-modal reasoning while reducing irrelevant context. Despite running on commodity hardware, MultiFinRAG achieves 19 percentage points higher accuracy than ChatGPT-4o (free-tier) on complex financial QA tasks involving text, tables, images, and combined multimodal reasoning.",
+    "publicationDate": "2025-06-25T20:37:20.000Z",
+    "votes": 21
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.16035",
+    "title": "Vision-Guided Chunking Is All You Need: Enhancing RAG with Multimodal Document Understanding",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems have revolutionized information retrieval and question answering, but traditional text-based chunking methods struggle with complex document structures, multi-page tables, embedded figures, and contextual dependencies across page boundaries. We present a novel multimodal document chunking approach that leverages Large Multimodal Models (LMMs) to process PDF documents in batches while maintaining semantic coherence and structural integrity. Our method processes documents in configurable page batches with cross-batch context preservation, enabling accurate handling of tables spanning multiple pages, embedded visual elements, and procedural content. We evaluate our approach on a curated dataset of PDF documents with manually crafted queries, demonstrating improvements in chunk quality and downstream RAG performance. Our vision-guided approach achieves better accuracy compared to traditional vanilla RAG systems, with qualitative analysis showing superior preservation of document structure and semantic coherence.",
+    "publicationDate": "2025-06-19T05:11:43.000Z",
+    "votes": 41
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.20626",
+    "title": "MegaRAG: Multimodal Knowledge Graph-Based Retrieval Augmented Generation",
+    "abstract": "Retrieval-augmented generation (RAG) enables large language models (LLMs) to dynamically access external information, which is powerful for answering questions over previously unseen documents. Nonetheless, they struggle with high-level conceptual understanding and holistic comprehension due to limited context windows, which constrain their ability to perform deep reasoning over long-form, domain-specific content such as full-length books. To solve this problem, knowledge graphs (KGs) have been leveraged to provide entity-centric structure and hierarchical summaries, offering more structured support for reasoning. However, existing KG-based RAG solutions remain restricted to text-only inputs and fail to leverage the complementary insights provided by other modalities such as vision. On the other hand, reasoning from visual documents requires textual, visual, and spatial cues into structured, hierarchical concepts. To address this issue, we introduce a multimodal knowledge graph-based RAG that enables cross-modal reasoning for better content understanding. Our method incorporates visual cues into the construction of knowledge graphs, the retrieval phase, and the answer generation process. Experimental results across both global and fine-grained question answering tasks show that our approach consistently outperforms existing RAG-based approaches on both textual and multimodal corpora.",
+    "publicationDate": "2025-11-26T05:00:03.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.03262",
+    "title": "Roles of MLLMs in Visually Rich Document Retrieval for RAG: A Survey",
+    "abstract": "Visually rich documents (VRDs) challenge retrieval-augmented generation (RAG) with layout-dependent semantics, brittle OCR, and evidence spread across complex figures and structured tables. This survey examines how Multimodal Large Language Models (MLLMs) are being used to make VRD retrieval practical for RAG. We organize the literature into three roles: Modality-Unifying Captioners, Multimodal Embedders, and End-to-End Representers. We compare these roles along retrieval granularity, information fidelity, latency and index size, and compatibility with reranking and grounding. We also outline key trade-offs and offer some practical guidance on when to favor each role. Finally, we identify promising directions for future research, including adaptive retrieval units, model size reduction, and the development of evaluation methods.",
+    "publicationDate": "2025-12-16T16:32:10.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2412.10704",
+    "title": "VisDoM: Multi-Document QA with Visually Rich Elements Using Multimodal  Retrieval-Augmented Generation",
+    "abstract": "Understanding information from a collection of multiple documents,\nparticularly those with visually rich elements, is important for\ndocument-grounded question answering. This paper introduces VisDoMBench, the\nfirst comprehensive benchmark designed to evaluate QA systems in multi-document\nsettings with rich multimodal content, including tables, charts, and\npresentation slides. We propose VisDoMRAG, a novel multimodal Retrieval\nAugmented Generation (RAG) approach that simultaneously utilizes visual and\ntextual RAG, combining robust visual retrieval capabilities with sophisticated\nlinguistic reasoning. VisDoMRAG employs a multi-step reasoning process\nencompassing evidence curation and chain-of-thought reasoning for concurrent\ntextual and visual RAG pipelines. A key novelty of VisDoMRAG is its\nconsistency-constrained modality fusion mechanism, which aligns the reasoning\nprocesses across modalities at inference time to produce a coherent final\nanswer. This leads to enhanced accuracy in scenarios where critical information\nis distributed across modalities and improved answer verifiability through\nimplicit context attribution. Through extensive experiments involving\nopen-source and proprietary large language models, we benchmark\nstate-of-the-art document QA methods on VisDoMBench. Extensive results show\nthat VisDoMRAG outperforms unimodal and long-context LLM baselines for\nend-to-end multimodal document QA by 12-20%.",
+    "publicationDate": "2024-12-14T06:24:55.000Z",
+    "votes": 28
+  }
+]

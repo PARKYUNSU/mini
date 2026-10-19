@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.21808",
+    "title": "RoleQ: Role-Aligned Scales for Converting Language Models to Ternary",
+    "abstract": "Weight quantization below four bits shrinks memory and bandwidth at a perplexity that looks acceptable, but often at the cost of factual knowledge and task accuracy. Ternary weights have mostly been obtained by training from scratch or long fine-tuning. We introduce RoleQ, a quantization framework that places scales by the functional roles of Transformer units rather than by the layout of the weight matrix, as conventional formats do. Vectors that read from the residual stream take one scale per output unit; those that write to it, one per input unit. The rule is structural, needs no search, calibration or stored state, and holds on integer and ternary grids. In a rotated basis it matches a per-layer axis search at half the solver work, and at ternary it cuts perplexity by up to half against layout-based placement in two families at every size from 0.6B to 14B, where per-row scales leave MMLU at chance. Our lightweight post-training pipeline converts an existing checkpoint to 1.59 bits per weight in a few GPU-hours, a fraction of the cost of learned ternarization, and leads every post-training ternary method at matched or lower memory-resident bits on perplexity, zero-shot accuracy and MMLU, most widely on knowledge. A sparse second ternary plane placed by a per-unit Fisher saliency keeps the matmul multiplication-free and recovers what ternary loses first: at 8B, a fraction of a bit returns about half the MMLU that conversion costs, well ahead of random or Hessian-based placement at equal bits.",
+    "publicationDate": "2026-10-15T12:56:57.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.16289",
+    "title": "Fast Quantized Johnson$-$Lindenstrauss Transforms",
+    "abstract": "Quantization has emerged as one of the primary techniques for reducing the memory footprint of large language models during inference. A prominent example is Quantized Johnson$-$Lindenstrauss (QJL), which compresses KV caches using 1-bit asymmetric quantization while approximately preserving the inner products required by the attention mechanism. Recent theoretical and practical work aims at replacing the dense Gaussian projections used by the aforementioned transforms with more structured embeddings $-$ such as compositions of randomized Hadamard transforms $-$ while retaining the same embedding dimension.\nIn this paper, we introduce two constructions based on a composition of randomized Hadamard transforms, albeit with a Gaussian rather than Rademacher diagonal in the second stage. The first adds Gaussian dithering to smooth the quantizer, while the second inserts a random permutation to regularize the covariance structure of the resulting Gaussian measurements.\nWe prove embedding-dimension and running-time guarantees analogous to those of Fast JL in the non-quantized setting. The first construction achieves $m=O(\\varepsilon^{-2}\\log^2(d/\\delta))$, while the second achieves $m=O(\\varepsilon^{-2}\\log(d/\\delta))$ under a restriction on $m$. Both constructions can be applied in $O(d\\log d)$ time.",
+    "publicationDate": "2026-10-12T07:16:40.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.03651",
+    "title": "MRVQ: One Resident Index for Dimension- and Rate-Elastic Vector Search",
+    "abstract": "Dense-retrieval services must switch among embedding-prefix dimensions and index bit rates as latency, quality, and memory budgets change. Tuning a quantizer separately for each rate gives the best quality, but the retrieval tier then holds several code streams and quantizer states at once. We introduce Matryoshka Residual Vector Quantization (MRVQ), a post-hoc residual quantizer for frozen embeddings. Its maximum-rate code can be truncated two ways: dropping residual stages lowers the rate, and dropping embedding coordinates lowers the dimension. One resident artifact therefore serves every (dimension, rate) pair we evaluate. Across FiQA and NFCorpus, four embedding families, and {4, 8, 16}-byte codes, MRVQ is the lowest-RAM design we evaluate. It uses 17.8-22.0x less memory than three separately trained QINCo2 indices, and 1.89-2.02x less than a lean shared-model steelman. The saving is not free: per-rate QINCo2 is 0.026-0.107 nDCG@10 better on FiQA. But MRVQ beats PQ, OPQ, and AdANNS-OPQ at matched code size. We also evaluate a low-build-cost PCA-scalar design that attains quality comparable to RaBitQ and its extension while fitting 420x faster at the median. Finally, we report two negative results: QINCo2 collapses when trained at high rates, and a ranking-bound hypothesis misses its pre-specified acceptance criteria. MRVQ is therefore a low-memory operating point for elastic retrieval, not a universal quality winner.",
+    "publicationDate": "2026-10-02T17:33:13.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.30384",
+    "title": "RSLM: Training-Free Vector Quantization for Approximate Nearest Neighbor Search",
+    "abstract": "By introducing RSLM (Rotated Scaled Lloyd-Max), a family of training-free vector quantization codecs compressing embeddings to 1--4 bits per dimension, we reduce memory cost and memory bandwidth of a typical large-scale Approximate Nearest Neighbor (ANN) search system, while reducing its complexity and keeping or improving recall across multiple benchmark datasets. State-of-the-art systems filter candidates using coarse partitions, approximately score them to narrow the set, and then rescore the best with higher precision representations (often &gt;=8 bits per dimension). Our relativized codecs can bring this down to 2--4 bits per dimension.\nWe use the properties of the ANN system to encode residual vectors instead of full vectors, both for the approximate scoring phase and the rescoring phase. Since Maximum Inner Product Search (MIPS) is very sensitive to vector norms, we correct the $L_2$ norms of quantized vectors. Our major innovation is that we correct the $L_2$ norm of the final reconstructed vector rather than just the residual. Our rescaling replaces more complicated schemes, such as Anisotropic loss. The residualization scheme gives us a more favorable quality vs size trade-off than generic quantization methods.\nOur high-performance implementation leverages a block-wise cascaded Fast Walsh-Hadamard Transform (FWHT) with linear-like complexity, AVX SIMD-optimized codebooks, and a steganographic encoding of scaling factors for perfect cache-line alignment.",
+    "publicationDate": "2026-08-31T07:40:57.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.19388",
+    "title": "Quantization Beyond Uniform Bit Allocation",
+    "abstract": "Quantization is a fundamental technique to handle the growing sizes of embeddings generated by modern models. Existing quantization schemes are largely embedding agnostic and allocate bits uniformly across dimensions. However, recent models produce embeddings with significant geometric structure. In this work, we investigate whether a variable bit allocation scheme can improve quantization quality under a fixed memory budget. We propose a simple variable bit allocation framework that partitions an embedding into contiguous buckets and allocates storage non-uniformly across them. Using a greedy allocation strategy, we instantiate this framework for both Product Quantization (PQ) and Scalar Quantization (SQ). We perform a series of experiments on embeddings known to have the Matryoshka property (MRL), and consistently observe that non-uniform allocations outperform uniform baselines at identical storage budgets. The largest improvements occur in the low-bit regime, where uniform allocation is particularly inefficient for MRL embeddings. At the same compression rates, variable allocation improves recall by up to 8\\% for PQ and up to 18\\% for SQ. Our results suggest a new direction for structure-aware compression and indexing techniques for large-scale retrieval systems.",
+    "publicationDate": "2026-08-19T19:06:43.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.24865",
+    "title": "Tokens are All You Need: Dual-purpose Semantic IDs for Achieving LLM-Level I/O Efficiency in recommendation systems",
+    "abstract": "Large-scale recommendation systems face \"Memory Wall\" bottlenecks due to massive, dense embedding tables. While generative retrieval uses discrete tokens for IDs, high-dimensional context still relies on inefficient dense formats. Inspired by computer vision data compression, we propose Dual-purpose Semantic IDs to achieve LLM-level I/O efficiency. Our methodology uses hierarchical quantization to condense continuous embeddings into discrete Semantic IDs performing two concurrent roles: (1) Collaborative Identity: modeling user-item interactions via learnable embedding table; and (2) Content Reconstruction: using a lightweight Semantic Decoder for on-the-fly embedding approximation. This approach replaces massive vector storage with on-demand reconstruction, reducing system overhead and data footprints. We demonstrate the efficacy of our framework through offline evaluations and successful online deployment in production-scale ranking and retrieval systems at a major video sharing platform, showing that discrete tokens are indeed all you need for highly efficient, content-rich recommendation.",
+    "publicationDate": "2026-07-26T18:04:19.000Z",
+    "votes": 17
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.01127",
+    "title": "$\\text{Log}_\\text{b}$Quant: Quantizing Language Models in Logarithmic Space",
+    "abstract": "Quantization has become an invaluable tool to reduce memory requirements and inference speed of modern language models, in particular to make them available for consumer setups and edge devices. While previous work has primarily focused on uniform quantization codebooks, such approaches are prone to suboptimal representations due to low-frequency high-magnitude weights. We introduce Log$_\\text{b}$Quant, a novel logarithmic quantization approach with adjustable bases, to adapt to common parameter distributions. We show that our method exhibits superior performance at 4-bit precision on several performance benchmarks compared to asymmetric linear quantization at tensor-wise granularity, while achieving moderate speedup and high memory savings, making it suitable for private use on consumer-grade GPUs.",
+    "publicationDate": "2026-07-01T16:13:03.000Z",
+    "votes": 11
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.25674",
+    "title": "BitNet Text Embeddings",
+    "abstract": "LLM-based text embedders have substantially improved retrieval and semantic representation quality, but their deployment remains costly: large backbone models slow down embedding inference, while high-dimensional full-precision embeddings impose substantial storage and bandwidth overhead on large-scale indexes. In this paper, we present BITEMBED, an extreme low-bit framework for LLM-based text embedding that jointly targets encoding efficiency and vector storage. BITEMBED converts pretrained LLM backbones into BitNet-style embedding encoders with ternary weights, quantized activations, and lightweight normalization refinement. The converted model is adapted to representation learning through continual contrastive pre-training, followed by supervised contrastive fine-tuning with both similarity-distribution distillation and attention-relation distillation from a full-precision teacher. Beyond quantizing the backbone, BITEMBED further trains output embeddings to support multiple storage precisions meeting different storage needs in various scenarios. Experiments on MMTEB (eng, v2) with Qwen3-0.6B and Gemma3-270M show that BITEMBED is largely comparable to full precision teacher embedders. Moreover, BITEMBED flexibly obtains text embeddings of various precisions, achieving a trade-off between performance and storage cost.",
+    "publicationDate": "2026-06-24T10:37:01.000Z",
+    "votes": 14
+  }
+]

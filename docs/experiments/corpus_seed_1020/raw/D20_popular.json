@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2607.26497",
+    "title": "BM25 Wins at Scale: A Scaling Study of Retrieval-Augmented Generation Paradigms",
+    "abstract": "Retrieval-augmented generation (RAG) spans lexical and dense retrieval, graph-based indexing, and agentic search, but these paradigms are usually evaluated on different benchmarks at one corpus size, leaving their accuracy-cost scaling unclear. To bridge this gap, we present a controlled study that varies corpus size along 28 strictly nested tiers spanning roughly 450-fold, while holding questions and a fixed bedrock of relevant and adversarial documents unchanged. Under one reader model and one judging protocol, we measure official accuracy, construction and query tokens, and latency. The results reveal a scale-dependent crossover rather than an unconditional winner. File-System Agent leads at the smallest shared tiers, but its sequential exploration costs 39 times more query tokens at the bedrock and becomes less effective as the search space grows. Around 10 million corpus tokens, BM25 overtakes it and leads at every larger shared tier, with a margin approaching 20 points at full scale. BM25 also anchors the low-cost end of the Pareto frontier without LLM-based construction. Dense retrieval remains efficient but less accurate, whereas graph-based RAG encounters construction walls before deployment scale and its scalable variants remain below BM25 at shared tiers. Overall, corpus growth increasingly favors global candidate ranking: lexical retrieval is the strongest scalable default, while agentic reasoning works best after ranked discovery rather than in place of it.",
+    "publicationDate": "2026-07-29T05:46:11.000Z",
+    "votes": 53
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2004.04906",
+    "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+    "abstract": "Open-domain question answering relies on efficient passage retrieval to select candidate contexts, where traditional sparse vector space models, such as TF-IDF or BM25, are the de facto method. In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework. When evaluated on a wide range of open-domain QA datasets, our dense retriever outperforms a strong Lucene-BM25 system largely by 9%-19% absolute in terms of top-20 passage retrieval accuracy, and helps our end-to-end QA system establish new state-of-the-art on multiple open-domain QA benchmarks.",
+    "publicationDate": "2020-04-10T04:53:17.000Z",
+    "votes": 52
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.05781",
+    "title": "Visual Words Meet BM25: Sparse Auto-Encoder Visual Word Scoring for Image Retrieval",
+    "abstract": "Dense image retrieval is accurate but offers limited interpretability and attribution, and it can be compute-intensive at scale. We present \\textbf{BM25-V}, which applies Okapi BM25 scoring to sparse visual-word activations from a Sparse Auto-Encoder (SAE) on Vision Transformer patch features. Across a large gallery, visual-word document frequencies are highly imbalanced and follow a Zipfian-like distribution, making BM25's inverse document frequency (IDF) weighting well suited for suppressing ubiquitous, low-information words and emphasizing rare, discriminative ones. BM25-V retrieves high-recall candidates via sparse inverted-index operations and serves as an efficient first-stage retriever for dense reranking. Across seven benchmarks, BM25-V achieves Recall@200 $\\geq$ 0.993, enabling a two-stage pipeline that reranks only $K{=}200$ candidates per query and recovers near-dense accuracy within $0.2$\\% on average. An SAE trained once on ImageNet-1K transfers zero-shot to seven fine-grained benchmarks without fine-tuning, and BM25-V retrieval decisions are attributable to specific visual words with quantified IDF contributions.",
+    "publicationDate": "2026-03-06T00:21:57.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2107.05720",
+    "title": "SPLADE: Sparse Lexical and Expansion Model for First Stage Ranking",
+    "abstract": "In neural Information Retrieval, ongoing research is directed towards improving the first retriever in ranking pipelines. Learning dense embeddings to conduct retrieval using efficient approximate nearest neighbors methods has proven to work well. Meanwhile, there has been a growing interest in learning sparse representations for documents and queries, that could inherit from the desirable properties of bag-of-words models such as the exact matching of terms and the efficiency of inverted indexes. In this work, we present a new first-stage ranker based on explicit sparsity regularization and a log-saturation effect on term weights, leading to highly sparse representations and competitive results with respect to state-of-the-art dense and sparse methods. Our approach is simple, trained end-to-end in a single stage. We also explore the trade-off between effectiveness and efficiency, by controlling the contribution of the sparsity regularization.",
+    "publicationDate": "2021-07-12T20:17:44.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.16351",
+    "title": "Training for Compositional Sensitivity Reduces Dense Retrieval Generalization",
+    "abstract": "Dense retrieval compresses texts into single embeddings ranked by cosine similarity. While efficient for recall, this interface is brittle for identity-level matching: minimal compositional edits (negation, role swaps) flip meaning yet retain high similarity. Motivated by geometric results for unit-sphere cosine spaces (Kang et al., 2025), we test this retrieval-composition tension in text-only retrieval. Across four dual-encoder backbones, adding structure-targeted negatives consistently reduces zero-shot NanoBEIR retrieval (8-9% mean nDCG@10 drop on small backbones; up to 40% on medium ones), while only partially improving pooled-space separation. Treating pooled cosine as a recall interface, we then benchmark verifiers scoring token--token cosine maps. MaxSim (late interaction) excels at reranking but fails to reject structural near-misses, whereas a small Transformer over similarity maps reliably separates near-misses under end-to-end training.",
+    "publicationDate": "2026-03-16T20:25:39.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2112.09118",
+    "title": "Unsupervised Dense Information Retrieval with Contrastive Learning",
+    "abstract": "Recently, information retrieval has seen the emergence of dense retrievers, using neural networks, as an alternative to classical sparse methods based on term-frequency. These models have obtained state-of-the-art results on datasets and tasks where large training sets are available. However, they do not transfer well to new applications with no training data, and are outperformed by unsupervised term-frequency methods such as BM25. In this work, we explore the limits of contrastive learning as a way to train unsupervised dense retrievers and show that it leads to strong performance in various retrieval settings. On the BEIR benchmark our unsupervised model outperforms BM25 on 11 out of 15 datasets for the Recall@100. When used as pre-training before fine-tuning, either on a few thousands in-domain examples or on the large MS~MARCO dataset, our contrastive model leads to improvements on the BEIR benchmark. Finally, we evaluate our approach for multi-lingual retrieval, where training data is even scarcer than for English, and show that our approach leads to strong unsupervised performance. Our model also exhibits strong cross-lingual transfer when fine-tuned on supervised English data only and evaluated on low resources language such as Swahili. We show that our unsupervised models can perform cross-lingual retrieval between different scripts, such as retrieving English documents from Arabic queries, which would not be possible with term matching methods.",
+    "publicationDate": "2021-12-16T18:57:37.000Z",
+    "votes": 34
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2409.06464",
+    "title": "Operational Advice for Dense and Sparse Retrievers: HNSW, Flat, or Inverted Indexes?",
+    "abstract": "Practitioners working on dense retrieval today face a bewildering number of choices. Beyond selecting the embedding model, another consequential choice is the actual implementation of nearest-neighbor vector search. While best practices recommend HNSW indexes, flat vector indexes with brute-force search represent another viable option, particularly for smaller corpora and for rapid prototyping. In this paper, we provide experimental results on the BEIR dataset using the open-source Lucene search library that explicate the tradeoffs between HNSW and flat indexes (including quantized variants) from the perspectives of indexing time, query evaluation performance, and retrieval quality. With additional comparisons between dense and sparse retrievers, our results provide guidance for today's search practitioner in understanding the design space of dense and sparse retrievers. To our knowledge, we are the first to provide operational advice supported by empirical experiments in this regard.",
+    "publicationDate": "2024-09-10T12:46:23.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.00041",
+    "title": "Decoding Dense Embeddings: Sparse Autoencoders for Interpreting and Discretizing Dense Retrieval",
+    "abstract": "Despite their strong performance, Dense Passage Retrieval (DPR) models suffer from a lack of interpretability. In this work, we propose a novel interpretability framework that leverages Sparse Autoencoders (SAEs) to decompose previously uninterpretable dense embeddings from DPR models into distinct, interpretable latent concepts. We generate natural language descriptions for each latent concept, enabling human interpretations of both the dense embeddings and the query-document similarity scores of DPR models. We further introduce Concept-Level Sparse Retrieval (CL-SR), a retrieval framework that directly utilizes the extracted latent concepts as indexing units. CL-SR effectively combines the semantic expressiveness of dense embeddings with the transparency and efficiency of sparse representations. We show that CL-SR achieves high index-space and computational efficiency while maintaining robust performance across vocabulary and semantic mismatches.",
+    "publicationDate": "2025-05-28T02:50:17.000Z",
+    "votes": 4
+  }
+]

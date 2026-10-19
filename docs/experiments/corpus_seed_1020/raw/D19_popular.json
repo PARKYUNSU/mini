@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2502.11371",
+    "title": "RAG vs. GraphRAG: A Systematic Evaluation and Key Insights",
+    "abstract": "Retrieval-Augmented Generation (RAG) improves large language models (LLMs) by retrieving relevant information from external sources and has been widely adopted for text-based tasks. For structured data, such as knowledge graphs, Graph Retrieval-Augmented Generation (GraphRAG) retrieves and aggregates information along graph structures. More recently, GraphRAG has been extended to general text settings by organizing unstructured text into graph representations, showing promise for reasoning and grounding. Despite these advances, existing GraphRAG systems for text data are often tailored to specific tasks, datasets, and system designs, resulting in heterogeneous evaluation protocols. Consequently, a systematic understanding of the relative strengths, limitations, and trade-offs between RAG and GraphRAG on widely used text benchmarks remains limited. In this paper, we present a comprehensive benchmark study comparing RAG and GraphRAG on established text-based tasks, including question answering and query-based summarization. We introduce a unified evaluation protocol that standardizes data preprocessing, retrieval configurations, and generation settings, enabling fair and reproducible comparisons. Our results highlight the distinct strengths of RAG and GraphRAG across different tasks and evaluation perspectives. Building on these findings, we explore selection and integration strategies that combine the strengths of both paradigms, leading to consistent performance improvements. We further analyze failure modes, efficiency trade-offs, and evaluation biases, and highlight key considerations for designing and evaluating retrieval-augmented generation systems.",
+    "publicationDate": "2025-02-17T02:36:30.000Z",
+    "votes": 47
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.11552",
+    "title": "HiChunk: Evaluating and Enhancing Retrieval-Augmented Generation with Hierarchical Chunking",
+    "abstract": "Retrieval-Augmented Generation (RAG) enhances the response capabilities of language models by integrating external knowledge sources. However, document chunking as an important part of RAG system often lacks effective evaluation tools. This paper first analyzes why existing RAG evaluation benchmarks are inadequate for assessing document chunking quality, specifically due to evidence sparsity. Based on this conclusion, we propose HiCBench, which includes manually annotated multi-level document chunking points, synthesized evidence-dense quetion answer(QA) pairs, and their corresponding evidence sources. Additionally, we introduce the HiChunk framework, a multi-level document structuring framework based on fine-tuned LLMs, combined with the Auto-Merge retrieval algorithm to improve retrieval quality. Experiments demonstrate that HiCBench effectively evaluates the impact of different chunking methods across the entire RAG pipeline. Moreover, HiChunk achieves better chunking quality within reasonable time consumption, thereby enhancing the overall performance of RAG systems.",
+    "publicationDate": "2025-09-15T03:32:50.000Z",
+    "votes": 37
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2501.01880",
+    "title": "Long Context vs. RAG for LLMs: An Evaluation and Revisits",
+    "abstract": "Extending context windows (i.e., Long Context, LC) and using retrievers to selectively access relevant information (i.e., Retrieval-Augmented Generation, RAG) are the two main strategies to enable LLMs to incorporate extremely long external contexts. This paper revisits recent studies on this topic, highlighting their key insights and discrepancies. We then provide a more comprehensive evaluation by filtering out questions answerable without external context, identifying the most effective retrieval methods, and expanding the datasets. We show that LC generally outperforms RAG in question-answering benchmarks, especially for Wikipedia-based questions. Summarization-based retrieval performs comparably to LC, while chunk-based retrieval lags behind. However, RAG has advantages in dialogue-based and general question queries. These insights underscore the trade-offs between RAG and LC strategies, offering guidance for future optimization of LLMs with external knowledge sources. We also provide an in-depth discussion on this topic, highlighting the overlooked importance of context relevance in existing studies.",
+    "publicationDate": "2024-12-27T14:34:37.000Z",
+    "votes": 24
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.16974",
+    "title": "Beyond Chunk-Then-Embed: A Comprehensive Taxonomy and Evaluation of Document Chunking Strategies for Information Retrieval",
+    "abstract": "Document chunking is a critical preprocessing step in dense retrieval systems, yet the design space of chunking strategies remains poorly understood. Recent research has proposed several concurrent approaches, including LLM-guided methods (e.g., DenseX and LumberChunker) and contextualized strategies(e.g., Late Chunking), which generate embeddings before segmentation to preserve contextual information. However, these methods emerged independently and were evaluated on benchmarks with minimal overlap, making direct comparisons difficult.\nThis paper reproduces prior studies in document chunking and presents a systematic framework that unifies existing strategies along two key dimensions: (1) segmentation methods, including structure-based methods (fixed-size, sentence-based, and paragraph-based) as well as semantically-informed and LLM-guided methods; and (2) embedding paradigms, which determine the timing of chunking relative to embedding (pre-embedding chunking vs. contextualized chunking). Our reproduction evaluates these approaches in two distinct retrieval settings established in previous work: in-document retrieval (needle-in-a-haystack) and in-corpus retrieval (the standard information retrieval task).\nOur comprehensive evaluation reveals that optimal chunking strategies are task-dependent: simple structure-based methods outperform LLM-guided alternatives for in-corpus retrieval, while LumberChunker performs best for in-document retrieval. Contextualized chunking improves in-corpus effectiveness but degrades in-document retrieval. We also find that chunk size correlates moderately with in-document but weakly with in-corpus effectiveness, suggesting segmentation method differences are not purely driven by chunk size. Our code and evaluation benchmarks are publicly available at (Anonymoused).",
+    "publicationDate": "2026-02-19T00:27:15.000Z",
+    "votes": 10
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.16035",
+    "title": "Vision-Guided Chunking Is All You Need: Enhancing RAG with Multimodal Document Understanding",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems have revolutionized information retrieval and question answering, but traditional text-based chunking methods struggle with complex document structures, multi-page tables, embedded figures, and contextual dependencies across page boundaries. We present a novel multimodal document chunking approach that leverages Large Multimodal Models (LMMs) to process PDF documents in batches while maintaining semantic coherence and structural integrity. Our method processes documents in configurable page batches with cross-batch context preservation, enabling accurate handling of tables spanning multiple pages, embedded visual elements, and procedural content. We evaluate our approach on a curated dataset of PDF documents with manually crafted queries, demonstrating improvements in chunk quality and downstream RAG performance. Our vision-guided approach achieves better accuracy compared to traditional vanilla RAG systems, with qualitative analysis showing superior preservation of document structure and semantic coherence.",
+    "publicationDate": "2025-06-19T05:11:43.000Z",
+    "votes": 41
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2402.05131",
+    "title": "Financial Report Chunking for Effective Retrieval Augmented Generation",
+    "abstract": "Chunking information is a key step in Retrieval Augmented Generation (RAG). Current research primarily centers on paragraph-level chunking. This approach treats all texts as equal and neglects the information contained in the structure of documents. We propose an expanded approach to chunk documents by moving beyond mere paragraph-level chunking to chunk primary by structural element components of documents. Dissecting documents into these constituent elements creates a new way to chunk documents that yields the best chunk size without tuning. We introduce a novel framework that evaluates how chunking based on element types annotated by document understanding models contributes to the overall context and accuracy of the information retrieved. We also demonstrate how this approach impacts RAG assisted Question & Answer task performance. Our research includes a comprehensive analysis of various element types, their role in effective information retrieval, and the impact they have on the quality of RAG outputs. Findings support that element type based chunking largely improve RAG results on financial reporting. Through this research, we are also able to answer how to uncover highly accurate RAG.",
+    "publicationDate": "2024-02-05T22:35:42.000Z",
+    "votes": 24
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.10529",
+    "title": "HeteRAG: A Heterogeneous Retrieval-augmented Generation Framework with  Decoupled Knowledge Representations",
+    "abstract": "Retrieval-augmented generation (RAG) methods can enhance the performance of\nLLMs by incorporating retrieved knowledge chunks into the generation process.\nIn general, the retrieval and generation steps usually have different\nrequirements for these knowledge chunks. The retrieval step benefits from\ncomprehensive information to improve retrieval accuracy, whereas excessively\nlong chunks may introduce redundant contextual information, thereby diminishing\nboth the effectiveness and efficiency of the generation process. However,\nexisting RAG methods typically employ identical representations of knowledge\nchunks for both retrieval and generation, resulting in suboptimal performance.\nIn this paper, we propose a heterogeneous RAG framework (\\myname) that\ndecouples the representations of knowledge chunks for retrieval and generation,\nthereby enhancing the LLMs in both effectiveness and efficiency. Specifically,\nwe utilize short chunks to represent knowledge to adapt the generation step and\nutilize the corresponding chunk with its contextual information from\nmulti-granular views to enhance retrieval accuracy. We further introduce an\nadaptive prompt tuning method for the retrieval model to adapt the\nheterogeneous retrieval augmented generation process. Extensive experiments\ndemonstrate that \\myname achieves significant improvements compared to\nbaselines.",
+    "publicationDate": "2025-04-12T13:12:54.000Z",
+    "votes": 72
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2505.21700",
+    "title": "Rethinking Chunk Size For Long-Document Retrieval: A Multi-Dataset  Analysis",
+    "abstract": "Chunking is a crucial preprocessing step in retrieval-augmented generation\n(RAG) systems, significantly impacting retrieval effectiveness across diverse\ndatasets. In this study, we systematically evaluate fixed-size chunking\nstrategies and their influence on retrieval performance using multiple\nembedding models. Our experiments, conducted on both short-form and long-form\ndatasets, reveal that chunk size plays a critical role in retrieval\neffectiveness -- smaller chunks (64-128 tokens) are optimal for datasets with\nconcise, fact-based answers, whereas larger chunks (512-1024 tokens) improve\nretrieval in datasets requiring broader contextual understanding. We also\nanalyze the impact of chunking on different embedding models, finding that they\nexhibit distinct chunking sensitivities. While models like Stella benefit from\nlarger chunks, leveraging global context for long-range retrieval, Snowflake\nperforms better with smaller chunks, excelling at fine-grained, entity-based\nmatching. Our results underscore the trade-offs between chunk size, embedding\nmodels, and dataset characteristics, emphasizing the need for improved chunk\nquality measures, and more comprehensive datasets to advance chunk-based\nretrieval in long-document Information Retrieval (IR).",
+    "publicationDate": "2025-05-27T19:39:16.000Z",
+    "votes": 4
+  }
+]

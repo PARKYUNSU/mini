@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2407.07071",
+    "title": "Lookback Lens: Detecting and Mitigating Contextual Hallucinations in Large Language Models Using Only Attention Maps",
+    "abstract": "When asked to summarize articles or answer questions given a passage, large language models (LLMs) can hallucinate details and respond with unsubstantiated answers that are inaccurate with respect to the input context. This paper describes a simple approach for detecting such contextual hallucinations. We hypothesize that contextual hallucinations are related to the extent to which an LLM attends to information in the provided context versus its own generations. Based on this intuition, we propose a simple hallucination detection model whose input features are given by the ratio of attention weights on the context versus newly generated tokens (for each attention head). We find that a linear classifier based on these lookback ratio features is as effective as a richer detector that utilizes the entire hidden states of an LLM or a text-based entailment model. The lookback ratio-based detector -- Lookback Lens -- is found to transfer across tasks and even models, allowing a detector that is trained on a 7B model to be applied (without retraining) to a larger 13B model. We further apply this detector to mitigate contextual hallucinations, and find that a simple classifier-guided decoding approach is able to reduce the amount of hallucination, for example by 9.6% in the XSum summarization task.",
+    "publicationDate": "2024-07-09T17:44:34.000Z",
+    "votes": 37
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.18145",
+    "title": "Detecting Contextual Hallucinations in LLMs with Frequency-Aware Attention",
+    "abstract": "Hallucination detection is critical for ensuring the reliability of large language models (LLMs) in context-based generation. Prior work has explored intrinsic signals available during generation, among which attention offers a direct view of grounding behavior. However, existing approaches typically rely on coarse summaries that fail to capture fine-grained instabilities in attention. Inspired by signal processing, we introduce a frequency-aware perspective on attention by analyzing its variation during generation. We model attention distributions as discrete signals and extract high-frequency components that reflect rapid local changes in attention. Our analysis reveals that hallucinated tokens are associated with high-frequency attention energy, reflecting fragmented and unstable grounding behavior. Based on this insight, we develop a lightweight hallucination detector using high-frequency attention features. Experiments on the RAGTruth and HalluRAG benchmarks show that our approach achieves performance gains over verification-based, internal-representation-based, and attention-based methods across models and tasks.",
+    "publicationDate": "2026-02-20T11:18:45.000Z",
+    "votes": 17
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.17229",
+    "title": "FactSelfCheck: Fact-Level Black-Box Hallucination Detection for LLMs",
+    "abstract": "Large Language Models (LLMs) frequently generate hallucinated content, posing significant challenges for applications where factuality is crucial. While existing hallucination detection methods typically operate at the sentence level or passage level, we propose FactSelfCheck, a novel zero-resource black-box sampling-based method that enables fine-grained fact-level detection. Our approach represents text as interpretable knowledge graphs consisting of facts in the form of triples, providing clearer insights into content factuality than traditional approaches. Through analyzing factual consistency across multiple LLM responses, we compute fine-grained hallucination scores without requiring external resources or training data. Our evaluation demonstrates that FactSelfCheck performs competitively with leading sentence-level sampling-based methods while providing more detailed and interpretable insights. Most notably, our fact-level approach significantly improves hallucination correction, achieving a 35.5% increase in factual content compared to the baseline, while sentence-level SelfCheckGPT yields only a 10.6% improvement. The granular nature of our detection enables more precise identification and correction of hallucinated content. Additionally, we contribute FavaMultiSamples, a novel dataset that addresses a gap in the field by providing the research community with a second dataset for evaluating sampling-based methods.",
+    "publicationDate": "2025-03-21T15:32:24.000Z",
+    "votes": 66
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2411.11919",
+    "title": "VL-Uncertainty: Detecting Hallucination in Large Vision-Language Model via Uncertainty Estimation",
+    "abstract": "Given the higher information load processed by large vision-language models (LVLMs) compared to single-modal LLMs, detecting LVLM hallucinations requires more human and time expense, and thus rise a wider safety concerns. In this paper, we introduce VL-Uncertainty, the first uncertainty-based framework for detecting hallucinations in LVLMs. Different from most existing methods that require ground-truth or pseudo annotations, VL-Uncertainty utilizes uncertainty as an intrinsic metric. We measure uncertainty by analyzing the prediction variance across semantically equivalent but perturbed prompts, including visual and textual data. When LVLMs are highly confident, they provide consistent responses to semantically equivalent queries. However, when uncertain, the responses of the target LVLM become more random. Considering semantically similar answers with different wordings, we cluster LVLM responses based on their semantic content and then calculate the cluster distribution entropy as the uncertainty measure to detect hallucination. Our extensive experiments on 10 LVLMs across four benchmarks, covering both free-form and multi-choice tasks, show that VL-Uncertainty significantly outperforms strong baseline methods in hallucination detection.",
+    "publicationDate": "2024-11-18T04:06:04.000Z",
+    "votes": 23
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.19918",
+    "title": "Lowest Span Confidence: Zero-Shot Hallucination Detection from a Single LLM Response",
+    "abstract": "Hallucinations in Large Language Models (LLMs), i.e., plausible but non-factual generations, pose a significant challenge to reliable deployment in high-stakes environments. However, many existing hallucination detectors require expensive repeated sampling for consistency checks or access to model-internal states unavailable in common API-based scenarios. To this end, we propose an efficient zero-shot metric called Lowest Span Confidence (LSC) for hallucination detection under minimal resource assumptions. Concretely, LSC evaluates the local confidence of adjacent complete-word spans. By selecting the lowest aggregated confidence across neighboring words whose token widths can vary, LSC captures localized uncertainty associated with factual inconsistency. This boundary-aligned smoothing reduces the global dilution of perplexity and the sensitivity of minimum token probability to isolated noise. Our main evaluation spans four model families {Llama-2, Qwen2.5, Gemma-2, Mistral} and seven benchmarks {NQ, TriviaQA, SQuAD, CoQA, HotpotQA, RAGTruth, FELM}. Additional analyses examine word reconstruction, span width, and the role of adjacency in preserving local confidence. Across these settings, LSC is competitive with methods that use multiple responses or model-internal information while requiring only one response and its output token probabilities, without training a separate detector or using an auxiliary model.",
+    "publicationDate": "2026-01-07T12:48:33.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2303.08896",
+    "title": "SelfCheckGPT: Zero-Resource Black-Box Hallucination Detection for\n  Generative Large Language Models",
+    "abstract": "Generative Large Language Models (LLMs) such as GPT-3 are capable of\ngenerating highly fluent responses to a wide variety of user prompts. However,\nLLMs are known to hallucinate facts and make non-factual statements which can\nundermine trust in their output. Existing fact-checking approaches either\nrequire access to the output probability distribution (which may not be\navailable for systems such as ChatGPT) or external databases that are\ninterfaced via separate, often complex, modules. In this work, we propose\n\"SelfCheckGPT\", a simple sampling-based approach that can be used to fact-check\nthe responses of black-box models in a zero-resource fashion, i.e. without an\nexternal database. SelfCheckGPT leverages the simple idea that if an LLM has\nknowledge of a given concept, sampled responses are likely to be similar and\ncontain consistent facts. However, for hallucinated facts, stochastically\nsampled responses are likely to diverge and contradict one another. We\ninvestigate this approach by using GPT-3 to generate passages about individuals\nfrom the WikiBio dataset, and manually annotate the factuality of the generated\npassages. We demonstrate that SelfCheckGPT can: i) detect non-factual and\nfactual sentences; and ii) rank passages in terms of factuality. We compare our\napproach to several baselines and show that our approach has considerably\nhigher AUC-PR scores in sentence-level hallucination detection and higher\ncorrelation scores in passage-level factuality assessment compared to grey-box\nmethods.",
+    "publicationDate": "2023-03-15T19:31:21.000Z",
+    "votes": 68
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2402.03744",
+    "title": "INSIDE: LLMs' Internal States Retain the Power of Hallucination Detection",
+    "abstract": "Knowledge hallucination have raised widespread concerns for the security and reliability of deployed LLMs. Previous efforts in detecting hallucinations have been employed at logit-level uncertainty estimation or language-level self-consistency evaluation, where the semantic information is inevitably lost during the token-decoding procedure. Thus, we propose to explore the dense semantic information retained within LLMs' \\textbf{IN}ternal \\textbf{S}tates for halluc\\textbf{I}nation \\textbf{DE}tection (\\textbf{INSIDE}). In particular, a simple yet effective \\textbf{EigenScore} metric is proposed to better evaluate responses' self-consistency, which exploits the eigenvalues of responses' covariance matrix to measure the semantic consistency/diversity in the dense embedding space. Furthermore, from the perspective of self-consistent hallucination detection, a test time feature clipping approach is explored to truncate extreme activations in the internal states, which reduces overconfident generations and potentially benefits the detection of overconfident hallucinations. Extensive experiments and ablation studies are performed on several popular LLMs and question-answering (QA) benchmarks, showing the effectiveness of our proposal.",
+    "publicationDate": "2024-02-06T06:23:12.000Z",
+    "votes": 35
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2502.03799",
+    "title": "Enhancing Hallucination Detection through Noise Injection",
+    "abstract": "Large Language Models (LLMs) are prone to generating plausible yet incorrect responses, known as hallucinations. Effectively detecting hallucinations is therefore crucial for the safe deployment of LLMs. Recent research has linked hallucinations to model uncertainty, suggesting that hallucinations can be detected by measuring dispersion over answer distributions obtained from multiple samples drawn from a model. While drawing from the distribution over tokens defined by the model is a natural way to obtain samples, in this work, we argue that it is suboptimal for the purpose of detecting hallucinations. We show that detection can be improved significantly by taking into account model uncertainty in the Bayesian sense. To this end, we propose a very simple, training-free approach based on perturbing an appropriate subset of model parameters, or equivalently hidden unit activations, during sampling. We demonstrate that our approach significantly improves inference-time hallucination detection over standard sampling across diverse datasets, model architectures, and uncertainty metrics.",
+    "publicationDate": "2025-02-06T06:02:20.000Z",
+    "votes": 18
+  }
+]

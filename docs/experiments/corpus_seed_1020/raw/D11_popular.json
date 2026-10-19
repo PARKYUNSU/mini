@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2406.05085",
+    "title": "Multi-Head RAG: Solving Multi-Aspect Problems with LLMs",
+    "abstract": "Retrieval-Augmented Generation (RAG) improves Large Language Models (LLMs) by retrieving supporting documents into the prompt, but existing methods do not explicitly target queries that require fetching multiple documents with substantially different content. Such multi-aspect queries are challenging because relevant documents can be far apart in embedding space, making joint retrieval difficult. We introduce Multi-Head RAG (MRAG), which addresses this gap with a simple yet powerful idea: using Transformer multi-head attention activations rather than the standard decoder-layer embedding, as retrieval keys. It leverages the observation that different heads capture different semantic aspects. This yields multi-aspect embeddings for both documents and queries, improving retrieval accuracy on complex queries. We show MRAG's design advantages over 18 RAG baselines, up to 20% higher retrieval success ratios for real-world use cases, and improved downstream LLM generation. MRAG integrates seamlessly with existing RAG frameworks and benchmarks.",
+    "publicationDate": "2024-06-07T16:59:38.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.04820",
+    "title": "Fishing for Answers: Exploring One-shot vs. Iterative Retrieval Strategies for Retrieval Augmented Generation",
+    "abstract": "Retrieval-Augmented Generation (RAG) based on Large Language Models (LLMs) is a powerful solution to understand and query the industry's closed-source documents. However, basic RAG often struggles with complex QA tasks in legal and regulatory domains, particularly when dealing with numerous government documents. The top-$k$ strategy frequently misses golden chunks, leading to incomplete or inaccurate answers. To address these retrieval bottlenecks, we explore two strategies to improve evidence coverage and answer quality. The first is a One-SHOT retrieval method that adaptively selects chunks based on a token budget, allowing as much relevant content as possible to be included within the model's context window. Additionally, we design modules to further filter and refine the chunks. The second is an iterative retrieval strategy built on a Reasoning Agentic RAG framework, where a reasoning LLM dynamically issues search queries, evaluates retrieved results, and progressively refines the context over multiple turns. We identify query drift and retrieval laziness issues and further design two modules to tackle them. Through extensive experiments on a dataset of government documents, we aim to offer practical insights and guidance for real-world applications in legal and regulatory domains.",
+    "publicationDate": "2025-09-05T05:44:50.000Z",
+    "votes": 14
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2404.00610",
+    "title": "RQ-RAG: Learning to Refine Queries for Retrieval Augmented Generation",
+    "abstract": "Large Language Models (LLMs) exhibit remarkable capabilities but are prone to generating inaccurate or hallucinatory responses. This limitation stems from their reliance on vast pretraining datasets, making them susceptible to errors in unseen scenarios. To tackle these challenges, Retrieval-Augmented Generation (RAG) addresses this by incorporating external, relevant documents into the response generation process, thus leveraging non-parametric knowledge alongside LLMs' in-context learning abilities. However, existing RAG implementations primarily focus on initial input for context retrieval, overlooking the nuances of ambiguous or complex queries that necessitate further clarification or decomposition for accurate responses. To this end, we propose learning to Refine Query for Retrieval Augmented Generation (RQ-RAG) in this paper, endeavoring to enhance the model by equipping it with capabilities for explicit rewriting, decomposition, and disambiguation. Our experimental results indicate that our method, when applied to a 7B Llama2 model, surpasses the previous state-of-the-art (SOTA) by an average of 1.9\\% across three single-hop QA datasets, and also demonstrates enhanced performance in handling complex, multi-hop QA datasets. Our code is available at this https URL.",
+    "publicationDate": "2024-03-31T08:58:54.000Z",
+    "votes": 30
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2305.14283",
+    "title": "Query Rewriting for Retrieval-Augmented Large Language Models",
+    "abstract": "Large Language Models (LLMs) play powerful, black-box readers in the retrieve-then-read pipeline, making remarkable progress in knowledge-intensive tasks. This work introduces a new framework, Rewrite-Retrieve-Read instead of the previous retrieve-then-read for the retrieval-augmented LLMs from the perspective of the query rewriting. Unlike prior studies focusing on adapting either the retriever or the reader, our approach pays attention to the adaptation of the search query itself, for there is inevitably a gap between the input text and the needed knowledge in retrieval. We first prompt an LLM to generate the query, then use a web search engine to retrieve contexts. Furthermore, to better align the query to the frozen modules, we propose a trainable scheme for our pipeline. A small language model is adopted as a trainable rewriter to cater to the black-box LLM reader. The rewriter is trained using the feedback of the LLM reader by reinforcement learning. Evaluation is conducted on downstream tasks, open-domain QA and multiple-choice QA. Experiments results show consistent performance improvement, indicating that our framework is proven effective and scalable, and brings a new framework for retrieval-augmented LLM.",
+    "publicationDate": "2023-05-23T17:27:50.000Z",
+    "votes": 30
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2405.17658",
+    "title": "Generative Query Reformulation Using Ensemble Prompting, Document Fusion, and Relevance Feedback",
+    "abstract": "Query Reformulation (QR) is a set of techniques used to transform a user's original search query to a text that better aligns with the user's intent and improves their search experience. Recently, zero-shot QR has been a promising approach due to its ability to exploit knowledge inherent in large language models. Inspired by the success of ensemble prompting strategies which have benefited other tasks, we investigate if they can improve query reformulation. In this context, we propose two ensemble-based prompting techniques, GenQREnsemble and GenQRFusion which leverage paraphrases of a zero-shot instruction to generate multiple sets of keywords to improve retrieval performance ultimately. We further introduce their post-retrieval variants to incorporate relevance feedback from a variety of sources, including an oracle simulating a human user and a \"critic\" LLM. We demonstrate that an ensemble of query reformulations can improve retrieval effectiveness by up to 18% on nDCG@10 in pre-retrieval settings and 9% on post-retrieval settings on multiple benchmarks, outperforming all previously reported SOTA results. We perform subsequent analyses to investigate the effects of feedback documents, incorporate domain-specific instructions, filter reformulations, and generate fluent reformulations that might be more beneficial to human searchers. Together, the techniques and the results presented in this paper establish a new state of the art in automated query reformulation for retrieval and suggest promising directions for future research.",
+    "publicationDate": "2024-05-27T21:03:26.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2411.13154",
+    "title": "DMQR-RAG: Diverse Multi-Query Rewriting for RAG",
+    "abstract": "Large language models often encounter challenges with static knowledge and hallucinations, which undermine their reliability. Retrieval-augmented generation (RAG) mitigates these issues by incorporating external information. However, user queries frequently contain noise and intent deviations, necessitating query rewriting to improve the relevance of retrieved documents. In this paper, we introduce DMQR-RAG, a Diverse Multi-Query Rewriting framework designed to improve the performance of both document retrieval and final responses in RAG. Specifically, we investigate how queries with varying information quantities can retrieve a diverse array of documents, presenting four rewriting strategies that operate at different levels of information to enhance the performance of baseline approaches. Additionally, we propose an adaptive strategy selection method that minimizes the number of rewrites while optimizing overall performance. Our methods have been rigorously validated through extensive experiments conducted in both academic and industry settings.",
+    "publicationDate": "2024-11-20T09:43:30.000Z",
+    "votes": 14
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2411.07396",
+    "title": "Toward Optimal Search and Retrieval for RAG",
+    "abstract": "Retrieval-augmented generation (RAG) is a promising method for addressing some of the memory-related challenges associated with Large Language Models (LLMs). Two separate systems form the RAG pipeline, the retriever and the reader, and the impact of each on downstream task performance is not well-understood. Here, we work towards the goal of understanding how retrievers can be optimized for RAG pipelines for common tasks such as Question Answering (QA). We conduct experiments focused on the relationship between retrieval and RAG performance on QA and attributed QA and unveil a number of insights useful to practitioners developing high-performance RAG pipelines. For example, lowering search accuracy has minor implications for RAG performance while potentially increasing retrieval speed and memory efficiency.",
+    "publicationDate": "2024-11-11T22:06:51.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2310.09716",
+    "title": "Enhancing Conversational Search: Large Language Model-Aided Informative Query Rewriting",
+    "abstract": "Query rewriting plays a vital role in enhancing conversational search by transforming context-dependent user queries into standalone forms. Existing approaches primarily leverage human-rewritten queries as labels to train query rewriting models. However, human rewrites may lack sufficient information for optimal retrieval performance. To overcome this limitation, we propose utilizing large language models (LLMs) as query rewriters, enabling the generation of informative query rewrites through well-designed instructions. We define four essential properties for well-formed rewrites and incorporate all of them into the instruction. In addition, we introduce the role of rewrite editors for LLMs when initial query rewrites are available, forming a \"rewrite-then-edit\" process. Furthermore, we propose distilling the rewriting capabilities of LLMs into smaller models to reduce rewriting latency. Our experimental evaluation on the QReCC dataset demonstrates that informative query rewrites can yield substantially improved retrieval performance compared to human rewrites, especially with sparse retrievers.",
+    "publicationDate": "2023-10-15T03:04:17.000Z",
+    "votes": 29
+  }
+]

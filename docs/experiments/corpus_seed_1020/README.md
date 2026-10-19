@@ -39,3 +39,5 @@
 | 날짜 | 내용 |
 |---|---|
 | 2026-10-20 | 사전 등록(질문 34 · held-out 30 먼저 작성). |
+| 2026-10-20 | 수집 전 측정 `cs0_*` 시작(`.cron/run_cs.sh cs0`). 후보 찾기 `.cron/cs_discover.sh` — D31–D34 의 orx 호출 8회가 빈 출력(일시 제한으로 보임)이라 같은 규칙으로 그 8회만 다시 부름. 후보 **173편**(`candidates.json`, 질문별 찾은 474 중 이미 DB 30). 검색만 재는데 정답 유무 판정(LLM)이 문항당 ~13s 를 써서 `RAG_PRESENCE_JUDGE=0` 으로 다시 시작(판정은 컨텍스트를 바꾸지 않음, 전·후 같게). |
+| 2026-10-20 | 수집 준비: `ingest_classics.py --ids` 는 classics.yaml 안 항목만 걸러서 후보를 `candidates.yaml` 로 따로 만들어 `--yaml` 로 넘김(dry-run 173 확인). 쓰기는 `make_chroma_client`(운영 Chroma 서버 HttpClient) + `chroma_write_lock` — 매일 수집과 같은 경로. 순서 `.cron/run_cs_ingest.sh`: cs0 끝 → 수집 → 임베딩 캐시 재생성 → 봇 재시작 → cs1. 수집 중(약 2시간) 봇 검색은 쓰기 잠금 때문에 JSONL 대체 경로로 돈다. |

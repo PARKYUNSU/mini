@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2508.01781",
+    "title": "A comprehensive taxonomy of hallucinations in Large Language Models",
+    "abstract": "Large language models (LLMs) have revolutionized natural language processing, yet their propensity for hallucination, generating plausible but factually incorrect or fabricated content, remains a critical challenge. This report provides a comprehensive taxonomy of LLM hallucinations, beginning with a formal definition and a theoretical framework that posits its inherent inevitability in computable LLMs, irrespective of architecture or training. It explores core distinctions, differentiating between intrinsic (contradicting input context) and extrinsic (inconsistent with training data or reality), as well as factuality (absolute correctness) and faithfulness (adherence to input). The report then details specific manifestations, including factual errors, contextual and logical inconsistencies, temporal disorientation, ethical violations, and task-specific hallucinations across domains like code generation and multimodal applications. It analyzes the underlying causes, categorizing them into data-related issues, model-related factors, and prompt-related influences. Furthermore, the report examines cognitive and human factors influencing hallucination perception, surveys evaluation benchmarks and metrics for detection, and outlines architectural and systemic mitigation strategies. Finally, it introduces web-based resources for monitoring LLM releases and performance. This report underscores the complex, multifaceted nature of LLM hallucinations and emphasizes that, given their theoretical inevitability, future efforts must focus on robust detection, mitigation, and continuous human oversight for responsible and reliable deployment in critical applications.",
+    "publicationDate": "2025-08-03T14:37:16.000Z",
+    "votes": 67
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.06265",
+    "title": "Large Language Models Hallucination: A Comprehensive Survey",
+    "abstract": "Large language models (LLMs) have transformed natural language processing, achieving remarkable performance across diverse tasks. However, their impressive fluency often comes at the cost of producing false or fabricated information, a phenomenon known as hallucination. Hallucination refers to the generation of content by an LLM that is fluent and syntactically correct but factually inaccurate or unsupported by external evidence. Hallucinations undermine the reliability and trustworthiness of LLMs, especially in domains requiring factual accuracy. This survey provides a comprehensive review of research on hallucination in LLMs, with a focus on causes, detection, and mitigation. We first present a taxonomy of hallucination types and analyze their root causes across the entire LLM development lifecycle, from data collection and architecture design to inference. We further examine how hallucinations emerge in key natural language generation tasks. Building on this foundation, we introduce a structured taxonomy of detection approaches and another taxonomy of mitigation strategies. We also analyze the strengths and limitations of current detection and mitigation approaches and review existing evaluation benchmarks and metrics used to quantify LLMs hallucinations. Finally, we outline key open challenges and promising directions for future research, providing a foundation for the development of more truthful and trustworthy LLMs.",
+    "publicationDate": "2025-10-05T20:26:38.000Z",
+    "votes": 21
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2311.05232",
+    "title": "A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions",
+    "abstract": "The emergence of large language models (LLMs) has marked a significant breakthrough in natural language processing (NLP), fueling a paradigm shift in information acquisition. Nevertheless, LLMs are prone to hallucination, generating plausible yet nonfactual content. This phenomenon raises significant concerns over the reliability of LLMs in real-world information retrieval (IR) systems and has attracted intensive research to detect and mitigate such hallucinations. Given the open-ended general-purpose attributes inherent to LLMs, LLM hallucinations present distinct challenges that diverge from prior task-specific models. This divergence highlights the urgency for a nuanced understanding and comprehensive overview of recent advances in LLM hallucinations. In this survey, we begin with an innovative taxonomy of hallucination in the era of LLM and then delve into the factors contributing to hallucinations. Subsequently, we present a thorough overview of hallucination detection methods and benchmarks. Our discussion then transfers to representative methodologies for mitigating LLM hallucinations. Additionally, we delve into the current limitations faced by retrieval-augmented LLMs in combating hallucinations, offering insights for developing more robust IR systems. Finally, we highlight the promising research directions on LLM hallucinations, including hallucination in large vision-language models and understanding of knowledge boundaries in LLM hallucinations.",
+    "publicationDate": "2023-11-09T09:25:37.000Z",
+    "votes": 115
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.24476",
+    "title": "Mitigating Hallucination in Large Language Models (LLMs): An Application-Oriented Survey on RAG, Reasoning, and Agentic Systems",
+    "abstract": "Hallucination remains one of the key obstacles to the reliable deployment of large language models (LLMs), particularly in real-world applications. Among various mitigation strategies, Retrieval-Augmented Generation (RAG) and reasoning enhancement have emerged as two of the most effective and widely adopted approaches, marking a shift from merely suppressing hallucinations to balancing creativity and reliability. However, their synergistic potential and underlying mechanisms for hallucination mitigation have not yet been systematically examined. This survey adopts an application-oriented perspective of capability enhancement to analyze how RAG, reasoning enhancement, and their integration in Agentic Systems mitigate hallucinations. We propose a taxonomy distinguishing knowledge-based and logic-based hallucinations, systematically examine how RAG and reasoning address each, and present a unified framework supported by real-world applications, evaluations, and benchmarks.",
+    "publicationDate": "2025-10-28T14:48:57.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.15005",
+    "title": "Mathematical Analysis of Hallucination Dynamics in Large Language Models: Uncertainty Quantification, Advanced Decoding, and Principled Mitigation",
+    "abstract": "Large Language Models (LLMs) are powerful linguistic engines but remain susceptible to hallucinations: plausible-sounding outputs that are factually incorrect or unsupported. In this work, we present a mathematically grounded framework to understand, measure, and mitigate these hallucinations. Drawing on probabilistic modeling, information theory, trigonometric signal analysis, and Bayesian uncertainty estimation, we analyze how errors compound autoregressively, propose refined uncertainty metrics, including semantic and phase-aware variants, and develop principled mitigation strategies such as contrastive decoding, retrieval-augmented grounding, factual alignment, and abstention. This unified lens connects recent advances in calibration, retrieval, and alignment to support safer and more reliable LLMs.",
+    "publicationDate": "2025-11-19T00:58:36.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2507.19024",
+    "title": "A Survey of Multimodal Hallucination Evaluation and Detection",
+    "abstract": "Multi-modal Large Language Models (MLLMs) have emerged as a powerful paradigm for integrating visual and textual information, supporting a wide range of multi-modal tasks. However, these models often suffer from hallucination, producing content that appears plausible but contradicts the input content or established world knowledge. This survey offers an in-depth review of hallucination evaluation benchmarks and detection methods across Image-to-Text (I2T) and Text-to-image (T2I) generation tasks. Specifically, we first propose a taxonomy of hallucination based on faithfulness and factuality, incorporating the common types of hallucinations observed in practice. Then we provide an overview of existing hallucination evaluation benchmarks for both T2I and I2T tasks, highlighting their construction process, evaluation objectives, and employed metrics. Furthermore, we summarize recent advances in hallucination detection methods, which aims to identify hallucinated content at the instance level and serve as a practical complement of benchmark-based evaluation. Finally, we highlight key limitations in current benchmarks and detection methods, and outline potential directions for future research.",
+    "publicationDate": "2025-07-25T07:22:42.000Z",
+    "votes": 24
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2404.18930",
+    "title": "Hallucination of Multimodal Large Language Models: A Survey",
+    "abstract": "This survey presents a comprehensive analysis of the phenomenon of\nhallucination in multimodal large language models (MLLMs), also known as Large\nVision-Language Models (LVLMs), which have demonstrated significant\nadvancements and remarkable abilities in multimodal tasks. Despite these\npromising developments, MLLMs often generate outputs that are inconsistent with\nthe visual content, a challenge known as hallucination, which poses substantial\nobstacles to their practical deployment and raises concerns regarding their\nreliability in real-world applications. This problem has attracted increasing\nattention, prompting efforts to detect and mitigate such inaccuracies. We\nreview recent advances in identifying, evaluating, and mitigating these\nhallucinations, offering a detailed overview of the underlying causes,\nevaluation benchmarks, metrics, and strategies developed to address this issue.\nAdditionally, we analyze the current challenges and limitations, formulating\nopen questions that delineate potential pathways for future research. By\ndrawing the granular classification and landscapes of hallucination causes,\nevaluation benchmarks, and mitigation methods, this survey aims to deepen the\nunderstanding of hallucinations in MLLMs and inspire further advancements in\nthe field. Through our thorough and in-depth review, we contribute to the\nongoing dialogue on enhancing the robustness and reliability of MLLMs,\nproviding valuable insights and resources for researchers and practitioners\nalike. Resources are available at:\nthis https URL",
+    "publicationDate": "2024-04-29T17:59:41.000Z",
+    "votes": 59
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.18346",
+    "title": "Comparing Uncertainty Measurement and Mitigation Methods for Large Language Models: A Systematic Review",
+    "abstract": "Large Language Models (LLMs) have been transformative across many domains. However, hallucination, i.e., confidently outputting incorrect information, remains one of the leading challenges for LLMs. This raises the question of how to accurately assess and quantify the uncertainty of LLMs. Extensive literature on traditional models has explored Uncertainty Quantification (UQ) to measure uncertainty and employed calibration techniques to address the misalignment between uncertainty and accuracy. While some of these methods have been adapted for LLMs, the literature lacks an in-depth analysis of their effectiveness and does not offer a comprehensive benchmark to enable insightful comparison among existing solutions. In this work, we fill this gap via a systematic survey of representative prior works on UQ and calibration for LLMs and introduce a rigorous benchmark. Using three widely used reliability datasets, we empirically evaluate seven related methods, which justify the significant findings of our review. Finally, we provide outlooks for key future directions and outline open challenges. To the best of our knowledge, this survey is one of the first dedicated studies to review the calibration methods and relevant metrics for LLMs.",
+    "publicationDate": "2025-04-25T13:34:40.000Z",
+    "votes": 21
+  }
+]

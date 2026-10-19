@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2210.10723",
+    "title": "TabLLM: Few-shot Classification of Tabular Data with Large Language\n  Models",
+    "abstract": "We study the application of large language models to zero-shot and few-shot\nclassification of tabular data. We prompt the large language model with a\nserialization of the tabular data to a natural-language string, together with a\nshort description of the classification problem. In the few-shot setting, we\nfine-tune the large language model using some labeled examples. We evaluate\nseveral serialization methods including templates, table-to-text models, and\nlarge language models. Despite its simplicity, we find that this technique\noutperforms prior deep-learning-based tabular classification methods on several\nbenchmark datasets. In most cases, even zero-shot classification obtains\nnon-trivial performance, illustrating the method's ability to exploit prior\nknowledge encoded in large language models. Unlike many deep learning methods\nfor tabular datasets, this approach is also competitive with strong traditional\nbaselines like gradient-boosted trees, especially in the very-few-shot setting.",
+    "publicationDate": "2023-03-17T16:36:53.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2501.14717",
+    "title": "What Really Matters for Table LLMs? A Meta-Evaluation of Model and Data Effects",
+    "abstract": "Table modeling has progressed for decades. In this work, we revisit this trajectory and highlight emerging challenges in the LLM era, particularly the paradox of choice: the difficulty of attributing performance gains amid diverse base models and training sets in the context of table instruction tuning. We replicate four table LLMs by instruction-tuning three foundation models on four existing datasets, yielding 12 models. We then evaluate these models across 16 table benchmarks. Our study is the first to quantitatively disentangle the effects of training data and base model selection, revealing that base model choice plays a more dominant role than the training data itself. Generalization and reasoning remain challenging, inviting future effort on table modeling. Based on our findings, we share our thoughts on the future directions for table modeling.",
+    "publicationDate": "2025-01-25T02:50:26.000Z",
+    "votes": 14
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2402.05121",
+    "title": "Large Language Model for Table Processing: A Survey",
+    "abstract": "Tables, typically two-dimensional and structured to store large amounts of data, are essential in daily activities like database queries, spreadsheet manipulations, web table question answering, and image table information extraction. Automating these table-centric tasks with Large Language Models (LLMs) or Visual Language Models (VLMs) offers significant public benefits, garnering interest from academia and industry. This survey provides a comprehensive overview of table-related tasks, examining both user scenarios and technical aspects. It covers traditional tasks like table question answering as well as emerging fields such as spreadsheet manipulation and table data analysis. We summarize the training techniques for LLMs and VLMs tailored for table processing. Additionally, we discuss prompt engineering, particularly the use of LLM-powered agents, for various table-related tasks. Finally, we highlight several challenges, including diverse user input when serving and slow thinking using chain-of-thought.",
+    "publicationDate": "2024-02-04T00:47:53.000Z",
+    "votes": 69
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2505.14131",
+    "title": "Texts or Images? A Fine-grained Analysis on the Effectiveness of Input  Representations and Models for Table Question Answering",
+    "abstract": "In table question answering (TQA), tables are encoded as either texts or\nimages. Prior work suggests that passing images of tables to multi-modal large\nlanguage models (MLLMs) performs comparably to or even better than using\ntextual input with large language models (LLMs). However, the lack of\ncontrolled setups limits fine-grained distinctions between these approaches. In\nthis paper, we conduct the first controlled study on the effectiveness of\nseveral combinations of table representations and models from two perspectives:\nquestion complexity and table size. We build a new benchmark based on existing\nTQA datasets. In a systematic analysis of seven pairs of MLLMs and LLMs, we\nfind that the best combination of table representation and model varies across\nsetups. We propose FRES, a method selecting table representations dynamically,\nand observe a 10% average performance improvement compared to using both\nrepresentations indiscriminately.",
+    "publicationDate": "2025-05-20T09:36:17.000Z",
+    "votes": 23
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.15402",
+    "title": "A Closer Look into LLMs for Table Understanding",
+    "abstract": "Despite the success of Large Language Models (LLMs) in table understanding, their internal mechanisms remain unclear. In this paper, we conduct an empirical study on 16 LLMs, covering general LLMs, specialist tabular LLMs, and Mixture-of-Experts (MoE) models, to explore how LLMs understand tabular data and perform downstream tasks. Our analysis focus on 4 dimensions including the attention dynamics, the effective layer depth, the expert activation, and the impacts of input designs. Key findings include: (1) LLMs follow a three-phase attention pattern -- early layers scan the table broadly, middle layers localize relevant cells, and late layers amplify their contributions; (2) tabular tasks require deeper layers than math reasoning to reach stable predictions; (3) MoE models activate table-specific experts in middle layers, with early and late layers sharing general-purpose experts; (4) Chain-of-Thought prompting increases table attention, further enhanced by table-tuning. We hope these findings and insights can facilitate interpretability and future research on table-related tasks.",
+    "publicationDate": "2026-03-16T15:16:38.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.24040",
+    "title": "Improving Robustness of Tabular Retrieval via Representational Stability",
+    "abstract": "Transformer-based table retrieval systems flatten structured tables into token sequences, making retrieval sensitive to the choice of serialization even when table semantics remain unchanged. We show that semantically equivalent serializations, such as $\\texttt{csv}$, $\\texttt{tsv}$, $\\texttt{html}$, $\\texttt{markdown}$, and $\\texttt{ddl}$, can produce substantially different embeddings and retrieval results across multiple benchmarks and retriever families. To address this instability, we treat serialization embedding as noisy views of a shared semantic signal and use its centroid as a canonical target representation. We show that centroid averaging suppresses format-specific variation and can recover the semantic content common to different serializations when format-induced shifts differ across tables. Empirically, centroid representations outrank individual formats in aggregate pairwise comparisons across $\\texttt{MPNet}$, $\\texttt{BGE-M3}$, $\\texttt{ReasonIR}$, and $\\texttt{SPLADE}$. We further introduce a lightweight residual bottleneck adapter on top of a frozen encoder that maps single-serialization embeddings towards centroid targets while preserving variance and enforcing covariance regularization. The adapter improves robustness for several dense retrievers, though gains are model-dependent and weaker for sparse lexical retrieval. These results identify serialization sensitivity as a major source of retrieval variance and show the promise of post hoc geometric correction for serialization-invariant table retrieval.",
+    "publicationDate": "2026-04-27T04:52:48.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2305.14336",
+    "title": "Schema-Driven Information Extraction from Heterogeneous Tables",
+    "abstract": "In this paper, we explore the question of whether large language models can\nsupport cost-efficient information extraction from tables. We introduce\nschema-driven information extraction, a new task that transforms tabular data\ninto structured records following a human-authored schema. To assess various\nLLM's capabilities on this task, we present a benchmark comprised of tables\nfrom four diverse domains: machine learning papers, chemistry literature,\nmaterial science journals, and webpages. We use this collection of annotated\ntables to evaluate the ability of open-source and API-based language models to\nextract information from tables covering diverse domains and data formats. Our\nexperiments demonstrate that surprisingly competitive performance can be\nachieved without requiring task-specific pipelines or labels, achieving F1\nscores ranging from 74.2 to 96.1, while maintaining cost efficiency. Moreover,\nthrough detailed ablation studies and analyses, we investigate the factors\ncontributing to model success and validate the practicality of distilling\ncompact models to reduce API reliance.",
+    "publicationDate": "2024-07-22T18:22:08.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2305.13062",
+    "title": "Table Meets LLM: Can Large Language Models Understand Structured Table Data? A Benchmark and Empirical Study",
+    "abstract": "Large language models (LLMs) are becoming attractive as few-shot reasoners to solve Natural Language (NL)-related tasks. However, the understanding of their capability to process structured data like tables remains an under-explored area. While tables can be serialized as input for LLMs, there is a lack of comprehensive studies on whether LLMs genuinely comprehend this data. In this paper, we try to understand this by designing a benchmark to evaluate the structural understanding capabilities of LLMs through seven distinct tasks, e.g., cell lookup, row retrieval and size detection. Specially, we perform a series of evaluations on the recent most advanced LLM models, GPT-3.5 and GPT-4 and observe that performance varied with different input choices, including table input format, content order, role prompting, and partition marks. Drawing from the insights gained through the benchmark evaluations, we propose $\\textit{self-augmentation}$ for effective structural prompting, such as critical value / range identification using internal knowledge of LLMs. When combined with carefully chosen input choices, these structural prompting methods lead to promising improvements in LLM performance on a variety of tabular tasks, e.g., TabFact($\\uparrow2.31\\%$), HybridQA($\\uparrow2.13\\%$), SQA($\\uparrow2.72\\%$), Feverous($\\uparrow0.84\\%$), and ToTTo($\\uparrow5.68\\%$). We believe that our open source benchmark and proposed prompting methods can serve as a simple yet generic selection for future research. The code and data of this paper will be temporality released at this https URL and will be replaced with an official one at this https URL later.",
+    "publicationDate": "2023-05-22T14:23:46.000Z",
+    "votes": 19
+  }
+]

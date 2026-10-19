@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.31505",
+    "title": "Prompt Minimization: Reducing Input Redundancy Without Sacrificing Output Fidelity",
+    "abstract": "Despite the growing capabilities of large language models (LLMs), prompt design remains largely heuristic and ad hoc. This project will explore $\\textit{prompt minimization}$, the process of reducing prompts to their smallest, most information-dense form while preserving output fidelity. Practically, shorter prompts reduce computational overhead and inference latency, especially when large contexts, such as entire documents or codebases, are included unnecessarily. Further, longer prompts can damage LLM reasoning and accuracy. Theoretically, the existence of multiple prompts yielding equivalent outputs suggests a high degree of redundancy in the input space, raising fundamental questions about what information is essential to elicit specific model behaviors. We propose three variant frameworks to identify and evaluate minimal prompts and demonstrate that minimal prompts often produce outputs comparable to those of their longer counterparts. These findings suggest new directions for efficient prompt engineering and deepen our understanding of input compression in LLMs.",
+    "publicationDate": "2026-09-25T16:45:28.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.32474",
+    "title": "PC-SubMax: Efficient Prompt Compression via Regularized Submodular Maximization",
+    "abstract": "While large language models (LLMs) are increasingly deployed in long-context scenarios, lengthy prompts can increase inference costs and latency and exacerbate the ``lost-in-the-middle'' phenomenon. Selective prompt compression offers a model-agnostic approach to alleviating these issues. However, methods based on fixed token- or sentence-level importance scores may overlook how content contributions change with the selected subset, limiting their ability to account for inter-sentence redundancy. Compression procedures that rely on autoregressive LLM scoring can also introduce substantial overhead. We propose PC-SubMax, a theoretically grounded framework that formulates selective prompt compression as regularized monotone submodular maximization under a knapsack constraint. The objective is $U(S)-\\ell(S)$, where the monotone submodular utility $U$ combines information coverage, query relevance, and log-determinant diversity, and the non-negative modular penalty $\\ell$ captures token cost. Through diminishing marginal returns, the objective evaluates each sentence's contribution relative to the selected content. To optimize this objective, we develop the Regularized Greedy+Max (RGM) algorithm, which deterministically returns a feasible set $Q$ satisfying $U(Q)-\\ell(Q)\\geq \\frac{1}{2}U(O)-\\ell(O)$, where $O$ is an optimal feasible solution to the regularized problem. RGM uses $O(n\\kappa)$ value-oracle queries, where $n$ is the number of candidate sentences and $\\kappa$ is the maximum feasible subset size. PC-SubMax uses encoder representations and avoids autoregressive LLM scoring during compression. Experiments across seven diverse benchmarks demonstrate competitive downstream performance with low compression overhead.",
+    "publicationDate": "2026-09-26T11:07:23.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.25335",
+    "title": "Every Time I Hire a Linguist, Inference Costs Go Down: On Linguistic Rules as Effective Prompt Compressors",
+    "abstract": "Prompt compression shortens LLM input to reduce inference cost, yet existing methods score token importance through LM forward passes. It remains questionable whether such nuanced, costly token selection is necessary. Compression requires identifying informative content, a problem that linguistic research has long addressed through cues that can be operationalized as deterministic rules. We therefore ask: can \\textbf{linguistic rules alone} serve as effective prompt compressors, without LM-based scoring at compression time?\nTo address this, we conduct offline evolutionary search over lexical, syntactic, semantic, and discourse seeds to find competitive rule combinations. The resulting linguistic compressor requires no LM forward pass at deployment and uses only CPU-side processing for compression. We evaluate it with a dual-path protocol to balance compression quality and reconstruction fidelity.\nAcross short passages, multi-document reasoning, and dialogue-memory QA datasets, evolved compressors achieve performance similar to that of recent advanced prompt-compression strategies. Performance is strongest under light-to-moderate compression and degrades as compression becomes more aggressive, while the Direct and Reconstruction paths exhibit distinct patterns. Evolutionary analysis reveals that effective compression fuses signals across linguistic levels and, as the compression ratio increases, rules shift from token pruning to sentence extraction.",
+    "publicationDate": "2026-07-28T06:33:27.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.15153",
+    "title": "Compressing Sequences in the Latent Embedding Space: $K$-Token Merging for Large Language Models",
+    "abstract": "Large Language Models (LLMs) incur significant computational and memory costs when processing long prompts, as full self-attention scales quadratically with input length. Token compression aims to address this challenge by reducing the number of tokens representing inputs. However, existing prompt-compression approaches primarily operate in token space and overlook inefficiencies in the latent embedding space. In this paper, we propose K-Token Merging, a latent-space compression framework that merges each contiguous block of K token embeddings into a single embedding via a lightweight encoder. The compressed sequence is processed by a LoRA-adapted LLM, while generation remains in the original vocabulary. Experiments on structural reasoning (Textualized Tree), sentiment classification (Amazon Reviews), and code editing (CommitPackFT) show that K-Token Merging lies on the Pareto frontier of performance vs. compression, achieving up to 75% input length reduction with minimal performance degradation. Code is available at this https URL.",
+    "publicationDate": "2026-04-16T15:32:45.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.19368",
+    "title": "Spectral-LSH: Sub-Quadratic Prompt Compression via Krylov-Projected Locality-Sensitive Hashing",
+    "abstract": "Long-prompt inference remains expensive because prefill attention scales quadratically with sequence length. We propose Spectral-LSH, a training-free prompt compression method that operates before the prompt enters the language model. Spectral-LSH approximates the dominant components of an implicit attention-kernel operator using a Krylov subspace method together with random features, avoiding explicit $O(N^2)$ attention-kernel materialization. It then applies SimHash in the resulting attention eigenspace to group similar tokens and aggregate them into macro-tokens with causal positional assignments.\nWe evaluate Mistral-7B-Instruct-v0.3, Qwen2.5-7B-Instruct, and Qwen2.5-14B-Instruct on C4. Our experiments reveal a compression-ratio phase transition. Below $\\rho = 4 \\times$, local token redundancy is low enough that lightweight chunking typically provides the best latency--quality trade-off. Above $\\rho = 8 \\times$, the spectral path preserves quality that chunking loses. At $\\rho = 16 \\times$, Qwen2.5-7B (adaptive) reduces the PPL ratio from 353.409 to 196.963, while Qwen2.5-14B (adaptive) reduces it from 9.533 to 3.427.\nOn a small long-context structured stress test containing JSON-like, code-like, and table-like inputs, local LSH also improves every metric over chunking at $8 \\times$. The adaptive backend captures both regimes by using the chunk path at low compression and spectral clustering at high compression, although chunking remains the fastest backend in total latency.",
+    "publicationDate": "2026-06-12T01:11:17.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.09463",
+    "title": "Beyond Position Bias: Shifting Context Compression from Position-Driven to Semantic-Driven",
+    "abstract": "Large Language Models (LLMs) have demonstrated exceptional performance across diverse tasks. However, their deployment in long-context scenarios faces high computational overhead and information redundancy. While soft prompt compression has emerged as a promising way to mitigate these costs by compressing sequences into compact embeddings, existing paradigms remain fundamentally constrained by position bias: they primarily rely on learnable tokens insertion at fixed positions or group tokens according to their physical token layout, thereby inducing performance instability and semantic fragmentation. To overcome this bottleneck, we propose Semantic Consistency Context Compression (SeCo), a method that shifts context compression from position-driven to semantic-driven. Rather than constraint by physical token layout, SeCo dynamically anchors compression directly in the semantic space by selecting query-relevant tokens as semantic centers and aggregating remaining tokens via consistency-weighted merging. This design inherently preserves semantic consistency while eliminating position bias. Extensive experiments on 14 benchmarks across two backbone models demonstrate that SeCo consistently shows superiority in downstream tasks, inference latency, and out-of-domain robustness. The code is available at this https URL.",
+    "publicationDate": "2026-05-10T10:27:57.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.03226",
+    "title": "ATACompressor: Adaptive Task-Aware Compression for Efficient Long-Context Processing in LLMs",
+    "abstract": "Long-context inputs in large language models (LLMs) often suffer from the \"lost in the middle\" problem, where critical information becomes diluted or ignored due to excessive length. Context compression methods aim to address this by reducing input size, but existing approaches struggle with balancing information preservation and compression efficiency. We propose Adaptive Task-Aware Compressor (ATACompressor), which dynamically adjusts compression based on the specific requirements of the task. ATACompressor employs a selective encoder that compresses only the task-relevant portions of long contexts, ensuring that essential information is preserved while reducing unnecessary content. Its adaptive allocation controller perceives the length of relevant content and adjusts the compression rate accordingly, optimizing resource utilization. We evaluate ATACompressor on three QA datasets: HotpotQA, MSMARCO, and SQUAD-showing that it outperforms existing methods in terms of both compression efficiency and task performance. Our approach provides a scalable solution for long-context processing in LLMs. Furthermore, we perform a range of ablation studies and analysis experiments to gain deeper insights into the key components of ATACompressor.",
+    "publicationDate": "2026-02-03T07:53:29.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.08128",
+    "title": "Sentence-Anchored Gist Compression for Long-Context LLMs",
+    "abstract": "This work investigates context compression for Large Language Models (LLMs) using learned compression tokens to reduce the memory and computational demands of processing long sequences. We demonstrate that pre-trained LLMs can be fine-tuned to compress their context by factors of 2x to 8x without significant performance degradation, as evaluated on both short-context and long-context benchmarks. Furthermore, in experiments on a 3-billion-parameter LLaMA model, our method achieves results on par with alternative compression techniques while attaining higher compression ratios.",
+    "publicationDate": "2025-11-11T11:34:32.000Z",
+    "votes": 5
+  }
+]

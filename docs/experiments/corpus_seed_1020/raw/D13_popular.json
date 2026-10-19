@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2504.01346",
+    "title": "RAG over Tables: Hierarchical Memory Index, Multi-Stage Retrieval, and Benchmarking",
+    "abstract": "Retrieval-Augmented Generation (RAG) enhances Large Language Models (LLMs) by integrating them with an external knowledge base to improve the answer relevance and accuracy. In real-world scenarios, beyond pure text, a substantial amount of knowledge is stored in tables, and user questions often require retrieving answers that are distributed across multiple tables. Retrieving knowledge from a table corpora (i.e., various individual tables) for a question remains nascent, at least, for (i) how to understand intra- and inter-table knowledge effectively, (ii) how to filter unnecessary tables and how to retrieve the most relevant tables efficiently, (iii) how to prompt LLMs to infer over the retrieval, (iv) how to evaluate the corresponding performance in a realistic setting. Facing the above challenges, in this paper, we first propose a table-corpora-aware RAG framework, named T-RAG, which consists of the hierarchical memory index, multi-stage retrieval, and graph-aware prompting for effective and efficient table knowledge retrieval and inference. Further, we first develop a multi-table question answering benchmark named MultiTableQA, which spans 3 different task types, 57,193 tables, and 23,758 questions in total, and the sources are all from real-world scenarios. Based on MultiTableQA, we did the holistic comparison over table retrieval methods, RAG methods, and table-to-graph representation learning methods, where T-RAG shows the leading accuracy, recall, and running time performance. Also, under T-RAG, we evaluate the inference ability upgrade of different LLMs. Code and Data are available at this https URL",
+    "publicationDate": "2025-04-02T04:24:41.000Z",
+    "votes": 169
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.10380",
+    "title": "TableRAG: A Retrieval Augmented Generation Framework for Heterogeneous Document Reasoning",
+    "abstract": "Retrieval-Augmented Generation (RAG) has demonstrated considerable effectiveness in open-domain question answering. However, when applied to heterogeneous documents, comprising both textual and tabular components, existing RAG approaches exhibit critical limitations. The prevailing practice of flattening tables and chunking strategies disrupts the intrinsic tabular structure, leads to information loss, and undermines the reasoning capabilities of LLMs in multi-hop, global queries. To address these challenges, we propose TableRAG, an SQL-based framework that unifies textual understanding and complex manipulations over tabular data. TableRAG iteratively operates in four steps: context-sensitive query decomposition, text retrieval, SQL programming and execution, and compositional intermediate answer generation. We also develop HeteQA, a novel benchmark designed to evaluate the multi-hop heterogeneous reasoning capabilities. Experimental results demonstrate that TableRAG consistently outperforms existing baselines on both public datasets and our HeteQA, establishing a new state-of-the-art for heterogeneous document question answering. We release TableRAG at this https URL.",
+    "publicationDate": "2025-06-12T06:16:49.000Z",
+    "votes": 70
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.06582",
+    "title": "TabRAG: Improving Tabular Document Question Answering for Retrieval Augmented Generation via Structured Representations",
+    "abstract": "Incorporating external knowledge bases in traditional retrieval-augmented generation (RAG) relies on parsing the document, followed by querying a language model with the parsed information via in-context learning. While effective for text-based documents, question answering on tabular documents often fails to generate plausible responses. Standard parsing techniques lose the two-dimensional structural semantics critical for cell interpretation. In this work, we present TabRAG, a parsing-based RAG framework designed to improve tabular document question answering via structured representations. Our framework consists of layout segmentation that decomposes the document inputs into a series of components, enabling fine-grained extraction. Subsequently, a vision language model parses and extracts the document tables into a hierarchically structured representation. In order to cater various table styles and formats, we integrate a self-generated in-context learning module that guides the table extraction process. Experimental results demonstrate that TabRAG outperforms existing popular parsing techniques across a broad suite of evaluation and ablation benchmarks. Code is available at: this https URL.",
+    "publicationDate": "2025-11-10T00:05:58.000Z",
+    "votes": 26
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2404.09889",
+    "title": "Is Table Retrieval a Solved Problem? Exploring Join-Aware Multi-Table  Retrieval",
+    "abstract": "Retrieving relevant tables containing the necessary information to accurately\nanswer a given question over tables is critical to open-domain\nquestion-answering (QA) systems. Previous methods assume the answer to such a\nquestion can be found either in a single table or multiple tables identified\nthrough question decomposition or rewriting. However, neither of these\napproaches is sufficient, as many questions require retrieving multiple tables\nand joining them through a join plan that cannot be discerned from the user\nquery itself. If the join plan is not considered in the retrieval stage, the\nsubsequent steps of reasoning and answering based on those retrieved tables are\nlikely to be incorrect. To address this problem, we introduce a method that\nuncovers useful join relations for any query and database during table\nretrieval. We use a novel re-ranking method formulated as a mixed-integer\nprogram that considers not only table-query relevance but also table-table\nrelevance that requires inferring join relationships. Our method outperforms\nthe state-of-the-art approaches for table retrieval by up to 9.3% in F1 score\nand for end-to-end QA by up to 5.4% in accuracy.",
+    "publicationDate": "2024-04-15T15:55:01.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2412.16311",
+    "title": "HybGRAG: Hybrid Retrieval-Augmented Generation on Textual and Relational  Knowledge Bases",
+    "abstract": "Given a semi-structured knowledge base (SKB), where text documents are\ninterconnected by relations, how can we effectively retrieve relevant\ninformation to answer user questions? Retrieval-Augmented Generation (RAG)\nretrieves documents to assist large language models (LLMs) in question\nanswering; while Graph RAG (GRAG) uses structured knowledge bases as its\nknowledge source. However, many questions require both textual and relational\ninformation from SKB - referred to as \"hybrid\" questions - which complicates\nthe retrieval process and underscores the need for a hybrid retrieval method\nthat leverages both information. In this paper, through our empirical analysis,\nwe identify key insights that show why existing methods may struggle with\nhybrid question answering (HQA) over SKB. Based on these insights, we propose\nHybGRAG for HQA consisting of a retriever bank and a critic module, with the\nfollowing advantages: (1) Agentic, it automatically refines the output by\nincorporating feedback from the critic module, (2) Adaptive, it solves hybrid\nquestions requiring both textual and relational information with the retriever\nbank, (3) Interpretable, it justifies decision making with intuitive refinement\npath, and (4) Effective, it surpasses all baselines on HQA benchmarks. In\nexperiments on the STaRK benchmark, HybGRAG achieves significant performance\ngains, with an average relative improvement in Hit@1 of 51%.",
+    "publicationDate": "2024-12-20T19:49:12.000Z",
+    "votes": 23
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.18766",
+    "title": "Retrieve Only Relevant Tables Whether Few or Many: Adaptive Table Retrieval Method",
+    "abstract": "Retrieving relevant tables from extensive databases for a given natural language query is essential for accurately answering questions in tasks such as text-to-SQL. Existing table retrieval approaches select a pre-determined set of k tables with the highest similarity to the query. However, the number of required tables varies across queries and cannot be known in advance. Enforcing a fixed number of retrieved tables regardless of the query may either retrieve an undersized set, failing to obtain all necessary evidence, or retrieve an oversized pool, including irrelevant tables. To address this issue, we propose an adaptive table retrieval method that adjusts the number of tables retrieved according to the requirements of each query. Specifically, we utilize an adaptive thresholding mechanism to selectively retrieve tables and integrate a sliding-window reranking algorithm to efficiently process a large table corpus. Extensive experiments on Spider, BIRD, and Spider 2.0 demonstrate that our method effectively addresses the limitations of the top-k retrieval strategy, improving performance in retrieval and downstream tasks. Our code and data are available at this https URL.",
+    "publicationDate": "2026-04-12T14:53:56.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.27164",
+    "title": "Query Symbolically or Retrieve Semantically? A Dataset and Method for Semi-Structured Question Answering",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems for question answering typically retrieve evidence by semantic similarity between the query and document chunks. While effective for unstructured text, this approach is less reliable on semi-structured corpora where answering may require exact filtering, aggregation, or exhaustive retrieval over structured attributes across multiple documents. Symbolic approaches support such operations, but they are often brittle on noisy natural-language corpora. We address this gap with DualGraph, a RAG framework that represents documents through two complementary views: a Textual Knowledge Graph for semantic retrieval and a Symbolic Knowledge Graph for symbolic querying over typed subject--predicate--object triples. Building on these two components, we provide multiple strategies for selecting or combining semantic and symbolic this http URL also introduce SpecsQA, a benchmark from a commercial shopping website with semi-structured product documents and manually curated questions spanning open-ended and specification-oriented retrieval. Experiments show that DualGraph consistently outperforms state-of-the-art dense-retrieval, GraphRAG, symbolic, and table-oriented baselines across question this http URL and data are available at this https URL.",
+    "publicationDate": "2026-05-26T15:22:42.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2207.03637",
+    "title": "OmniTab: Pretraining with Natural and Synthetic Data for Few-shot Table-based Question Answering",
+    "abstract": "The information in tables can be an important complement to text, making table-based question answering (QA) systems of great value. The intrinsic complexity of handling tables often adds an extra burden to both model design and data annotation. In this paper, we aim to develop a simple table-based QA model with minimal annotation effort. Motivated by the fact that table-based QA requires both alignment between questions and tables and the ability to perform complicated reasoning over multiple table elements, we propose an omnivorous pretraining approach that consumes both natural and synthetic data to endow models with these respective abilities. Specifically, given freely available tables, we leverage retrieval to pair them with relevant natural sentences for mask-based pretraining, and synthesize NL questions by converting SQL sampled from tables for pretraining with a QA loss. We perform extensive experiments in both few-shot and full settings, and the results clearly demonstrate the superiority of our model OmniTab, with the best multitasking approach achieving an absolute gain of 16.2% and 2.7% in 128-shot and full settings respectively, also establishing a new state-of-the-art on WikiTableQuestions. Detailed ablations and analyses reveal different characteristics of natural and synthetic data, shedding light on future directions in omnivorous pretraining. Code, pretraining data, and pretrained models are available at this https URL.",
+    "publicationDate": "2022-07-08T01:23:45.000Z",
+    "votes": 1
+  }
+]

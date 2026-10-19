@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.10955",
+    "title": "Learning Multi-Step Query Rewriting via Corpus Feedback for Conversational Search",
+    "abstract": "Conversational Query Rewriting (CQR) turns a context dependent user turn into a standalone query for a retriever, and most methods do this in a single step from the dialogue history before retrieving once. The rewrite is therefore fixed before any corpus evidence is available to correct its reference resolution or its vocabulary. We recast CQR as a sequential retrieval problem: an agent rewrites the current turn, retrieves, and conditions its next rewrite on the returned passages. The agent acts in a typed space of three rewriting operations, resolving conversational intent into a standalone query, generating lexical reformulations, or synthesizing pseudo-documents for document-to-document matching, together with a stop action that ends the episode. We train the policy with supervised fine-tuning followed by reinforcement learning against a single retrieval-quality reward, using no human rewrite annotations. Across TopiOCQA and QReCC, the agent outperforms several retrieval-aligned baselines, while remaining effective across retrieval backends and generalizing to the CAsT benchmarks without additional training. Further analysis shows that, through retrieval-reward optimization alone, the learned policy develops a behavior of grounding pseudo-documents in passages retrieved by earlier steps, substantially improving retrieval.",
+    "publicationDate": "2026-10-07T22:14:05.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.29402",
+    "title": "Bridging the Question-Answer Gap in Retrieval-Augmented Generation: Hypothetical Prompt Embeddings",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems synergize retrieval mechanisms with generative language models to enhance the accuracy and relevance of responses. However, bridging the style gap between user queries and relevant information in document text remains a persistent challenge in retrieval-augmented systems, often addressed by runtime solutions (e.g., Hypothetical Document Embeddings (HyDE)) that attempt to improve alignment but introduce extra computational overhead at query time. To address these challenges, we propose Hypothetical Prompt Embeddings (HyPE), a framework that shifts the generation of hypothetical content from query time to the indexing phase. By precomputing multiple hypothetical prompts for each data chunk and embedding the chunk in place of the prompt, HyPE transforms retrieval into a question-question matching task, bypassing the need for runtime synthetic answer generation. This approach does not introduce latency but also strengthens the alignment between queries and relevant context. Our experimental results on six common datasets show that HyPE can improve retrieval context precision by up to 42 percentage points and claim recall by up to 45 percentage points, compared to standard approaches, while remaining compatible with re-ranking, multi-vector retrieval, query decomposition, and other RAG advancements",
+    "publicationDate": "2026-07-31T13:22:11.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.01697",
+    "title": "RCEM: Robust Conversational Search EMbedder in Distributional Shift",
+    "abstract": "We propose RCEM, a Robust Conversational search EMbedder that is additionally equipped with LLM's query reformulation capability without losing base model's generalization. Unlike prior conversational dense retrieval approaches that learn direct conversation-to-passage matching, RCEM aligns conversations, prepended by special token, to LLM-rewritten queries, while preserving the original embedding space. The unchanged embedding space automatically maps the rewritten-query to the relevant passages. As a result, RCEM (1) reduces overfitting by simplifying the alignment task from long passages to shorter rewritten queries, (2) eliminates the need for conversation-to-passage relevance labels for training, and (3) maintains its original embedding space that allows conversational queries against indexes built by original embedder without rebuilding them. Extensive experiments show that RCEM consistently outperforms prior approaches, achieving up to 30% improvement under distributional shift.",
+    "publicationDate": "2026-06-01T05:04:17.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.17325",
+    "title": "Align Documents to Questions: Question-Oriented Document Rewriting for Retrieval-Augmented Generation",
+    "abstract": "Retrieval-Augmented Generation (RAG) enhances the factuality of Large Language Models (LLMs) by incorporating retrieved documents and/or generated context. However, LLMs often exhibit a stylistic bias when presented with mixed contexts, favoring fluent but hallucinated generated content over factually grounded yet disorganized retrieved evidence. This phenomenon reveals that the utility of retrieved information is bottlenecked by its presentation. To bridge this gap, we propose QREAM, a style-controlled rewriter that aligns retrieved documents with a question-oriented style while preserving facts, better for LLM readers to utilize. Our framework consists of two stages: (1) QREAM-ICL, which uses stylistic seeds to guide iterative rewriting exploration; and (2) QREAM-FT, a lightweight student model distilled from denoised ICL outputs. QREAM-FT employs dual-criteria rejection sampling, filtering based on answer correctness and factual consistency to ensure high-quality supervision. QREAM seamlessly integrates into existing RAG pipelines as a plug-and-play module. Experiments demonstrate that QREAM consistently enhances advanced RAG pipelines, yielding up to 8% relative improvement with negligible latency overhead, effectively balancing question relevance with factual grounding.",
+    "publicationDate": "2026-04-19T08:39:21.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.05087",
+    "title": "Document Optimization for Black-Box Retrieval via Reinforcement Learning",
+    "abstract": "Generative large language models (LLMs) are increasingly used as inference-time components in retrieval pipelines, for tasks such as query rewriting and document reranking. However, these online approaches place costly autoregressive computation directly on the latency-critical retrieval path. We explore an alternative axis: using LLMs to improve documents instead, rewriting them into better representations and shifting computation offline. Yet producing a useful document rewrite is not straightforward: retrieval is inherently discriminative, so an effective rewrite must make a document more similar to relevant queries than competing candidates under the retriever's notion of similarity. We therefore formulate document transformation as an optimization problem, directly training an LLM or VLM to produce rewrites that improve retrieval. Our approach, DocOpt, uses GRPO with retriever ranking improvements as rewards, requires only black-box access to retrieval ranks, and applies across single-vector, multi-vector, and lexical retrievers. We evaluate zero-shot LLM rewriting and DocOpt on code and visual retrieval tasks, finding that document rewriting can improve retrieval and that optimizing rewrites yields further gains. For example, OpenAI text-embedding-3-small achieves 58.35 nDCG@5 on average with direct retrieval; zero-shot rewriting improves this to 60.83 with GPT-5.4-mini, 63.75 with Claude Haiku 4.5, and 64.23 with Qwen3. DocOpt further improves performance to 67.94, surpassing the 6.5X more expensive text-embedding-3-large retriever at 66.15.",
+    "publicationDate": "2026-04-06T18:41:40.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.19008",
+    "title": "Hypothesis-Conditioned Query Rewriting for Decision-Useful Retrieval",
+    "abstract": "Retrieval-Augmented Generation (RAG) improves Large Language Models (LLMs) by grounding generation in external, non-parametric knowledge. However, when a task requires choosing among competing options, simply grounding generation in broadly relevant context is often insufficient to drive the final decision. Existing RAG methods typically rely on a single initial query, which often favors topical relevance over decision-relevant evidence, and therefore retrieves background information that can fail to discriminate among answer options. To address this issue, here we propose Hypothesis-Conditioned Query Rewriting (HCQR), a training-free pre-retrieval framework that reorients RAG from topic-oriented retrieval to evidence-oriented retrieval. HCQR first derives a lightweight working hypothesis from the input question and candidate options, and then rewrites retrieval into three targeted queries that seek evidence to: (1) support the hypothesis, (2) distinguish it from competing alternatives, and (3) verify salient clues in the question. This approach enables context retrieval that is more directly aligned with answer selection, allowing the generator to confirm or overturn the initial hypothesis based on the retrieved evidence. Experiments on MedQA and MMLU-Med show that HCQR consistently outperforms single-query RAG and re-rank/filter baselines, improving average accuracy over Simple RAG by 5.9 and 3.6 points, respectively. Code is available at this https URL.",
+    "publicationDate": "2026-03-19T15:15:58.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.01417",
+    "title": "ReFeed: Retrieval Feedback-Guided Dataset Construction for Style-Aware Query Rewriting",
+    "abstract": "Retrieval systems often fail when user queries differ stylistically or semantically from the language used in domain documents. Query rewriting has been proposed to bridge this gap, improving retrieval by reformulating user queries into semantically equivalent forms. However, most existing approaches overlook the stylistic characteristics of target documents-their domain-specific phrasing, tone, and structure-which are crucial for matching real-world data distributions. We introduce a retrieval feedback-driven dataset generation framework that automatically identifies failed retrieval cases, leverages large language models to rewrite queries in the style of relevant documents, and verifies improvement through re-retrieval. The resulting corpus of (original, rewritten) query pairs enables the training of rewriter models that are explicitly aware of document style and retrieval feedback. This work highlights a new direction in data-centric information retrieval, emphasizing how feedback loops and document-style alignment can enhance the reasoning and adaptability of RAG systems in real-world, domain-specific contexts.",
+    "publicationDate": "2026-03-02T03:43:53.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.11841",
+    "title": "Improving Neural Retrieval with Attribution-Guided Query Rewriting",
+    "abstract": "Neural retrievers are effective but brittle: underspecified or ambiguous queries can misdirect ranking even when relevant documents exist. Existing approaches address this brittleness only partially: LLMs rewrite queries without retriever feedback, and explainability methods identify misleading tokens but are used for post-hoc analysis. We close this loop and propose an attribution-guided query rewriting method that uses token-level explanations to guide query rewriting. For each query, we compute gradient-based token attributions from the retriever and then use these scores as soft guidance in a structured prompt to an LLM that clarifies weak or misleading query components while preserving intent. Evaluated on BEIR collections, the resulting rewrites consistently improve retrieval effectiveness over strong baselines, with larger gains for implicit or ambiguous information needs.",
+    "publicationDate": "2026-02-12T11:34:06.000Z",
+    "votes": 3
+  }
+]

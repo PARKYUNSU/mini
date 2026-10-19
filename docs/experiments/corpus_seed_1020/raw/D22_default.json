@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.breadbowl-embed",
+    "title": "BreadBowl-Embed: Encode Once, Retrieve and Rerank",
+    "abstract": "Modern retrieval systems typically separate candidate generation from relevance refinement: bi-encoders provide efficient retrieval, while cross-encoders recover richer query–document interactions at substantially higher inference cost. We ask whether these two stages can instead operate on the same representation. We introduce BreadBowl-Embed, a retrieval model built around a Slot Encoder, which represents each query and document as a compact set of routing–value slots. The routing vectors provide an indexable representation for first-stage retrieval, while the same routing vectors subsequently define attention over a candidate’s stored value vectors to produce query-dependent readouts for reranking. Retrieval and reranking therefore share not only an encoder, but the representation that determines both which documents are retrieved and how their contents are compared. Documents are encoded once and reused across both stages, so reranking requires neither a separate cross-encoder nor an additional backbone pass over candidate text. Across 15 BEIR tasks, value-based reranking raises macro nDCG@10 from 48.47 to 51.54 (scores scaled by 100) over routing alone on the same retrieved candidates. These results suggest that indexed retrieval and query-dependent relevance refinement can be supported by a single precomputed representation.",
+    "publicationDate": "2026-10-01T00:00:00.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.14196",
+    "title": "Simple Linear Corrections for Compression in Late Interaction",
+    "abstract": "Late-interaction (multi-vector) models represent documents using a set of token-level vectors, providing a middle ground between cross-encoders and dense encoders in terms of quality and cost of embedding. However, compared to the latter, the indices are costly to store and score. Pooling and pruning based compression techniques are deployed widely but deteriorate in quality noticeably with aggressive compression. We investigate whether a lightweight change to the scoring function can recover retrieval quality after document-vector compression. For each combination of encoder, compressor, and vector budget, we learn a global linear correction by distilling the uncompressed model's score distributions over candidate documents. The encoder and compressor remain frozen, and the correction can be applied to each query at search time or once, offline, to the stored vectors.\nWe evaluate the method with ColBERTv2 and Jina v4 on MS MARCO and BEIR, and with ColPali2 on the ViDoRe v3 visual document retrieval benchmark. Experiments cover four training-free compression methods, multiple vector budgets, in-domain adaptation, and transfer from MS MARCO to BEIR. In the in-domain setting, the correction improves over baseline compression in 154 of 160 BEIR settings, while transfer from MS MARCO is more variable across models and datasets. We also find that matrices trained with synthetic queries can improve over baseline compression on ViDoRe v3. These results show that a small learned correction can recover some of the quality lost to compression without retraining the encoder or recompressing the documents.",
+    "publicationDate": "2026-10-09T18:08:54.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.22807",
+    "title": "Lychee-Reranker: Fast but Not Late Interaction for Compressed Document Reranking",
+    "abstract": "As retrieval systems scale, effective and efficient reranking becomes increasingly important. However, most existing encoder- and decoder-based rerankers jointly process every query--passage pair, tightly coupling their online computation and limiting deployment efficiency and flexibility. We present Lychee-Reranker, a fast but not late-interaction (FBNL) reranker that decouples query and passage computation while retaining expressive relevance modeling. Built on an encoder--decoder architecture, Lychee-Reranker pre-encodes passages using Matryoshka embedding pooling, while its decoder models system and user instructions together with query intent; cross-attention then captures fine-grained relevance between the resulting query context and passage representations. Together, these designs offer four key advantages: (i) efficiency from offline passage encoding, (ii) expressiveness from cross-attention, (iii) compactness from Matryoshka embedding pooling, and (iv) test-time compute through an adjustable compute budget. We instantiate Lychee-Reranker in three sizes, Nano, Small, and Large, with 0.27B, 1B, and 4B activated parameters, respectively. Extensive experiments on BEIR, MIRACL, and LMEB demonstrate strong reranking performance with superior efficiency. On BEIR and MIRACL, our models achieve competitive performance in multi-domain and multilingual reranking, on par with strong industrial rerankers such as the Qwen3/BGE-Reranker series. On LMEB-Dialogue, a compact embedding model paired with our Nano reranker, which has only 0.27B activated parameters, remains competitive with 7--12B embedding models. Lychee-Reranker was previously known as KaLM-Reranker-V1. Data and models are available at this https URL. The code is available at this https URL.",
+    "publicationDate": "2026-06-22T03:36:31.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.19204",
+    "title": "CrossQ: Task-Aligned Cross-Token Conditional Quantization for Late Interaction Retrieval",
+    "abstract": "Late-interaction retrievers like ColBERT achieve high quality but suffer from large multi-vector indices. Standard compression minimizes token reconstruction error, while ranking depends critically on preserving scores of sparse \"winner\" tokens. We introduce CrossQ, which adaptively improves effective token fidelity within documents by conditioning token codes on lightweight document context computed at indexing time (but not stored). CrossQ is trained with ranking-aligned objectives that preserve candidate score distributions and protect hard-negative margins. At 2 B/token, CrossQ improves MRR@10 by +0.010 over the strongest strictly footprint-matched quantization baseline and by +0.012 over the strongest candidate-matched system reference. On a nine-dataset BEIR subset, CrossQ improves average nDCG@10 by +0.009 at 4 B/token over the strongest candidate-matched system reference. At 4 B/token, CrossQ achieves 64x raw token-storage reduction, approximately 61x including metadata and approximately 58x under conservative padding/alignment accounting. At 8 B/token, CrossQ with light fine-tuning retains approximately 98% of full-precision ColBERT MRR@10, improving the footprint-quality tradeoff for memory-constrained late-interaction retrieval.",
+    "publicationDate": "2026-06-10T17:41:30.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.20683",
+    "title": "Layer-wise Token Compression for Efficient Document Reranking",
+    "abstract": "Transformer-based document cross-encoder rerankers are a central component of modern information retrieval systems. Despite their success, these models suffer from high computational costs due to processing long query-document sequences at inference time. A known approach to improve efficiency is token compression, which consists of aggregating groups of tokens together in the initial embedding layer, reducing the effective number of tokens, and making the computation faster. While token compression has proven to be successful for bi-encoder retrievers, we empirically observed that this approach may be ineffective for cross-encoder rerankers. In this paper, we propose Layer-wise Token Compression (LTC), which applies adaptive token pooling at intermediate transformer layers. Through extensive ablation studies on MS MARCO passage and document ranking tasks, we demonstrate that compression at middle layers preserves ranking quality while increasing inference QPS by up to 25% for passage ranking and up to 116% for document ranking. We also extend LTC to listwise LLM rerankers and show that the same approach can be easily applied to long-context listwise reranking, where the QPS improvements are even greater. More surprisingly, when applying rerankers trained on short passages to long-document ranking tasks, models trained with compression outperform their uncompressed counterparts, suggesting that compression may act as a beneficial regularizer that encourages length-invariant representations.",
+    "publicationDate": "2026-05-20T03:52:31.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.25248",
+    "title": "ColBERT-Att: Late-Interaction Meets Attention for Enhanced Retrieval",
+    "abstract": "Vector embeddings from pre-trained language models form a core component in Neural Information Retrieval systems across a multitude of knowledge extraction tasks. The paradigm of late interaction, introduced in ColBERT, demonstrates high accuracy along with runtime efficiency. However, the current formulation fails to take into account the attention weights of query and document terms, which intuitively capture the \"importance\" of similarities between them, that might lead to a better understanding of relevance between the queries and documents. This work proposes ColBERT-Att, to explicitly integrate attention mechanism into the late interaction framework for enhanced retrieval performance. Empirical evaluation of ColBERT-Att depicts improvements in recall accuracy on MS-MARCO as well as on a wide range of BEIR and LoTTE benchmark datasets.",
+    "publicationDate": "2026-03-26T09:51:54.000Z",
+    "votes": 18
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.16351",
+    "title": "Training for Compositional Sensitivity Reduces Dense Retrieval Generalization",
+    "abstract": "Dense retrieval compresses texts into single embeddings ranked by cosine similarity. While efficient for recall, this interface is brittle for identity-level matching: minimal compositional edits (negation, role swaps) flip meaning yet retain high similarity. Motivated by geometric results for unit-sphere cosine spaces (Kang et al., 2025), we test this retrieval-composition tension in text-only retrieval. Across four dual-encoder backbones, adding structure-targeted negatives consistently reduces zero-shot NanoBEIR retrieval (8-9% mean nDCG@10 drop on small backbones; up to 40% on medium ones), while only partially improving pooled-space separation. Treating pooled cosine as a recall interface, we then benchmark verifiers scoring token--token cosine maps. MaxSim (late interaction) excels at reranking but fails to reject structural near-misses, whereas a small Transformer over similarity maps reliably separates near-misses under end-to-end training.",
+    "publicationDate": "2026-03-16T20:25:39.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.16299",
+    "title": "MICE: Minimal Interaction Cross-Encoders for efficient Re-ranking",
+    "abstract": "In Information Retrieval (IR), cross-encoders deliver state-of-the-art ranking effectiveness but have a high inference cost, limiting their use to second-stage re-rankers. Prior work has addressed this bottleneck from two largely separate directions: accelerating cross-encoder inference through attention sparsification, or improving first-stage retrieval effectiveness to alleviate the need of a re-ranker, using more complex models, e.g. late-interactions. In this work, we bridge these two directions through an in-depth analysis of cross-encoder internal mechanisms. By identifying and removing superfluous interactions, we derive MICE (Minimal Interaction Cross-Encoders), a new cross-encoder architecture that retains effectiveness while reducing computational overhead. Extensive evaluations show MICE retains most of the performances of its cross-encoder counterparts in-domain and matches or even exceeds it in out-of-domain, while reducing FLOPs down to 2.5 times.",
+    "publicationDate": "2026-02-18T09:30:29.000Z",
+    "votes": 7
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.15830",
+    "title": "CiteGuard-RAG: A Validation-Centered AI System for Evidence-Grounded Question Answering",
+    "abstract": "Retrieval-augmented generation (RAG) can improve access to complex information; however, retrieving evidence alone does not ensure that answers are grounded, citation-valid, or appropriately refused. This paper introduces CiteGuard-RAG, a validation-centered AI system for evidence-grounded question answering. The system integrates hybrid semantic-lexical retrieval, citation-constrained generation, sentence-level grounding validation, and single-pass regeneration. Validation is used at runtime to determine whether a candidate answer should be accepted, refused, or regenerated before final delivery.\nCiteGuard-RAG is evaluated on 400 questions across a controlled housing-law dataset, PrivacyQA, and CUAD. In the controlled evaluation, it achieves 99.1% retrieval accuracy, 98.3% grounded-answer accuracy, and 98.3% citation validity, with no validation-detected hallucinations. Ablation results show that grounded-answer accuracy drops sharply when validation is removed, even when retrieval accuracy remains unchanged. External evaluation shows that while citation validity remains strong, evidence utilization, span alignment, and refusal calibration become harder under domain shift.\nThese findings indicate that trustworthy RAG systems require explicit validation between retrieval and final answer delivery. CiteGuard-RAG provides a practical architecture for linking retrieval, generation, citation checking, abstention, and regeneration in high-stakes information access.",
+    "publicationDate": "2026-09-14T16:30:54.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.06519",
+    "title": "MedRAGChecker: Claim-Level Verification for Biomedical Retrieval-Augmented Generation",
+    "abstract": "Biomedical retrieval-augmented generation (RAG) can ground LLM answers in medical literature, yet long-form outputs often contain isolated unsupported or contradictory claims with safety implications.\nWe introduce MedRAGChecker, a claim-level verification and diagnostic framework for biomedical RAG.\nGiven a question, retrieved evidence, and a generated answer, MedRAGChecker decomposes the answer into atomic claims and estimates claim support by combining evidence-grounded natural language inference (NLI) with biomedical knowledge-graph (KG) consistency signals.\nAggregating claim decisions yields answer-level diagnostics that help disentangle retrieval and generation failures, including faithfulness, under-evidence, contradiction, and safety-critical error rates.\nTo enable scalable evaluation, we distill the pipeline into compact biomedical models and use an ensemble verifier with class-specific reliability weighting.\nExperiments on four biomedical QA benchmarks show that MedRAGChecker reliably flags unsupported and contradicted claims and reveals distinct risk profiles across generators, particularly on safety-critical biomedical relations.",
+    "publicationDate": "2026-01-10T10:40:42.000Z",
+    "votes": 32
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.03534",
+    "title": "SURE-RAG: Sufficiency and Uncertainty-Aware Evidence Verification for Selective Retrieval-Augmented Generation",
+    "abstract": "Retrieval-augmented generation (RAG) grounds answers in retrieved passages, yet relevance does not guarantee sufficiency: a topical passage may still fail to justify the answer. We study evidence sufficiency verification for selective RAG answering, in which a verifier receives a question, a candidate answer, and retrieved evidence and decides whether the evidence supports, refutes, or is insufficient for the answer, answering only when support is established. We present SURE-RAG, an aggregation protocol that treats evidence sufficiency as a set-level property: missing hops and unresolved conflicts cannot be detected by scoring passages independently. A shared claim-evidence verifier produces a local relation distribution for each (claim, passage) pair, which SURE-RAG aggregates into four interpretable answer-level feature blocks (coverage, relation strength, uncertainty, and retrieval), producing a three-way decision and an auditable selective score. We evaluate on HotpotQA-RAG v3, a controlled multi-hop benchmark, under an artifact-aware protocol (shortcut baselines, counterfactual swaps, no-oracle checks, and GPT-4o audits). Calibrated SURE-RAG attains 0.9075 Macro-F1 (raw 0.8951 +/- 0.0069), well above DeBERTa mean-pooling (0.6516) and a GPT-4o judge (0.7284), and on par with a strong concat cross-encoder (0.8888 +/- 0.0109) while remaining fully auditable. At 30% coverage, risk falls from 0.2588 to 0.1642, a 37% relative reduction. As a boundary-mapping experiment, we contrast SURE-RAG with GPT-4o on HaluBench unsafe detection: the ranking reverses (0.3343 vs. 0.7389 unsafe-F1), indicating that controlled sufficiency verification and natural hallucination detection are distinct problems.",
+    "publicationDate": "2026-05-05T09:05:40.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.05244",
+    "title": "Towards Dependable Retrieval-Augmented Generation Using Factual Confidence Prediction",
+    "abstract": "Incorporating specific knowledge into large language models via retrieval-augmented generation (RAG) is a widespread technique that fuels many of today's industry AI applications. A fundamental problem is to assess if the context retrieved by some similarity search provides indeed supporting facts, or instead misguides the generator with irrelevant information. It is critical to associate meaningful confidence measures about the factuality of the retrieval process with the generated answers. We present a new, two-staged approach to predict fact faithfulness of the output of retrieval-augmented generations. First, we employ conformal prediction to select only those retrieved chunks who have a high chance to come from the correct source. This approach in itself can improve answer quality by up to 6% in some of the studied datasets, however, the associated statistical guarantees do not hold generally, since the assumption of sample exchangeability depends on the retriever setup. We present diagnostic metrics to assess whether a setup is suitable. Second, we quantify confidence in the consistency of a generated final answer with a given retrieved context, using an attention-based factuality classifier. This approach can detect inconsistent answers with a chance of up to 77%. Our work helps to establish a novel type of certified RAG systems for a broad range of natural language industry applications.",
+    "publicationDate": "2026-05-04T11:28:19.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.07783",
+    "title": "Evaluating RAG Reliability under Clean, Misleading, and Mixed Retrieval",
+    "abstract": "Retrieval-Augmented Generation (RAG) is widely used to improve the factual reliability of large language models (LLMs) by grounding answers in retrieved evidence. In misinformation-rich environments, however, retrieved content may include plausible but incorrect information, raising concerns about the reliability of RAG-based information access systems.\nIn this work, we propose an evaluation protocol to systematically test how the RAG system handles conflicts between parametric knowledge and evidence retrieved from context with varying amounts of misleading information. We target correct answers to factoid questions that the model responds to correctly, even when there is no retrieval, and use this to test the system with clean, poisoned, and mixed evidence.\nThe proposed analytical framework combines parametric override and confidence metrics to assess when and how misleading information affects the generation process of LLMs. This study aims to provide insights into the robustness of RAG systems in information disorder scenarios.",
+    "publicationDate": "2026-06-05T18:54:23.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.21803",
+    "title": "Quantifying Retriever-Generator Alignment in RAG with Local Explanations",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems combine dense retrievers and language models to ground outputs in external documents. However, the interaction between these components remains opaque, creating challenges for deployment in high-stakes domains. We present RAG-E, an end-to-end explainability framework that quantifies retriever-generator alignment through mathematically grounded attribution methods. Our approach adapts Integrated Gradients for retriever analysis, proposes a Monte Carlo-stabilized Shapley Value approximation for generator attribution, and introduces the Weighted Alignment between Retriever and Generator (WARG) metric to measure how closely the generator's document usage aligns with retriever rankings. Experiments on PopQA, QAMPARI, and TREC CAST datasets reveal substantial misalignment: depending on the model and setting, generators often ignore top-ranked documents and rely on documents ranked as less relevant. We show that WARG captures retriever-generator alignment better than Pearson and Spearman correlations and can serve as an indicator of RAG performance. RAG-E and WARG provide a practical framework for auditing this interaction, enabling more reliable and transparent RAG systems.",
+    "publicationDate": "2026-01-29T14:47:00.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.08892",
+    "title": "Toward Faithful Retrieval-Augmented Generation with Sparse Autoencoders",
+    "abstract": "Retrieval-Augmented Generation (RAG) improves the factuality of large language models (LLMs) by grounding outputs in retrieved evidence, but faithfulness failures, where generations contradict or extend beyond the provided sources, remain a critical challenge. Existing hallucination detection methods for RAG often rely either on large-scale detector training, which requires substantial annotated data, or on querying external LLM judges, which leads to high inference costs. Although some approaches attempt to leverage internal representations of LLMs for hallucination detection, their accuracy remains limited. Motivated by recent advances in mechanistic interpretability, we employ sparse autoencoders (SAEs) to disentangle internal activations, successfully identifying features that are specifically triggered during RAG hallucinations. Building on a systematic pipeline of information-based feature selection and additive feature modeling, we introduce RAGLens, a lightweight hallucination detector that accurately flags unfaithful RAG outputs using LLM internal representations. RAGLens not only achieves superior detection performance compared to existing methods, but also provides interpretable rationales for its decisions, enabling effective post-hoc mitigation of unfaithful RAG. Finally, we justify our design choices and reveal new insights into the distribution of hallucination-related signals within LLMs. The code is available at this https URL.",
+    "publicationDate": "2025-12-09T18:33:22.000Z",
+    "votes": 20
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2505.04847",
+    "title": "Benchmarking LLM Faithfulness in RAG with Evolving Leaderboards",
+    "abstract": "Retrieval-augmented generation (RAG) aims to reduce hallucinations by grounding responses in external context, yet large language models (LLMs) still frequently introduce unsupported information or contradictions even when provided with relevant context. This paper presents two complementary efforts at Vectara to measure and benchmark LLM faithfulness in RAG. First, we describe our original hallucination leaderboard, which has tracked hallucination rates for LLMs since 2023 using our HHEM hallucination detection model. Motivated by limitations observed in current hallucination detection methods, we introduce FaithJudge, an LLM-as-a-judge framework that leverages a pool of diverse human-annotated hallucination examples to substantially improve the automated hallucination evaluation of LLMs. We introduce an enhanced hallucination leaderboard centered on FaithJudge that benchmarks LLMs on RAG faithfulness in summarization, question-answering, and data-to-text generation tasks. FaithJudge enables a more reliable benchmarking of LLM hallucinations in RAG and supports the development of more trustworthy generative AI systems: this https URL.",
+    "publicationDate": "2025-05-07T22:50:33.000Z",
+    "votes": 22
+  }
+]

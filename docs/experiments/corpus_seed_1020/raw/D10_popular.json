@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2605.15184",
+    "title": "Is Grep All You Need? How Agent Harnesses Reshape Agentic Search",
+    "abstract": "Recent advances in Large Language Model (LLM) agents have enabled complex agentic workflows where models autonomously retrieve information, call tools, and reason over large corpora to complete tasks on behalf of users. Despite the growing adoption of retrieval-augmented generation (RAG) in agentic search systems, existing literature lacks a systematic comparison of how retrieval strategy choice interacts with agent architecture and tool-calling paradigm. Important practical dimensions, including how tool outputs are presented to the model and how performance changes when searches must cope with more irrelevant surrounding text, remain under-explored in agent loops. This paper reports an empirical study organized into two experiments. Experiment 1 compares grep and vector retrieval on a 116-question sample from LongMemEval, using a custom agent harness (Chronos) and provider-native CLI harnesses (Claude Code, Codex, and Gemini CLI), for both inline tool results and file-based tool results that the model reads separately. Experiment 2 compares grep-only and vector-only retrieval while progressively mixing in additional unrelated conversation history, so that each query is embedded in more distracting material alongside the passages that matter. Across Chronos and the provider CLIs, grep generally yields higher accuracy than vector retrieval in our comparisons in experiment 1; at the same time, overall scores still depend strongly on which harness and tool-calling style is used, even when the underlying conversation data are the same.",
+    "publicationDate": "2026-05-14T17:58:41.000Z",
+    "votes": 180
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2407.16833",
+    "title": "Retrieval Augmented Generation or Long-Context LLMs? A Comprehensive Study and Hybrid Approach",
+    "abstract": "Retrieval Augmented Generation (RAG) has been a powerful tool for Large Language Models (LLMs) to efficiently process overly lengthy contexts. However, recent LLMs like Gemini-1.5 and GPT-4 show exceptional capabilities to understand long contexts directly. We conduct a comprehensive comparison between RAG and long-context (LC) LLMs, aiming to leverage the strengths of both. We benchmark RAG and LC across various public datasets using three latest LLMs. Results reveal that when resourced sufficiently, LC consistently outperforms RAG in terms of average performance. However, RAG's significantly lower cost remains a distinct advantage. Based on this observation, we propose Self-Route, a simple yet effective method that routes queries to RAG or LC based on model self-reflection. Self-Route significantly reduces the computation cost while maintaining a comparable performance to LC. Our findings provide a guideline for long-context applications of LLMs using RAG and LC.",
+    "publicationDate": "2024-07-23T20:51:52.000Z",
+    "votes": 26
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2410.05983",
+    "title": "Long-Context LLMs Meet RAG: Overcoming Challenges for Long Inputs in RAG",
+    "abstract": "Retrieval-augmented generation (RAG) empowers large language models (LLMs) to utilize external knowledge sources. The increasing capacity of LLMs to process longer input sequences opens up avenues for providing more retrieved information, to potentially enhance the quality of generated outputs. It is plausible to assume that a larger retrieval set would contain more relevant information (higher recall), that might result in improved performance. However, our empirical findings demonstrate that for many long-context LLMs, the quality of generated output initially improves first, but then subsequently declines as the number of retrieved passages increases. This paper investigates this phenomenon, identifying the detrimental impact of retrieved \"hard negatives\" as a key contributor. To mitigate this and enhance the robustness of long-context LLM-based RAG, we propose both training-free and training-based approaches. We first showcase the effectiveness of retrieval reordering as a simple yet powerful training-free optimization. Furthermore, we explore training-based methods, specifically RAG-specific implicit LLM fine-tuning and RAG-oriented fine-tuning with intermediate reasoning, demonstrating their capacity for substantial performance gains. Finally, we conduct a systematic analysis of design choices for these training-based methods, including data distribution, retriever selection, and training context length.",
+    "publicationDate": "2024-10-08T12:30:07.000Z",
+    "votes": 25
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2502.11371",
+    "title": "RAG vs. GraphRAG: A Systematic Evaluation and Key Insights",
+    "abstract": "Retrieval-Augmented Generation (RAG) improves large language models (LLMs) by retrieving relevant information from external sources and has been widely adopted for text-based tasks. For structured data, such as knowledge graphs, Graph Retrieval-Augmented Generation (GraphRAG) retrieves and aggregates information along graph structures. More recently, GraphRAG has been extended to general text settings by organizing unstructured text into graph representations, showing promise for reasoning and grounding. Despite these advances, existing GraphRAG systems for text data are often tailored to specific tasks, datasets, and system designs, resulting in heterogeneous evaluation protocols. Consequently, a systematic understanding of the relative strengths, limitations, and trade-offs between RAG and GraphRAG on widely used text benchmarks remains limited. In this paper, we present a comprehensive benchmark study comparing RAG and GraphRAG on established text-based tasks, including question answering and query-based summarization. We introduce a unified evaluation protocol that standardizes data preprocessing, retrieval configurations, and generation settings, enabling fair and reproducible comparisons. Our results highlight the distinct strengths of RAG and GraphRAG across different tasks and evaluation perspectives. Building on these findings, we explore selection and integration strategies that combine the strengths of both paradigms, leading to consistent performance improvements. We further analyze failure modes, efficiency trade-offs, and evaluation biases, and highlight key considerations for designing and evaluating retrieval-augmented generation systems.",
+    "publicationDate": "2025-02-17T02:36:30.000Z",
+    "votes": 47
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2501.01880",
+    "title": "Long Context vs. RAG for LLMs: An Evaluation and Revisits",
+    "abstract": "Extending context windows (i.e., Long Context, LC) and using retrievers to selectively access relevant information (i.e., Retrieval-Augmented Generation, RAG) are the two main strategies to enable LLMs to incorporate extremely long external contexts. This paper revisits recent studies on this topic, highlighting their key insights and discrepancies. We then provide a more comprehensive evaluation by filtering out questions answerable without external context, identifying the most effective retrieval methods, and expanding the datasets. We show that LC generally outperforms RAG in question-answering benchmarks, especially for Wikipedia-based questions. Summarization-based retrieval performs comparably to LC, while chunk-based retrieval lags behind. However, RAG has advantages in dialogue-based and general question queries. These insights underscore the trade-offs between RAG and LC strategies, offering guidance for future optimization of LLMs with external knowledge sources. We also provide an in-depth discussion on this topic, highlighting the overlooked importance of context relevance in existing studies.",
+    "publicationDate": "2024-12-27T14:34:37.000Z",
+    "votes": 24
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2409.01666",
+    "title": "In Defense of RAG in the Era of Long-Context Language Models",
+    "abstract": "Overcoming the limited context limitations in early-generation LLMs,\nretrieval-augmented generation (RAG) has been a reliable solution for\ncontext-based answer generation in the past. Recently, the emergence of\nlong-context LLMs allows the models to incorporate much longer text sequences,\nmaking RAG less attractive. Recent studies show that long-context LLMs\nsignificantly outperform RAG in long-context applications. Unlike the existing\nworks favoring the long-context LLM over RAG, we argue that the extremely long\ncontext in LLMs suffers from a diminished focus on relevant information and\nleads to potential degradation in answer quality. This paper revisits the RAG\nin long-context answer generation. We propose an order-preserve\nretrieval-augmented generation (OP-RAG) mechanism, which significantly improves\nthe performance of RAG for long-context question-answer applications. With\nOP-RAG, as the number of retrieved chunks increases, the answer quality\ninitially rises, and then declines, forming an inverted U-shaped curve. There\nexist sweet points where OP-RAG could achieve higher answer quality with much\nless tokens than long-context LLM taking the whole context as input. Extensive\nexperiments on public benchmark demonstrate the superiority of our OP-RAG.",
+    "publicationDate": "2024-09-03T07:17:41.000Z",
+    "votes": 37
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.05991",
+    "title": "Ontology Learning and Knowledge Graph Construction: A Comparison of Approaches and Their Impact on RAG Performance",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems combine Large Language Models (LLMs) with external knowledge, and their performance depends heavily on how that knowledge is represented. This study investigates how different Knowledge Graph (KG) construction strategies influence RAG performance. We compare a variety of approaches: standard vector-based RAG, GraphRAG, and retrieval over KGs built from ontologies derived either from relational databases or textual corpora. Results show that ontology-guided KGs incorporating chunk information achieve competitive performance with state-of-the-art frameworks, substantially outperforming vector retrieval baselines. Moreover, the findings reveal that ontology-guided KGs built from relational databases perform competitively to ones built with ontologies extracted from text, with the benefit of offering a dual advantage: they require a one-time-only ontology learning process, substantially reducing LLM usage costs; and avoid the complexity of ontology merging inherent to text-based approaches.",
+    "publicationDate": "2025-11-08T12:38:45.000Z",
+    "votes": 13
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.08202",
+    "title": "Harnessing the Unseen: The Hidden Influence of Intrinsic Knowledge in Long-Context Language Models",
+    "abstract": "Recent advances in long-context language models (LCLMs), designed to handle extremely long contexts, primarily focus on utilizing external contextual information, often leaving the influence of language models' parametric knowledge underexplored. In this work, we firstly investigate how this parametric knowledge affects content generation and demonstrate that its impact becomes increasingly pronounced as context length extends. Furthermore, we show that the model's ability to utilize parametric knowledge, which we call parametric recall ability, does not improve simultaneously with its ability to leverage contextual knowledge through extrinsic retrieval ability. Moreover, better extrinsic retrieval ability can interfere with the model's parametric recall ability, limiting its full potential. To bridge this gap, we design a simple yet effective Hybrid Needle-in-a-Haystack test that evaluates models based on their capabilities across both abilities, rather than solely emphasizing extrinsic retrieval ability. Our experimental results reveal that Qwen-2.5 models significantly outperform Llama-3.1 models, demonstrating superior potential to combine various abilities. Moreover, even the more powerful Llama-3.1-70B-Instruct model fails to exhibit better performance, highlighting the importance of evaluating models from a dual-ability perspective.",
+    "publicationDate": "2025-04-11T02:06:58.000Z",
+    "votes": 50
+  }
+]

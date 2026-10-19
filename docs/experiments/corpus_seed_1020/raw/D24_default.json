@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.15285",
+    "title": "Retrieving Complementary Evidence for Multi-Hop RAG with Semantic Gain Graphs",
+    "abstract": "Multi-hop retrieval-augmented generation (RAG) requires finding documents whose evidence is useful in combination. Query relevance and graph connectivity help locate related content, but neither directly measures the additional information one document contributes given another. We introduce SG$^2$RAG, a framework that represents this complementarity through semantic gain. Offline, a large language model assesses the relevant and nonredundant information contributed by one chunk given another within neighborhoods proposed by semantic similarity. These ordered assessments are aggregated into symmetric edge weights to construct a reusable Semantic Gain Graph. Online, controlled Personalized PageRank starts from query-relevant seeds and ranks complementary evidence beyond the initial retrieval set. Experiments on MuSiQue, 2Wiki, and HotpotQA with two language model backbones show that SG$^2$RAG achieves the best average EM, F1, and Recall@10 among the evaluated single-retrieval methods. Under identical candidate support and propagation, semantic gain improves average F1 and Recall@10 over similarity weighting by 4.08 and 4.31 points. Analyses of supporting documents and improvements in three iterative retrieval frameworks further support its effectiveness as a reusable retrieval component.",
+    "publicationDate": "2026-10-11T02:30:20.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.37661",
+    "title": "Corpus-Guided Dual-Path Propagation for Graph Retrieval-Augmented Generation",
+    "abstract": "Graph-based retrieval-augmented generation supports multi-hop retrieval by organizing corpus information into graphs. However, existing relation-free graph retrieval methods rely primarily on query-sentence similarity to search for evidence. This can exclude useful bridging evidence with low query similarity and activate incidental entities unrelated to the reasoning chain. In this paper, we propose a simple and effective approach called NexusRAG, which augments the relation-free Tri-Graph with a corpus-level entity neighborhood structure derived from joint entity co-occurrence and semantic similarity. NexusRAG employs this structure to guide two complementary propagation paths: neighborhood-constrained semantic propagation through sentences identifies the query-relevant entity frontier, while direct structural propagation between neighboring entities expands that frontier to structurally related entities. The propagated entity weights also inform neighborhood-aware passage initialization for Personalized PageRank. Experiments on three multi-hop QA benchmarks and a domain-specific subset of GraphRAG-Bench show that NexusRAG consistently outperforms existing approaches. On the GraphRAG-Bench subset, NexusRAG achieves the highest evidence recall in all question categories, exceeding baselines by 4.2-8.1 points. The implementation code is available at this https URL.",
+    "publicationDate": "2026-09-29T14:20:46.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.34127",
+    "title": "STITCH-RAG: Spatio-Temporal Influence Tracing over Topic Hypergraphs for Multi-Hop Retrieval-Augmented Generation",
+    "abstract": "Multi-hop retrieval-augmented generation requires a retriever to connect evidence distributed across documents while preserving a concise, faithful generation context. Existing indexes leave two complementary gaps: chunk-based RAG can break cross-passage evidence chains, whereas an unlabeled pairwise projection without generating-topic provenance cannot jointly preserve topic-level co-participation and per-occurrence entity descriptions. We propose STITCH-RAG, a hypergraph-based framework with three coupled components. First, a semi-merged topic hypergraph encodes multi-entity co-participation as topic-summary hyperedges while retaining per-chunk entity states linked by canonical-name equivalence. Second, spatio-temporal influence bridging propagation (STIBP) combines topic-space propagation with deterministic chunk-index linkage across name-equivalent states under frequency-adaptive decay. Third, continuous STIBP scores replace binary entity-match seeds in localized Personalized PageRank (PPR). We characterize the condition under which this prior assigns more PPR mass to ground-truth evidence than a binary prior. Under the reported protocol, STITCH-RAG attains the highest reported Contain-Acc and LLM-Acc point estimates among the compared methods on HotpotQA and 2WikiMultiHopQA, and higher Recall@8 than the methods included in the standardized retrieval comparison. Results on the mixed-domain benchmark remain auxiliary preference-based evidence because only LLM-judged accuracy is available.",
+    "publicationDate": "2026-09-28T02:05:31.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.07050",
+    "title": "Beyond One-Shot Expansion: Contrastive Evidence Exploration for Multi-Hop Retrieval",
+    "abstract": "Retrieval-augmented generation (RAG) critically depends on retrieving the evidence necessary for effective reasoning. However, this remains particularly challenging in multi-hop question answering (QA), where supporting passages are often linked through intermediate entities and relations that must be progressively uncovered. Existing retrieval approaches typically rely on a single retrieval intent or one-shot query expansion, limiting their ability to adapt to newly retrieved evidence and potentially introducing noisy or redundant retrieval signals. To address these limitations, we propose a training-free multi-hop retrieval framework that integrates evidence-conditioned exploration, passage-specific contrastive refinement, and coverage-aware final ranking. During offline indexing, the framework constructs passage-specific contrastive facets that characterize each passage relative to its semantically similar neighbors, providing fine-grained signals to distinguish closely related candidates. At inference time, the framework iteratively retrieves evidence, generates probes targeting unresolved information needs, refines candidate relevance using the contrastive facets, and selects a complementary set of passages that collectively cover diverse evidence-seeking intents. Experiments on MuSiQue, HotpotQA, and 2WikiMultihopQA demonstrate consistent improvements in retrieval quality and downstream QA performance over baselines.",
+    "publicationDate": "2026-09-07T05:13:56.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.16004",
+    "title": "LineageRAG: Harnessing GraphRAG by Constructing Evidence Lineages with Source Grounding",
+    "abstract": "Graph-based Retrieval-Augmented Generation (GraphRAG) retrieves evidence for multi-hop questions over structured cor- pus graphs. Existing GraphRAG methods leave the connection between evidence discovery and source grounding implicit. We propose LineageRAG, which constructs one evidence lin- eage for each query-derived evidence demand and completes it with a verbatim source span when the selected evidence supports that demand. LineageRAG first initializes the evi- dence demands. It then expands each lineage through demand- conditioned retrieval over the corpus graph while retaining the demand associated with every candidate. Lineage completion uses this provenance to select complementary passages and grounds supported demands in verbatim source text. Experi- ments on HotpotQA, 2WikiMultiHopQA, and MuSiQue show that LineageRAG improves R@5, EM, and F1 by 3.51, 5.96, and 5.22 points on average over leading GraphRAG baselines.",
+    "publicationDate": "2026-08-17T01:42:55.000Z",
+    "votes": 17
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.28397",
+    "title": "GLM-RAG: Graph Language Models for Graph-Based Retrieval-Augmented Generation",
+    "abstract": "Retrieval-augmented generation (RAG) over knowledge graphs requires retrievers that can effectively capture both graph structure and semantic information. Recent approaches have explored graph neural network (GNN)-based retrievers to model graph topology in multi-hop reasoning tasks. In parallel, graph language models (GLMs) have emerged as a promising paradigm that integrates graph reasoning and the semantic capabilities of language models. In this work, we introduce a GLM-based retriever and investigate the comparative strengths of GLM-based, GNN-based, and traditional vector-search-based retrievers in single- and multi-hop RAG settings, and with a particular focus on transferability to unseen domains. Our findings suggest that finetuned GLM retrievers generalize better out of domain, achieving SOTA on two multi-hop benchmarks. On in-domain multi-hop QA datasets they remain comparable to prior work, with promising scaling as parameters and subgraph coverage increase. GNN-based retrievers achieve higher graph coverage with an efficient training setup, whereas the vector-search baseline excels at single-hop datasets.",
+    "publicationDate": "2026-07-30T15:49:34.000Z",
+    "votes": 14
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.25487",
+    "title": "ReliableRAG: Combating Misinformation in Retrieval-Augmented Generation via Reliability-Guided Reasoning Chains",
+    "abstract": "Retrieval-Augmented Generation (RAG) has emerged as a powerful architecture for Question Answering (QA) by integrating external information into Large Language Models (LLMs). However, false, inaccurate, and misleading information in news and social media poses a serious challenge to real-world RAG systems, especially in multi-hop QA, where complex multi-step reasoning can be misled by even a single deceptive misinformation segment in the retrieved documents. Existing approaches mainly rely on implicit alignment or explicit regulation, but their limited ability to assess fine-grained information reliability makes them vulnerable to deceptive misinformation that is semantically relevant to the question yet factually incorrect, leading to erroneous answers. To address this limitation, we propose ReliableRAG, which, to the best of our knowledge, is the first reliability-driven framework that mitigates deceptive misinformation in multi-hop QA through fine-grained evaluation of individual triples. ReliableRAG first extracts information segments from source documents and represents them as structured triples. It then quantifies triple reliability by combining query-triple semantic relevance with triple credibility, retaining only the top-$K$ reliable and non-redundant triples. Based on these refined triples, ReliableRAG autoregressively constructs robust reasoning chains to consolidate trustworthy evidence and filter deceptive misinformation, producing accurate answers faithful to reliable information. Experiments on three multi-hop QA datasets show that ReliableRAG outperforms existing methods, substantially improving the factual reliability and robustness of RAG systems under deceptive misinformation injection.",
+    "publicationDate": "2026-08-26T07:59:24.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.27136",
+    "title": "KAMR: Grounding Generation via Knowledge-Aligned Multi-hop Retrieval",
+    "abstract": "Graph-based retrieval-augmented generation increasingly relies on multi-hop retrieval, where answering a query requires composing multiple connected knowledge-graph triplets. However, existing retrievers often rank triplets independently via global semantic matching. Moreover, many multi-hop benchmarks provide only final answers, which limits supervision for query--triplet alignment and causes structurally necessary but weakly aligned facts to be missed. To address these issues, we propose a knowledge-aligned multi-hop retriever, KAMR, which distinguishes anchor triplets that are strongly constrained by the query from connected triplets that are weakly aligned yet structurally linked to the anchors. To mitigate the lack of query-triplet alignment supervision, we build a partial alignment dataset by masking triplet elements and prompting an LLM to generate corresponding queries, and optimize two contrastive objectives for pair-level and element-level matching. At inference time, KAMR retrieves anchors globally and then expands locally to collect connected evidence. Across four benchmarks, three LLM backbones, and fourteen baselines, KAMR consistently improves multi-hop retrieval and downstream question answering performance.",
+    "publicationDate": "2026-07-29T17:07:37.000Z",
+    "votes": 2
+  }
+]

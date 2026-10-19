@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2604.15153",
+    "title": "Compressing Sequences in the Latent Embedding Space: $K$-Token Merging for Large Language Models",
+    "abstract": "Large Language Models (LLMs) incur significant computational and memory costs when processing long prompts, as full self-attention scales quadratically with input length. Token compression aims to address this challenge by reducing the number of tokens representing inputs. However, existing prompt-compression approaches primarily operate in token space and overlook inefficiencies in the latent embedding space. In this paper, we propose K-Token Merging, a latent-space compression framework that merges each contiguous block of K token embeddings into a single embedding via a lightweight encoder. The compressed sequence is processed by a LoRA-adapted LLM, while generation remains in the original vocabulary. Experiments on structural reasoning (Textualized Tree), sentiment classification (Amazon Reviews), and code editing (CommitPackFT) show that K-Token Merging lies on the Pareto frontier of performance vs. compression, achieving up to 75% input length reduction with minimal performance degradation. Code is available at this https URL.",
+    "publicationDate": "2026-04-16T15:32:45.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2410.12388",
+    "title": "Prompt Compression for Large Language Models: A Survey",
+    "abstract": "Leveraging large language models (LLMs) for complex natural language tasks typically requires long-form prompts to convey detailed requirements and information, which results in increased memory usage and inference costs. To mitigate these challenges, multiple efficient methods have been proposed, with prompt compression gaining significant research interest. This survey provides an overview of prompt compression techniques, categorized into hard prompt methods and soft prompt methods. First, the technical approaches of these methods are compared, followed by an exploration of various ways to understand their mechanisms, including the perspectives of attention optimization, Parameter-Efficient Fine-Tuning (PEFT), modality integration, and new synthetic language. We also examine the downstream adaptations of various prompt compression techniques. Finally, the limitations of current prompt compression methods are analyzed, and several future directions are outlined, such as optimizing the compression encoder, combining hard and soft prompts methods, and leveraging insights from multimodality.",
+    "publicationDate": "2024-10-16T09:13:23.000Z",
+    "votes": 54
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2403.12968",
+    "title": "LLMLingua-2: Data Distillation for Efficient and Faithful Task-Agnostic Prompt Compression",
+    "abstract": "This paper focuses on task-agnostic prompt compression for better generalizability and efficiency. Considering the redundancy in natural language, existing approaches compress prompts by removing tokens or lexical units according to their information entropy obtained from a causal language model such as LLaMa-7B. The challenge is that information entropy may be a suboptimal compression metric: (i) it only leverages unidirectional context and may fail to capture all essential information needed for prompt compression; (ii) it is not aligned with the prompt compression objective.\nTo address these issues, we propose a data distillation procedure to derive knowledge from an LLM to compress prompts without losing crucial information, and meantime, introduce an extractive text compression dataset. We formulate prompt compression as a token classification problem to guarantee the faithfulness of the compressed prompt to the original one, and use a Transformer encoder as the base architecture to capture all essential information for prompt compression from the full bidirectional context. Our approach leads to lower latency by explicitly learning the compression objective with smaller models such as XLM-RoBERTa-large and mBERT.\nWe evaluate our method on both in-domain and out-of-domain datasets, including MeetingBank, LongBench, ZeroScrolls, GSM8K, and BBH. Despite its small size, our model shows significant performance gains over strong baselines and demonstrates robust generalization ability across different LLMs. Additionally, our model is 3x-6x faster than existing prompt compression methods, while accelerating the end-to-end latency by 1.6x-2.9x with compression ratios of 2x-5x. Our code is available at this https URL.",
+    "publicationDate": "2024-03-19T17:59:56.000Z",
+    "votes": 34
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.08128",
+    "title": "Sentence-Anchored Gist Compression for Long-Context LLMs",
+    "abstract": "This work investigates context compression for Large Language Models (LLMs) using learned compression tokens to reduce the memory and computational demands of processing long sequences. We demonstrate that pre-trained LLMs can be fine-tuned to compress their context by factors of 2x to 8x without significant performance degradation, as evaluated on both short-context and long-context benchmarks. Furthermore, in experiments on a 3-billion-parameter LLaMA model, our method achieves results on par with alternative compression techniques while attaining higher compression ratios.",
+    "publicationDate": "2025-11-11T11:34:32.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.11004",
+    "title": "Dynamic Compressing Prompts for Efficient Inference of Large Language  Models",
+    "abstract": "Large Language Models (LLMs) have shown outstanding performance across a\nvariety of tasks, partly due to advanced prompting techniques. However, these\ntechniques often require lengthy prompts, which increase computational costs\nand can hinder performance because of the limited context windows of LLMs.\nWhile prompt compression is a straightforward solution, existing methods\nconfront the challenges of retaining essential information, adapting to context\nchanges, and remaining effective across different tasks. To tackle these\nissues, we propose a task-agnostic method called Dynamic Compressing Prompts\n(LLM-DCP). Our method reduces the number of prompt tokens while aiming to\npreserve the performance as much as possible. We model prompt compression as a\nMarkov Decision Process (MDP), enabling the DCP-Agent to sequentially remove\nredundant tokens by adapting to dynamic contexts and retaining crucial content.\nWe develop a reward function for training the DCP-Agent that balances the\ncompression rate, the quality of the LLM output, and the retention of key\ninformation. This allows for prompt token reduction without needing an external\nblack-box LLM. Inspired by the progressive difficulty adjustment in curriculum\nlearning, we introduce a Hierarchical Prompt Compression (HPC) training\nstrategy that gradually increases the compression difficulty, enabling the\nDCP-Agent to learn an effective compression method that maintains information\nintegrity. Experiments demonstrate that our method outperforms state-of-the-art\ntechniques, especially at higher compression rates. The code for our approach\nwill be available at this https URL",
+    "publicationDate": "2025-04-15T09:20:45.000Z",
+    "votes": 160
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.19114",
+    "title": "Understanding and Improving Information Preservation in Prompt Compression for LLMs",
+    "abstract": "Recent advancements in large language models (LLMs) have enabled their successful application to a broad range of tasks. However, in information-intensive tasks, the prompt length can grow fast, leading to increased computational requirements, performance degradation, and induced biases from irrelevant or redundant information. Recently, various prompt compression techniques have been introduced to optimize the trade-off between reducing input length and retaining performance. We propose a holistic evaluation framework that allows for in-depth analysis of prompt compression methods. We focus on three key aspects, besides compression ratio: (i) downstream task performance, (ii) grounding in the input context, and (iii) information preservation. Using our framework, we analyze state-of-the-art soft and hard compression methods and show that some fail to preserve key details from the original prompt, limiting performance on complex tasks. By identifying these limitations, we are able to improve one soft prompting method by controlling compression granularity, achieving up to +23% in downstream performance, +8 BERTScore points in grounding, and 2.7x more entities preserved in compression. Ultimately, we find that the best effectiveness/compression rate trade-off is achieved with soft prompting combined with sequence-level this http URL code is available at this https URL.",
+    "publicationDate": "2025-03-24T20:06:11.000Z",
+    "votes": 68
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2408.03094",
+    "title": "500xCompressor: Generalized Prompt Compression for Large Language Models",
+    "abstract": "Prompt compression is crucial for enhancing inference speed, reducing costs, and improving user experience. However, current methods face challenges such as low compression ratios and potential data leakage during evaluation. To address these issues, we propose 500xCompressor, a method that compresses extensive natural language contexts into a minimum of one single special token. The 500xCompressor introduces approximately 0.3% additional parameters and achieves compression ratios ranging from 6x to 480x. It is designed to compress any text, answer various types of questions, and could be utilized by the original large language model (LLM) without requiring fine-tuning. Initially, 500xCompressor was pretrained on the Arxiv Corpus, followed by fine-tuning on the ArxivQA dataset, and subsequently evaluated on strictly unseen and classical question answering (QA) datasets. The results demonstrate that the LLM retained 62.26-72.89% of its capabilities compared to using non-compressed prompts. This study also shows that not all the compressed tokens are equally utilized and that K V values have significant advantages over embeddings in preserving information at high compression ratios. The highly compressive nature of natural language prompts, even for fine-grained complex information, suggests promising potential for future applications and further research into developing a new LLM language.",
+    "publicationDate": "2024-08-06T10:51:47.000Z",
+    "votes": 15
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2405.17052",
+    "title": "SelfCP: Compressing Over-Limit Prompt via the Frozen Large Language Model Itself",
+    "abstract": "Long prompt leads to huge hardware costs when using transformer-based Large Language Models (LLMs). Unfortunately, many tasks, such as summarization, inevitably introduce long documents, and the wide application of in-context learning easily makes the prompt length explode. This paper proposes a Self-Compressor (SelfCP), which employs the target LLM itself to compress over-limit prompts into dense vectors while keeping the allowed prompts unmodified. Dense vectors are then projected into dense tokens via a learnable connector to make the same LLM unburden to understand. The connector is supervised-tuned under the language modeling objective of the LLM on relatively long texts selected from publicly accessed datasets, involving an instruction dataset to make SelfCP respond to various prompts, while the target LLM keeps frozen during training. We build the lightweight SelfCP upon 2 different backbones with merely 17M learnable parameters originating from the connector and a learnable embedding. Evaluation on both English and Chinese benchmarks demonstrate that SelfCP effectively substitutes 12$\\times$ over-limit prompts with dense tokens to reduce memory costs and booster inference throughputs, yet improving response quality. The outstanding performance brings an efficient solution for LLMs to tackle long prompts without training LLMs from scratch.",
+    "publicationDate": "2024-05-27T11:14:55.000Z",
+    "votes": 14
+  }
+]

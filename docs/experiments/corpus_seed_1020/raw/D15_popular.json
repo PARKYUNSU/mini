@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2410.21169",
+    "title": "Document Parsing Unveiled: Techniques, Challenges, and Prospects for Structured Information Extraction",
+    "abstract": "Document parsing (DP) transforms unstructured or semi-structured documents into structured, machine-readable representations, enabling downstream applications such as knowledge base construction and retrieval-augmented generation (RAG). This survey provides a comprehensive and timely review of document parsing research. We propose a systematic taxonomy that organizes existing approaches into modular pipeline-based systems and unified models driven by Vision-Language Models (VLMs). We provide a detailed review of key components in pipeline systems, including layout analysis and the recognition of heterogeneous content such as text, tables, mathematical expressions, and visual elements, and then systematically track the evolution of specialized VLMs for document parsing. Additionally, we summarize widely adopted evaluation metrics and high-quality benchmarks that establish current standards for parsing quality. Finally, we discuss key open challenges, including robustness to complex layouts, reliability of VLM-based parsing, and inference efficiency, and outline directions for building more accurate and scalable document intelligence systems.",
+    "publicationDate": "2024-10-28T16:11:35.000Z",
+    "votes": 64
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.10390",
+    "title": "MonkeyOCR v1.5 Technical Report: Unlocking Robust Document Parsing for Complex Patterns",
+    "abstract": "Document parsing is a core task in document intelligence, supporting applications such as information extraction, retrieval-augmented generation, and automated document analysis. However, real-world documents often feature complex layouts with multi-level tables, embedded images or formulas, and cross-page structures, which remain challenging for existing OCR systems. We introduce MonkeyOCR v1.5, a unified vision-language framework that enhances both layout understanding and content recognition through a two-stage pipeline. The first stage employs a large multimodal model to jointly predict layout and reading order, leveraging visual information to ensure sequential consistency. The second stage performs localized recognition of text, formulas, and tables within detected regions, maintaining high visual fidelity while reducing error propagation. To address complex table structures, we propose a visual consistency-based reinforcement learning scheme that evaluates recognition quality via render-and-compare alignment, improving structural accuracy without manual annotations. Additionally, two specialized modules, Image-Decoupled Table Parsing and Type-Guided Table Merging, are introduced to enable reliable parsing of tables containing embedded images and reconstruction of tables crossing pages or columns. Comprehensive experiments on OmniDocBench v1.5 demonstrate that MonkeyOCR v1.5 achieves state-of-the-art performance, outperforming PPOCR-VL and MinerU 2.5 while showing exceptional robustness in visually complex document scenarios. A trial link can be found at this https URL .",
+    "publicationDate": "2025-11-13T15:12:17.000Z",
+    "votes": 43
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.24973",
+    "title": "MinerU-Popo: Universal Post-Processing Model for Structured Document Parsing",
+    "abstract": "VLM-based OCR models have become the de facto choice for document parsing, as they can accurately extract page-level elements (e.g., paragraphs within individual pages) together with their bounding boxes and textual content. However, downstream applications such as RAG require coherent document-level information, whereas these models often break cross-page continuity and fail to recover disrupted structures, such as paragraphs and tables truncated by page boundaries. Such relationships are not confined to a single page; instead, they require joint analysis of titles, paragraphs, tables, and images spanning multiple pages. A natural solution is therefore to reuse existing OCR outputs and reconstruct document-level logical structures through post-processing.\nTo this end, we propose MinerU-Popo, a lightweight and universal framework for POst-Processing OCR outputs, which converts page-level results from diverse parsers into coherent document-level structures. MinerU-Popo decomposes the problem into four focused subtasks: text truncation recovery, table truncation recovery, title hierarchy reconstruction, and image-text association. To address these effectively, we build a task-oriented data engine with task-specific input filtering, and use the generated data (30K) to fine-tune a lightweight post-processing model (Qwen3-VL-4B). To support long documents, we introduce dynamic chunking with overlap-based synchronization, which aligns chunk-level outputs from the fine-tuned model and preserves global consistency. Finally, we assemble the aligned outputs into a tree-structured document representation, further enriched with node chunking and summaries for downstream retrieval and analysis. Empirical results show MinerU-Popo improves title-hierarchy TEDS by at least 20% across all five tested OCR models, improves RAG accuracy and reduces per-query latency.",
+    "publicationDate": "2026-05-24T10:00:28.000Z",
+    "votes": 13
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.06582",
+    "title": "TabRAG: Improving Tabular Document Question Answering for Retrieval Augmented Generation via Structured Representations",
+    "abstract": "Incorporating external knowledge bases in traditional retrieval-augmented generation (RAG) relies on parsing the document, followed by querying a language model with the parsed information via in-context learning. While effective for text-based documents, question answering on tabular documents often fails to generate plausible responses. Standard parsing techniques lose the two-dimensional structural semantics critical for cell interpretation. In this work, we present TabRAG, a parsing-based RAG framework designed to improve tabular document question answering via structured representations. Our framework consists of layout segmentation that decomposes the document inputs into a series of components, enabling fine-grained extraction. Subsequently, a vision language model parses and extracts the document tables into a hierarchically structured representation. In order to cater various table styles and formats, we integrate a self-generated in-context learning module that guides the table extraction process. Experimental results demonstrate that TabRAG outperforms existing popular parsing techniques across a broad suite of evaluation and ablation benchmarks. Code is available at: this https URL.",
+    "publicationDate": "2025-11-10T00:05:58.000Z",
+    "votes": 26
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.24134",
+    "title": "AgenticOCR: Parsing Only What You Need for Efficient Retrieval-Augmented Generation",
+    "abstract": "The expansion of retrieval-augmented generation (RAG) into multimodal domains has intensified the challenge for processing complex visual documents, such as financial reports. While page-level chunking and retrieval is a natural starting point, it creates a critical bottleneck: delivering entire pages to the generator introduces excessive extraneous context. This not only overloads the generator's attention mechanism but also dilutes the most salient evidence. Moreover, compressing these information-rich pages into a limited visual token budget further increases the risk of hallucinations. To address this, we introduce AgenticOCR, a dynamic parsing paradigm that transforms optical character recognition (OCR) from a static, full-text process into a query-driven, on-demand extraction system. By autonomously analyzing document layout in a \"thinking with images\" manner, AgenticOCR identifies and selectively recognizes regions of interest. This approach performs on-demand decompression of visual tokens precisely where needed, effectively decoupling retrieval granularity from rigid page-level chunking. AgenticOCR has the potential to serve as the \"third building block\" of the visual document RAG stack, operating alongside and enhancing standard Embedding and Reranking modules. Experimental results demonstrate that AgenticOCR improves both the efficiency and accuracy of visual RAG systems, achieving expert-level performance in long document understanding. Code and models are available at this https URL.",
+    "publicationDate": "2026-02-27T16:09:38.000Z",
+    "votes": 30
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.16035",
+    "title": "Vision-Guided Chunking Is All You Need: Enhancing RAG with Multimodal Document Understanding",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems have revolutionized information retrieval and question answering, but traditional text-based chunking methods struggle with complex document structures, multi-page tables, embedded figures, and contextual dependencies across page boundaries. We present a novel multimodal document chunking approach that leverages Large Multimodal Models (LMMs) to process PDF documents in batches while maintaining semantic coherence and structural integrity. Our method processes documents in configurable page batches with cross-batch context preservation, enabling accurate handling of tables spanning multiple pages, embedded visual elements, and procedural content. We evaluate our approach on a curated dataset of PDF documents with manually crafted queries, demonstrating improvements in chunk quality and downstream RAG performance. Our vision-guided approach achieves better accuracy compared to traditional vanilla RAG systems, with qualitative analysis showing superior preservation of document structure and semantic coherence.",
+    "publicationDate": "2025-06-19T05:11:43.000Z",
+    "votes": 41
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.03197",
+    "title": "Infinity Parser: Layout Aware Reinforcement Learning for Scanned Document Parsing",
+    "abstract": "Automated parsing of scanned documents into richly structured, machine-readable formats remains a critical bottleneck in Document AI, as traditional multi-stage pipelines suffer from error propagation and limited adaptability to diverse layouts. We introduce layoutRL, an end-to-end reinforcement learning framework that trains models to be explicitly layout-aware by optimizing a composite reward of normalized edit distance, paragraph count accuracy, and reading order preservation. Leveraging our newly released dataset, Infinity-Doc-55K, which combines 55K high-fidelity synthetic scanned document parsing data with expert-filtered real-world documents, we instantiate layoutRL in a vision-language-model-based parser called Infinity-Parser. Evaluated on English and Chinese benchmarks for OCR, table and formula extraction, and reading order detection, Infinity-Parser achieves new state-of-the-art performance in both accuracy and structural fidelity, outpacing specialist pipelines and general-purpose vision-language models. We will publicly release our code and dataset to accelerate progress in robust document understanding.",
+    "publicationDate": "2025-06-01T15:19:52.000Z",
+    "votes": 17
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2505.14381",
+    "title": "SCAN: Semantic Document Layout Analysis for Textual and Visual Retrieval-Augmented Generation",
+    "abstract": "With the increasing adoption of Large Language Models (LLMs) and Vision-Language Models (VLMs), rich document analysis technologies for applications like Retrieval-Augmented Generation (RAG) and visual RAG are gaining significant attention. Recent research indicates that using VLMs yields better RAG performance, but processing rich documents remains a challenge since a single page contains large amounts of information. In this paper, we present SCAN (SemantiC Document Layout ANalysis), a novel approach that enhances both textual and visual Retrieval-Augmented Generation (RAG) systems that work with visually rich documents. It is a VLM-friendly approach that identifies document components with appropriate semantic granularity, balancing context preservation with processing efficiency. SCAN uses a coarse-grained semantic approach that divides documents into coherent regions covering contiguous components. We trained the SCAN model by fine-tuning object detection models on an annotated dataset. Our experimental results across English and Japanese datasets demonstrate that applying SCAN improves end-to-end textual RAG performance by up to 9.4 points and visual RAG performance by up to 10.4 points, outperforming conventional approaches and even commercial document processing solutions.",
+    "publicationDate": "2025-05-20T14:03:24.000Z",
+    "votes": 23
+  }
+]

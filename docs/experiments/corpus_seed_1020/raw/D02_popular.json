@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2502.09604",
+    "title": "SelfCite: Self-Supervised Alignment for Context Attribution in Large Language Models",
+    "abstract": "We introduce SelfCite, a novel self-supervised approach that aligns LLMs to generate high-quality, fine-grained, sentence-level citations for the statements in their generated responses. Instead of only relying on costly and labor-intensive annotations, SelfCite leverages a reward signal provided by the LLM itself through context ablation: If a citation is necessary, removing the cited text from the context should prevent the same response; if sufficient, retaining the cited text alone should preserve the same response. This reward can guide the inference-time best-of-N sampling strategy to improve citation quality significantly, as well as be used in preference optimization to directly fine-tune the models for generating better citations. The effectiveness of SelfCite is demonstrated by increasing citation F1 up to 5.3 points on the LongBench-Cite benchmark across five long-form question answering tasks. The source code is available at this https URL",
+    "publicationDate": "2025-02-13T18:55:13.000Z",
+    "votes": 45
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2412.18004",
+    "title": "Correctness is not Faithfulness in RAG Attributions",
+    "abstract": "Retrieving relevant context is a common approach to reduce hallucinations and enhance answer reliability. Explicitly citing source documents allows users to verify generated responses and increases trust. Prior work largely evaluates citation correctness - whether cited documents support the corresponding statements. But citation correctness alone is insufficient. To establish trust in attributed answers, we must examine both citation correctness and citation faithfulness. In this work, we first disentangle the notions of citation correctness and faithfulness, which have been applied inconsistently in previous studies. Faithfulness ensures that the model's reliance on cited documents is genuine, reflecting actual reference use rather than superficial alignment with prior beliefs, which we call post-rationalization. We design an experiment that reveals the prevalent issue of post-rationalization, which undermines reliable attribution and may result in misplaced trust. Our findings suggest that current attributed answers often lack citation faithfulness (up to 57 percent of the citations), highlighting the need to evaluate correctness and faithfulness for trustworthy attribution in language models.",
+    "publicationDate": "2024-12-23T21:57:11.000Z",
+    "votes": 28
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2404.01019",
+    "title": "Source-Aware Training Enables Knowledge Attribution in Language Models",
+    "abstract": "Large language models (LLMs) learn a vast amount of knowledge during pretraining, but they are often oblivious to the source(s) of such knowledge. We investigate the problem of intrinsic source citation, where LLMs are required to cite the pretraining source supporting a generated response. Intrinsic source citation can enhance LLM transparency, interpretability, and verifiability. To give LLMs such ability, we explore source-aware training -- a recipe that involves (i) training the LLM to associate unique source document identifiers with the knowledge in each document, followed by (ii) an instruction-tuning stage to teach the LLM to cite a supporting pretraining source when prompted. Source-aware training borrows from existing pretraining/fine-tuning frameworks and requires minimal changes to the model architecture or implementation. Through experiments on synthetic data, we demonstrate that our training recipe can enable faithful attribution to the pretraining data without a substantial impact on the model's perplexity compared to standard pretraining. Our findings also highlight the importance of pretraining data augmentation in achieving attribution. Code and data available here: \\url{this https URL}",
+    "publicationDate": "2024-04-01T09:39:38.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.17853",
+    "title": "CiteGuard: Faithful Citation Attribution for LLMs via Retrieval-Augmented Validation",
+    "abstract": "Large Language Models (LLMs) have emerged as powerful assistants for scientific writing. However, concerns remain about the quality and reliability of the generated text, including citation accuracy and faithfulness. While most recent work relies on methods such as LLM-as-a-Judge, the reliability of LLM-as-a-Judge alone is also in doubt. In this work, we reframe citation evaluation as a problem of citation attribution alignment, which assesses whether LLM-generated citations match those a human author would include for the same text. We propose CiteGuard, a retrieval-aware agent framework designed to provide more faithful grounding for citation validation. CiteGuard improves over the prior baseline by 10 percentage points and achieves up to 68.1% accuracy on the CiteME benchmark, approaching human performance (69.2%). It also identifies alternative valid citations and demonstrates generalization ability for cross-domain citation attribution. Our code is available at this https URL.",
+    "publicationDate": "2025-10-15T00:32:26.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.21557",
+    "title": "Generation-Time vs. Post-hoc Citation: A Holistic Evaluation of LLM Attribution",
+    "abstract": "Trustworthy Large Language Models (LLMs) must cite human-verifiable sources in high-stakes domains such as healthcare, law, academia, and finance, where even small errors can have severe consequences. Practitioners and researchers face a choice: let models generate citations during decoding, or let models draft answers first and then attach appropriate citations. To clarify this choice, we introduce two paradigms: Generation-Time Citation (G-Cite), which produces the answer and citations in one pass, and Post-hoc Citation (P-Cite), which adds or verifies citations after drafting. We conduct a comprehensive evaluation from zero-shot to advanced retrieval-augmented methods across four popular attribution datasets and provide evidence-based recommendations that weigh trade-offs across use cases. Our results show a consistent trade-off between coverage and citation correctness, with retrieval as the main driver of attribution quality in both paradigms. P-Cite methods achieve high coverage with competitive correctness and moderate latency, whereas G-Cite methods prioritize precision at the cost of coverage and speed. We recommend a retrieval-centric, P-Cite-first approach for high-stakes applications, reserving G-Cite for precision-critical settings such as strict claim verification. Our codes and human evaluation results are available at this https URL",
+    "publicationDate": "2025-09-25T20:39:26.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2407.01796",
+    "title": "Ground Every Sentence: Improving Retrieval-Augmented LLMs with  Interleaved Reference-Claim Generation",
+    "abstract": "Retrieval-Augmented Generation (RAG) has been widely adopted to enhance Large\nLanguage Models (LLMs) in knowledge-intensive tasks. To enhance credibility and\nverifiability in RAG systems, Attributed Text Generation (ATG) is proposed,\nwhich provides citations to retrieval knowledge in LLM-generated responses.\nPrior methods mainly adopt coarse-grained attributions, with passage-level or\nparagraph-level references or citations, which fall short in verifiability.\nThis paper proposes ReClaim (Refer & Claim), a fine-grained ATG method that\nalternates the generation of references and answers step by step. Different\nfrom previous coarse-grained attribution, ReClaim provides sentence-level\ncitations in long-form question-answering tasks. With extensive experiments, we\nverify the effectiveness of ReClaim in extensive settings, achieving a citation\naccuracy rate of 90%.",
+    "publicationDate": "2024-07-01T20:47:47.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.11394",
+    "title": "VeriCite: Towards Reliable Citations in Retrieval-Augmented Generation via Rigorous Verification",
+    "abstract": "Retrieval-Augmented Generation (RAG) has emerged as a crucial approach for enhancing the responses of large language models (LLMs) with external knowledge sources. Despite the impressive performance in complex question-answering tasks, RAG still struggles with hallucinations. Attributing RAG-generated content through in-line citations has demonstrated potential in reducing hallucinations and facilitating human verification. Existing citation generation methods primarily rely on either fine-tuning the generator or employing post-processing approaches for citation matching. However, the former approach demands substantial annotated data and computational resources, while the latter often encounters difficulties in managing multiple citations and frequently produces suboptimal results. In this paper, we introduce a novel framework, called VeriCite, designed to rigorously validate supporting evidence and enhance answer attribution. Specifically, VeriCite breaks down into a three-stage generation: 1) The initial answer generation first generates a response based on all available contexts and has its claims verified through the NLI model; 2) the supporting evidence selection assesses the utility of each document and extracts useful supporting evidences; 3) the final answer refinement integrates the initial response and collected evidences to produce the final, refined this http URL conduct experiments across five open-source LLMs and four datasets, demonstrating that VeriCite can significantly improve citation quality while maintaining the correctness of the answers.",
+    "publicationDate": "2025-10-13T13:38:54.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2406.13663",
+    "title": "Model Internals-based Answer Attribution for Trustworthy Retrieval-Augmented Generation",
+    "abstract": "Ensuring the verifiability of model answers is a fundamental challenge for retrieval-augmented generation (RAG) in the question answering (QA) domain. Recently, self-citation prompting was proposed to make large language models (LLMs) generate citations to supporting documents along with their answers. However, self-citing LLMs often struggle to match the required format, refer to non-existent sources, and fail to faithfully reflect LLMs' context usage throughout the generation. In this work, we present MIRAGE --Model Internals-based RAG Explanations -- a plug-and-play approach using model internals for faithful answer attribution in RAG applications. MIRAGE detects context-sensitive answer tokens and pairs them with retrieved documents contributing to their prediction via saliency methods. We evaluate our proposed approach on a multilingual extractive QA dataset, finding high agreement with human answer attribution. On open-ended QA, MIRAGE achieves citation quality and efficiency comparable to self-citation while also allowing for a finer-grained control of attribution parameters. Our qualitative evaluation highlights the faithfulness of MIRAGE's attributions and underscores the promising application of model internals for RAG answer attribution.",
+    "publicationDate": "2024-06-19T16:10:26.000Z",
+    "votes": 10
+  }
+]

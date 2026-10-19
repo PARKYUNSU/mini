@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.09412",
+    "title": "Finding the Right Balance: Relevance and Diversity in LLM Retrieval",
+    "abstract": "Retrieval diversification is widely available in retrieval-augmented generation (RAG) frameworks, yet prior studies disagree on whether it improves retrieval and answer quality. We show that its effectiveness varies primarily with candidate-pool redundancy, in a pattern consistent with the number of distinct evidence pieces a query requires. Using controlled near-duplicate injection and production-style overlapping chunking, we find that diversification harms relevance, evidence coverage and answer quality on clean pools, but becomes beneficial on multi-evidence tasks when redundancy causes nearest-neighbor retrieval to select repeated passages. We therefore introduce a query-adaptive rule that diversifies only when the effective number of distinct documents in the nearest-neighbor top-$k$ selection falls below the query's evidence requirement. Computed from existing embeddings, the rule captures most of the achievable gain, transfers across datasets and encoders and automatically reduces to nearest-neighbor retrieval for single-evidence queries. We also introduce RNG-Score, a geometric reranker with an exact nearest-neighbor fallback whose margin indicates duplicate structure. Overall, we conclude that diversification should be used selectively, based on observable redundancy and evidence requirements.",
+    "publicationDate": "2026-10-07T04:14:31.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.26379",
+    "title": "Assessing the Downstream Utility of Evidence-Aware Retrieval in RAG",
+    "abstract": "Retrieval evaluation for retrieval-augmented generation (RAG) is increasingly designed around whether retrieved passages contain evidence that can support generation, rather than topical relevance alone. We study whether this closer alignment with downstream evidence needs also makes retrieval evaluation more useful for the decisions built from it.\nAcross five retrieval benchmarks and an end-to-end TREC RAG 2025 setting, we examine an answer-support signal in four roles: comparing retrievers, guiding retrieval training and system selection, predicting downstream answer quality, and filtering the evidence supplied to a generator. The signal changes retrieval rankings, but its downstream value is not uniform. It does not reliably improve retriever training; the benefit of using it for system selection depends on how the generator is instructed to use the retrieved evidence; and retrieval scores based on it do not robustly predict answer quality on unseen topics. In a direct evidence intervention, human annotators confirm that filtering preferentially preserves passages containing useful answer evidence, yet different answer evaluators reach different conclusions about whether the resulting answers improve.\nThese results show that making retrieval evaluation more closely reflect the evidence needed for generation does not by itself make every downstream use of that evaluation more reliable. RAG evaluation methods should therefore be assessed with respect to the particular comparisons, decisions, and conclusions they are intended to support.",
+    "publicationDate": "2026-08-26T20:07:45.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.03454",
+    "title": "When Retrieval Helps: Selective Retrieval for Single-Turn Mental-Health QA",
+    "abstract": "Retrieval-augmented generation (RAG) can improve the specificity and grounding of large language model responses, but its effect is not uniformly beneficial in single-turn mental-health question answering, where user queries often combine emotional distress, treatment concerns, and safety-sensitive needs. We study when retrieval helps or hurts mental-health QA, and whether a lightweight selective retrieval policy can better control this trade-off. We operationalize retrieval need using three draft-conditioned utility dimensions: psychoeducational need, coping need, and response specificity, together with a rule-based safety trigger. Following psychotherapy-grounded RAG systems such as coTherapist, we construct a compact and controllable guideline corpus comprising coping-strategy, psychoeducational, and safety resources. We fine-tune an instruction-tuned generator on MentalChat16K using QLoRA and compare Closed-book, Always Retrieval, and Selective Retrieval settings on CounselBench-Eval and CounselBench-Adv. Experiments show that retrieval is not uniformly beneficial in this domain. Always Retrieval improves specificity but lowers overall quality and introduces additional safety-sensitive failures. Selective Retrieval preserves closed-book behavior for low-need cases while avoiding the additional degradation caused by unconditional retrieval, supporting the view that retrieval activation is a safety-sensitive control decision.",
+    "publicationDate": "2026-09-03T07:13:58.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.26192",
+    "title": "Comparing Chunking and Embedding Strategies for Turkish RAG Systems",
+    "abstract": "Retrieval-Augmented Generation conditions a language model on chunks retrieved from a document collection. Its accuracy is therefore limited by the chunking and embedding stages that determine what can be retrieved. We compare Turkish document question answering across three chunking strategies (fixed-length, semantic, and layout-aware Docling), five embedding models, and two LLMs, over three documents with contrasting layouts. Every configuration answers the same question set, which allows component effects to be separated by paired testing rather than inferred from separate benchmarks. The fully crossed design yields 9{,}000 graded question-answer evaluations, each scored by an independent judge model, and component comparisons are tested by paired McNemar tests under Holm correction. The three leading embedding models are statistically indistinguishable, so language specialization yields no measurable retrieval advantage. The faster LLM is not the more accurate one. The preferred configuration depends on content type, since layout-aware chunking helps table-heavy documents far more than text-heavy ones.",
+    "publicationDate": "2026-08-24T07:24:37.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.13956",
+    "title": "How retriever redundancy and diversity impact RAG effectiveness",
+    "abstract": "In RAG, while the retriever typically ranks documents by their individual relevance to the query, the generator instead produces an answer based on the retrieved documents as a whole. This paper investigates how redundancy and diversity from the retrieved document set impact the generator in terms of answer correctness.\nPrevious work has provided a mix of findings: some showing that redundancy improves generation by reinforcing relevant information, others that LLM-based paraphrasing of the same content may be beneficial. Many of these studies did not control for confounding factors like whether the documents contained the exact answer or not, and if parametric knowledge plays a role. We conduct a carefully controlled experiment investigating three key scenarios of retrieved document sets: 1) Duplicate (exact copies of the same document), 2) Paraphrased (LLM rephrased versions of one document) and 3) Diverse (documents from different genres each containing relevant information in different forms). We control for which documents contain the answer in exact match or rephrased form.\nEvaluation is done with FictionalQA, a synthetic, fictional question-answer dataset that ensures the LLM generator prior knowledge cannot answer the question; the answer must come from retrieved documents. We show that duplicate redundancy and LLM paraphrasing does not significantly improve answer correctness. However, providing diverse documents is highly beneficial, improving answer correctness by 17%-47%. We further show this improvement is driven by diverse forms of document genre (news, blogs, etc.) alone and not a consequence of more relevant answer being available to generator. Our findings help to direct more attention to how new retrieval methods might improve RAG by catering to the generator preference for diversity in retrieval results.",
+    "publicationDate": "2026-08-14T04:55:31.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.01852",
+    "title": "Evaluating Chunking Strategies for Retrieval-Augmented Generation on Academic Texts",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems use the question-answering capabilities of Large Language Models (LLMs) to access information outside their parameters. We evaluate if cluster-based semantic chunking improves retrieval and answer quality compared to fixed-size and recursive chunking evaluating on long, structured academic theses using the Retrieval Augmented Generation Assessment (RAGAs) framework. RAGAs based faithfulness shows limited reliability in this setup. Performance on fixed versus document specific questions varied substantially, likely related to the formatting of documents and preprocessing. Under the tested configuration, cluster-based chunking did not outperform simpler strategies.",
+    "publicationDate": "2026-07-02T08:12:35.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.07783",
+    "title": "Evaluating RAG Reliability under Clean, Misleading, and Mixed Retrieval",
+    "abstract": "Retrieval-Augmented Generation (RAG) is widely used to improve the factual reliability of large language models (LLMs) by grounding answers in retrieved evidence. In misinformation-rich environments, however, retrieved content may include plausible but incorrect information, raising concerns about the reliability of RAG-based information access systems.\nIn this work, we propose an evaluation protocol to systematically test how the RAG system handles conflicts between parametric knowledge and evidence retrieved from context with varying amounts of misleading information. We target correct answers to factoid questions that the model responds to correctly, even when there is no retrieval, and use this to test the system with clean, poisoned, and mixed evidence.\nThe proposed analytical framework combines parametric override and confidence metrics to assess when and how misleading information affects the generation process of LLMs. This study aims to provide insights into the robustness of RAG systems in information disorder scenarios.",
+    "publicationDate": "2026-06-05T18:54:23.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.12469",
+    "title": "Influence Factors on RAG Poisoning",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems enhance large language models by grounding responses in retrieved documents from external knowledge sources at inference time. However, this reliance on retrieved content introduces vulnerabilities to poisoning attacks, in which adversarial documents can manipulate both the retrieval process and the generated outputs. This paper investigates poisoning robustness in RAG through a full factorial experimental study covering 432 configurations. We analyze the impacts of dataset, retriever type, retrieval depth, database composition, chunking strategy, and generator model on retrieval-level and generation-level metrics. The results show that retriever architecture, dataset, and retrieval depth are the strongest factors affecting poisoning exposure, while generator choice and database composition have a major impact on downstream attack success. Dense and graph-based retrievers generally improve robustness relative to BM25, whereas larger retrieval depth increases the likelihood of retrieving poisoned passages. We further show that replicating poisoned content across multiple databases amplifies adversarial influence, while additional clean sources can mitigate it. These findings highlight that poisoning vulnerability in RAG is not attributable to a single component, but instead arises from the interaction of retrieval, generation, and knowledge-base configuration.",
+    "publicationDate": "2026-06-09T19:07:42.000Z",
+    "votes": 0
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2411.04403",
+    "title": "Towards Competitive Search Relevance For Inference-Free Learned Sparse Retrievers",
+    "abstract": "Learned sparse retrieval, which can efficiently perform retrieval through mature inverted-index engines, has garnered growing attention in recent years. Particularly, the inference-free sparse retrievers are attractive as they eliminate online model inference in the retrieval phase thereby avoids huge computational cost, offering reasonable throughput and latency. However, even the state-of-the-art (SOTA) inference-free sparse models lag far behind in terms of search relevance when compared to both sparse and dense siamese models. Towards competitive search relevance for inference-free sparse retrievers, we argue that they deserve dedicated training methods other than using same ones with siamese encoders. In this paper, we propose two different approaches for performance improvement. First, we propose an IDF-aware penalty for the matching function that suppresses the contribution of low-IDF tokens and increases the model's focus on informative terms. Moreover, we propose a heterogeneous ensemble knowledge distillation framework that combines siamese dense and sparse retrievers to generate supervisory signals during the pre-training phase. The ensemble framework of dense and sparse retriever capitalizes on their strengths respectively, providing a strong upper bound for knowledge distillation. To concur the diverse feedback from heterogeneous supervisors, we normalize and then aggregate the outputs of the teacher models to eliminate score scale differences. On the BEIR benchmark, our model outperforms existing SOTA inference-free sparse model by \\textbf{3.3 NDCG@10 score}. It exhibits search relevance comparable to siamese sparse retrievers and client-side latency only \\textbf{1.1x that of BM25}.",
+    "publicationDate": "2024-11-07T03:46:43.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2107.05720",
+    "title": "SPLADE: Sparse Lexical and Expansion Model for First Stage Ranking",
+    "abstract": "In neural Information Retrieval, ongoing research is directed towards improving the first retriever in ranking pipelines. Learning dense embeddings to conduct retrieval using efficient approximate nearest neighbors methods has proven to work well. Meanwhile, there has been a growing interest in learning sparse representations for documents and queries, that could inherit from the desirable properties of bag-of-words models such as the exact matching of terms and the efficiency of inverted indexes. In this work, we present a new first-stage ranker based on explicit sparsity regularization and a log-saturation effect on term weights, leading to highly sparse representations and competitive results with respect to state-of-the-art dense and sparse methods. Our approach is simple, trained end-to-end in a single stage. We also explore the trade-off between effectiveness and efficiency, by controlling the contribution of the sparsity regularization.",
+    "publicationDate": "2021-07-12T20:17:44.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2210.11934",
+    "title": "An Analysis of Fusion Functions for Hybrid Retrieval",
+    "abstract": "We study hybrid search in text retrieval where lexical and semantic search\nare fused together with the intuition that the two are complementary in how\nthey model relevance. In particular, we examine fusion by a convex combination\n(CC) of lexical and semantic scores, as well as the Reciprocal Rank Fusion\n(RRF) method, and identify their advantages and potential pitfalls. Contrary to\nexisting studies, we find RRF to be sensitive to its parameters; that the\nlearning of a CC fusion is generally agnostic to the choice of score\nnormalization; that CC outperforms RRF in in-domain and out-of-domain settings;\nand finally, that CC is sample efficient, requiring only a small set of\ntraining examples to tune its only parameter to a target domain.",
+    "publicationDate": "2022-10-21T13:10:28.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.16351",
+    "title": "Training for Compositional Sensitivity Reduces Dense Retrieval Generalization",
+    "abstract": "Dense retrieval compresses texts into single embeddings ranked by cosine similarity. While efficient for recall, this interface is brittle for identity-level matching: minimal compositional edits (negation, role swaps) flip meaning yet retain high similarity. Motivated by geometric results for unit-sphere cosine spaces (Kang et al., 2025), we test this retrieval-composition tension in text-only retrieval. Across four dual-encoder backbones, adding structure-targeted negatives consistently reduces zero-shot NanoBEIR retrieval (8-9% mean nDCG@10 drop on small backbones; up to 40% on medium ones), while only partially improving pooled-space separation. Treating pooled cosine as a recall interface, we then benchmark verifiers scoring token--token cosine maps. MaxSim (late interaction) excels at reranking but fails to reject structural near-misses, whereas a small Transformer over similarity maps reliably separates near-misses under end-to-end training.",
+    "publicationDate": "2026-03-16T20:25:39.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2405.13173",
+    "title": "Efficient and Interpretable Information Retrieval for Product Question  Answering with Heterogeneous Data",
+    "abstract": "Expansion-enhanced sparse lexical representation improves information\nretrieval (IR) by minimizing vocabulary mismatch problems during lexical\nmatching. In this paper, we explore the potential of jointly learning dense\nsemantic representation and combining it with the lexical one for ranking\ncandidate information. We present a hybrid information retrieval mechanism that\nmaximizes lexical and semantic matching while minimizing their shortcomings.\nOur architecture consists of dual hybrid encoders that independently encode\nqueries and information elements. Each encoder jointly learns a dense semantic\nrepresentation and a sparse lexical representation augmented by a learnable\nterm expansion of the corresponding text through contrastive learning. We\ndemonstrate the efficacy of our model in single-stage ranking of a benchmark\nproduct question-answering dataset containing the typical heterogeneous\ninformation available on online product pages. Our evaluation demonstrates that\nour hybrid approach outperforms independently trained retrievers by 10.95%\n(sparse) and 2.7% (dense) in MRR@5 score. Moreover, our model offers better\ninterpretability and performs comparably to state-of-the-art cross encoders\nwhile reducing response time by 30% (latency) and cutting computational load by\napproximately 38% (FLOPs).",
+    "publicationDate": "2024-05-21T19:46:35.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.13728",
+    "title": "Hybrid Retrieval for COVID-19 Literature: Comparing Rank Fusion and Projection Fusion with Diversity Reranking",
+    "abstract": "We present a hybrid retrieval system for COVID-19 scientific literature, evaluated on the TREC-COVID benchmark (171,332 papers, 50 expert queries). The system implements six retrieval configurations spanning sparse (SPLADE), dense (BGE), rank-level fusion (RRF), and a projection-based vector fusion (B5) approach. RRF fusion achieves the best relevance (nDCG@10 = 0.828), outperforming dense-only by 6.1% and sparse-only by 14.9%. Our projection fusion variant reaches nDCG@10 = 0.678 on expert queries while being 33% faster (847 ms vs. 1271 ms) and producing 2.2x higher ILD@10 than RRF. Evaluation across 400 queries -- including expert, machine-generated, and three paraphrase styles -- shows that B5 delivers the largest relative gain on keyword-heavy reformulations (+8.8%), although RRF remains best in absolute nDCG@10. On expert queries, MMR reranking increases intra-list diversity by 23.8-24.5% at a 20.4-25.4% nDCG@10 cost. Both fusion pipelines evaluated for latency remain below the sub-2 s target across all query sets. The system is deployed as a Streamlit web application backed by Pinecone serverless indices.",
+    "publicationDate": "2026-04-15T11:05:46.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2403.13291",
+    "title": "An Analysis on Matching Mechanisms and Token Pruning for Late-interaction Models",
+    "abstract": "With the development of pre-trained language models, the dense retrieval models have become promising alternatives to the traditional retrieval models that rely on exact match and sparse bag-of-words representations. Different from most dense retrieval models using a bi-encoder to encode each query or document into a dense vector, the recently proposed late-interaction multi-vector models (i.e., ColBERT and COIL) achieve state-of-the-art retrieval effectiveness by using all token embeddings to represent documents and queries and modeling their relevance with a sum-of-max operation. However, these fine-grained representations may cause unacceptable storage overhead for practical search systems. In this study, we systematically analyze the matching mechanism of these late-interaction models and show that the sum-of-max operation heavily relies on the co-occurrence signals and some important words in the document. Based on these findings, we then propose several simple document pruning methods to reduce the storage overhead and compare the effectiveness of different pruning methods on different late-interaction models. We also leverage query pruning methods to further reduce the retrieval latency. We conduct extensive experiments on both in-domain and out-domain datasets and show that some of the used pruning methods can significantly improve the efficiency of these late-interaction models without substantially hurting their retrieval effectiveness.",
+    "publicationDate": "2024-03-20T04:10:37.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.01405",
+    "title": "Balancing the Blend: An Experimental Analysis of Trade-offs in Hybrid Search",
+    "abstract": "Hybrid search, the integration of lexical and semantic retrieval, has become a cornerstone of modern information retrieval systems, driven by demanding applications like Retrieval-Augmented Generation (RAG). The architectural design space for these systems is vast and complex, yet a systematic understanding of the trade-offs among their core components -- retrieval paradigms, combination schemes, and re-ranking methods -- is lacking. To address this, and informed by our experience building the Infinity open-source database, we present the first experimental analysis of advanced hybrid search architectures. Our framework integrates four retrieval paradigms -- Full-Text Search (FTS), Sparse Vector Search (SVS), Dense Vector Search (DVS), and Tensor Search (TenS) -- and evaluates their combinations and re-ranking strategies across 11 real-world datasets. Our results reveal three key findings: (1) A \"weakest link\" phenomenon, where a weak path can substantially degrade overall accuracy, highlighting the need for path-wise quality assessment before fusion. (2) A data-driven map of performance trade-offs, demonstrating that optimal configurations depend heavily on resource constraints and data characteristics, precluding a one-size-fits-all solution. (3) The identification of Tensor-based Re-ranking Fusion (TRF) as a high-efficacy alternative to mainstream fusion methods, offering the semantic power of tensor search at a fraction of the computational and memory cost. Our findings offer concrete guidelines for designing adaptive, scalable hybrid search systems and identify key directions for future research.",
+    "publicationDate": "2025-08-02T15:24:01.000Z",
+    "votes": 1
+  }
+]

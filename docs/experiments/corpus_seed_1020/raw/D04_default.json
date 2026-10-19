@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2608.05823",
+    "title": "Decomposed Entailment for Factuality Checking and Hallucination Detection",
+    "abstract": "The reliability of Large Language Models (LLMs) is often compromised by factual inconsistencies, including hallucinations---cases where generated content is not supported by the underlying source. We present HallDetect, a lightweight, reference-free, and black-box framework for hallucination detection that we evaluate not only on summarization but across a broader range of source-grounded generation settings. HallDetect builds on decomposition-based factuality evaluation: generated content is decomposed into atomic claims, each verified by a compact encoder-based entailment model through a contrastive formulation over a multi-scale library of source chunks, and aggregated with an asymmetric score in which a single confidently contradicted claim flags the response. Under a controlled protocol in which all methods share the same 4-bit quantized backbones and consumer-grade hardware budget, HallDetect outperforms comparably resourced generative and embedding-based baselines on three of four benchmarks while remaining stable across backbone families, and yields a claim-to-span audit trail that localizes each error.",
+    "publicationDate": "2026-08-06T09:52:09.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.12900",
+    "title": "Zero-source LLM Hallucination Detection with Human-like Criteria Probing",
+    "abstract": "Large language models (LLMs) often hallucinate by generating factually incorrect or unfaithful content, posing significant risks to their safe use. Detecting such hallucinations is particularly challenging under the zero-source constraint, where no model internals or external references are available, and detection must rely solely on the textual query-answer pair. In this paper, we propose Human-like Criteria Probing for Hallucination Detection (HCPD), a paradigm that emulates the multi-faceted reasoning of human evaluators. Its core is a Human-like Criteria Probing (HCP) mechanism, in which a LLM agent adaptively decomposes its judgment into a weighted set of interpretable criteria and aggregates criterion-specific scores into a final truthfulness measure. To achieve this adaptive capability, we introduce a reward-based alignment scheme using only weak supervision from semantic consistency. At inference, we employ a multi-sampling aggregation strategy to ensure robust decisions while preserving full interpretability. We further provide theoretical analysis supporting the reliability of our approach. Extensive experiments show that HCPD consistently outperforms state-of-the-art baselines, offering an effective and explainable solution for zero-source hallucination detection. Code is available at this https URL.",
+    "publicationDate": "2026-06-11T04:58:05.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.03628",
+    "title": "Building Reliable Long-Form Generation via Hallucination Rejection Sampling",
+    "abstract": "Large language models (LLMs) have achieved remarkable progress in open-ended text generation, yet they remain prone to hallucinating incorrect or unsupported content, which undermines their reliability. This issue is exacerbated in long-form generation due to hallucination snowballing, a phenomenon where early errors propagate and compound into subsequent outputs. To address this challenge, we propose a novel inference-time hallucination mitigation framework, named Segment-wise HAllucination Rejection Sampling (SHARS), which uses an arbitrary hallucination detector to identify and reject hallucinated segments during generation and resample until faithful content is produced. By retaining only confident information and building subsequent generations upon it, the framework mitigates hallucination accumulation and enhances factual consistency. To instantiate this framework, we adopt semantic uncertainty as the detector and introduce several vital modifications to address its limitations and better adapt it to long-form text. Our method enables models to self-correct hallucinations without requiring external resources such as web search or knowledge bases, while remaining compatible with them for future extensions. Empirical evaluations on standardized hallucination benchmarks demonstrate that our method substantially reduces hallucinations in long-form generation while preserving or even improving the informativeness of generation. Code is available at: this https URL.",
+    "publicationDate": "2026-06-02T13:26:17.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.08158",
+    "title": "Constrained Paraphrase Consistency for LLM Hallucination Detection",
+    "abstract": "Large language models (LLMs) can generate factually inconsistent claims, motivating accurate and scalable hallucination detectors. Prior work largely enlarges training sets via synthesis or new annotations, introducing increasing cost and potential bias while underusing the consistency implied by semantically equivalent paraphrases. We propose Consistency-Constrained Hallucination Detector (CCHD), which formulates training as a constrained optimization problem. The standard cross-entropy on original document-claim pairs is complemented by (i) paraphrase-consistency constraints bounding divergence across paraphrased views, and (ii) label-preservation constraints tying paraphrases to ground truth. We solve the problem by gradient descent-ascent over model parameters and per-view Lagrange multipliers, adding only a few scalar dual variables and no inference-time overhead. With DeBERTa and Flan-T5 backbones, CCHD consistently outperforms strong baselines (FactCG, MiniCheck, and AlignScore) on standard factuality benchmarks, demonstrating its superiority on hallucination detection.",
+    "publicationDate": "2026-06-06T13:14:10.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.03971",
+    "title": "Logical Consistency as a Bridge: Improving LLM Hallucination Detection via Label Constraint Modeling between Responses and Self-Judgments",
+    "abstract": "Large Language Models (LLMs) are prone to factual hallucinations, risking their reliability in real-world applications. Existing hallucination detectors mainly extract micro-level intrinsic patterns for uncertainty quantification or elicit macro-level self-judgments through verbalized prompts. However, these methods address only a single facet of the hallucination, focusing either on implicit neural uncertainty or explicit symbolic reasoning, thereby treating these inherently coupled behaviors in isolation and failing to exploit their interdependence for a holistic view. In this paper, we propose LaaB (Logical Consistency-as-a-Bridge), a framework that bridges neural features and symbolic judgments for hallucination detection. LaaB introduces a \"meta-judgment\" process to map symbolic labels back into the feature space. By leveraging the inherent logical bridge where response and meta-judgment labels are either the same or opposite based on the self-judgment's semantics, LaaB aligns and integrates dual-view signals via mutual learning and enhances the hallucination detection. Extensive experiments on 4 public datasets, across 4 LLMs, against 8 baselines demonstrate the superiority of LaaB.",
+    "publicationDate": "2026-05-05T16:53:20.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.18145",
+    "title": "Detecting Contextual Hallucinations in LLMs with Frequency-Aware Attention",
+    "abstract": "Hallucination detection is critical for ensuring the reliability of large language models (LLMs) in context-based generation. Prior work has explored intrinsic signals available during generation, among which attention offers a direct view of grounding behavior. However, existing approaches typically rely on coarse summaries that fail to capture fine-grained instabilities in attention. Inspired by signal processing, we introduce a frequency-aware perspective on attention by analyzing its variation during generation. We model attention distributions as discrete signals and extract high-frequency components that reflect rapid local changes in attention. Our analysis reveals that hallucinated tokens are associated with high-frequency attention energy, reflecting fragmented and unstable grounding behavior. Based on this insight, we develop a lightweight hallucination detector using high-frequency attention features. Experiments on the RAGTruth and HalluRAG benchmarks show that our approach achieves performance gains over verification-based, internal-representation-based, and attention-based methods across models and tasks.",
+    "publicationDate": "2026-02-20T11:18:45.000Z",
+    "votes": 17
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.10697",
+    "title": "Attention Sinks as Internal Signals for Hallucination Detection in Large Language Models",
+    "abstract": "Large language models frequently exhibit hallucinations: fluent and confident outputs that are factually incorrect or unsupported by the input context. While recent hallucination detection methods have explored various features derived from attention maps, the underlying mechanisms they exploit remain poorly understood. In this work, we propose SinkProbe, a hallucination detection method grounded in the observation that hallucinations are deeply entangled with attention sinks - tokens that accumulate disproportionate attention mass during generation - indicating a transition from distributed, input-grounded attention to compressed, prior-dominated computation. Importantly, although sink scores are computed solely from attention maps, we find that the classifier preferentially relies on sinks whose associated value vectors have large norms. Moreover, we show that previous methods implicitly depend on attention sinks by establishing their mathematical relationship to sink scores. Our findings yield a novel hallucination detection method grounded in theory that produces state-of-the-art results across popular datasets and LLMs.",
+    "publicationDate": "2026-04-12T15:46:22.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.07253",
+    "title": "From Out-of-Distribution Detection to Hallucination Detection: A Geometric View",
+    "abstract": "Detecting hallucinations in large language models is a critical open problem with significant implications for safety and reliability. While existing hallucination detection methods achieve strong performance in question-answering tasks, they remain less effective on tasks requiring reasoning. In this work, we revisit hallucination detection through the lens of out-of-distribution (OOD) detection, a well-studied problem in areas like computer vision. Treating next-token prediction in language models as a classification task allows us to apply OOD techniques, provided appropriate modifications are made to account for the structural differences in large language models. We show that OOD-based approaches yield training-free, single-sample-based detectors, achieving strong accuracy in hallucination detection for reasoning tasks. Overall, our work suggests that reframing hallucination detection as OOD detection provides a promising and scalable pathway toward language model safety.",
+    "publicationDate": "2026-02-06T23:05:48.000Z",
+    "votes": 4
+  }
+]

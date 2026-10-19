@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.04691",
+    "title": "RAGStress: A controlled benchmark for evaluating retrieval-augmented generation under knowledge-base degradation",
+    "abstract": "Retrieval-Augmented Generation (RAG) is typically evaluated under the implicit assumption that the underlying knowledge base (KB) is clean, leaving the behaviour of RAG systems under realistic KB degradation poorly characterised. We introduce RAGStress, a controlled evaluation benchmark for stress-testing RAG systems under systematic KB corruption. The benchmark pairs four naturalistic corruption types (factual corruption, numeric typo, relevance poisoning, and contradiction injection) with three severity levels (subtle, moderate, and obvious) over a single-KB, metadata-filtered experimental design built from 57 MMLU subjects and 182,546 documents. Across 52,500 model-question-condition evaluations, RAGStress reveals that clean retrieval can mask robustness differences, semantic-fidelity corruptions are substantially more harmful than signal-utility perturbations, no-retrieval accuracy does not predict corrupted-retrieval robustness, and mixed-KB accuracy should not be treated as worst-case robustness. We document the benchmark's intended use, supported claims, and limitations, and provide an artifact bundle including generation scripts, corruption prompts, metadata schema, and evaluation code. RAGStress is intended as a controlled stress test for RAG robustness under KB corruption, not as a general model leaderboard.",
+    "publicationDate": "2026-10-03T18:07:17.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.00543",
+    "title": "Feedback-Assisted Trust Propagation over Document Relation Graphs for Retrieval-Augmented Generation",
+    "abstract": "Retrieval-augmented generation (RAG) systems rely on external corpora that may contain outdated, contradictory, noisy, or unreliable documents, introducing reliability risks. Prior work has leveraged document relations to improve the answer reliability of RAG. To propagate reliability signals beyond directly compared document pairs, we propose TrustPropRAG, which structures document relations as a graph and estimates document reliability through multi-hop propagation across the graph. TrustPropRAG anchors this propagation with a limited set of human feedback on document reliability, extending these costly-to-collect feedback-based reliability signals across the whole corpus. Specifically, based on the constructed document relation graph, TrustPropRAG estimates a trust score for each document by formulating and solving an optimization problem that jointly captures pairwise document relations and user feedback. These scores are then used to improve the selection of reliable documents and support trust-aware answer generation. Evaluation results show that TrustPropRAG improves both retrieval quality and exact match over baselines, and remains robust under sparse and noisy feedback.",
+    "publicationDate": "2026-09-01T01:30:15.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.23419",
+    "title": "Robustness of IR Models to Collection Growth",
+    "abstract": "Information Retrieval (IR) systems seek to identify relevant documents within a collection. In practical applications, collections are dynamic, with documents frequently added. We argue that ideally, a retriever's effectiveness should not decrease when non-relevant documents are added to a collection. This study formalises this concept and empirically evaluates it by merging two collections with negligible topic overlap. We hypothesise that the way an IR model conditions its ranking on other documents in a collection (e.g., the IDF component in BM25 or contextual documents in listwise rerankers) plays an important role in its robustness to the addition of non-relevant documents. We broadly classify models as those that do not depend on other documents (Multi-Document-Agnostic, MDA) and those that do (Multi-Document-Dependent, MDD). Our results show that neither MDD nor MDA models are fully robust to the addition of non-relevant documents, as all models exhibit some performance degradation. Interestingly, among the models we test, MDA is more effective than MDD for retrieval, whereas MDD and MDA rerankers are equally effective.",
+    "publicationDate": "2026-08-24T16:00:20.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.09243",
+    "title": "In RAG We Trust? Measuring Robustness of Retrieval-Augmented Generation Under Document Poisoning",
+    "abstract": "Retrieval-augmented generation (RAG) grounds a language model in retrieved documents, which reduces hallucination but creates a new attack surface: if retrieved text is tampered with, the model may repeat the falsehood. We study how much a small quantized model, Llama 3.1 8B, degrades when a fraction of its retrieved context is poisoned. Three corruption strategies are tested, entity swap, number swap, and negation, each applied to zero, one, two, or three of the three retrieved passages, over a factorial sweep of 588 runs on a fact-checking task built from FEVER. Accuracy falls from 77.9% on clean context to 43.5% when all three passages are corrupted. Entity swap flips the largest share of answers that were correct on clean context. Number-based corruption stays flat while poisoned passages are a minority and jumps once they form a majority, a pattern we re-check with query-level bootstrap intervals. The model rarely invents new falsehoods; its dominant reaction is to abstain, and a lexical overlap proxy of unsupported generation falls under attack rather than rising. The study is a small-scale measurement with coarse automated labels; we treat the strategy contrasts as suggestive until decoding is controlled and stronger adjudication is in place.",
+    "publicationDate": "2026-09-08T08:31:57.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.03615",
+    "title": "The Powerless Noise: How Experimental Settings Shape the Reported Power of Noise",
+    "abstract": "Recent work has suggested that adding irrelevant documents to the input of retrieval-augmented generation (RAG) systems can improve question-answering performance, a phenomenon referred to as the Power of Noise. This motivated investigations into the role of noise in information retrieval. In this paper, we reproduce the main findings of Cuconasu et al. and evaluate the robustness of the effect under extended experimental settings. We first confirm that the phenomenon holds under the original setup, which uses earlier-generation LLMs, restrictive prompting and constrained decoding settings. We subsequently introduce a series of extensions to investigate the underlying causes of the noise effect, examining the authors' original design choices including the use of different models, instruction prompting, and relaxed output length constraints. Across these ablations, the Power-of-Noise pattern proves highly sensitive to inference configuration: it can appear, weaken, or disappear under small changes to prompt formulation and decoding limits. Combined with our error analysis, which shows substantial contributions from truncation and malformed generations, this variance indicates that the original effect cannot be robustly confirmed as a general benefit of noisy retrieval under these experimental conditions. More broadly, our work highlights the importance of carefully scrutinizing inference design in retrieval-augmented generation systems. Our code is available at this https URL.",
+    "publicationDate": "2026-07-03T22:06:20.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.01852",
+    "title": "Evaluating Chunking Strategies for Retrieval-Augmented Generation on Academic Texts",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems use the question-answering capabilities of Large Language Models (LLMs) to access information outside their parameters. We evaluate if cluster-based semantic chunking improves retrieval and answer quality compared to fixed-size and recursive chunking evaluating on long, structured academic theses using the Retrieval Augmented Generation Assessment (RAGAs) framework. RAGAs based faithfulness shows limited reliability in this setup. Performance on fixed versus document specific questions varied substantially, likely related to the formatting of documents and preprocessing. Under the tested configuration, cluster-based chunking did not outperform simpler strategies.",
+    "publicationDate": "2026-07-02T08:12:35.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.07783",
+    "title": "Evaluating RAG Reliability under Clean, Misleading, and Mixed Retrieval",
+    "abstract": "Retrieval-Augmented Generation (RAG) is widely used to improve the factual reliability of large language models (LLMs) by grounding answers in retrieved evidence. In misinformation-rich environments, however, retrieved content may include plausible but incorrect information, raising concerns about the reliability of RAG-based information access systems.\nIn this work, we propose an evaluation protocol to systematically test how the RAG system handles conflicts between parametric knowledge and evidence retrieved from context with varying amounts of misleading information. We target correct answers to factoid questions that the model responds to correctly, even when there is no retrieval, and use this to test the system with clean, poisoned, and mixed evidence.\nThe proposed analytical framework combines parametric override and confidence metrics to assess when and how misleading information affects the generation process of LLMs. This study aims to provide insights into the robustness of RAG systems in information disorder scenarios.",
+    "publicationDate": "2026-06-05T18:54:23.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.28337",
+    "title": "A Systems-Level Analysis of Sensitivity, Robustness, and Stability in Retrieval-Augmented Generation",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems are often evaluated using final answer accuracy, even though their failures can originate from preprocessing, retrieval, context packing, or generation. This paper presents a controlled empirical study of RAG sensitivity, robustness, and stability across 56 experimental runs. We evaluate how chunk size, retrieval depth (top k), embedding-based reranking, probabilistic retrieval noise, and repeated seeded runs affect retrieval, context packing, and generation behavior. Using a fixed 500-question QA subset mapped to 20,958 unique corpus contexts, we analyze both final answer metrics and intermediate failure modes. Across these experiments, retrieval-oriented metrics improved under broader retrieval settings, while downstream exact-match and F1 scores often behaved non-monotonically. We also observe preprocessing-induced answer loss under smaller chunk sizes, progressive degradation under retrieval corruption, and higher observed variance in broader retrieval regimes. These findings suggest that RAG evaluation should include sensitivity, robustness, stability, and multi-stage failure analysis rather than relying only on final answer accuracy.",
+    "publicationDate": "2026-05-29T17:24:40.000Z",
+    "votes": 1
+  }
+]

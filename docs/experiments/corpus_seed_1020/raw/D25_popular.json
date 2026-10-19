@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "1603.09320",
+    "title": "Efficient and robust approximate nearest neighbor search using\n  Hierarchical Navigable Small World graphs",
+    "abstract": "We present a new approach for the approximate K-nearest neighbor search based\non navigable small world graphs with controllable hierarchy (Hierarchical NSW,\nHNSW). The proposed solution is fully graph-based, without any need for\nadditional search structures, which are typically used at the coarse search\nstage of the most proximity graph techniques. Hierarchical NSW incrementally\nbuilds a multi-layer structure consisting from hierarchical set of proximity\ngraphs (layers) for nested subsets of the stored elements. The maximum layer in\nwhich an element is present is selected randomly with an exponentially decaying\nprobability distribution. This allows producing graphs similar to the\npreviously studied Navigable Small World (NSW) structures while additionally\nhaving the links separated by their characteristic distance scales. Starting\nsearch from the upper layer together with utilizing the scale separation boosts\nthe performance compared to NSW and allows a logarithmic complexity scaling.\nAdditional employment of a heuristic for selecting proximity graph neighbors\nsignificantly increases performance at high recall and in case of highly\nclustered data. Performance evaluation has demonstrated that the proposed\ngeneral metric space search index is able to strongly outperform previous\nopensource state-of-the-art vector-only approaches. Similarity of the algorithm\nto the skip list structure allows straightforward balanced distributed\nimplementation.",
+    "publicationDate": "2016-03-30T19:29:44.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.00566",
+    "title": "Panorama: Fast-Track Nearest Neighbors",
+    "abstract": "Approximate Nearest-Neighbor Search (ANNS) pipelines for high-dimensional neural embeddings spend the bulk of their query time in candidate verification, making it the primary bottleneck in the search process. In this paper, we present PANORAMA, a state-of-the-art refinement technique that accelerates verification by exploiting the inherent spectral decay of these embeddings. Using PCA to compact signal energy, PANORAMA evaluates candidate distances incrementally, computing at each step a strict lower bound on the full-vector distance and dynamically pruning candidates the moment this bound exceeds the running k-th nearest neighbor distance. While PCA's concentration of variance facilitates pruning, it breaks the uniform-variance assumption required by Product Quantization (PQ); we resolve this with a variance-shaping step that redistributes energy across subvectors, rendering accretive refinement compatible with quantized indexes. Optimized for modern memory hierarchies via vectorized bulk-pruning and cache-conscious data layouts, PANORAMA has been upstreamed into the FAISS library across major index families (IVFPQ/Flat, HNSW, and Refine). PANORAMA achieves higher QPS at any target recall with a cost that provably scales inversely with dataset spectral decay, delivering end-to-end speedups of up to 28.9x and outperforming probabilistic methods across all recall bands.",
+    "publicationDate": "2025-10-01T06:38:45.000Z",
+    "votes": 10
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.20417",
+    "title": "Semantic Recall for Vector Search",
+    "abstract": "We introduce Semantic Recall, a novel metric to assess the quality of approximate nearest neighbor search algorithms by considering only semantically relevant objects that are theoretically retrievable via exact nearest neighbor search. Unlike traditional recall, semantic recall does not penalize algorithms for failing to retrieve objects that are semantically irrelevant to the query, even if those objects are among their nearest neighbors. We demonstrate that semantic recall is particularly useful for assessing retrieval quality on queries that have few relevant results among their nearest neighbors-a scenario we uncover to be common within embedding datasets. Additionally, we introduce Tolerant Recall, a proxy metric that approximates semantic recall when semantically relevant objects cannot be identified. We empirically show that our metrics are more effective indicators of retrieval quality, and that optimizing search algorithms for these metrics can lead to improved cost-quality tradeoffs.",
+    "publicationDate": "2026-04-22T10:34:56.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.17911",
+    "title": "VSAG: An Optimized Search Framework for Graph-based Approximate Nearest Neighbor Search",
+    "abstract": "Approximate nearest neighbor search (ANNS) is a fundamental problem in vector databases and AI infrastructures. Recent graph-based ANNS algorithms have achieved high search accuracy with practical efficiency. Despite the advancements, these algorithms still face performance bottlenecks in production, due to the random memory access patterns of graph-based search and the high computational overheads of vector distance. In addition, the performance of a graph-based ANNS algorithm is highly sensitive to parameters, while selecting the optimal parameters is cost-prohibitive, e.g., manual tuning requires repeatedly re-building the index. This paper introduces VSAG, an open-source framework that aims to enhance the in production performance of graph-based ANNS algorithms. VSAG has been deployed at scale in the services of Ant Group, and it incorporates three key optimizations: (i) efficient memory access: it reduces L3 cache misses with pre-fetching and cache-friendly vector organization; (ii) automated parameter tuning: it automatically selects performance-optimal parameters without requiring index rebuilding; (iii) efficient distance computation: it leverages modern hardware, scalar quantization, and smartly switches to low-precision representation to dramatically reduce the distance computation costs. We evaluate VSAG on real-world datasets. The experimental results show that VSAG achieves the state-of-the-art performance and provides up to 4x speedup over HNSWlib (an industry-standard library) while ensuring the same accuracy.",
+    "publicationDate": "2025-03-23T03:16:50.000Z",
+    "votes": 24
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.00229",
+    "title": "Hierarchical BM25: Lexical Search at Billion-Document Scale",
+    "abstract": "A flat BM25 index over one billion documents occupies about 400 GB. Holding it in memory requires DRAM proportional to corpus size. Serving it from disk takes 4-12 seconds per query. Exact top-k lexical retrieval at this scale is therefore impractical within an interactive latency budget.\nHierarchical BM25 gives up exact ranking in exchange for fixed bounds on memory and latency. A resident coarse index selects which of ~1K topical, size-balanced document groups a query visits, using two signals: the total frequency of each query term within a group, and, for informative terms spread too thinly across groups for frequency totals to reflect, whether several of them appear together in one document. Selected groups are then searched exhaustively and scored against ~100 KB of global statistics. Every returned score therefore equals the flat index's score, and the approximation is confined to selection alone. The resident footprint is ~4.4 GB, independent of corpus size. Sixteen-term queries over one billion documents return in ~300 ms (4.7x to 5.6x the throughput of a flat multi-threaded index), and a warmed cache sustains ~32 queries per second versus under 3 for flat indexing. At a 500K-document configuration, visiting 5-10% of clusters recovers 0.83-0.92 of the exhaustive result score. Billion-scale recall and a direct comparison against document-reordered BlockMax-WAND remain open.",
+    "publicationDate": "2026-07-31T19:18:37.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.21514",
+    "title": "I/O Optimizations for Graph-Based Disk-Resident Approximate Nearest Neighbor Search: A Design Space Exploration",
+    "abstract": "Approximate nearest neighbor (ANN) search on SSD-backed indexes is increasingly I/O-bound (I/O accounts for 70--90\\% of query latency). We present an I/O-first framework for disk-based ANN that organizes techniques along three dimensions: memory layout, disk layout, and search algorithm. We introduce a page-level complexity model that explains how page locality and path length jointly determine page reads, and we validate the model empirically. Using consistent implementations across four public datasets, we quantify both single-factor effects and cross-dimensional synergies. We find that (i) memory-resident navigation and dynamic width provide the strongest standalone gains; (ii) page shuffle and page search are weak alone but complementary together; and (iii) a principled composition, OctopusANN, substantially reduces I/O and achieves 4.1--37.9\\% higher throughput than the state-of-the-art system Starling and 87.5--149.5\\% higher throughput than DiskANN at matched Recall@10=90\\%. Finally, we distill actionable guidelines for selecting storage-centric or hybrid designs across diverse concurrency levels and accuracy constraints, advocating systematic composition rather than isolated tweaks when pushing the performance frontier of disk-based ANN.",
+    "publicationDate": "2026-02-25T03:02:32.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.02815",
+    "title": "Unified and Efficient Approach for Multi-Vector Similarity Search",
+    "abstract": "Multi-Vector Similarity Search is essential for fine-grained semantic retrieval in many real-world applications, offering richer representations than traditional single-vector paradigms. Due to the lack of native multi-vector index, existing methods rely on a filter-and-refine framework built upon single-vector indexes. By treating token vectors within each multi-vector object in isolation and ignoring their correlations, these methods face an inherent dilemma: aggressive filtering sacrifices recall, while conservative filtering incurs prohibitive computational cost during refinement. To address this limitation, we propose MV-HNSW, the first native hierarchical graph index designed for multi-vector data. MV-HNSW introduces a novel edge-weight function that satisfies essential properties (symmetry, cardinality robustness, and query consistency) for graph-based indexing, an accelerated multi-vector similarity computation algorithm, and an augmented search strategy that dynamically discovers topologically disconnected yet relevant candidates. Extensive experiments on seven real-world datasets show that MV-HNSW achieves state-of-the-art search performance, maintaining over 90% recall while reducing search latency by up to 14.0$\\times$ compared to existing methods.",
+    "publicationDate": "2026-04-03T07:31:41.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.04630",
+    "title": "Exploiting Structural Properties for Efficient Constraint-Aware HNSW Hyperparameter Tuning",
+    "abstract": "Vector databases (VectorDBs) are a core component of modern retrieval systems, including Retrieval-Augmented Generation (RAG), where efficient Approximate Nearest Neighbor Search (ANNS) is critical. Among ANNS algorithms, Hierarchical Navigable Small World (HNSW) graphs are widely adopted for their strong recalllatency trade-off. However, configuring HNSW remains challenging: its hyperparameters jointly affect search quality, latency, build time, and index size in nonlinear ways, while production deployments impose strict resource and tuning-time this http URL study HNSW hyperparameter tuning from a systems perspective and show that its configuration space exhibits strong structural regularities. Specifically, we identify monotonic, dominant unimodal, and separable relationships among search-time and construction-time parameters, which induce feasibility boundaries under performance and resource constraints. Building on this insight, we propose CHAT, a constraint-aware tuning framework for HNSW. Unlike generic black-box optimizers, CHAT exploits HNSW-specific structure to perform deterministic, sample-efficient search and prune resource-infeasible configurations before full index construction. Across multiple datasets and HNSW-based vector search engines, CHAT identifies configurations that maximize recall or throughput while satisfying constraints on accuracy, latency, build time, index size, and tuning budget. Compared to strong baselines, CHAT achieves up to 45% higher throughput or 11% higher recall, and converges up to 44x faster. These results show that principled, structure-aware tuning enables efficient and robust HNSW deployment beyond generic black-box optimization.",
+    "publicationDate": "2026-07-06T03:30:53.000Z",
+    "votes": 5
+  }
+]

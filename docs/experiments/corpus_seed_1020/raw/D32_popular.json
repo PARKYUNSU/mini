@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2604.20417",
+    "title": "Semantic Recall for Vector Search",
+    "abstract": "We introduce Semantic Recall, a novel metric to assess the quality of approximate nearest neighbor search algorithms by considering only semantically relevant objects that are theoretically retrievable via exact nearest neighbor search. Unlike traditional recall, semantic recall does not penalize algorithms for failing to retrieve objects that are semantically irrelevant to the query, even if those objects are among their nearest neighbors. We demonstrate that semantic recall is particularly useful for assessing retrieval quality on queries that have few relevant results among their nearest neighbors-a scenario we uncover to be common within embedding datasets. Additionally, we introduce Tolerant Recall, a proxy metric that approximates semantic recall when semantically relevant objects cannot be identified. We empirically show that our metrics are more effective indicators of retrieval quality, and that optimizing search algorithms for these metrics can lead to improved cost-quality tradeoffs.",
+    "publicationDate": "2026-04-22T10:34:56.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.21440",
+    "title": "Redefining Retrieval Evaluation in the Era of LLMs",
+    "abstract": "Traditional Information Retrieval (IR) metrics, such as nDCG, MAP, and MRR, assume that human users sequentially examine documents with diminishing attention to lower ranks. This assumption breaks down in Retrieval Augmented Generation (RAG) systems, where search results are consumed by Large Language Models (LLMs), which, unlike humans, process all retrieved documents as a whole rather than sequentially. Additionally, traditional IR metrics do not account for related but irrelevant documents that actively degrade generation quality, rather than merely being ignored. Due to these two major misalignments, namely human vs. machine position discount and human relevance vs. machine utility, classical IR metrics do not accurately predict RAG performance. We introduce a utility-based annotation schema that quantifies both the positive contribution of relevant passages and the negative impact of distracting ones. Building on this foundation, we propose UDCG (Utility and Distraction-aware Cumulative Gain), a metric using an LLM-oriented positional discount to directly optimize the correlation with the end-to-end answer accuracy. Experiments on five datasets and six LLMs demonstrate that UDCG improves correlation by up to 36% compared to traditional metrics. Our work provides a critical step toward aligning IR evaluation with LLM consumers and enables more reliable assessment of RAG components",
+    "publicationDate": "2025-10-24T13:17:00.000Z",
+    "votes": 14
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.20034",
+    "title": "CoverageBench: Evaluating Information Coverage across Tasks and Domains",
+    "abstract": "We wish to measure the information coverage of an ad hoc retrieval algorithm, that is, how much of the range of available relevant information is covered by the search results. Information coverage is a central aspect for retrieval, especially when the retrieval system is integrated with generative models in a retrieval-augmented generation (RAG) system. The classic metrics for ad hoc retrieval, precision and recall, reward a system as more and more relevant documents are retrieved. However, since relevance in ad hoc test collections is defined for a document without any relation to other documents that might contain the same information, high recall is sufficient but not necessary to ensure coverage. The same is true for other metrics such as rank-biased precision (RBP), normalized discounted cumulative gain (nDCG), and mean average precision (MAP). Test collections developed around the notion of diversity ranking in web search incorporate multiple aspects that support a concept of coverage in the web domain. In this work, we construct a suite of collections for evaluating information coverage from existing collections. This suite offers researchers a unified testbed spanning multiple genres and tasks. All topics, nuggets, relevance labels, and baseline rankings are released on Hugging Face Datasets, along with instructions for accessing the publicly available document collections.",
+    "publicationDate": "2026-03-20T15:20:44.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2410.21549",
+    "title": "Semantic Search Evaluation",
+    "abstract": "We propose a novel method for evaluating the performance of a content search system that measures the semantic match between a query and the results returned by the search system. We introduce a metric called \"on-topic rate\" to measure the percentage of results that are relevant to the query. To achieve this, we design a pipeline that defines a golden query set, retrieves the top K results for each query, and sends calls to GPT 3.5 with formulated prompts. Our semantic evaluation pipeline helps identify common failure patterns and goals against the metric for relevance improvements.",
+    "publicationDate": "2024-10-28T21:25:38.000Z",
+    "votes": 15
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.20854",
+    "title": "How important is Recall for Measuring Retrieval Quality?",
+    "abstract": "In realistic retrieval settings with large and evolving knowledge bases, the total number of documents relevant to a query is typically unknown, and recall cannot be computed. In this paper, we evaluate several established strategies for handling this limitation by measuring the correlation between retrieval quality metrics and LLM-based judgments of response quality, where responses are generated from the retrieved documents. We conduct experiments across multiple datasets with a relatively low number of relevant documents (2-15). We also introduce a simple retrieval quality measure that performs well without requiring knowledge of the total number of relevant documents.",
+    "publicationDate": "2025-12-24T00:16:31.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.21553",
+    "title": "Revisiting RAG Retrievers: An Information Theoretic Benchmark",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems rely critically on the retriever module to surface relevant context for large language models. Although numerous retrievers have recently been proposed, each built on different ranking principles such as lexical matching, dense embeddings, or graph citations, there remains a lack of systematic understanding of how these mechanisms differ and overlap. Existing benchmarks primarily compare entire RAG pipelines or introduce new datasets, providing little guidance on selecting or combining retrievers themselves. Those that do compare retrievers directly use a limited set of evaluation tools which fail to capture complementary and overlapping strengths. This work presents MIGRASCOPE, a Mutual Information based RAG Retriever Analysis Scope. We revisit state-of-the-art retrievers and introduce principled metrics grounded in information and statistical estimation theory to quantify retrieval quality, redundancy, synergy, and marginal contribution. We further show that if chosen carefully, an ensemble of retrievers outperforms any single retriever. We leverage the developed tools over major RAG corpora to provide unique insights on contribution levels of the state-of-the-art retrievers. Our findings provide a fresh perspective on the structure of modern retrieval techniques and actionable guidance for designing robust and efficient RAG systems.",
+    "publicationDate": "2026-02-25T04:19:06.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.23419",
+    "title": "Robustness of IR Models to Collection Growth",
+    "abstract": "Information Retrieval (IR) systems seek to identify relevant documents within a collection. In practical applications, collections are dynamic, with documents frequently added. We argue that ideally, a retriever's effectiveness should not decrease when non-relevant documents are added to a collection. This study formalises this concept and empirically evaluates it by merging two collections with negligible topic overlap. We hypothesise that the way an IR model conditions its ranking on other documents in a collection (e.g., the IDF component in BM25 or contextual documents in listwise rerankers) plays an important role in its robustness to the addition of non-relevant documents. We broadly classify models as those that do not depend on other documents (Multi-Document-Agnostic, MDA) and those that do (Multi-Document-Dependent, MDD). Our results show that neither MDD nor MDA models are fully robust to the addition of non-relevant documents, as all models exhibit some performance degradation. Interestingly, among the models we test, MDA is more effective than MDD for retrieval, whereas MDD and MDA rerankers are equally effective.",
+    "publicationDate": "2026-08-24T16:00:20.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.25318",
+    "title": "Rank-Deviation Quality: A Distance-Aware Metric for Multi-Answer Retrieval and Ranking Evaluation",
+    "abstract": "We introduce Rank-Deviation Quality (RDQ), an evaluation metric for retrieval and ranking systems that adapts to queries with varying numbers of reference items, from a single correct answer to many valid results. RDQ scores a candidate ranking against an ordered reference list (ORL): each retrieved reference item contributes its output-position weight multiplied by a rank-deviation penalty, and items outside the ORL receive zero credit. Application-specific parameters control tolerance to misordering. Larger values emphasize retrieving valid reference items, whereas smaller values place more weight on matching their reference order. The output-position weights can reflect visibility in the application's interface, such as a vertical list or a carousel. Unlike metrics that require absolute relevance grades, RDQ operates on ordinal rankings, which annotators can produce through pairwise or listwise judgments. Unlike rank-correlation measures such as Kendall's tau, RDQ accounts for both which items are returned and how they are ordered. On a 5,000-query point-of-interest (POI) dataset with 12 systems, RDQ has the highest median empirical power@100 among the 13 evaluated metric configurations. It reaches mean tau &gt;= 0.8 agreement with its own full-query ordering at 200 queries; RBP(0.9), the strongest tested non-RDQ configuration, reaches the same threshold at 250. On TREC Deep Learning benchmarks, where NDCG uses native graded labels and RDQ uses ordinal tiers derived from them, RDQ reaches comparable median power at n=25, while NDCG is higher at n=100.",
+    "publicationDate": "2026-08-26T03:00:18.000Z",
+    "votes": 3
+  }
+]

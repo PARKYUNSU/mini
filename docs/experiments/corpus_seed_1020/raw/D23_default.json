@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.10508",
+    "title": "Your Prompt Should Do More: Effects of Retrieval Instructions in Embedding Models",
+    "abstract": "Prompted embedding models have recently received increasing attention, particularly for retrieval, where detailed retrieval instructions are provided as part of the retrieval prompt. Several new datasets and studies have examined this setting, showing that the current embedding models often struggle to follow such instructions reliably. In this paper, we study the mechanism of how instructions actually affect the representations of retrieval queries in asymmetric retrieval tasks. We show that models can fail to follow even simple task instructions when query-side distractors are included in the evaluation. We hypothesize that this behavior is driven by the training setup of current embedding models and their evaluation, and show that fine-tuning with added query-side distractors leads to substantial improvements, with minimal effect on other tasks.",
+    "publicationDate": "2026-10-07T17:51:46.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.14730",
+    "title": "Self-improving data synthesis enables scalable adaptation of embedding models",
+    "abstract": "AI agents require specialised retrieval across domains and tasks, but adapting embedding models is constrained by costly manual training-data design. Here we introduce SYNTRA, a self-improving agentic framework that turns a few retrieval examples into reusable synthesis instructions. Given an unlabelled corpus and a few relevant query-document pairs, SYNTRA infers implicit information needs and relevance criteria, then uses feedback on trial outputs to refine instructions for query generation and relevance assessment. Experiments across 24 datasets spanning 15 domains demonstrate that the same synthesis workflow produces effective training data, benefiting even strong embedding models with and without existing labelled training sets. Self-improvement strengthens this supervision on all six evaluated tasks, yielding better retrieval than human calibration on four. The training value persists at larger scales: on MS MARCO, retrieval gains continue across a 32-fold range of synthetic training-data sizes. SYNTRA thus enables scalable embedding-model adaptation with minimal human intervention.",
+    "publicationDate": "2026-10-10T08:50:48.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.16161",
+    "title": "Domain-Specific Text Embedding Models for Entity Resolution",
+    "abstract": "General-purpose text embedding models are designed to capture semantic similarity but are not optimised for distinguishing entity records that represent the same real-world business or person. This limitation affects applications such as entity resolution and duplicate record retrieval, where small textual differences may either preserve or change identity. This paper investigates whether domain-specific triplet fine-tuning can adapt pretrained embedding models for identity-sensitive retrieval. A synthetic dataset of business and person records was created with identity-preserving variations and challenging non-matching examples. Two widely used embedding models were evaluated before and after fine-tuning using a margin-based similarity evaluation. The results show substantial improvements in separating true matches from highly similar non-matches, demonstrating that domain-specific triplet training can effectively reshape general-purpose embedding spaces for entity retrieval. These findings suggest that targeted fine-tuning provides a practical approach for improving embedding models in data quality management and information retrieval applications.",
+    "publicationDate": "2026-08-17T06:26:05.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.15547",
+    "title": "jina-embeddings-v5-text: Task-Targeted Embedding Distillation",
+    "abstract": "Text embedding models are widely used for semantic similarity tasks, including information retrieval, clustering, and classification. General-purpose models are typically trained with single- or multi-stage processes using contrastive loss functions. We introduce a novel training regimen that combines model distillation techniques with task-specific contrastive loss to produce compact, high-performance embedding models. Our findings suggest that this approach is more effective for training small models than purely contrastive or distillation-based training paradigms alone. Benchmark scores for the resulting models, jina-embeddings-v5-text-small and jina-embeddings-v5-text-nano, exceed or match the state-of-the-art for models of similar size. jina-embeddings-v5-text models additionally support long texts (up to 32k tokens) in many languages, and generate embeddings that remain robust under truncation and binary quantization. Model weights are publicly available, hopefully inspiring further advances in embedding model development.",
+    "publicationDate": "2026-02-17T12:50:50.000Z",
+    "votes": 60
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.17257",
+    "title": "REZE: Representation Regularization for Domain-adaptive Text Embedding Pre-finetuning",
+    "abstract": "Recent text embedding models are often adapted to specialized domains via contrastive pre-finetuning (PFT) on a naive collection of scattered, heterogeneous tasks. However, this approach often introduces task-induced bias alongside domain knowledge, leading to uncontrolled representation shifts that distort the pretrained embedding geometry and cause substantial performance degradation. To address this issue, we propose REZE, a representation regularization framework that explicitly controls representation shift during embedding pre-finetuning. REZE operates on the relations of anchor-positive pairs and decomposes them in an eigenspace. It then measures task-wise dispersion along each eigencomponent to identify task-variant directions and applies adaptive soft-shrinkage to suppress task-induced noise while preserving task-invariant semantic structure, without inference-time overhead. Experiments across multiple embedding backbones and specialized benchmarks show that REZE outperforms standard pre-finetuning and isotropy-oriented post-hoc regularization in most settings, remaining stable where existing PFT variants collapse. Embedding space analyses further confirm that REZE induces controlled shifts aligned with the original embedding manifold, underscoring representation shift control as a key principle for robust embedding pre-finetuning under heterogeneous supervision.",
+    "publicationDate": "2026-04-19T04:41:55.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.03403",
+    "title": "Align Then Adapt: Label-Efficient Adapter Learning for Asymmetric Dense Retrieval",
+    "abstract": "Dense retrieval systems increasingly face an asymmetry between complex instruction-like queries and relatively simple, static document collections. While stronger embedders can better understand such queries, re-embedding large corpora or fine-tuning large models is often impractical. We propose Efficient Retrieval Adapter (ERA), a query-side adapter learning framework for re-index-free retrieval adaptation. ERA first aligns the embedding spaces of a strong query embedder and a lightweight document embedder using unlabeled corpus documents, and then adapts the aligned query representation with a small number of labeled query-document pairs. Across 126 MAIR retrieval tasks from six domains, ERA improves average nDCG@10 by up to 8.2 points in symmetric settings and by more than 12 points in asymmetric settings, while using substantially fewer labels than supervised adapter training. These results show that retrieval systems can benefit from stronger query understanding without updating backbone embedders or rebuilding document indexes.",
+    "publicationDate": "2026-04-03T19:04:42.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.20666",
+    "title": "ORPHEAS: A Cross-Lingual Greek-English Embedding Model for Retrieval-Augmented Generation",
+    "abstract": "Effective retrieval-augmented generation across bilingual Greek--English applications requires embedding models capable of capturing both domain-specific semantic relationships and cross-lingual semantic alignment. Existing multilingual embedding models distribute their representational capacity across numerous languages, limiting their optimization for Greek and failing to encode the morphological complexity and domain-specific terminological structures inherent in Greek text. In this work, we propose ORPHEAS, a specialized Greek--English embedding model for bilingual retrieval-augmented generation. ORPHEAS is trained with a high quality dataset generated by a knowledge graph-based fine-tuning methodology which is applied to a diverse multi-domain corpus, which enables language-agnostic semantic representations. The numerical experiments across monolingual and cross-lingual retrieval benchmarks reveal that ORPHEAS outperforms state-of-the-art multilingual embedding models, demonstrating that domain-specialized fine-tuning on morphologically complex languages does not compromise cross-lingual retrieval capability.",
+    "publicationDate": "2026-04-22T15:15:45.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.13525",
+    "title": "More Than Efficiency: Embedding Compression Improves Domain Adaptation in Dense Retrieval",
+    "abstract": "Dense retrievers powered by pretrained embeddings are widely used for document retrieval but struggle in specialized domains due to the mismatches between the training and target domain distributions. Domain adaptation typically requires costly annotation and retraining of query-document pairs. In this work, we revisit an overlooked alternative: applying PCA to domain embeddings to derive lower-dimensional representations that preserve domain-relevant features while discarding non-discriminative components. Though traditionally used for efficiency, we demonstrate that this simple embedding compression can effectively improve retrieval performance. Evaluated across 9 retrievers and 14 MTEB datasets, PCA applied solely to query embeddings improves NDCG@10 in 75.4% of model-dataset pairs, offering a simple and lightweight method for domain adaptation.",
+    "publicationDate": "2026-01-20T02:21:03.000Z",
+    "votes": 5
+  }
+]

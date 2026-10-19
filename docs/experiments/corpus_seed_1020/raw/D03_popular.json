@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2506.09038",
+    "title": "AbstentionBench: Reasoning LLMs Fail on Unanswerable Questions",
+    "abstract": "For Large Language Models (LLMs) to be reliably deployed in both everyday and\nhigh-stakes domains, knowing when not to answer is equally critical as\nanswering correctly. Real-world user queries, which can be underspecified,\nill-posed, or fundamentally unanswerable, require LLMs to reason about\nuncertainty and selectively abstain -- i.e., refuse to answer definitively.\nHowever, abstention remains understudied, without a systematic evaluation\nframework for modern LLMs. In this work, we introduce AbstentionBench, a\nlarge-scale benchmark for holistically evaluating abstention across 20 diverse\ndatasets, including questions with unknown answers, underspecification, false\npremises, subjective interpretations, and outdated information. Evaluating 20\nfrontier LLMs reveals abstention is an unsolved problem, and one where scaling\nmodels is of little use. While recent reasoning LLMs have shown impressive\nresults in complex problem solving, surprisingly, we find that reasoning\nfine-tuning degrades abstention (by $24\\%$ on average), even for math and\nscience domains on which reasoning models are explicitly trained. We find that\nwhile a carefully crafted system prompt can boost abstention in practice, it\ndoes not resolve models' fundamental inability to reason about uncertainty. We\nrelease AbstentionBench to foster research into advancing LLM reliability.",
+    "publicationDate": "2025-06-10T17:57:30.000Z",
+    "votes": 51
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2412.12300",
+    "title": "Unanswerability Evaluation for Retrieval Augmented Generation",
+    "abstract": "Existing evaluation frameworks for retrieval-augmented generation (RAG)\nsystems focus on answerable queries, but they overlook the importance of\nappropriately rejecting unanswerable requests. In this paper, we introduce\nUAEval4RAG, a framework designed to evaluate whether RAG systems can handle\nunanswerable queries effectively. We define a taxonomy with six unanswerable\ncategories, and UAEval4RAG automatically synthesizes diverse and challenging\nqueries for any given knowledge base with unanswered ratio and acceptable ratio\nmetrics. We conduct experiments with various RAG components, including\nretrieval models, rewriting methods, rerankers, language models, and prompting\nstrategies, and reveal hidden trade-offs in performance of RAG systems. Our\nfindings highlight the critical role of component selection and prompt design\nin optimizing RAG systems to balance the accuracy of answerable queries with\nhigh rejection rates of unanswerable ones. UAEval4RAG provides valuable\ninsights and tools for developing more robust and reliable RAG systems.",
+    "publicationDate": "2024-12-16T19:11:55.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.02230",
+    "title": "Answering the Wrong Question: Reasoning Trace Inversion for Abstention in LLMs",
+    "abstract": "For Large Language Models (LLMs) to be reliably deployed, models must effectively know when not to answer: abstain. Reasoning models, in particular, have gained attention for impressive performance on complex tasks. However, reasoning models have been shown to have worse abstention abilities. Taking the vulnerabilities of reasoning models into account, we propose our Query Misalignment Framework. Hallucinations resulting in failed abstention can be reinterpreted as LLMs answering the wrong question (rather than answering a question incorrectly). Based on this framework, we develop a new class of state-of-the-art abstention methods called Trace Inversion. First, we generate the reasoning trace of a model. Based on only the trace, we then reconstruct the most likely query that the model responded to. Finally, we compare the initial query with the reconstructed query. Low similarity score between the initial query and reconstructed query suggests that the model likely answered the question incorrectly and is flagged to abstain. Extensive experiments demonstrate that Trace Inversion effectively boosts abstention performance in four frontier LLMs across nine abstention QA datasets, beating competitive baselines in 33 out of 36 settings.",
+    "publicationDate": "2026-04-02T16:23:46.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.15578",
+    "title": "The Magnitude Mirage: Rethinking Confidence for Reasoning-Intensive Retrieval",
+    "abstract": "Many production RAG systems implement retrieval abstention by thresholding raw similarity scores, implicitly treating score magnitude as a confidence signal. We demonstrate that this practice degrades systematically as queries require reasoning beyond semantic matching. Across 11 retrieval architectures and 28 datasets, neural retrievers consistently assign high similarity scores to semantically related but constraint-violating documents, causing magnitude-based thresholds to collapse toward near-random abstention performance on logical and temporal reasoning tasks---a failure we term the Magnitude Mirage. To address this without computationally expensive alternatives, we conduct a large-scale empirical study of six zero-cost Query Performance Prediction (QPP) metrics across three cognitive tiers: semantic matching (BEIR), logical reasoning (BRIGHT), and temporal reasoning (TEMPO). Our central finding is that the key improvement comes from abandoning magnitude in favor of score-distribution signals: the gain from this shift exceeds the differences among distributional alternatives by a factor of 5-10$\\times$. In particular, Score Gap ($s_1 - s_k$) and a practical adaptation of Score Magnitude and Variance (LSMV) improve abstention AUROC by up to 0.16 in settings where magnitude-based confidence provides little discriminative power. These methods require no additional inference, retraining, or latency, making them a practical zero-cost replacement for magnitude thresholding in deployed RAG systems.",
+    "publicationDate": "2026-09-14T13:49:24.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.04597",
+    "title": "When Robots Should Say \"I Don't Know\": Benchmarking Abstention in Embodied Question Answering",
+    "abstract": "Embodied Question Answering (EQA) requires an agent to interpret language, perceive its environment, and navigate within 3D scenes to produce responses. Existing EQA benchmarks assume that every question must be answered, but embodied agents should know when they do not have sufficient information to answer. In this work, we focus on a minimal requirement for EQA agents, abstention: knowing when to withhold an answer. From an initial study of 500 human queries, we find that 32.4% contain missing or underspecified context. Drawing on this initial study and cognitive theories of human communication errors, we derive five representative categories requiring abstention: actionability limitation, referential underspecification, preference dependence, information unavailability, and false presupposition. We augment OpenEQA by having annotators transform well-posed questions into ambiguous variants outlined by these categories. The resulting dataset, AbstainEQA, comprises 1,636 annotated abstention cases paired with 1,636 original OpenEQA instances for balanced evaluation. Evaluating on AbstainEQA, we find that even the best frontier model only attains 42.79% abstention recall, while humans achieve 91.17%. We also find that scaling, prompting, and reasoning only yield marginal gains, and that fine-tuned models overfit to textual cues. Together, these results position abstention as a fundamental prerequisite for reliable interaction in embodied settings and as a necessary basis for effective clarification.",
+    "publicationDate": "2025-12-04T09:17:40.000Z",
+    "votes": 30
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.10390",
+    "title": "RefusalBench: Generative Evaluation of Selective Refusal in Grounded Language Models",
+    "abstract": "The ability of language models in RAG systems to selectively refuse to answer based on flawed context is critical for safety, yet remains a significant failure point. Our large-scale study reveals that even frontier models struggle in this setting, with refusal accuracy dropping below 50% on multi-document tasks, while exhibiting either dangerous overconfidence or overcaution. Static benchmarks fail to reliably evaluate this capability, as models exploit dataset-specific artifacts and memorize test instances. We introduce RefusalBench, a generative methodology that programmatically creates diagnostic test cases through controlled linguistic perturbation. Our framework employs 176 distinct perturbation strategies across six categories of informational uncertainty and three intensity levels. Evaluation of over 30 models uncovers systematic failure patterns: refusal comprises separable detection and categorization skills, and neither scale nor extended reasoning improves performance. We find that selective refusal is a trainable, alignment-sensitive capability, offering a clear path for improvement. We release two benchmarks -- RefusalBench-NQ (single document) and RefusalBench-GaRAGe (multi-document) -- and our complete generation framework to enable continued, dynamic evaluation of this critical capability.",
+    "publicationDate": "2025-10-12T00:53:42.000Z",
+    "votes": 14
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.14799",
+    "title": "Knowing When Not to Answer: Evaluating Abstention in Multimodal Reasoning Systems",
+    "abstract": "Effective abstention (EA), recognizing evidence insufficiency and refraining from answering, is critical for reliable multimodal systems. Yet existing evaluation paradigms for vision-language models (VLMs) and multi-agent systems (MAS) assume answerability, pushing models to always respond. Abstention has been studied in text-only settings but remains underexplored multimodally; current benchmarks either ignore unanswerability or rely on coarse methods that miss realistic failure modes. We introduce MM-AQA, a benchmark that constructs unanswerable instances from answerable ones via transformations along two axes: visual modality dependency and evidence sufficiency. Evaluating three frontier VLMs spanning closed and open-source models and two MAS architectures across 2079 samples, we find: (1) under standard prompting, VLMs rarely abstain; even simple confidence baselines outperform this setup, (2) MAS improves abstention but introduces an accuracy-abstention trade-off, (3) sequential designs match or exceed iterative variants, suggesting the bottleneck is miscalibration rather than reasoning depth, and (4) models abstain when image or text evidence is absent, but attempt reconciliation with degraded or contradictory evidence. Effective multimodal abstention requires abstention-aware training rather than better prompting or more agents.",
+    "publicationDate": "2026-04-16T09:23:22.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.11956",
+    "title": "Investigating Retrieval-Augmented Generation Systems on Unanswerable, Uncheatable, Realistic, Multi-hop Queries",
+    "abstract": "Real-world use cases often present RAG systems with complex queries for which relevant information is missing from the corpus or is incomplete. In these settings, RAG systems must be able to reject unanswerable, out-of-scope queries and identify failures of retrieval and multi-hop reasoning. Despite this, existing RAG benchmarks rarely reflect realistic task complexity for multi-hop or out-of-scope questions, which often can be cheated via disconnected reasoning (i.e., solved without genuine multi-hop inference) or require only simple factual recall. This limits the ability for such benchmarks to uncover limitations of existing RAG systems. To address this gap, we present the first pipeline for automatic, difficulty-controlled creation of un$\\underline{c}$heatable, $\\underline{r}$ealistic, $\\underline{u}$nanswerable, and $\\underline{m}$ulti-hop $\\underline{q}$uerie$\\underline{s}$ (CRUMQs), adaptable to any corpus and domain. We use our pipeline to create CRUMQs over two popular RAG datasets and demonstrate its effectiveness via benchmark experiments on leading retrieval-augmented LLMs. Results show that compared to prior RAG benchmarks, CRUMQs are highly challenging for RAG systems and achieve up to 81.0\\% reduction in cheatability scores. More broadly, our pipeline offers a simple way to enhance benchmark difficulty and drive development of more capable RAG systems.",
+    "publicationDate": "2025-10-13T21:38:04.000Z",
+    "votes": 13
+  }
+]

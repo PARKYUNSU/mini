@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2004.12832",
+    "title": "ColBERT: Efficient and Effective Passage Search via Contextualized Late\n  Interaction over BERT",
+    "abstract": "Recent progress in Natural Language Understanding (NLU) is driving fast-paced\nadvances in Information Retrieval (IR), largely owed to fine-tuning deep\nlanguage models (LMs) for document ranking. While remarkably effective, the\nranking models based on these LMs increase computational cost by orders of\nmagnitude over prior approaches, particularly as they must feed each\nquery-document pair through a massive neural network to compute a single\nrelevance score. To tackle this, we present ColBERT, a novel ranking model that\nadapts deep LMs (in particular, BERT) for efficient retrieval. ColBERT\nintroduces a late interaction architecture that independently encodes the query\nand the document using BERT and then employs a cheap yet powerful interaction\nstep that models their fine-grained similarity. By delaying and yet retaining\nthis fine-granular interaction, ColBERT can leverage the expressiveness of deep\nLMs while simultaneously gaining the ability to pre-compute document\nrepresentations offline, considerably speeding up query processing. Beyond\nreducing the cost of re-ranking the documents retrieved by a traditional model,\nColBERT's pruning-friendly interaction mechanism enables leveraging\nvector-similarity indexes for end-to-end retrieval directly from a large\ndocument collection. We extensively evaluate ColBERT using two recent passage\nsearch datasets. Results show that ColBERT's effectiveness is competitive with\nexisting BERT-based models (and outperforms every non-BERT baseline), while\nexecuting two orders-of-magnitude faster and requiring four orders-of-magnitude\nfewer FLOPs per query.",
+    "publicationDate": "2020-06-04T05:28:21.000Z",
+    "votes": 44
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.16528",
+    "title": "TurkColBERT: A Benchmark of Dense and Late-Interaction Models for Turkish Information Retrieval",
+    "abstract": "Neural information retrieval systems excel in high-resource languages but remain underexplored for morphologically rich, lower-resource languages such as Turkish. Dense bi-encoders currently dominate Turkish IR, yet late-interaction models -- which retain token-level representations for fine-grained matching -- have not been systematically evaluated. We introduce TurkColBERT, the first comprehensive benchmark comparing dense encoders and late-interaction models for Turkish retrieval. Our two-stage adaptation pipeline fine-tunes English and multilingual encoders on Turkish NLI/STS tasks, then converts them into ColBERT-style retrievers using PyLate trained on MS MARCO-TR. We evaluate 10 models across five Turkish BEIR datasets covering scientific, financial, and argumentative domains. Results show strong parameter efficiency: the 1.0M-parameter colbert-hash-nano-tr is 600$\\times$ smaller than the 600M turkish-e5-large dense encoder while preserving over 71\\% of its average mAP. Late-interaction models that are 3--5$\\times$ smaller than dense encoders significantly outperform them; ColmmBERT-base-TR yields up to +13.8\\% mAP on domain-specific tasks. For production-readiness, we compare indexing algorithms: MUVERA+Rerank is 3.33$\\times$ faster than PLAID and offers +1.7\\% relative mAP gain. This enables low-latency retrieval, with ColmmBERT-base-TR achieving 0.54 ms query times under MUVERA. We release all checkpoints, configs, and evaluation scripts. Limitations include reliance on moderately sized datasets ($\\leq$50K documents) and translated benchmarks, which may not fully reflect real-world Turkish retrieval conditions; larger-scale MUVERA evaluations remain necessary.",
+    "publicationDate": "2025-11-20T16:42:21.000Z",
+    "votes": 11
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.25085",
+    "title": "jina-reranker-v3: Last but Not Late Interaction for Listwise Document Reranking",
+    "abstract": "jina-reranker-v3 is a 0.6B-parameter multilingual listwise reranker that introduces a novel \"last but not late\" interaction. Unlike late interaction models like ColBERT that encode documents separately before multi-vector matching, our approach applies causal attention between the query and all candidate documents in the same context window, enabling rich interactions before extracting contextual embeddings from each document's final token. The new model achieves state-of-the-art BEIR performance with 61.94 nDCG@10 while being significantly smaller than other models with comparable performance.",
+    "publicationDate": "2025-09-29T17:23:54.000Z",
+    "votes": 31
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.25248",
+    "title": "ColBERT-Att: Late-Interaction Meets Attention for Enhanced Retrieval",
+    "abstract": "Vector embeddings from pre-trained language models form a core component in Neural Information Retrieval systems across a multitude of knowledge extraction tasks. The paradigm of late interaction, introduced in ColBERT, demonstrates high accuracy along with runtime efficiency. However, the current formulation fails to take into account the attention weights of query and document terms, which intuitively capture the \"importance\" of similarities between them, that might lead to a better understanding of relevance between the queries and documents. This work proposes ColBERT-Att, to explicitly integrate attention mechanism into the late interaction framework for enhanced retrieval performance. Empirical evaluation of ColBERT-Att depicts improvements in recall accuracy on MS-MARCO as well as on a wide range of BEIR and LoTTE benchmark datasets.",
+    "publicationDate": "2026-03-26T09:51:54.000Z",
+    "votes": 18
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2112.01488",
+    "title": "ColBERTv2: Effective and Efficient Retrieval via Lightweight Late\n  Interaction",
+    "abstract": "Neural information retrieval (IR) has greatly advanced search and other\nknowledge-intensive language tasks. While many neural IR methods encode queries\nand documents into single-vector representations, late interaction models\nproduce multi-vector representations at the granularity of each token and\ndecompose relevance modeling into scalable token-level computations. This\ndecomposition has been shown to make late interaction more effective, but it\ninflates the space footprint of these models by an order of magnitude. In this\nwork, we introduce ColBERTv2, a retriever that couples an aggressive residual\ncompression mechanism with a denoised supervision strategy to simultaneously\nimprove the quality and space footprint of late interaction. We evaluate\nColBERTv2 across a wide range of benchmarks, establishing state-of-the-art\nquality within and outside the training domain while reducing the space\nfootprint of late interaction models by 6--10$\\times$.",
+    "publicationDate": "2021-12-02T18:38:50.000Z",
+    "votes": 49
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2404.13950",
+    "title": "SPLATE: Sparse Late Interaction Retrieval",
+    "abstract": "The late interaction paradigm introduced with ColBERT stands out in the neural Information Retrieval space, offering a compelling effectiveness-efficiency trade-off across many benchmarks. Efficient late interaction retrieval is based on an optimized multi-step strategy, where an approximate search first identifies a set of candidate documents to re-rank exactly. In this work, we introduce SPLATE, a simple and lightweight adaptation of the ColBERTv2 model which learns an ``MLM adapter'', mapping its frozen token embeddings to a sparse vocabulary space with a partially learned SPLADE module. This allows us to perform the candidate generation step in late interaction pipelines with traditional sparse retrieval techniques, making it particularly appealing for running ColBERT in CPU environments. Our SPLATE ColBERTv2 pipeline achieves the same effectiveness as the PLAID ColBERTv2 engine by re-ranking 50 documents that can be retrieved under 10ms.",
+    "publicationDate": "2024-04-22T07:51:13.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.16299",
+    "title": "MICE: Minimal Interaction Cross-Encoders for efficient Re-ranking",
+    "abstract": "In Information Retrieval (IR), cross-encoders deliver state-of-the-art ranking effectiveness but have a high inference cost, limiting their use to second-stage re-rankers. Prior work has addressed this bottleneck from two largely separate directions: accelerating cross-encoder inference through attention sparsification, or improving first-stage retrieval effectiveness to alleviate the need of a re-ranker, using more complex models, e.g. late-interactions. In this work, we bridge these two directions through an in-depth analysis of cross-encoder internal mechanisms. By identifying and removing superfluous interactions, we derive MICE (Minimal Interaction Cross-Encoders), a new cross-encoder architecture that retains effectiveness while reducing computational overhead. Extensive evaluations show MICE retains most of the performances of its cross-encoder counterparts in-domain and matches or even exceeds it in out-of-domain, while reducing FLOPs down to 2.5 times.",
+    "publicationDate": "2026-02-18T09:30:29.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.14749",
+    "title": "Evaluating Large Language Models for Cross-Lingual Retrieval",
+    "abstract": "Multi-stage information retrieval (IR) has become a widely-adopted paradigm in search. While Large Language Models (LLMs) have been extensively evaluated as second-stage reranking models for monolingual IR, a systematic large-scale comparison is still lacking for cross-lingual IR (CLIR). Moreover, while prior work shows that LLM-based rerankers improve CLIR performance, their evaluation setup relies on lexical retrieval with machine translation (MT) for the first stage. This is not only prohibitively expensive but also prone to error propagation across stages. Our evaluation on passage-level and document-level CLIR reveals that further gains can be achieved with multilingual bi-encoders as first-stage retrievers and that the benefits of translation diminishes with stronger reranking models. We further show that pairwise rerankers based on instruction-tuned LLMs perform competitively with listwise rerankers. To the best of our knowledge, we are the first to study the interaction between retrievers and rerankers in two-stage CLIR with LLMs. Our findings reveal that, without MT, current state-of-the-art rerankers fall severely short when directly applied in CLIR.",
+    "publicationDate": "2025-09-18T08:54:17.000Z",
+    "votes": 10
+  }
+]

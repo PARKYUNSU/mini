@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.10170",
+    "title": "Does Document Structure Help Dense Retrieval? A Placebo-Controlled Ablation of Four Mechanisms Across Two Corpora",
+    "abstract": "Retrieval-augmented generation systems increasingly rely on document-structure treatments: structure-aligned chunking, LLM-generated chunk contexts, heading-path metadata, and hierarchical two-stage retrieval. Separate studies support each on different corpora, embedders, and metrics, and none control for a shared confound: any text prepended to a chunk perturbs its embedding. We present a mechanism-isolating ablation testing all four treatments under one protocol, matching chunk sizes across conditions and adding a semantically null placebo---heading paths that are structurally valid but shuffled across documents. We score retrieval with a coverage-aware nDCG and test four pre-registered contrasts via document-clustered bootstrap with Holm correction, on two distant corpora: 200 Wikipedia Featured Articles (951 queries) and 1,585 QASPER papers (4,303 questions). Organization helps, and the cause is content, not tokens: structure-aligned chunks with real heading paths beat contextualized fixed windows (+0.022 / +0.012 cov-nDCG@10) and the placebo (+0.010 / +0.016). Naive two-stage hierarchical retrieval hurts (-0.033 / -0.015), traceable to first-stage section recall. Gold structure beats LLM-induced structure on Wikipedia but not on QASPER. Effects are small ($dz$ 0.06-0.11) but Holm-significant and consistent across corpora.",
+    "publicationDate": "2026-10-07T14:45:26.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.18622",
+    "title": "Structural Segmentation for Brazilian Legal Document Retrieval",
+    "abstract": "Long legal documents are often represented as single retrieval units, which can dilute relevant content and limit retrieval effectiveness. This study investigates structural segmentation as a document representation strategy to improve Brazilian legal document retrieval. Using the hierarchical structure of legal acts, we represent each document as a collection of chunks. We evaluate four representation strategies: a multi-layered hierarchy representation and three simplified versions based on core chunks (articles and non-normative document components), with varying contextual details. We test these strategies on two publicly available Brazilian legal datasets containing normative acts and legislative proposals, using both lexical and dense retrieval models. Results show that structural segmentation improves dense retrieval compared with whole-document indexing, despite substantially increasing the number of indexed units. However, it does not consistently benefit lexical retrieval. Finally, we find that full hierarchicy representation is not necessary: core chunks enriched with document metadata yield comparable or better results.",
+    "publicationDate": "2026-10-13T16:02:14.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.31660",
+    "title": "Parser, Chunking, and Embedding Interactions in Retrieval-Augmented Generation over Indian Government Regulatory Documents",
+    "abstract": "Retrieval-augmented generation (RAG) pipelines are typically assembled from independently-chosen components -- a document parser, a chunking strategy, and an embedding model -- yet these choices are rarely evaluated jointly, and evaluations that do combine them are usually run on a single document or corpus. We present a controlled factorial study of 3 parsers, 3 chunking strategies, and 5 dense embedding models, together with a sparse BM25 baseline, evaluated against 800 question instances, each with one or more required evidence strings, with evidence strings automatically validated against source text and a 10% random sample manually reviewed, across four structurally distinct Indian central-government regulatory documents. We fit linear mixed-effects models with document-query-level random intercepts to the resulting 72,000-row result set, run Holm-corrected paired comparisons between matched dense and sparse configurations, and report clustered bootstrap confidence intervals for all 54 unique retriever configurations. We find that no single retriever family dominates across documents; parser and chunker choice interact significantly; MPNet-base is a consistent underperformer with a severe failure mode on table-derived questions; and the corpus exhibits a near-saturated evidence-preservation ceiling above 98%, indicating that retrieval differences are driven primarily by ranking quality rather than information loss during ingestion. We additionally report embedding-dimension and chunk-size/overlap ablations and an efficiency/quality Pareto analysis. We release our full evaluation harness, corpus manifest, and 800-question benchmark.",
+    "publicationDate": "2026-09-15T07:32:06.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.26192",
+    "title": "Comparing Chunking and Embedding Strategies for Turkish RAG Systems",
+    "abstract": "Retrieval-Augmented Generation conditions a language model on chunks retrieved from a document collection. Its accuracy is therefore limited by the chunking and embedding stages that determine what can be retrieved. We compare Turkish document question answering across three chunking strategies (fixed-length, semantic, and layout-aware Docling), five embedding models, and two LLMs, over three documents with contrasting layouts. Every configuration answers the same question set, which allows component effects to be separated by paired testing rather than inferred from separate benchmarks. The fully crossed design yields 9{,}000 graded question-answer evaluations, each scored by an independent judge model, and component comparisons are tested by paired McNemar tests under Holm correction. The three leading embedding models are statistically indistinguishable, so language specialization yields no measurable retrieval advantage. The faster LLM is not the more accurate one. The preferred configuration depends on content type, since layout-aware chunking helps table-heavy documents far more than text-heavy ones.",
+    "publicationDate": "2026-08-24T07:24:37.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.16586",
+    "title": "When Is Complex Chunking Worth It? A Multi-Objective Evaluation of Chunking Methods at Scale",
+    "abstract": "Dense retrieval is commonly evaluated on benchmarks that represent each document with a single embedding, even though real-world retrieval systems often index long documents that require chunking. In these settings, the chosen chunking method not only affects retrieval quality, but also indexing throughput, query latency, and memory usage. Prior comparisons of chunking strategies have mainly focused on retrieval performance, leaving operational trade-offs underexplored. To address these issues, we evaluate eight representative chunking strategies across two scalable corpora, three embedding models, and multiple corpus sizes, measuring both retrieval effectiveness and system-level costs. Our results show that computationally expensive methods rarely provide consistent gains over simpler chunking. Instead, the best performing strategy depends on the embedding model, dataset, corpus size, and target retrieval metric. Methods with similar performance can also differ substantially in operational cost, showing that chunking should be seen as a multi-objective design decision.",
+    "publicationDate": "2026-08-17T13:47:48.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.01852",
+    "title": "Evaluating Chunking Strategies for Retrieval-Augmented Generation on Academic Texts",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems use the question-answering capabilities of Large Language Models (LLMs) to access information outside their parameters. We evaluate if cluster-based semantic chunking improves retrieval and answer quality compared to fixed-size and recursive chunking evaluating on long, structured academic theses using the Retrieval Augmented Generation Assessment (RAGAs) framework. RAGAs based faithfulness shows limited reliability in this setup. Performance on fixed versus document specific questions varied substantially, likely related to the formatting of documents and preprocessing. Under the tested configuration, cluster-based chunking did not outperform simpler strategies.",
+    "publicationDate": "2026-07-02T08:12:35.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.18381",
+    "title": "SproutRAG: Attention-Guided Tree Search with Progressive Embeddings for Long-Document RAG",
+    "abstract": "Retrieval-augmented generation (RAG) systems must balance retrieval granularity with contextual coherence, a challenge that existing methods address through LLM-guided chunking, single-level context expansion, or hierarchical summarization. These approaches variously depend on costly LLM calls during indexing or retrieval, limit context aggregation to a single granularity level, or introduce information loss through summarization. We present SproutRAG, an attention-guided hierarchical RAG framework that addresses this trade-off by organizing sentence-level chunks into progressively larger but semantically coherent units, using learned inter-sentence attention to construct a binary chunking tree. Unlike prior approaches that rely on external LLMs, fixed context expansion, or lossy summarization, SproutRAG learns which attention heads and layers best capture semantic document structure, enabling multi-granularity retrieval without additional LLM calls or compressed summaries. At retrieval time, SproutRAG uses hierarchical beam search to retrieve candidates at multiple granularities, capturing multi-sentence relevance beyond flat retrieval. The framework is trained end-to-end with a joint objective that improves both embeddings and tree structure. Experiments across four benchmarks spanning scientific, legal, and open-domain settings demonstrate that SproutRAG improves information efficiency (IE) by 6.1% on average over the strongest baseline. Code is available on this https URL.",
+    "publicationDate": "2026-06-16T18:28:00.000Z",
+    "votes": 15
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.24767",
+    "title": "The Effect of Text Chunk Size on Retrieval-Augmented Generation Performance",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems have emerged as a powerful process for allowing large language models (LLMs) to retrieve relevant information to use as source material during text generation. A critical yet under-explored component of these systems is the granularity at which source documents are segmented into retrievable chunks. The size of these chunks has the potential to significantly influence generation quality, contextual correctness, retrieval precision, and computational efficiency. Despite its importance, chunk size is often selected without proper evaluation of its impact on generation quality. Smaller chunks, such as individual sentences, may allow for precise retrieval by narrowing the focus of each chunk. However, they contain less information, which may limit the model's ability to generate coherent responses. Larger chunks, such as entire chapters, contain lots of broad information that may improve correctness, but also introduce additional noise and increase computational cost. Because larger chunks contain more information, the number of chunks returned to the model must also be considered. This paper evaluates how chunk size, along with the number of retrieved segments, influences generation quality and retrieval effectiveness. By comparing these configurations, this study seeks to better understand how document segmentation affects the performance and efficiency of Retrieval-Augmented Generation systems. segmentation affects the performance and efficiency of Retrieval-Augmented Generation systems.",
+    "publicationDate": "2026-06-08T13:55:14.000Z",
+    "votes": 0
+  }
+]

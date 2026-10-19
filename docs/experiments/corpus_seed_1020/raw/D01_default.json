@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.15830",
+    "title": "CiteGuard-RAG: A Validation-Centered AI System for Evidence-Grounded Question Answering",
+    "abstract": "Retrieval-augmented generation (RAG) can improve access to complex information; however, retrieving evidence alone does not ensure that answers are grounded, citation-valid, or appropriately refused. This paper introduces CiteGuard-RAG, a validation-centered AI system for evidence-grounded question answering. The system integrates hybrid semantic-lexical retrieval, citation-constrained generation, sentence-level grounding validation, and single-pass regeneration. Validation is used at runtime to determine whether a candidate answer should be accepted, refused, or regenerated before final delivery.\nCiteGuard-RAG is evaluated on 400 questions across a controlled housing-law dataset, PrivacyQA, and CUAD. In the controlled evaluation, it achieves 99.1% retrieval accuracy, 98.3% grounded-answer accuracy, and 98.3% citation validity, with no validation-detected hallucinations. Ablation results show that grounded-answer accuracy drops sharply when validation is removed, even when retrieval accuracy remains unchanged. External evaluation shows that while citation validity remains strong, evidence utilization, span alignment, and refusal calibration become harder under domain shift.\nThese findings indicate that trustworthy RAG systems require explicit validation between retrieval and final answer delivery. CiteGuard-RAG provides a practical architecture for linking retrieval, generation, citation checking, abstention, and regeneration in high-stakes information access.",
+    "publicationDate": "2026-09-14T16:30:54.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.22537",
+    "title": "EvidenT: Building Trustworthy Enterprise Assistants through Evidence Groundedness and Traceability",
+    "abstract": "Enterprise AI assistants must produce responses that are verifiable and traceable to source evidence. However, retrieval augmented generation (RAG) over heterogeneous enterprise data can suffer from citation drift, unsupported content, and weak source traceability. We present EvidenT (T = Trust + Transparency + Traceability), a lightweight pipeline that verifies extracted evidence against retrieved documents before answer generation, without model retraining. EvidenT combines structured passage extraction with deterministic lexical alignment to filter unsupported content, correct citation drift, and preserve source-span traceability. On approximately 500 real enterprise queries, EvidenT improves gold-source hit rate by an average of 29% over prompting baselines, produces no citations to nonretrieved urls, and achieves near-saturated answer-to-source lexical coverage.",
+    "publicationDate": "2026-09-18T19:49:06.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.00543",
+    "title": "Feedback-Assisted Trust Propagation over Document Relation Graphs for Retrieval-Augmented Generation",
+    "abstract": "Retrieval-augmented generation (RAG) systems rely on external corpora that may contain outdated, contradictory, noisy, or unreliable documents, introducing reliability risks. Prior work has leveraged document relations to improve the answer reliability of RAG. To propagate reliability signals beyond directly compared document pairs, we propose TrustPropRAG, which structures document relations as a graph and estimates document reliability through multi-hop propagation across the graph. TrustPropRAG anchors this propagation with a limited set of human feedback on document reliability, extending these costly-to-collect feedback-based reliability signals across the whole corpus. Specifically, based on the constructed document relation graph, TrustPropRAG estimates a trust score for each document by formulating and solving an optimization problem that jointly captures pairwise document relations and user feedback. These scores are then used to improve the selection of reliable documents and support trust-aware answer generation. Evaluation results show that TrustPropRAG improves both retrieval quality and exact match over baselines, and remains robust under sparse and noisy feedback.",
+    "publicationDate": "2026-09-01T01:30:15.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.25487",
+    "title": "ReliableRAG: Combating Misinformation in Retrieval-Augmented Generation via Reliability-Guided Reasoning Chains",
+    "abstract": "Retrieval-Augmented Generation (RAG) has emerged as a powerful architecture for Question Answering (QA) by integrating external information into Large Language Models (LLMs). However, false, inaccurate, and misleading information in news and social media poses a serious challenge to real-world RAG systems, especially in multi-hop QA, where complex multi-step reasoning can be misled by even a single deceptive misinformation segment in the retrieved documents. Existing approaches mainly rely on implicit alignment or explicit regulation, but their limited ability to assess fine-grained information reliability makes them vulnerable to deceptive misinformation that is semantically relevant to the question yet factually incorrect, leading to erroneous answers. To address this limitation, we propose ReliableRAG, which, to the best of our knowledge, is the first reliability-driven framework that mitigates deceptive misinformation in multi-hop QA through fine-grained evaluation of individual triples. ReliableRAG first extracts information segments from source documents and represents them as structured triples. It then quantifies triple reliability by combining query-triple semantic relevance with triple credibility, retaining only the top-$K$ reliable and non-redundant triples. Based on these refined triples, ReliableRAG autoregressively constructs robust reasoning chains to consolidate trustworthy evidence and filter deceptive misinformation, producing accurate answers faithful to reliable information. Experiments on three multi-hop QA datasets show that ReliableRAG outperforms existing methods, substantially improving the factual reliability and robustness of RAG systems under deceptive misinformation injection.",
+    "publicationDate": "2026-08-26T07:59:24.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.11238",
+    "title": "Towards Query-Agnostic RAG Evaluation via Query Coverage and Claim Verifiability",
+    "abstract": "Retrieval-augmented generation improves the factuality of large language models by grounding responses in retrieved evidence, yet existing evaluation frameworks struggle to provide consistent, fine-grained diagnostics across the diverse spectrum of user queries, ranging from close-ended fact-seeking to open-ended explanatory requests. We propose Q-CARE, a query-agnostic and fully reference-free framework that enables fine-grained assessment by decomposing queries into sub-queries and answers into atomic claims. Q-CARE establishes a unified evaluation principle based on query coverage and claim verifiability, yielding coverage-aware retriever metrics (C-Prec@k, C-nDCG@k) and claim-level generator metrics (Completeness, Conciseness, and Verifiableness). On a human-annotated benchmark spanning eight datasets, Q-CARE achieves higher correlation with human judgments than four existing RAG evaluation metrics, including RAGEval and RAGChecker, proving its effectiveness as a reliable, automated evaluation framework. Code and data are publicly available at this https URL.",
+    "publicationDate": "2026-07-31T09:21:43.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.14400",
+    "title": "DS@GT ARC at LongEval: Citation Integrity and Factual Grounding in Scientific QA",
+    "abstract": "This paper describes DS@GT ARC's submission to the CLEF 2026 LongEval Task 4 on Retrieval-Augmented Generation (RAG). In this submission, we examine a divergence between traditional natural language evaluation metrics and citation integrity as applied to RAG QA systems. We evaluate a corrective pipeline using Corrective RAG (CRAG) and CiteFix against baseline and frontier model benchmark RAG QA scores. While frontier models maximized answer relevance and fluency scores, our RAGAs LLM-as-judge diagnostics indicate that frontier models would correctly identify relevant documents without using their context in answer generation. Conversely, by filtering chunks pre-generation and enforcing strict entailment of generated claims to the cited material post-generation, our corrective pipeline marginally improved citation faithfulness and answer grounding. We propose that evaluation of trustworthy RAG QA requires metrics that reward strict answer grounding.",
+    "publicationDate": "2026-07-15T22:35:02.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.04223",
+    "title": "Sentence-Level Context Sensitivity as a Training-Free Detector of Unsupported Content, Evaluated Against Trained Verifiers",
+    "abstract": "Retrieval-augmented generation (RAG) assistants summarize records in clinical and legal work, where one unsupported sentence can mislead a reader. The contrast between an output's likelihood with and without its source is an established faithfulness score for whole summaries and answers, but it has not been measured as a detector of the individual unsupported sentence in multi-passage RAG answers, against trained verifiers, or for its cost. We implement it as a training-free detector that re-scores a fixed answer under the full context, no context, and each chunk removed, and returns the chunk whose removal lowers a sentence's likelihood most as a candidate supporting passage. We evaluate it on RAGTruth, TofuEval, and RAGBench with six scorers and against five verifiers, up to a large language model (LLM) judge, on identical inputs under a source-level split. Scoring per sentence ranks unsupported sentences better than the answer-level form of the same signal on all three benchmarks, by 0.033 to 0.071 in the area under the receiver operating characteristic curve (AUC). On RAGTruth the training-free score reaches an AUC of 0.717 to 0.745 across scorers and 0.773 with a classifier, above entailment and attribution baselines and level with per-chunk fact-checkers, at about one forty-seventh of the LLM judge's compute on a 1.5B scorer, while a full-context fact-checker and the judge are more accurate and are not improved by it. The signal is weakest on short-answer question answering, where the scorer can answer from memory.",
+    "publicationDate": "2026-07-05T10:35:30.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.07783",
+    "title": "Evaluating RAG Reliability under Clean, Misleading, and Mixed Retrieval",
+    "abstract": "Retrieval-Augmented Generation (RAG) is widely used to improve the factual reliability of large language models (LLMs) by grounding answers in retrieved evidence. In misinformation-rich environments, however, retrieved content may include plausible but incorrect information, raising concerns about the reliability of RAG-based information access systems.\nIn this work, we propose an evaluation protocol to systematically test how the RAG system handles conflicts between parametric knowledge and evidence retrieved from context with varying amounts of misleading information. We target correct answers to factoid questions that the model responds to correctly, even when there is no retrieval, and use this to test the system with clean, poisoned, and mixed evidence.\nThe proposed analytical framework combines parametric override and confidence metrics to assess when and how misleading information affects the generation process of LLMs. This study aims to provide insights into the robustness of RAG systems in information disorder scenarios.",
+    "publicationDate": "2026-06-05T18:54:23.000Z",
+    "votes": 2
+  }
+]

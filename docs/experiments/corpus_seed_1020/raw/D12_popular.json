@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2601.07226",
+    "title": "Lost in the Noise: How Reasoning Models Fail with Contextual Distractors",
+    "abstract": "Recent advances in reasoning models and agentic AI systems have led to an increased reliance on diverse external information. However, this shift introduces input contexts that are inherently noisy, a reality that current sanitized benchmarks fail to capture. We introduce NoisyBench, a comprehensive benchmark that systematically evaluates model robustness across 11 datasets in RAG, reasoning, alignment, and tool-use tasks against diverse noise types, including random documents, irrelevant chat histories, and hard negative distractors. Our evaluation reveals a catastrophic performance drop of up to 80% in state-of-the-art models when faced with contextual distractors. Crucially, we find that agentic workflows often amplify these errors by over-trusting noisy tool outputs, and distractors can trigger emergent misalignment even without adversarial intent. We find that prompting, context engineering, SFT, and outcome-reward only RL fail to ensure robustness; in contrast, our proposed Rationale-Aware Reward (RARE) significantly strengthens resilience by incentivizing the identification of helpful information within noise. Finally, we uncover an inverse scaling trend where increased test-time computation leads to worse performance in noisy settings and demonstrate via attention visualization that models disproportionately focus on distractor tokens, providing vital insights for building the next generation of robust, reasoning-capable agents.",
+    "publicationDate": "2026-01-12T05:43:51.000Z",
+    "votes": 24
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2412.02592",
+    "title": "OCR Hinders RAG: Evaluating the Cascading Impact of OCR on Retrieval-Augmented Generation",
+    "abstract": "Retrieval-augmented Generation (RAG) enhances Large Language Models (LLMs) by integrating external knowledge to reduce hallucinations and incorporate up-to-date information without retraining. As an essential part of RAG, external knowledge bases are commonly built by extracting structured data from unstructured PDF documents using Optical Character Recognition (OCR). However, given the imperfect prediction of OCR and the inherent non-uniform representation of structured data, knowledge bases inevitably contain various OCR noises. In this paper, we introduce OHRBench, the first benchmark for understanding the cascading impact of OCR on RAG systems. OHRBench includes 8,561 carefully selected unstructured document images from seven real-world RAG application domains, along with 8,498 Q&A pairs derived from multimodal elements in documents, challenging existing OCR solutions used for RAG. To better understand OCR's impact on RAG systems, we identify two primary types of OCR noise: Semantic Noise and Formatting Noise and apply perturbation to generate a set of structured data with varying degrees of each OCR noise. Using OHRBench, we first conduct a comprehensive evaluation of current OCR solutions and reveal that none is competent for constructing high-quality knowledge bases for RAG systems. We then systematically evaluate the impact of these two noise types and demonstrate the trend relationship between the degree of OCR noise and RAG performance. Our OHRBench, including PDF documents, Q&As, and the ground truth structured data are released at: this https URL",
+    "publicationDate": "2024-12-04T05:50:08.748Z",
+    "votes": 32
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.03689",
+    "title": "Rethinking the Reranker: Boundary-Aware Evidence Selection for Robust Retrieval-Augmented Generation",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems remain brittle under realistic retrieval noise, even when the required evidence appears in the top-K results. A key reason is that retrievers and rerankers optimize solely for relevance, often selecting either trivial, answer-revealing passages or evidence that lacks the critical information required to answer the question, without considering whether the evidence is suitable for the generator. We propose BAR-RAG, which reframes the reranker as a boundary-aware evidence selector that targets the generator's Goldilocks Zone -- evidence that is neither trivially easy nor fundamentally unanswerable for the generator, but is challenging yet sufficient for inference and thus provides the strongest learning signal. BAR-RAG trains the selector with reinforcement learning using generator feedback, and adopts a two-stage pipeline that fine-tunes the generator under the induced evidence distribution to mitigate the distribution mismatch between training and inference. Experiments on knowledge-intensive question answering benchmarks show that BAR-RAG consistently improves end-to-end performance under noisy retrieval, achieving an average gain of 10.3 percent over strong RAG and reranking baselines while substantially improving robustness. Code is publicly avaliable at this https URL.",
+    "publicationDate": "2026-02-03T16:08:23.000Z",
+    "votes": 26
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2501.18365",
+    "title": "RbFT: Robust Fine-tuning for Retrieval-Augmented Generation against Retrieval Defects",
+    "abstract": "Retrieval-augmented generation (RAG) enhances large language models (LLMs) by integrating external knowledge retrieved from a knowledge base. However, its effectiveness is fundamentally constrained by the reliability of both the retriever and the knowledge base. In real-world scenarios, imperfections in these components often lead to the retrieval of noisy, irrelevant, or misleading counterfactual information, ultimately undermining the trustworthiness of RAG systems. To address this challenge, we propose Robust Fine-Tuning (RbFT), a method designed to enhance the resilience of LLMs against retrieval defects through two targeted fine-tuning tasks. Experimental results demonstrate that RbFT significantly improves the robustness of RAG systems across diverse retrieval conditions, surpassing existing methods while maintaining high inference efficiency and compatibility with other robustness techniques.",
+    "publicationDate": "2025-01-30T14:15:09.000Z",
+    "votes": 34
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.01896",
+    "title": "Tackling the Inherent Difficulty of Noise Filtering in RAG",
+    "abstract": "Retrieval-Augmented Generation (RAG) has become a widely adopted approach to enhance Large Language Models (LLMs) by incorporating external knowledge and reducing hallucinations. However, noisy or irrelevant documents are often introduced during RAG, potentially degrading performance and even causing hallucinated outputs. While various methods have been proposed to filter out such noise, we argue that identifying irrelevant information from retrieved content is inherently difficult and limited number of transformer layers can hardly solve this. Consequently, retrievers fail to filter out irrelevant documents entirely. Therefore, LLMs must be robust against such noise, but we demonstrate that standard fine-tuning approaches are often ineffective in enabling the model to selectively utilize relevant information while ignoring irrelevant content due to the structural constraints of attention patterns. To address this, we propose a novel fine-tuning method designed to enhance the model's ability to distinguish between relevant and irrelevant information within retrieved documents. Extensive experiments across multiple benchmarks show that our approach significantly improves the robustness and performance of LLMs.",
+    "publicationDate": "2026-01-05T08:40:37.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.07783",
+    "title": "Evaluating RAG Reliability under Clean, Misleading, and Mixed Retrieval",
+    "abstract": "Retrieval-Augmented Generation (RAG) is widely used to improve the factual reliability of large language models (LLMs) by grounding answers in retrieved evidence. In misinformation-rich environments, however, retrieved content may include plausible but incorrect information, raising concerns about the reliability of RAG-based information access systems.\nIn this work, we propose an evaluation protocol to systematically test how the RAG system handles conflicts between parametric knowledge and evidence retrieved from context with varying amounts of misleading information. We target correct answers to factoid questions that the model responds to correctly, even when there is no retrieval, and use this to test the system with clean, poisoned, and mixed evidence.\nThe proposed analytical framework combines parametric override and confidence metrics to assess when and how misleading information affects the generation process of LLMs. This study aims to provide insights into the robustness of RAG systems in information disorder scenarios.",
+    "publicationDate": "2026-06-05T18:54:23.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2401.15884",
+    "title": "Corrective Retrieval Augmented Generation",
+    "abstract": "Large language models (LLMs) inevitably exhibit hallucinations since the accuracy of generated texts cannot be secured solely by the parametric knowledge they encapsulate. Although retrieval-augmented generation (RAG) is a practicable complement to LLMs, it relies heavily on the relevance of retrieved documents, raising concerns about how the model behaves if retrieval goes wrong. To this end, we propose the Corrective Retrieval Augmented Generation (CRAG) to improve the robustness of generation. Specifically, a lightweight retrieval evaluator is designed to assess the overall quality of retrieved documents for a query, returning a confidence degree based on which different knowledge retrieval actions can be triggered. Since retrieval from static and limited corpora can only return sub-optimal documents, large-scale web searches are utilized as an extension for augmenting the retrieval results. Besides, a decompose-then-recompose algorithm is designed for retrieved documents to selectively focus on key information and filter out irrelevant information in them. CRAG is plug-and-play and can be seamlessly coupled with various RAG-based approaches. Experiments on four datasets covering short- and long-form generation tasks show that CRAG can significantly improve the performance of RAG-based approaches.",
+    "publicationDate": "2024-02-16T19:10:36.000Z",
+    "votes": 56
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.05037",
+    "title": "Collapse of Dense Retrievers: Short, Early, and Literal Biases  Outranking Factual Evidence",
+    "abstract": "Dense retrieval models are commonly used in Information Retrieval (IR)\napplications, such as Retrieval-Augmented Generation (RAG). Since they often\nserve as the first step in these systems, their robustness is critical to avoid\ndownstream failures. In this work, we repurpose a relation extraction dataset\n(e.g., Re-DocRED) to design controlled experiments that quantify the impact of\nheuristic biases, such as a preference for shorter documents, on retrievers\nlike Dragon+ and Contriever. We uncover major vulnerabilities, showing\nretrievers favor shorter documents, early positions, repeated entities, and\nliteral matches, all while ignoring the answer's presence! Notably, when\nmultiple biases combine, models exhibit catastrophic performance degradation,\nselecting the answer-containing document in less than 10% of cases over a\nsynthetic biased document without the answer. Furthermore, we show that these\nbiases have direct consequences for downstream applications like RAG, where\nretrieval-preferred documents can mislead LLMs, resulting in a 34% performance\ndrop than providing no documents at all.\nthis https URL",
+    "publicationDate": "2025-03-06T23:23:13.000Z",
+    "votes": 46
+  }
+]

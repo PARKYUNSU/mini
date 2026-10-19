@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2503.05070",
+    "title": "PromptPex: Automatic Test Generation for Language Model Prompts",
+    "abstract": "Large language models (LLMs) are being used in many applications and prompts for these models are integrated into software applications as code-like artifacts. These prompts behave much like traditional software in that they take inputs, generate outputs, and perform some specific function. However, prompts differ from traditional code in many ways and require new approaches to ensure that they are robust. For example, unlike traditional software the output of a prompt depends on the AI model that interprets it. Also, while natural language prompts are easy to modify, the impact of updates is harder to predict. New approaches to testing, debugging, and modifying prompts with respect to the model running them are required.\nTo address some of these issues, we developed PromptPex, an LLM-based tool to automatically generate and evaluate unit tests for a given prompt. PromptPex extracts input and output specifications from a prompt and uses them to generate diverse, targeted, and valid unit tests. These tests are instrumental in identifying regressions when a prompt is changed and also serve as a tool to understand how prompts are interpreted by different models. We use PromptPex to generate tests for eight benchmark prompts and evaluate the quality of the generated tests by seeing if they can cause each of four diverse models to produce invalid output. PromptPex consistently creates tests that result in more invalid model outputs than a carefully constructed baseline LLM-based test generator. Furthermore, by extracting concrete specifications from the input prompt, PromptPex allows prompt writers to clearly understand and test specific aspects of their prompts. The source code of PromptPex is available at this https URL.",
+    "publicationDate": "2025-03-07T01:31:03.000Z",
+    "votes": 35
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.17393",
+    "title": "Agent-Testing Agent: A Meta-Agent for Automated Testing and Evaluation of Conversational AI Agents",
+    "abstract": "LLM agents are increasingly deployed to plan, retrieve, and write with tools, yet evaluation still leans on static benchmarks and small human studies. We present the Agent-Testing Agent (ATA), a meta-agent that combines static code analysis, designer interrogation, literature mining, and persona-driven adversarial test generation whose difficulty adapts via judge feedback. Each dialogue is scored with an LLM-as-a-Judge (LAAJ) rubric and used to steer subsequent tests toward the agent's weakest capabilities. On a travel planner and a Wikipedia writer, the ATA surfaces more diverse and severe failures than expert annotators while matching severity, and finishes in 20--30 minutes versus ten-annotator rounds that took days. Ablating code analysis and web search increases variance and miscalibration, underscoring the value of evidence-grounded test generation. The ATA outputs quantitative metrics and qualitative bug reports for developers. We release the full methodology and open-source implementation for reproducible agent testing: this https URL",
+    "publicationDate": "2025-08-24T15:02:13.000Z",
+    "votes": 16
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.18827",
+    "title": "Automated structural testing of LLM-based agents: methods, framework, and case studies",
+    "abstract": "LLM-based agents are rapidly being adopted across diverse domains. Since they interact with users without supervision, they must be tested extensively. Current testing approaches focus on acceptance-level evaluation from the user's perspective. While intuitive, these tests require manual evaluation, are difficult to automate, do not facilitate root cause analysis, and incur expensive test environments. In this paper, we present methods to enable structural testing of LLM-based agents. Our approach utilizes traces (based on OpenTelemetry) to capture agent trajectories, employs mocking to enforce reproducible LLM behavior, and adds assertions to automate test verification. This enables testing agent components and interactions at a deeper technical level within automated workflows. We demonstrate how structural testing enables the adaptation of software engineering best practices to agents, including the test automation pyramid, regression testing, test-driven development, and multi-language testing. In representative case studies, we demonstrate automated execution and faster root-cause analysis. Collectively, these methods reduce testing costs and improve agent quality through higher coverage, reusability, and earlier defect detection. We provide an open source reference implementation on GitHub.",
+    "publicationDate": "2026-01-25T11:52:30.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.00497",
+    "title": "STELLAR: A Search-Based Testing Framework for Large Language Model Applications",
+    "abstract": "Large Language Model (LLM)-based applications are increasingly deployed across various domains, including customer service, education, and mobility. However, these systems are prone to inaccurate, fictitious, or harmful responses, and their vast, high-dimensional input space makes systematic testing particularly challenging. To address this, we present STELLAR, an automated search-based testing framework for LLM-based applications that systematically uncovers text inputs leading to inappropriate system responses. Our framework models test generation as an optimization problem and discretizes the input space into stylistic, content-related, and perturbation features. Unlike prior work that focuses on prompt optimization or coverage heuristics, our work employs evolutionary optimization to dynamically explore feature combinations that are more likely to expose failures. We evaluate STELLAR on three LLM-based conversational question-answering systems. The first focuses on safety, benchmarking both public and proprietary LLMs against malicious or unsafe prompts. The second and third target navigation, using an open-source and an industrial retrieval-augmented system for in-vehicle venue recommendations. Overall, STELLAR exposes up to 4.3 times (average 2.5 times) more failures than the existing baseline approaches.",
+    "publicationDate": "2026-01-01T22:30:15.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.02755",
+    "title": "Acceptance-Test-Driven Evaluation Protocols for Business-Centric LLM Systems",
+    "abstract": "Large language model (LLM) applications are increasingly expected to satisfy deterministic institutional requirements while relying on probabilistic generative components. This mismatch makes ordinary post-hoc benchmarking insufficient for systems that must be safe, reliable, auditable, and economically useful. This paper contributes an evaluation-protocol extension for operational LLM systems grounded in acceptance-test-driven development, safety engineering, and business-centric validation. The extension translates stakeholder goals into executable behavioral contracts, release gates, monitoring signals, and evidence artifacts before prompt, model, retrieval, or agent changes are accepted. It adapts the red-green-refactor discipline of test-driven development to a red-train-green lifecycle: first define failing acceptance tests for desired behavior, then improve the LLM system through prompt changes, retrieval design, fine-tuning, guardrails, or data augmentation, and finally release only when multidimensional gates are satisfied. The contribution is a governance-oriented metric stack, reference architecture, and empirical protocol for comparing acceptance-test-driven LLM development against prompt-first and benchmark-after workflows.",
+    "publicationDate": "2026-06-01T18:21:10.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2411.13768",
+    "title": "Evaluation-Driven Development and Operations of LLM Agents: A Process Model and Reference Architecture",
+    "abstract": "Large Language Models (LLMs) have enabled the emergence of LLM agents, systems capable of pursuing under-specified goals and adapting after deployment. Evaluating such agents is challenging because their behavior is open ended, probabilistic, and shaped by system-level interactions over time. Traditional evaluation methods, built around fixed benchmarks and static test suites, fail to capture emergent behaviors or support continuous adaptation across the lifecycle. To ground a more systematic approach, we conduct a multivocal literature review (MLR) synthesizing academic and industrial evaluation practices. The findings directly inform two empirically derived artifacts: a process model and a reference architecture that embed evaluation as a continuous, governing function rather than a terminal checkpoint. Together they constitute the evaluation-driven development and operations (EDDOps) approach, which unifies offline (development-time) and online (runtime) evaluation within a closed feedback loop. By making evaluation evidence drive both runtime adaptation and governed redevelopment, EDDOps supports safer, more traceable evolution of LLM agents aligned with changing objectives, user needs, and governance constraints.",
+    "publicationDate": "2024-11-21T00:34:30.000Z",
+    "votes": 27
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.20403",
+    "title": "LLMs for Automated Unit Test Generation and Assessment in Java: The AgoneTest Framework",
+    "abstract": "Unit testing is an essential but resource-intensive step in software development, ensuring individual code units function correctly. This paper introduces AgoneTest, an automated evaluation framework for Large Language Model-generated (LLM) unit tests in Java. AgoneTest does not aim to propose a novel test generation algorithm; rather, it supports researchers and developers in comparing different LLMs and prompting strategies through a standardized end-to-end evaluation pipeline under realistic conditions. We introduce the Classes2Test dataset, which maps Java classes under test to their corresponding test classes, and a framework that integrates advanced evaluation metrics, such as mutation score and test smells, for a comprehensive assessment. Experimental results show that, for the subset of tests that compile, LLM-generated tests can match or exceed human-written tests in terms of coverage and defect detection. Our findings also demonstrate that enhanced prompting strategies contribute to test quality. AgoneTest clarifies the potential of LLMs in software testing and offers insights for future improvements in model design, prompt engineering, and testing practices.",
+    "publicationDate": "2025-11-25T15:33:00.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2410.19406",
+    "title": "An Auditing Test To Detect Behavioral Shift in Language Models",
+    "abstract": "As language models (LMs) approach human-level performance, a comprehensive\nunderstanding of their behavior becomes crucial. This includes evaluating\ncapabilities, biases, task performance, and alignment with societal values.\nExtensive initial evaluations, including red teaming and diverse benchmarking,\ncan establish a model's behavioral profile. However, subsequent fine-tuning or\ndeployment modifications may alter these behaviors in unintended ways. We\npresent a method for continual Behavioral Shift Auditing (BSA) in LMs. Building\non recent work in hypothesis testing, our auditing test detects behavioral\nshifts solely through model generations. Our test compares model generations\nfrom a baseline model to those of the model under scrutiny and provides\ntheoretical guarantees for change detection while controlling false positives.\nThe test features a configurable tolerance parameter that adjusts sensitivity\nto behavioral changes for different use cases. We evaluate our approach using\ntwo case studies: monitoring changes in (a) toxicity and (b) translation\nperformance. We find that the test is able to detect meaningful changes in\nbehavior distributions using just hundreds of examples.",
+    "publicationDate": "2024-10-25T09:09:31.000Z",
+    "votes": 3
+  }
+]

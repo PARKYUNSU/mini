@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.08153",
+    "title": "Penalty-Framed No-Valid-Option MCQA: Analyzing LLM Abstention under Invalid Choices",
+    "abstract": "Multiple-choice question answering (MCQA) is commonly used to evaluate large language models under the assumption that one of the provided options is correct, typically using answer-selection accuracy. However, in real deployments, users or retrieval systems may provide invalid option sets in which none of the listed choices is correct, and selecting one of them may incur downstream cost. We study this setting as penalty-framed no-valid-option MCQA. Using the mathematics subset of MMLU-Pro, we remove the labeled correct option, allow models to either choose a remaining option or output ABSTAIN, and penalize invalid forced-choice responses. We further introduce correct-conditioned analysis, evaluating abstention only on instances that the model originally answered correctly. Experiments show that high MCQA accuracy does not fully guarantee abstention reliability: even under explicit no-valid-option-aware instructions and penalty-based scoring, models still produce invalid forced-choice responses for a subset of originally correct instances. These results show that penalty-framed no-valid-option MCQA reveals an aspect of model reliability not captured by standard answer-selection accuracy.",
+    "publicationDate": "2026-10-06T11:04:20.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.15578",
+    "title": "The Magnitude Mirage: Rethinking Confidence for Reasoning-Intensive Retrieval",
+    "abstract": "Many production RAG systems implement retrieval abstention by thresholding raw similarity scores, implicitly treating score magnitude as a confidence signal. We demonstrate that this practice degrades systematically as queries require reasoning beyond semantic matching. Across 11 retrieval architectures and 28 datasets, neural retrievers consistently assign high similarity scores to semantically related but constraint-violating documents, causing magnitude-based thresholds to collapse toward near-random abstention performance on logical and temporal reasoning tasks---a failure we term the Magnitude Mirage. To address this without computationally expensive alternatives, we conduct a large-scale empirical study of six zero-cost Query Performance Prediction (QPP) metrics across three cognitive tiers: semantic matching (BEIR), logical reasoning (BRIGHT), and temporal reasoning (TEMPO). Our central finding is that the key improvement comes from abandoning magnitude in favor of score-distribution signals: the gain from this shift exceeds the differences among distributional alternatives by a factor of 5-10$\\times$. In particular, Score Gap ($s_1 - s_k$) and a practical adaptation of Score Magnitude and Variance (LSMV) improve abstention AUROC by up to 0.16 in settings where magnitude-based confidence provides little discriminative power. These methods require no additional inference, retraining, or latency, making them a practical zero-cost replacement for magnitude thresholding in deployed RAG systems.",
+    "publicationDate": "2026-09-14T13:49:24.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.37469",
+    "title": "Relevance Is Not Sufficient Evidence: Detecting Evidence Gaps Before Generation in RAG",
+    "abstract": "Retrieval-augmented generation (RAG) grounds large language models in external sources, but retrieved passages often name the right entities without providing the facts needed to answer. Even when instructed to abstain, 12 generators answer 40.0-99.3% of insufficient-evidence questions. Training generators to abstain ties the decision to model weights, may reward answers recalled from parametric knowledge, and still requires a full generator call. Can sufficiency be judged from the question and evidence alone, before any answer exists? We identify pitfalls in constructing insufficient-evidence tests: removing relevant evidence or pairing evidence with unrelated questions can reveal labels through lexical overlap or evidence position. We build a paired benchmark using substitution, deletion, and question-swap constructions that vary answer support while controlling selected surface features, such as word use. Sufficiency can be judged without generating an answer, but no single signal works across all datasets. We introduce RINSE (Relevance Is Not Sufficient Evidence), which combines three signals: whether every part of the question is covered, whether any passage offers an answer, and whether a small language model reading the passages together judges them sufficient. Across six datasets, RINSE ranks sufficient above insufficient evidence with a score of 0.837 (chance 0.5), exceeding the best of 10 prior methods (0.746) and a frontier model queried through an API (0.784). Its weakest dataset scores higher than any other method's weakest (0.684 vs. 0.676). RINSE runs locally before generation, taking 36.5 ms per question on a single GPU.",
+    "publicationDate": "2026-09-27T17:39:51.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.37491",
+    "title": "Regime Boundary Alignment for Evidence-Gated Question Answering",
+    "abstract": "Retrieval-augmented language models are expected to answer from the retrieved evidence, but in practice they often keep answering when that evidence is missing. We trace this behavior to the training signal: answer-focused fine-tuning assigns no target to unsupported contexts, so it cannot distinguish a reader that abstains from one that guesses, and unsupported answering stays near 100% even as supported accuracy improves. We introduce Regime Boundary Alignment (RBA), which trains a single reader on matched variants of the same question and gold answer. The reader is trained to produce the gold answer when the context supports it, including when conflicting evidence is also present, and to abstain when the correct support is removed; inference is ordinary decoding, with no verifier, threshold, or regime label. On three multi-hop QA datasets across three seeds, RBA reduces the unsupported-answer rate by more than sixty percentage points relative to conflict-focused training while matching its supported accuracy. On a held-out TriviaQA retrieval-miss slice, the same reader reduces unsupported answering from 100% to below 1% while also improving supported accuracy. These results indicate that evidence-gated answering must be learned on both sides of the support boundary.",
+    "publicationDate": "2026-09-25T18:48:13.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.30130",
+    "title": "E-SENS: Exclusion-Sensitive Penalization for Negative-Constraint Retrieval",
+    "abstract": "Retrieval-augmented language models can fail to respect negative constraints when the retriever supplies evidence about concepts the user explicitly excluded. Beyond explicit negation, queries may ask for answers that include one concept while excluding another, or for entities that belong to a category but differ from a closely related instance. Because the excluded concept still appears in the query text, dense retrievers may assign high similarity to documents about that concept even when the user asks to avoid it. We introduce E-SENS, a training-free reranking method for negation-sensitive retrieval. E-SENS extracts a compact trap query for the excluded side and subtracts trap-query similarity from the original-query retrieval score. On ExcluIR, E-SENS shows a clear recall-violation trade-off across four embedding models and reduces trap retrieval at recall-preserving settings.",
+    "publicationDate": "2026-08-31T01:28:49.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.22228",
+    "title": "Prompt-Based Abstention Fails Under Misleading Context: A Controlled Study of Small Frozen RAG Models",
+    "abstract": "Missing and misleading evidence are not the same problem in retrieval-augmented generation (RAG), but prompt-based abstention treats them alike. Models abstain when context is absent, not when it is misleading. We introduce GRAB-RAG (Graded Abstention Benchmark for Retrieval-Augmented Generation), a paired benchmark that tests the same questions across four context conditions (supportive, degraded, missing, and misleading) in Natural Questions and HotpotQA. In the misleading condition, we edit a gold passage to support a wrong answer and place it among other retrieved passages. We test five abstention policies on three small frozen models (3.8B--8B) across two QA benchmarks. Models abstain reliably when evidence is missing, but under explicit abstention prompting still answer 41.6% of misleading questions, with 63% of those answers echoing the planted wrong entity verbatim. Chain-of-thought provides little additional benefit. A generator-side conflict check cuts the rate to 13.3% but discards many correct answers, while an NLI verifier recovers that coverage but fails when parametric memory and the misleading passage agree on the same wrong answer. Prompt-based abstention asks whether context is sufficient, not whether it is correct. Neither verifier closes this gap without trading coverage for safety.",
+    "publicationDate": "2026-08-23T05:43:27.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.35794",
+    "title": "Sieve and Sage: Efficient Distraction Filtering for Reliable RALM Abstention",
+    "abstract": "Just as Socrates recognized the limits of his own knowledge, Retrieval-Augmented Language Models (RALMs) should learn to abstain when the retrieved evidence cannot support a reliable response. Existing approaches largely rely on monolithic LLMs to handle heterogeneous retrieval failures in a single step, resulting in limited abstention performance and high computational costs. We instead decompose retrieval failures into two distinct states: (i) the unanswerable state, where the required evidence is absent, and (ii) the distracted state, where relevant evidence is mixed with conflicting, negated, or adversarial information. Based on this decomposition, we introduce a lightweight module (Sieve) that screens retrieved document sets for distracting evidence before invoking a costly LLM (Sage) for grounded generation and abstention. Evaluated across both general and high-stakes expert domains, our Sieve and Sage framework preemptively detects distracting noise, improving system accuracy by up to 69.4 percentage points and Macro-F1 by 55.2 percentage points compared to one-stage baselines. Furthermore, it achieves up to a 1.99x speedup, establishing a highly efficient and reliable abstention pipeline for RALM with abstention.",
+    "publicationDate": "2026-09-17T04:59:56.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.04591",
+    "title": "When Absence Is Evidence: Evaluating Completeness-Sensitive Negative Reasoning in Large Language Models",
+    "abstract": "Large language models (LLMs) are often asked whether something is absent from a record, list, or retrieved context. Yet non-observation licenses a negative answer only when evidence completely covers the query scope; otherwise, the answer should remain unknown. We call this completeness-sensitive negative reasoning. We introduce CROWN-QA, comprising CROWN-Synth, a controlled paired core that fixes the question and observed facts while varying only query-relative coverage, and CROWN-Real, a real-document contrast-set evaluation with controlled coverage variants. Across three LLM families, models show unstable closure judgments and substantial over-closure, failing to reliably distinguish a justified negative answer (Certified-Negative) from insufficient evidence (Unknown). The dominant CROWN-Synth failure is asymmetric: models often recognize implicitly complete evidence yet treat implicitly partial evidence as query-covering. Prompting redistributes errors between over- and under-closure rather than consistently resolving them. Structured certificate elicitation traces many errors to evidence-coverage mischaracterization. CROWN-Real shows that the core partial-coverage asymmetry persists on real-document content, while its strength and the balance between over- and under-closure vary by model, prompt, and source.",
+    "publicationDate": "2026-08-05T08:53:16.000Z",
+    "votes": 1
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2605.15184",
+    "title": "Is Grep All You Need? How Agent Harnesses Reshape Agentic Search",
+    "abstract": "Recent advances in Large Language Model (LLM) agents have enabled complex agentic workflows where models autonomously retrieve information, call tools, and reason over large corpora to complete tasks on behalf of users. Despite the growing adoption of retrieval-augmented generation (RAG) in agentic search systems, existing literature lacks a systematic comparison of how retrieval strategy choice interacts with agent architecture and tool-calling paradigm. Important practical dimensions, including how tool outputs are presented to the model and how performance changes when searches must cope with more irrelevant surrounding text, remain under-explored in agent loops. This paper reports an empirical study organized into two experiments. Experiment 1 compares grep and vector retrieval on a 116-question sample from LongMemEval, using a custom agent harness (Chronos) and provider-native CLI harnesses (Claude Code, Codex, and Gemini CLI), for both inline tool results and file-based tool results that the model reads separately. Experiment 2 compares grep-only and vector-only retrieval while progressively mixing in additional unrelated conversation history, so that each query is embedded in more distracting material alongside the passages that matter. Across Chronos and the provider CLIs, grep generally yields higher accuracy than vector retrieval in our comparisons in experiment 1; at the same time, overall scores still depend strongly on which harness and tool-calling style is used, even when the underlying conversation data are the same.",
+    "publicationDate": "2026-05-14T17:58:41.000Z",
+    "votes": 180
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.25717",
+    "title": "When RAG Fails to Equalize: Geo-bias in Factual Question Answering over Public Companies",
+    "abstract": "Retrieval-augmented generation (RAG) is widely assumed to mitigate factual errors in large language models (LLMs), but it remains unclear whether retrieval uniformly compensates for missing knowledge. We study this question in a controlled factual QA setting over public companies, constructing a benchmark of approximately 2,000 firms across global equity indices. We evaluate six LLMs on four atomic attributes under four conditions: no-context, perfect context, misleading context, and distraction context. We find strong geographic disparities in no-context accuracy, indicating uneven parametric knowledge. While perfect context improves performance, it does not eliminate these gaps: gains are correlated with baseline accuracy, suggesting retrieval effectiveness is coupled to internal representations. Under misleading context, models frequently copy incorrect information. Larger models improve overall performance but do not remove these structural effects. These results challenge the view of RAG as a universal corrective and highlight the interaction between model knowledge, context quality, and entity representation.",
+    "publicationDate": "2026-08-26T12:34:12.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.01852",
+    "title": "Evaluating Chunking Strategies for Retrieval-Augmented Generation on Academic Texts",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems use the question-answering capabilities of Large Language Models (LLMs) to access information outside their parameters. We evaluate if cluster-based semantic chunking improves retrieval and answer quality compared to fixed-size and recursive chunking evaluating on long, structured academic theses using the Retrieval Augmented Generation Assessment (RAGAs) framework. RAGAs based faithfulness shows limited reliability in this setup. Performance on fixed versus document specific questions varied substantially, likely related to the formatting of documents and preprocessing. Under the tested configuration, cluster-based chunking did not outperform simpler strategies.",
+    "publicationDate": "2026-07-02T08:12:35.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.20898",
+    "title": "The Token Tax of Epistemic Accuracy: Comparing RAG and Long-Context Architectures for Document-Grounded Generative AI Applications",
+    "abstract": "Document-grounded assistants built on large language models are increasingly used in high-stakes, knowledge-intensive work. Their usefulness, however, may depend on how evidence is allocated before generation. We investigate such a claim by comparing two grounding architectures: (a) retrieval-augmented generation (RAG) that retrieves a few relevant passages, and (b) long-context prompting, which loads the whole document collection in context. We view these as two regimes of \"epistemic access\" on an accuracy--cost frontier. We use \"epistemic accuracy\" to capture model correctness that depends on having the right evidence. We posit that broader access (via long context) can increase it, but with a \"token tax\" (i.e., a substantial increase in cost due to larger input token consumption). We probe this framing with a case study in manufacturing safety training. Using an expert-validated benchmark, we evaluate 972 answers across three machines, two small language models, and three retrieval/in-context prompting approaches. Long-context prompting achieved the highest correctness (73.1% vs. 65.4% for semantic RAG), but at 26 times the per-query token cost. We interpret this gap as the token tax of broader evidentiary access. We carefully discuss the implications of our findings for resource-constrained organizations.",
+    "publicationDate": "2026-06-18T19:49:18.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.18234",
+    "title": "Evaluating Multi-Hop Reasoning in RAG Systems: A Comparison of LLM-Based Retriever Evaluation Strategies",
+    "abstract": "Retrieval-augmented generation (RAG) enhances large language models (LLMs) with external knowledge to answer questions more accurately.\nHowever, research on evaluating RAG systems-particularly the retriever component-remains limited, as most existing work focuses on single-context retrieval rather than multi-hop queries, where individual contexts may appear irrelevant in isolation but are essential when combined. In this research, we use the HotPotQA, MuSiQue, and SQuAD datasets to simulate a RAG system and compare three LLM-as-judge evaluation strategies, including our proposed Context-Aware Retriever Evaluation (CARE). Our goal is to better understand how multi-hop reasoning can be most effectively evaluated in RAG systems.\nExperiments with LLMs from OpenAI, Meta, and Google demonstrate that CARE consistently outperforms existing methods for evaluating multi-hop reasoning in RAG systems. The performance gains are most pronounced in models with larger parameter counts and longer context windows, while single-hop queries show minimal sensitivity to context-aware evaluation. Overall, the results highlight the critical role of context-aware evaluation in improving the reliability and accuracy of retrieval-augmented generation systems, particularly in complex query scenarios. To ensure reproducibility, we provide the complete data of our experiments at this https URL.",
+    "publicationDate": "2026-04-20T13:20:57.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.03174",
+    "title": "Beyond the Parameters: A Technical Survey of Contextual Enrichment in Large Language Models: From In-Context Prompting to Causal Retrieval-Augmented Generation",
+    "abstract": "Large language models (LLMs) encode vast world knowledge in their parameters, yet they remain fundamentally limited by static knowledge, finite context windows, and weakly structured causal reasoning. This survey provides a unified account of augmentation strategies along a single axis: the degree of structured context supplied at inference time. We cover in-context learning and prompt engineering, Retrieval-Augmented Generation (RAG), GraphRAG, and CausalRAG. Beyond conceptual comparison, we provide a transparent literature-screening protocol, a claim-audit framework, and a structured cross-paper evidence synthesis that distinguishes higher-confidence findings from emerging results. The paper concludes with a deployment-oriented decision framework and concrete research priorities for trustworthy retrieval-augmented NLP.",
+    "publicationDate": "2026-04-03T16:49:09.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.04814",
+    "title": "Beyond the Context Window: A Cost-Performance Analysis of Fact-Based Memory vs. Long-Context LLMs for Persistent Agents",
+    "abstract": "Persistent conversational AI systems face a choice between passing full conversation histories to a long-context large language model (LLM) and maintaining a dedicated memory system that extracts and retrieves structured facts. We compare a fact-based memory system built on the Mem0 framework against long-context LLM inference on three memory-centric benchmarks - LongMemEval, LoCoMo, and PersonaMemv2 - and evaluate both architectures on accuracy and cumulative API cost. Long-context GPT-5-mini achieves higher factual recall on LongMemEval and LoCoMo, while the memory system is competitive on PersonaMemv2, where persona consistency depends on stable, factual attributes suited to flat-typed extraction. We construct a cost model that incorporates prompt caching and show that the two architectures have structurally different cost profiles: long-context inference incurs a per-turn charge that grows with context length even under caching, while the memory system's per-turn read cost remains roughly fixed after a one-time write phase. At a context length of 100k tokens, the memory system becomes cheaper after approximately ten interaction turns, with the break-even point decreasing as context length grows. These results characterize the accuracy-cost trade-off between the two approaches and provide a concrete criterion for selecting between them in production deployments.",
+    "publicationDate": "2026-03-05T05:01:30.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.12278",
+    "title": "AttentionRetriever: Attention Layers are Secretly Long Document Retrievers",
+    "abstract": "Retrieval augmented generation (RAG) has been widely adopted to help Large Language Models (LLMs) to process tasks involving long documents. However, existing retrieval models are not designed for long document retrieval and fail to address several key challenges of long document retrieval, including context-awareness, causal dependence, and scope of retrieval. In this paper, we proposed AttentionRetriever, a novel long document retrieval model that leverages attention mechanism and entity-based retrieval to build context-aware embeddings for long document and determine the scope of retrieval. With extensive experiments, we found AttentionRetriever is able to outperform existing retrieval models on long document retrieval datasets by a large margin while remaining as efficient as dense retrieval models.",
+    "publicationDate": "2026-02-12T18:59:35.000Z",
+    "votes": 16
+  }
+]

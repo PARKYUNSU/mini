@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2606.17856",
+    "title": "FlowRAG: Synergizing Explicit Reasoning via Frequency-Aware Multi-Granularity Graph Flow",
+    "abstract": "Graph-based retrieval-augmented generation (GraphRAG) is effective for knowledge-intensive and multi-hop query tasks; however, many existing methods primarily seed entity-based graphs and rely on implicit semantic relevance propagation. This often (i) under-retrieves when user queries are abstract and semantically sparse at the entity level, and (ii) suffers from brittle multi-hop reasoning, where noisy activations can derail entity-to-entity transitions and corrupt the inferred relation chain, yielding unreliable conclusions. To this end, we propose \\texttt{FlowRAG}, a semantic-aware retrieval framework that improves both semantic recall and explicit reasoning. Specifically, \\texttt{FlowRAG} constructs a quad-level heterogeneous graph over passages, summaries, sentences, and entities, where summary nodes serve as a coarse semantic hub. At retrieval time, a dual-granularity activation module combines summary--query alignment with sentence-level matching to activate relevant entities under paraphrase and abstraction robustly. We then introduce a frequency-aware weighted flow module that routes relevance through entity--passage links weighted by within-passage term frequency, pruning noisy connections and extracting high-confidence reasoning paths as an explicit logic skeleton for generation. Extensive experiments show that \\texttt{FlowRAG} obtains state-of-the-art performance on complex reasoning benchmarks.",
+    "publicationDate": "2026-06-16T12:28:14.000Z",
+    "votes": 38
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2502.12442",
+    "title": "HopRAG: Multi-Hop Reasoning for Logic-Aware Retrieval-Augmented  Generation",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems often struggle with imperfect\nretrieval, as traditional retrievers focus on lexical or semantic similarity\nrather than logical relevance. To address this, we propose \\textbf{HopRAG}, a\nnovel RAG framework that augments retrieval with logical reasoning through\ngraph-structured knowledge exploration. During indexing, HopRAG constructs a\npassage graph, with text chunks as vertices and logical connections established\nvia LLM-generated pseudo-queries as edges. During retrieval, it employs a\n\\textit{retrieve-reason-prune} mechanism: starting with lexically or\nsemantically similar passages, the system explores multi-hop neighbors guided\nby pseudo-queries and LLM reasoning to identify truly relevant ones.\nExperiments on multiple multi-hop benchmarks demonstrate that HopRAG's\n\\textit{retrieve-reason-prune} mechanism can expand the retrieval scope based\non logical connections and improve final answer quality.",
+    "publicationDate": "2025-02-18T02:24:42.000Z",
+    "votes": 26
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.20136",
+    "title": "M$^3$KG-RAG: Multi-hop Multimodal Knowledge Graph-enhanced Retrieval-Augmented Generation",
+    "abstract": "Retrieval-Augmented Generation (RAG) has recently been extended to multimodal settings, connecting multimodal large language models (MLLMs) with vast corpora of external knowledge such as multimodal knowledge graphs (MMKGs). Despite their recent success, multimodal RAG in the audio-visual domain remains challenging due to 1) limited modality coverage and multi-hop connectivity of existing MMKGs, and 2) retrieval based solely on similarity in a shared multimodal embedding space, which fails to filter out off-topic or redundant knowledge. To address these limitations, we propose M$^3$KG-RAG, a Multi-hop Multimodal Knowledge Graph-enhanced RAG that retrieves query-aligned audio-visual knowledge from MMKGs, improving reasoning depth and answer faithfulness in MLLMs. Specifically, we devise a lightweight multi-agent pipeline to construct multi-hop MMKG (M$^3$KG), which contains context-enriched triplets of multimodal entities, enabling modality-wise retrieval based on input queries. Furthermore, we introduce GRASP (Grounded Retrieval And Selective Pruning), which ensures precise entity grounding to the query, evaluates answer-supporting relevance, and prunes redundant context to retain only knowledge essential for response generation. Extensive experiments across diverse multimodal benchmarks demonstrate that M$^3$KG-RAG significantly enhances MLLMs' multimodal reasoning and grounding over existing approaches. Project website: this https URL",
+    "publicationDate": "2025-12-23T07:54:03.000Z",
+    "votes": 21
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.03014",
+    "title": "SentGraph: Hierarchical Sentence Graph for Multi-hop Retrieval-Augmented Question Answering",
+    "abstract": "Traditional Retrieval-Augmented Generation (RAG) effectively supports single-hop question answering with large language models but faces significant limitations in multi-hop question answering tasks, which require combining evidence from multiple documents. Existing chunk-based retrieval often provides irrelevant and logically incoherent context, leading to incomplete evidence chains and incorrect reasoning during answer generation. To address these challenges, we propose SentGraph, a sentence-level graph-based RAG framework that explicitly models fine-grained logical relationships between sentences for multi-hop question answering. Specifically, we construct a hierarchical sentence graph offline by first adapting Rhetorical Structure Theory to distinguish nucleus and satellite sentences, and then organizing them into topic-level subgraphs with cross-document entity bridges. During online retrieval, SentGraph performs graph-guided evidence selection and path expansion to retrieve fine-grained sentence-level evidence. Extensive experiments on four multi-hop question answering benchmarks demonstrate the effectiveness of SentGraph, validating the importance of explicitly modeling sentence-level logical dependencies for multi-hop reasoning.",
+    "publicationDate": "2026-01-06T13:39:51.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2401.15391",
+    "title": "MultiHop-RAG: Benchmarking Retrieval-Augmented Generation for Multi-Hop\n  Queries",
+    "abstract": "Retrieval-augmented generation (RAG) augments large language models (LLM) by\nretrieving relevant knowledge, showing promising potential in mitigating LLM\nhallucinations and enhancing response quality, thereby facilitating the great\nadoption of LLMs in practice. However, we find that existing RAG systems are\ninadequate in answering multi-hop queries, which require retrieving and\nreasoning over multiple pieces of supporting evidence. Furthermore, to our\nknowledge, no existing RAG benchmarking dataset focuses on multi-hop queries.\nIn this paper, we develop a novel dataset, MultiHop-RAG, which consists of a\nknowledge base, a large collection of multi-hop queries, their ground-truth\nanswers, and the associated supporting evidence. We detail the procedure of\nbuilding the dataset, utilizing an English news article dataset as the\nunderlying RAG knowledge base. We demonstrate the benchmarking utility of\nMultiHop-RAG in two experiments. The first experiment compares different\nembedding models for retrieving evidence for multi-hop queries. In the second\nexperiment, we examine the capabilities of various state-of-the-art LLMs,\nincluding GPT-4, PaLM, and Llama2-70B, in reasoning and answering multi-hop\nqueries given the evidence. Both experiments reveal that existing RAG methods\nperform unsatisfactorily in retrieving and answering multi-hop queries. We hope\nMultiHop-RAG will be a valuable resource for the community in developing\neffective RAG systems, thereby facilitating greater adoption of LLMs in\npractice. The MultiHop-RAG and implemented RAG system is publicly available at\nhttps://github.com/yixuantt/MultiHop-RAG/.",
+    "publicationDate": "2024-01-27T11:41:48.000Z",
+    "votes": 25
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2406.13249",
+    "title": "R^2AG: Incorporating Retrieval Information into Retrieval Augmented  Generation",
+    "abstract": "Retrieval augmented generation (RAG) has been applied in many scenarios to\naugment large language models (LLMs) with external documents provided by\nretrievers. However, a semantic gap exists between LLMs and retrievers due to\ndifferences in their training objectives and architectures. This misalignment\nforces LLMs to passively accept the documents provided by the retrievers,\nleading to incomprehension in the generation process, where the LLMs are\nburdened with the task of distinguishing these documents using their inherent\nknowledge. This paper proposes R$^2$AG, a novel enhanced RAG framework to fill\nthis gap by incorporating Retrieval information into Retrieval Augmented\nGeneration. Specifically, R$^2$AG utilizes the nuanced features from the\nretrievers and employs a R$^2$-Former to capture retrieval information. Then, a\nretrieval-aware prompting strategy is designed to integrate retrieval\ninformation into LLMs' generation. Notably, R$^2$AG suits low-source scenarios\nwhere LLMs and retrievers are frozen. Extensive experiments across five\ndatasets validate the effectiveness, robustness, and efficiency of R$^2$AG. Our\nanalysis reveals that retrieval information serves as an anchor to aid LLMs in\nthe generation process, thereby filling the semantic gap.",
+    "publicationDate": "2024-06-19T06:19:48.000Z",
+    "votes": 13
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.11247",
+    "title": "Cross-Granularity Hypergraph Retrieval-Augmented Generation for Multi-hop Question Answering",
+    "abstract": "Multi-hop question answering (MHQA) requires integrating knowledge scattered across multiple passages to derive the correct answer. Traditional retrieval-augmented generation (RAG) methods primarily focus on coarse-grained textual semantic similarity and ignore structural associations among dispersed knowledge, which limits their effectiveness in MHQA tasks. GraphRAG methods address this by leveraging knowledge graphs (KGs) to capture structural associations, but they tend to overly rely on structural information and fine-grained word- or phrase-level retrieval, resulting in an underutilization of textual semantics. In this paper, we propose a novel RAG approach called HGRAG for MHQA that achieves cross-granularity integration of structural and semantic information via hypergraphs. Structurally, we construct an entity hypergraph where fine-grained entities serve as nodes and coarse-grained passages as hyperedges, and establish knowledge association through shared entities. Semantically, we design a hypergraph retrieval method that integrates fine-grained entity similarity and coarse-grained passage similarity via hypergraph diffusion. Finally, we employ a retrieval enhancement module, which further refines the retrieved results both semantically and structurally, to obtain the most relevant passages as context for answer generation with the LLM. Experimental results on benchmark datasets demonstrate that our approach outperforms state-of-the-art methods in QA performance, and achieves a 6$\\times$ speedup in retrieval efficiency.",
+    "publicationDate": "2025-08-15T06:36:13.000Z",
+    "votes": 17
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.11541",
+    "title": "Question-Adaptive Graph Learning for Multi-hop Retrieval Augmented Generation",
+    "abstract": "Retrieval-augmented generation (RAG) has demonstrated its ability to enhance Large Language Models (LLMs) by integrating external knowledge sources. However, multi-hop questions, which require the identification of multiple knowledge targets to form a synthesized answer, raise new challenges for RAG systems. Under the multi-hop settings, existing methods often struggle to fully understand the questions with complex semantic structures and are susceptible to irrelevant noise during the retrieval of multiple information targets. To address these limitations, we propose a novel graph representation learning framework for multi-hop question retrieval. We first introduce a Multi-information Level Knowledge Graph (Multi-L KG) to model various information levels for a more comprehensive understanding of multi-hop questions. Based on this, we design a Question-Adaptive Graph Neural Network (Quest-GNN) for representation learning on the Multi-L KG. Quest-GNN employs intra/inter-level message passing mechanisms, and in each message passing the information aggregation is guided by the question, which not only facilitates multi-granular information aggregation but also significantly reduces the impact of noise. To enhance its ability to learn robust representations, we further propose two synthesized data generation strategies for pre-training the Quest-GNN. Extensive experimental results demonstrate the effectiveness of our framework in multi-hop scenarios, especially in high-hop questions the improvement can reach 33.8\\%. The code is available at: this https URL.",
+    "publicationDate": "2025-10-13T15:41:15.000Z",
+    "votes": 17
+  }
+]

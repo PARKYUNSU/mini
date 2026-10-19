@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2608.21558",
+    "title": "Automating Multi-Hop RAG Evaluation via TRIAD: From Context Extraction to Validated Dataset Generation",
+    "abstract": "Recent advances in LLMs and the adoption of RAG systems in industry have created a need for domain-specific question-answer datasets that can assess RAG performance on proprietary data. Existing datasets, such as HotpotQA, challenge current RAG systems on Wikipedia-based knowledge, but they cannot be transferred directly to domain-specific settings. A comprehensive evaluation of RAG system quality requires both multi-hop queries and unanswerable questions. This paper introduces TRIAD, a three-stage automated dataset generation approach. First, it generates question--answer (QA) pairs for the domain-specific knowledge base of a RAG system. Second, a validator checks each QA-pair in a feedback loop. Third, the QA pairs are extended with relevance-labeled context documents for downstream evaluation. We evaluate this approach against the established MuSiQue and HotpotQA datasets. The results show that the generated dataset exhibits similar performance trends across different RAG setups, while human validation indicates that the questions are suitable for evaluating a domain-specific RAG system. The code used to generate the dataset and all validation results are available in our GitHub repository(this https URL).",
+    "publicationDate": "2026-08-21T18:46:55.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.08838",
+    "title": "Generating Leakage-Free Benchmarks for Robust RAG Evaluation",
+    "abstract": "Retrieval-augmented generation (RAG) is widely used to augment large language models (LLMs) with external knowledge. However, many benchmark datasets, designed to test RAG performance, comprise many questions that can already be answered from an LLM's parametric memory. This leads to unreliable evaluation. We refer to this phenomenon as knowledge leakage: cases where RAG tasks are solvable without retrieval. This issue worsens over time due to benchmark aging. As benchmarks are reused for training, their contents are increasingly absorbed into model parameters, making them less effective for evaluating retrieval.\nWe introduce SeedRG, a semi-synthetic benchmark generation pipeline that mitigates knowledge leakage and addresses the issue of benchmark aging. Starting from a seed benchmark dataset, SeedRG extracts a reasoning graph from question-context pairs to capture their underlying reasoning structure, and then generates new examples via type-constrained entity replacement. This process produces structurally similar but novel instances that are unlikely to exist in the model's parametric knowledge, while preserving the original reasoning patterns. To ensure quality, we incorporate two verification steps: (1) a reasoning-graph consistency check to maintain task difficulty, and (2) a knowledge-leakage filter to exclude instances answerable without retrieval.",
+    "publicationDate": "2026-05-09T09:48:50.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.18202",
+    "title": "SAGE: Steerable Agentic Data Generation for Deep Search with Execution Feedback",
+    "abstract": "Deep search agents, which aim to answer complex questions requiring reasoning across multiple documents, can significantly speed up the information-seeking process. Collecting human annotations for this application is prohibitively expensive due to long and complex exploration trajectories. We propose an agentic pipeline that automatically generates high quality, difficulty-controlled deep search question-answer pairs for a given corpus and a target difficulty level. Our pipeline, SAGE, consists of a data generator which proposes QA pairs and a search agent which attempts to solve the generated question and provide execution feedback for the data generator. The two components interact over multiple rounds to iteratively refine the question-answer pairs until they satisfy the target difficulty level. Our intrinsic evaluation shows SAGE generates questions that require diverse reasoning strategies, while significantly increases the correctness and difficulty of the generated data. Our extrinsic evaluation demonstrates up to 23% relative performance gain on popular deep search benchmarks by training deep search agents with our synthetic data. Additional experiments show that agents trained on our data can adapt from fixed-corpus retrieval to Google Search at inference time, without further training.",
+    "publicationDate": "2026-01-26T06:37:56.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.04473",
+    "title": "Ground-Truth Subgraphs for Better Training and Evaluation of Knowledge Graph Augmented LLMs",
+    "abstract": "Retrieval of information from graph-structured knowledge bases represents a promising direction for improving the factuality of LLMs. While various solutions have been proposed, a comparison of methods is difficult due to the lack of challenging QA datasets with ground-truth targets for graph retrieval. We present SynthKGQA, an LLM-powered framework for generating high-quality Knowledge Graph Question Answering datasets from any Knowledge Graph, providing the full set of ground-truth facts in the KG to reason over questions. To demonstrate its utility, we apply SynthKGQA to ogbl-wikikg2, a Wikidata-derived KG, and validate generated items against an up-to-date dump of Wikidata to create GTSQA. This new dataset is specifically designed to test zero-shot generalization with respect to unseen graph structures and relation types, enabling us to analyze the abilities and limitations of SOTA graph retrieval approaches at an unprecedented level of granularity. We also show that KG retrievers trained on GTSQA can transfer to a human-curated benchmark, and that the ground-truth subgraphs produced by SynthKGQA provide a better training supervision signal than previously-used heuristics.",
+    "publicationDate": "2025-11-06T15:45:18.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2501.12789",
+    "title": "Generating Diverse Q&A Benchmarks for RAG Evaluation with DataMorgana",
+    "abstract": "Evaluating Retrieval-Augmented Generation (RAG) systems, especially in domain-specific contexts, requires benchmarks that address the distinctive requirements of the applicative scenario. Since real data can be hard to obtain, a common strategy is to use LLM-based methods to generate synthetic data. Existing solutions are general purpose: given a document, they generate a question to build a Q&A pair. However, although the generated questions can be individually good, they are typically not diverse enough to reasonably cover the different ways real end-users can interact with the RAG system. We introduce here DataMorgana, a tool for generating highly customizable and diverse synthetic Q&A benchmarks tailored to RAG applications. DataMorgana enables detailed configurations of user and question categories and provides control over their distribution within the benchmark. It uses a lightweight two-stage process, ensuring efficiency and fast iterations, while generating benchmarks that reflect the expected traffic. We conduct a thorough line of experiments, showing quantitatively and qualitatively that DataMorgana surpasses existing tools and approaches in producing lexically, syntactically, and semantically diverse question sets across domain-specific and general-knowledge corpora. DataMorgana will be made available to selected teams in the research community, as first beta testers, in the context of the upcoming SIGIR'2025 LiveRAG challenge to be announced in early February 2025.",
+    "publicationDate": "2025-01-22T18:47:08.000Z",
+    "votes": 60
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.14531",
+    "title": "LiveRAG: A diverse Q&A dataset with varying difficulty level for RAG evaluation",
+    "abstract": "With Retrieval Augmented Generation (RAG) becoming more and more prominent in generative AI solutions, there is an emerging need for systematically evaluating their effectiveness. We introduce the LiveRAG benchmark, a publicly available dataset of 895 synthetic questions and answers designed to support systematic evaluation of RAG-based Q&A systems. This synthetic benchmark is derived from the one used during the SIGIR'2025 LiveRAG Challenge, where competitors were evaluated under strict time constraints. It is augmented with information that was not made available to competitors during the Challenge, such as the ground-truth answers, together with their associated supporting claims which were used for evaluating competitors' answers. In addition, each question is associated with estimated difficulty and discriminability scores, derived from applying an Item Response Theory model to competitors' responses. Our analysis highlights the benchmark's questions diversity, the wide range of their difficulty levels, and their usefulness in differentiating between system capabilities. The LiveRAG benchmark will hopefully help the community advance RAG research, conduct systematic evaluation, and develop more robust Q&A systems.",
+    "publicationDate": "2025-11-18T14:34:35.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.24151",
+    "title": "BMGQ: A Bottom-up Method for Generating Complex Multi-hop Reasoning Questions from Semi-structured Data",
+    "abstract": "Building training-ready multi-hop question answering (QA) datasets that truly stress a model's retrieval and reasoning abilities remains highly challenging recently. While there have been a few recent evaluation datasets that capture the characteristics of hard-to-search but easy-to-verify problems -- requiring the integration of ambiguous, indirect, and cross-domain cues -- these data resources remain scarce and are mostly designed for evaluation, making them unsuitable for supervised fine-tuning (SFT) or reinforcement learning (RL). Meanwhile, manually curating non-trivially retrievable questions -- where answers cannot be found through a single direct query but instead require multi-hop reasoning over oblique and loosely connected evidence -- incurs prohibitive human costs and fails to scale, creating a critical data bottleneck for training high-capability retrieval-and-reasoning agents.\nTo address this, we present BMGQ, a bottom-up automated method for generating high-difficulty, training-ready multi-hop questions from semi-structured knowledge sources. The BMGQ system (i) grows diverse, logically labeled evidence clusters through Natural Language Inference (NLI)-based relation typing and diversity-aware expansion; (ii) applies reverse question construction to compose oblique cues so that isolated signals are underinformative but their combination uniquely identifies the target entity; and (iii) enforces quality with a two-step evaluation pipeline that combines multi-model consensus filtering with structured constraint decomposition and evidence-based matching. The result is a scalable process that yields complex, retrieval-resistant yet verifiable questions suitable for SFT/RL training as well as challenging evaluation, substantially reducing human curation effort while preserving the difficulty profile of strong evaluation benchmarks.",
+    "publicationDate": "2025-10-28T07:43:15.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.18929",
+    "title": "Diverse And Private Synthetic Datasets Generation for RAG evaluation: A multi-agent framework",
+    "abstract": "Retrieval-augmented generation (RAG) systems improve large language model outputs by incorporating external knowledge, enabling more informed and context-aware responses. However, the effectiveness and trustworthiness of these systems critically depends on how they are evaluated, particularly on whether the evaluation process captures real-world constraints like protecting sensitive information. While current evaluation efforts for RAG systems have primarily focused on the development of performance metrics, far less attention has been given to the design and quality of the underlying evaluation datasets, despite their pivotal role in enabling meaningful, reliable assessments. In this work, we introduce a novel multi-agent framework for generating synthetic QA datasets for RAG evaluation that prioritize semantic diversity and privacy preservation. Our approach involves: (1) a Diversity agent leveraging clustering techniques to maximize topical coverage and semantic variability, (2) a Privacy Agent that detects and mask sensitive information across multiple domains and (3) a QA curation agent that synthesizes private and diverse QA pairs suitable as ground truth for RAG evaluation. Extensive experiments demonstrate that our evaluation sets outperform baseline methods in diversity and achieve robust privacy masking on domain-specific datasets. This work offers a practical and ethically aligned pathway toward safer, more comprehensive RAG system evaluation, laying the foundation for future enhancements aligned with evolving AI regulations and compliance standards.",
+    "publicationDate": "2025-08-26T11:16:14.000Z",
+    "votes": 17
+  }
+]

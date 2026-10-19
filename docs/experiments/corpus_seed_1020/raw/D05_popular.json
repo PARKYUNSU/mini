@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2511.06209",
+    "title": "ReProbe: Efficient Test-Time Scaling of Multi-Step Reasoning by Probing Internal States of Large Language Models",
+    "abstract": "LLMs can solve complex tasks by generating long, multi-step reasoning chains. Test-time scaling (TTS) can further improve performance by sampling multiple variants of intermediate reasoning steps, verifying their correctness, and selecting the best steps for continuation. However, existing verification approaches, such as Process Reward Models (PRMs), are computationally expensive and require large-scale human or model-generated annotations. We propose a lightweight alternative for step-level reasoning verification based on probing the internal states of LLMs. We train a transformer-based probe that uses the internal states of a frozen LLM to estimate the credibility of its reasoning steps during generation. Annotation can be provided either by a larger LLM (e.g., DeepSeek-R1) or in a self-supervised manner by the original model itself. The probes are lightweight, containing fewer than 10M parameters. Across multiple domains, including mathematics, planning, and general knowledge question answering, our probes match or exceed the performance of PRMs that are up to 810x larger. These results suggest that LLM internal states encode confidence in their reasoning processes and can serve as reliable signals for step verification, offering a promising path toward scalable, generalizable TTS and more introspective LLMs.",
+    "publicationDate": "2025-11-09T03:38:29.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.10621",
+    "title": "SSR: Socratic Self-Refine for Large Language Model Reasoning",
+    "abstract": "Large Language Models (LLMs) have demonstrated remarkable reasoning abilities, yet existing test-time frameworks often rely on coarse self-verification and self-correction, limiting their effectiveness on complex tasks. In this paper, we propose Socratic Self-Refine (SSR), a novel framework for fine-grained evaluation and precise refinement of LLM reasoning. Our proposed SSR decomposes model responses into verifiable (sub-question, sub-answer) pairs, enabling step-level confidence estimation through controlled re-solving and self-consistency checks. By pinpointing unreliable steps and iteratively refining them, SSR produces more accurate and interpretable reasoning chains. Empirical results across five reasoning benchmarks and three LLMs show that SSR consistently outperforms state-of-the-art iterative self-refinement baselines. Beyond performance gains, SSR provides a principled black-box approach for evaluating and understanding the internal reasoning processes of LLMs. Code is available at this https URL.",
+    "publicationDate": "2025-11-13T18:47:07.000Z",
+    "votes": 44
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.07594",
+    "title": "Learning to Self-Verify Makes Language Models Better Reasoners",
+    "abstract": "Recent large language models (LLMs) achieve strong performance in generating promising reasoning paths for complex tasks. However, despite powerful generation ability, LLMs remain weak at verifying their own answers, revealing a persistent capability asymmetry between generation and self-verification. In this work, we conduct an in-depth investigation of this asymmetry throughout training evolution and show that, even on the same task, improving generation does not lead to corresponding improvements in self-verification. Interestingly, we find that the reverse direction of this asymmetry behaves differently: learning to self-verify can effectively improve generation performance, achieving accuracy comparable to standard generation training while yielding more efficient and effective reasoning traces. Building on this observation, we further explore integrating self-verification into generation training by formulating a multi-task reinforcement learning framework, where generation and self-verification are optimized as two independent but complementary objectives. Extensive experiments across benchmarks and models demonstrate performance gains over generation-only training in both generation and verification capabilities.",
+    "publicationDate": "2026-02-07T15:49:06.000Z",
+    "votes": 40
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.10406",
+    "title": "PAG: Multi-Turn Reinforced LLM Self-Correction with Policy as Generative  Verifier",
+    "abstract": "Large Language Models (LLMs) have demonstrated impressive capabilities in\ncomplex reasoning tasks, yet they still struggle to reliably verify the\ncorrectness of their own outputs. Existing solutions to this verification\nchallenge often depend on separate verifier models or require multi-stage\nself-correction training pipelines, which limit scalability. In this paper, we\npropose Policy as Generative Verifier (PAG), a simple and effective framework\nthat empowers LLMs to self-correct by alternating between policy and verifier\nroles within a unified multi-turn reinforcement learning (RL) paradigm.\nDistinct from prior approaches that always generate a second attempt regardless\nof model confidence, PAG introduces a selective revision mechanism: the model\nrevises its answer only when its own generative verification step detects an\nerror. This verify-then-revise workflow not only alleviates model collapse but\nalso jointly enhances both reasoning and verification abilities. Extensive\nexperiments across diverse reasoning benchmarks highlight PAG's dual\nadvancements: as a policy, it enhances direct generation and self-correction\naccuracy; as a verifier, its self-verification outperforms self-consistency.",
+    "publicationDate": "2025-06-12T06:59:35.000Z",
+    "votes": 46
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2505.13445",
+    "title": "Trust, But Verify: A Self-Verification Approach to Reinforcement  Learning with Verifiable Rewards",
+    "abstract": "Large Language Models (LLMs) show great promise in complex reasoning, with\nReinforcement Learning with Verifiable Rewards (RLVR) being a key enhancement\nstrategy. However, a prevalent issue is ``superficial self-reflection'', where\nmodels fail to robustly verify their own outputs. We introduce RISE\n(Reinforcing Reasoning with Self-Verification), a novel online RL framework\ndesigned to tackle this. RISE explicitly and simultaneously trains an LLM to\nimprove both its problem-solving and self-verification abilities within a\nsingle, integrated RL process. The core mechanism involves leveraging\nverifiable rewards from an outcome verifier to provide on-the-fly feedback for\nboth solution generation and self-verification tasks. In each iteration, the\nmodel generates solutions, then critiques its own on-policy generated\nsolutions, with both trajectories contributing to the policy update. Extensive\nexperiments on diverse mathematical reasoning benchmarks show that RISE\nconsistently improves model's problem-solving accuracy while concurrently\nfostering strong self-verification skills. Our analyses highlight the\nadvantages of online verification and the benefits of increased verification\ncompute. Additionally, RISE models exhibit more frequent and accurate\nself-verification behaviors during reasoning. These advantages reinforce RISE\nas a flexible and effective path towards developing more robust and self-aware\nreasoners.",
+    "publicationDate": "2025-05-19T17:59:31.000Z",
+    "votes": 103
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2405.14092",
+    "title": "Large Language Models Can Self-Correct with Key Condition Verification",
+    "abstract": "Intrinsic self-correct was a method that instructed large language models (LLMs) to verify and correct their responses without external feedback. Unfortunately, the study concluded that the LLMs could not self-correct reasoning yet. We find that a simple yet effective verification method can unleash inherent capabilities of the LLMs. That is to mask a key condition in the question, add the current response to construct a verification question, and predict the condition to verify the response. The condition can be an entity in an open-domain question or a numeric value in a math question, which requires minimal effort (via prompting) to identify. We propose an iterative verify-then-correct framework to progressively identify and correct (probably) false responses, named ProCo. We conduct experiments on three reasoning tasks. On average, ProCo, with GPT-3.5-Turbo as the backend LLM, yields $+6.8$ exact match on four open-domain question answering datasets, $+14.1$ accuracy on three arithmetic reasoning datasets, and $+9.6$ accuracy on a commonsense reasoning dataset, compared to Self-Correct. Our implementation is made publicly available at this https URL.",
+    "publicationDate": "2024-10-03T02:00:53.000Z",
+    "votes": 22
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2309.11495",
+    "title": "Chain-of-Verification Reduces Hallucination in Large Language Models",
+    "abstract": "Generation of plausible yet incorrect factual information, termed\nhallucination, is an unsolved issue in large language models. We study the\nability of language models to deliberate on the responses they give in order to\ncorrect their mistakes. We develop the Chain-of-Verification (CoVe) method\nwhereby the model first (i) drafts an initial response; then (ii) plans\nverification questions to fact-check its draft; (iii) answers those questions\nindependently so the answers are not biased by other responses; and (iv)\ngenerates its final verified response. In experiments, we show CoVe decreases\nhallucinations across a variety of tasks, from list-based questions from\nWikidata, closed book MultiSpanQA and longform text generation.",
+    "publicationDate": "2023-09-20T17:50:55.000Z",
+    "votes": 40
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.15137",
+    "title": "From Solving to Verifying: A Unified Objective for Robust Reasoning in LLMs",
+    "abstract": "The reasoning capabilities of large language models (LLMs) have been significantly improved through reinforcement learning (RL). Nevertheless, LLMs still struggle to consistently verify their own reasoning traces. This raises the research question of how to enhance the self-verification ability of LLMs and whether such an ability can further improve reasoning performance. In this work, we propose GRPO-Verif, an algorithm that jointly optimizes solution generation and self-verification within a unified loss function, with an adjustable hyperparameter controlling the weight of the verification signal. Experimental results demonstrate that our method enhances self-verification capability while maintaining comparable performance in reasoning.",
+    "publicationDate": "2025-11-19T05:27:06.000Z",
+    "votes": 29
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2309.15217",
+    "title": "Ragas: Automated Evaluation of Retrieval Augmented Generation",
+    "abstract": "We introduce Ragas (Retrieval Augmented Generation Assessment), a framework\nfor reference-free evaluation of Retrieval Augmented Generation (RAG)\npipelines. RAG systems are composed of a retrieval and an LLM based generation\nmodule, and provide LLMs with knowledge from a reference textual database,\nwhich enables them to act as a natural language layer between a user and\ntextual databases, reducing the risk of hallucinations. Evaluating RAG\narchitectures is, however, challenging because there are several dimensions to\nconsider: the ability of the retrieval system to identify relevant and focused\ncontext passages, the ability of the LLM to exploit such passages in a faithful\nway, or the quality of the generation itself. With Ragas, we put forward a\nsuite of metrics which can be used to evaluate these different dimensions\n\\textit{without having to rely on ground truth human annotations}. We posit\nthat such a framework can crucially contribute to faster evaluation cycles of\nRAG architectures, which is especially important given the fast adoption of\nLLMs.",
+    "publicationDate": "2023-09-26T19:23:54.000Z",
+    "votes": 105
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.25656",
+    "title": "Is GraphRAG Needed? From Basic RAG to Graph-/Agentic Solutions with Context Optimization",
+    "abstract": "As advanced RAG variants like GraphRAG and Agentic RAG emerge, one leading question is when and how to use them. Here, we introduce a framework for different RAG scenarios evaluation and comparison on semi-structured knowledge bases, including regular RAG, GraphRAG, Modular RAG and Agentic RAG. We provide implementation for 9 standardized RAG scenarios, and conduct experiments for a comprehensive comparison. These scenarios are designed for real use cases regarding data and domain restrictions, spanning from simple document-based retrieval to advanced features such as hybrid text-graph retrieval, integration with computed or pre-defined domain knowledge graphs, agentic multi-step planning, and agent-graph integration. Besides, we present a novel context engineering method for GraphRAG and Agentic RAG, addressing the context/memory overflow issues, efficiently managing text and graph retrievals with new representations and agentic loop design, leading to 19%-53% reduction on token usage. Moreover, further analysis identifies a retrieval-generation gap where expanded retrieval does not proportionally improve generation quality, suggesting retrieval-oriented metrics overstate advanced retrieval benefits. This work provides data-driven insights on when and how to use them for building production-ready intelligent RAG systems.",
+    "publicationDate": "2026-06-24T10:11:02.000Z",
+    "votes": 24
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.01478",
+    "title": "SePer: Measure Retrieval Utility Through The Lens Of Semantic Perplexity  Reduction",
+    "abstract": "Large Language Models (LLMs) have demonstrated improved generation\nperformance by incorporating externally retrieved knowledge, a process known as\nretrieval-augmented generation (RAG). Despite the potential of this approach,\nexisting studies evaluate RAG effectiveness by 1) assessing retrieval and\ngeneration components jointly, which obscures retrieval's distinct\ncontribution, or 2) examining retrievers using traditional metrics such as\nNDCG, which creates a gap in understanding retrieval's true utility in the\noverall generation process. To address the above limitations, in this work, we\nintroduce an automatic evaluation method that measures retrieval quality\nthrough the lens of information gain within the RAG framework. Specifically, we\npropose Semantic Perplexity (SePer), a metric that captures the LLM's internal\nbelief about the correctness of the retrieved information. We quantify the\nutility of retrieval by the extent to which it reduces semantic perplexity\npost-retrieval. Extensive experiments demonstrate that SePer not only aligns\nclosely with human preferences but also offers a more precise and efficient\nevaluation of retrieval utility across diverse RAG scenarios.",
+    "publicationDate": "2025-03-03T12:37:34.000Z",
+    "votes": 14
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2408.01262",
+    "title": "RAGEval: Scenario Specific RAG Evaluation Dataset Generation Framework",
+    "abstract": "Retrieval-Augmented Generation (RAG) is a powerful approach that enables\nlarge language models (LLMs) to incorporate external knowledge. However,\nevaluating the effectiveness of RAG systems in specialized scenarios remains\nchallenging due to the high costs of data construction and the lack of suitable\nevaluation metrics. This paper introduces RAGEval, a framework designed to\nassess RAG systems across diverse scenarios by generating high-quality\ndocuments, questions, answers, and references through a schema-based pipeline.\nWith a focus on factual accuracy, we propose three novel metrics: Completeness,\nHallucination, and Irrelevance to evaluate LLM generated responses rigorously.\nExperimental results show that RAGEval outperforms zero-shot and one-shot\nmethods in terms of clarity, safety, conformity, and richness of generated\nsamples. Furthermore, the use of LLMs for scoring the proposed metrics\ndemonstrates a high level of consistency with human evaluations. RAGEval\nestablishes a new paradigm for evaluating RAG systems in real-world\napplications. The code and dataset are released at\nthis https URL",
+    "publicationDate": "2024-08-27T03:13:50.000Z",
+    "votes": 26
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2412.12300",
+    "title": "Unanswerability Evaluation for Retrieval Augmented Generation",
+    "abstract": "Existing evaluation frameworks for retrieval-augmented generation (RAG)\nsystems focus on answerable queries, but they overlook the importance of\nappropriately rejecting unanswerable requests. In this paper, we introduce\nUAEval4RAG, a framework designed to evaluate whether RAG systems can handle\nunanswerable queries effectively. We define a taxonomy with six unanswerable\ncategories, and UAEval4RAG automatically synthesizes diverse and challenging\nqueries for any given knowledge base with unanswered ratio and acceptable ratio\nmetrics. We conduct experiments with various RAG components, including\nretrieval models, rewriting methods, rerankers, language models, and prompting\nstrategies, and reveal hidden trade-offs in performance of RAG systems. Our\nfindings highlight the critical role of component selection and prompt design\nin optimizing RAG systems to balance the accuracy of answerable queries with\nhigh rejection rates of unanswerable ones. UAEval4RAG provides valuable\ninsights and tools for developing more robust and reliable RAG systems.",
+    "publicationDate": "2024-12-16T19:11:55.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2501.03995",
+    "title": "RAG-Check: Evaluating Multimodal Retrieval Augmented Generation Performance",
+    "abstract": "Retrieval-augmented generation (RAG) improves large language models (LLMs) by using external knowledge to guide response generation, reducing hallucinations. However, RAG, particularly multi-modal RAG, can introduce new hallucination sources: (i) the retrieval process may select irrelevant pieces (e.g., documents, images) as raw context from the database, and (ii) retrieved images are processed into text-based context via vision-language models (VLMs) or directly used by multi-modal language models (MLLMs) like GPT-4o, which may hallucinate. To address this, we propose a novel framework to evaluate the reliability of multi-modal RAG using two performance measures: (i) the relevancy score (RS), assessing the relevance of retrieved entries to the query, and (ii) the correctness score (CS), evaluating the accuracy of the generated response. We train RS and CS models using a ChatGPT-derived database and human evaluator samples. Results show that both models achieve ~88% accuracy on test data. Additionally, we construct a 5000-sample human-annotated database evaluating the relevancy of retrieved pieces and the correctness of response statements. Our RS model aligns with human preferences 20% more often than CLIP in retrieval, and our CS model matches human preferences ~91% of the time. Finally, we assess various RAG systems' selection and generation performances using RS and CS.",
+    "publicationDate": "2025-01-07T18:52:05.000Z",
+    "votes": 11
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.20051",
+    "title": "Controlled Retrieval-augmented Context Evaluation for Long-form RAG",
+    "abstract": "Retrieval-augmented generation (RAG) enhances large language models by incorporating context retrieved from external knowledge sources. While the effectiveness of the retrieval module is typically evaluated with relevance-based ranking metrics, such metrics may be insufficient to reflect the retrieval's impact on the final RAG result, especially in long-form generation scenarios. We argue that providing a comprehensive retrieval-augmented context is important for long-form RAG tasks like report generation and propose metrics for assessing the context independent of generation. We introduce CRUX, a \\textbf{C}ontrolled \\textbf{R}etrieval-a\\textbf{U}gmented conte\\textbf{X}t evaluation framework designed to directly assess retrieval-augmented contexts. This framework uses human-written summaries to control the information scope of knowledge, enabling us to measure how well the context covers information essential for long-form generation. CRUX uses question-based evaluation to assess RAG's retrieval in a fine-grained manner. Empirical results show that CRUX offers more reflective and diagnostic evaluation. Our findings also reveal substantial room for improvement in current retrieval methods, pointing to promising directions for advancing RAG's retrieval. Our data and code are publicly available to support and advance future research on retrieval.",
+    "publicationDate": "2025-06-24T23:17:48.000Z",
+    "votes": 16
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2507.22927",
+    "title": "PRGB Benchmark: A Robust Placeholder-Assisted Algorithm for Benchmarking Retrieval-Augmented Generation",
+    "abstract": "Retrieval-Augmented Generation (RAG) enhances large language models (LLMs) by integrating external knowledge, where the LLM's ability to generate responses based on the combination of a given query and retrieved documents is crucial. However, most benchmarks focus on overall RAG system performance, rarely assessing LLM-specific capabilities. Current benchmarks emphasize broad aspects such as noise robustness, but lack a systematic and granular evaluation framework on document utilization. To this end, we introduce \\textit{Placeholder-RAG-Benchmark}, a multi-level fine-grained benchmark, emphasizing the following progressive dimensions: (1) multi-level filtering abilities, (2) combination abilities, and (3) reference reasoning. To provide a more nuanced understanding of LLMs' roles in RAG systems, we formulate an innovative placeholder-based approach to decouple the contributions of the LLM's parametric knowledge and the external knowledge. Experiments demonstrate the limitations of representative LLMs in the RAG system's generation capabilities, particularly in error resilience and context faithfulness. Our benchmark provides a reproducible framework for developing more reliable and efficient RAG systems. Our code is available in this https URL.",
+    "publicationDate": "2025-07-23T16:14:08.000Z",
+    "votes": 7
+  }
+]

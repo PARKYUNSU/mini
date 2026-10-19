@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.24895",
+    "title": "Human-LLM Deliberation as Interactive Proof: Conditions for Verifiability Without Transparency",
+    "abstract": "When an LLM supplies an argument a user could not produce, how can the user decide whether to accept its claim? Inspired by interactive proofs, we pair a computationally unbounded LLM prover with a resource-bounded human verifier. The verifier checks requested details without seeing the LLM's internals; passed checks accumulate evidence toward an acceptance threshold. Given task-supplied bounds on false passes and human checking errors, we prove anytime-valid soundness against adaptive provers: the probability of ever accepting a false claim is at most a chosen error level. For a true claim, acceptance within the budget has probability at least the product of per-round probabilities that the LLM responds adequately and the human checks correctly, provided the threshold is reachable in time. Each additional check guards against false claims but gives a true claim another chance to fail. Which review lengths meet both error targets depends on the verifier's effort, cognitive load, expertise, and fatigue. With equal resources, we identify conditions under which the bounds certify a review by local checks but not a one-shot check. In LLM-only simulations on GPQA Diamond and Humanity's Last Exam, whether answers accepted without revision were more accurate varied by task and model pair.",
+    "publicationDate": "2026-09-21T17:00:15.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.31561",
+    "title": "What Am I Missing? Question-Answering as Hidden State Probing",
+    "abstract": "Test-time reasoning has become a significant field of study since the introduction of chain-of-thought reasoning in large language models (LLMs). However, the mechanisms of this reasoning process are still under-explored -- from the same input prompt, and even the same partial solution, LLMs can produce varied answers if sampled multiple times. We propose to leverage question-asking as an inference-time intervention that articulates information about the model's hidden state. To achieve that, we present a student-teacher setting where a student asks questions to a teacher. We train a probe on the student's hidden state before and after asking a question and find it is predictive of the trajectory's final correctness, even before generating the teacher's answer. This suggests there is a meaningful signal from the self-diagnosis that occurs during question generation rather than information transfer from the teacher. We then frame question-asking as a sequential decision problem, using this probe as a quality score, and define a gating policy to ask questions that maximize likelihood of correctness. We find that the success of question-asking as an intervention is largely dependent on the model's self-consistency. Our empirical results show a gap between detection and recovery; while our gating policy captures model correctness and uncertainty, interventions are equally likely to harm correct trajectories as they are to recover incorrect ones. This gap between diagnosis and correction has broader implications on language models' capacity for self-refinement under uncertainty.",
+    "publicationDate": "2026-05-29T17:27:07.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.07594",
+    "title": "Learning to Self-Verify Makes Language Models Better Reasoners",
+    "abstract": "Recent large language models (LLMs) achieve strong performance in generating promising reasoning paths for complex tasks. However, despite powerful generation ability, LLMs remain weak at verifying their own answers, revealing a persistent capability asymmetry between generation and self-verification. In this work, we conduct an in-depth investigation of this asymmetry throughout training evolution and show that, even on the same task, improving generation does not lead to corresponding improvements in self-verification. Interestingly, we find that the reverse direction of this asymmetry behaves differently: learning to self-verify can effectively improve generation performance, achieving accuracy comparable to standard generation training while yielding more efficient and effective reasoning traces. Building on this observation, we further explore integrating self-verification into generation training by formulating a multi-task reinforcement learning framework, where generation and self-verification are optimized as two independent but complementary objectives. Extensive experiments across benchmarks and models demonstrate performance gains over generation-only training in both generation and verification capabilities.",
+    "publicationDate": "2026-02-07T15:49:06.000Z",
+    "votes": 40
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.25031",
+    "title": "Faithful Autoformalization via Roundtrip Verification and Repair",
+    "abstract": "When an LLM formalizes natural language, how do we know the output is faithful? We propose a roundtrip verification approach which does not require ground-truth annotations: formalize a statement, translate the result back to natural language, re-formalize, and use a formal tool to check logical equivalence. When the two formalizations agree, this provides evidence of a faithful formalization. When they disagree, a stage-level diagnosis localizes the error to a specific translation step, and a scoped repair operator attempts to correct that step. We evaluate the framework on two statutory domains (the Texas Transportation Code and the Texas Parks and Wildlife Code) using two LLMs (Claude Opus~4.6 and GPT-5.2) with three repair baselines. Diagnosis-guided scoped repair is the most effective method, with effectiveness contingent on the reliability of the diagnosis function. Across both domains and both models, under our full repair system, rules that fail the equivalence check show 1.4x-2.5x more natural language inference (NLI) drift than rules that pass it.",
+    "publicationDate": "2026-04-27T22:26:01.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.01993",
+    "title": "SAFE: An LLM-as-Verifier Framework for Evidence-Grounded Multi-Hop Reasoning",
+    "abstract": "Multi-hop QA benchmarks often reward Large Language Models (LLMs) for spurious correctness, where models reach correct answers through invalid intermediate reasoning. We propose SAFE, an LLM-as-verifier framework for evidence-grounded multi-hop QA. Rather than judging only the final answer after generation, SAFE verifies reasoning during generation by checking intermediate steps against the provided passages and previous reasoning trajectory. To make this process checkable, SAFE decomposes reasoning into atomic, evidence-grounded units represented with Knowledge Graph (KG) triples. At train-time, SAFE verifies benchmark supervision under KG-grounded constraints and constructs reliable verifier training data. At inference-time, an external verifier checks each generated step, identifies invalid reasoning, and provides correction feedback before errors propagate. Across three multi-hop QA benchmarks, SAFE improves accuracy by 8.8 pp on average. These results show that evidence-grounded multi-hop QA benefits from shifting LLM-based evaluation from post-hoc answer judgment to stepwise reasoning verification.",
+    "publicationDate": "2026-04-02T12:59:30.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.10621",
+    "title": "SSR: Socratic Self-Refine for Large Language Model Reasoning",
+    "abstract": "Large Language Models (LLMs) have demonstrated remarkable reasoning abilities, yet existing test-time frameworks often rely on coarse self-verification and self-correction, limiting their effectiveness on complex tasks. In this paper, we propose Socratic Self-Refine (SSR), a novel framework for fine-grained evaluation and precise refinement of LLM reasoning. Our proposed SSR decomposes model responses into verifiable (sub-question, sub-answer) pairs, enabling step-level confidence estimation through controlled re-solving and self-consistency checks. By pinpointing unreliable steps and iteratively refining them, SSR produces more accurate and interpretable reasoning chains. Empirical results across five reasoning benchmarks and three LLMs show that SSR consistently outperforms state-of-the-art iterative self-refinement baselines. Beyond performance gains, SSR provides a principled black-box approach for evaluating and understanding the internal reasoning processes of LLMs. Code is available at this https URL.",
+    "publicationDate": "2025-11-13T18:47:07.000Z",
+    "votes": 44
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.06209",
+    "title": "ReProbe: Efficient Test-Time Scaling of Multi-Step Reasoning by Probing Internal States of Large Language Models",
+    "abstract": "LLMs can solve complex tasks by generating long, multi-step reasoning chains. Test-time scaling (TTS) can further improve performance by sampling multiple variants of intermediate reasoning steps, verifying their correctness, and selecting the best steps for continuation. However, existing verification approaches, such as Process Reward Models (PRMs), are computationally expensive and require large-scale human or model-generated annotations. We propose a lightweight alternative for step-level reasoning verification based on probing the internal states of LLMs. We train a transformer-based probe that uses the internal states of a frozen LLM to estimate the credibility of its reasoning steps during generation. Annotation can be provided either by a larger LLM (e.g., DeepSeek-R1) or in a self-supervised manner by the original model itself. The probes are lightweight, containing fewer than 10M parameters. Across multiple domains, including mathematics, planning, and general knowledge question answering, our probes match or exceed the performance of PRMs that are up to 810x larger. These results suggest that LLM internal states encode confidence in their reasoning processes and can serve as reliable signals for step verification, offering a promising path toward scalable, generalizable TTS and more introspective LLMs.",
+    "publicationDate": "2025-11-09T03:38:29.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.15137",
+    "title": "From Solving to Verifying: A Unified Objective for Robust Reasoning in LLMs",
+    "abstract": "The reasoning capabilities of large language models (LLMs) have been significantly improved through reinforcement learning (RL). Nevertheless, LLMs still struggle to consistently verify their own reasoning traces. This raises the research question of how to enhance the self-verification ability of LLMs and whether such an ability can further improve reasoning performance. In this work, we propose GRPO-Verif, an algorithm that jointly optimizes solution generation and self-verification within a unified loss function, with an adjustable hyperparameter controlling the weight of the verification signal. Experimental results demonstrate that our method enhances self-verification capability while maintaining comparable performance in reasoning.",
+    "publicationDate": "2025-11-19T05:27:06.000Z",
+    "votes": 29
+  }
+]

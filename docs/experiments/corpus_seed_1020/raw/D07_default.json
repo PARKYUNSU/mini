@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.26718",
+    "title": "The Sirens' Song: When Proximal Background Context Overshadows Distant Evidence",
+    "abstract": "Long-context LLMs focus on retrieving distant evidence from extensive context, yet existing work has largely focused on overcoming distance alone. In this work, we identify the Proximity Trap, insufficient attention to distant evidence often arises less from distance itself than from cumulative competition with abundant, task-irrelevant proximal background. To address the Proximity Trap, we introduce LYRA (Long-context heavY-tailed Relevance Alignment), a t-distributed directional matching mechanism that reshapes the context retrieval distribution, directing more attention mass toward task-relevant evidence, while preserving the relative positional information encoded. Extensive experiments on LongBench-v2, RULER, and LongBench demonstrate consistent improvements across context lengths and task categories. We further introduce ProxBench, a multi-level fine-grained benchmark for evaluating distant evidence utilization under increasing proximal background interference. Project page: this https URL",
+    "publicationDate": "2026-09-22T17:06:51.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.29718",
+    "title": "Diagnosing and Mitigating Context Rot in Long-horizon Search",
+    "abstract": "Extensive context has become the norm as Large Language Models (LLMs) are increasingly deployed in long-horizon search tasks. The concern that increasing context length degrades model capabilities, known as context rot, has become a widely recognized issue for these applications. However, in deep search scenarios, it remains unclear how models actually fail under extensive context, and to what extent existing methods can mitigate such failures. Through a systematic study of four flagship models across three benchmarks, we identify a previously overlooked phenomenon, which we term premature termination: under extensive context, models give up or provide uncertain incorrect answers long before exhausting the context window. By controlling for query difficulty, we show that the premature termination rate is positively correlated with context length. Based on the findings, we revisit methods to mitigate context rot, including context management and parallel sampling. For context management, we analyze seven methods across three categories and show that they are inherently test-time scaling strategies that reduce the premature termination rate to enable more exploration, and we further provide model-dependent principles for method selection. For parallel sampling, we develop a behavior-aware filtering strategy and observe a performance gain of 2.6% to 4.9% across three aggregation methods.",
+    "publicationDate": "2026-06-29T02:53:28.000Z",
+    "votes": 72
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.12387",
+    "title": "Query Timing Produces Opposite Positional Biases Between LLMs and Humans",
+    "abstract": "Positional biases such as recency and primacy effects have been documented in large language models (LLMs), yet the underlying mechanism by which these models make their evaluations remains poorly understood. Both primacy and recency biases have been observed in human judgments in response to evidence, but recent work suggest that \\emph{when} the listener updates their beliefs -- during the presentation of evidence or only at the end -- influences the presence of such effects. We investigate whether a similar phenomenon holds for LLMs, finding divergence from human behavior. These biases are more exacerbated in newer models compared to their predecessors.",
+    "publicationDate": "2026-08-01T03:23:52.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.15514",
+    "title": "RoPE Distinguishes Neither Positions Nor Tokens in Long Contexts, Provably",
+    "abstract": "We identify intrinsic limitations of Rotary Positional Embeddings (RoPE) in Transformer-based long-context language models. Our theoretical analysis abstracts away from the specific content of the context and depends only on its length. We prove that as context length increases, RoPE-based attention becomes unpredictable and loses two properties that are central to its effectiveness. First, it loses its locality bias: RoPE is no more likely to favor nearer positions than substantially farther ones. Second, it loses consistency in token relevance: a key vector that receives a higher attention score than an alternative at one position may receive a lower score at another. In both cases, the probability of failure approaches 0.5, no better than random guessing. We further prove that the attention score can remain unchanged when a key token is moved to a different position, or even replaced by a different token, indicating a failure to distinguish positions or tokens. Adjusting the RoPE base trades off distinguishing positions against distinguishing tokens but cannot preserve both at the same time. Increasing the RoPE base hyperparameter, a common practice in today's long-context models, helps distinguish different tokens, but inevitably sacrifices the ability to distinguish positions. Our empirical analysis shows that multi-head, multi-layer architectures are insufficient to overcome these limitations. Our findings suggest that fundamentally new mechanisms for encoding position and token order may be needed in future Transformer long-context language models.",
+    "publicationDate": "2026-05-15T01:16:16.000Z",
+    "votes": 57
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.27705",
+    "title": "Mitigating Position Bias in Transformers via Layer-Specific Positional Embedding Scaling",
+    "abstract": "Large Language Models (LLMs) still struggle with the ``lost-in-the-middle'' problem, where critical information located in the middle of long-context inputs is often underrepresented or lost. While existing methods attempt to address this by combining multi-scale rotary position embeddings (RoPE), they typically suffer from high latency or rely on suboptimal hand-crafted scaling strategies. To overcome these limitations, we introduce a layer-specific positional embedding scaling~(LPES) method that assigns distinct scaling factors to each layer. LPES achieves a more balanced attention distribution without fine-tuning model parameters or increasing inference delay. A specially designed genetic algorithm is employed to efficiently select the optimal scaling factors for each layer by incorporating Bézier curves to significantly reduce the search space. Extensive experiments demonstrate that LPES effectively mitigates positional attention bias and delivers consistent improvements across multiple long-context benchmarks, yielding up to an $11.2$\\% accuracy gain on the key-value retrieval dataset.",
+    "publicationDate": "2026-06-26T04:07:41.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.16494",
+    "title": "Lost at the End: Primacy Bias in Multimodal Retrieval-Augmented Question Answering",
+    "abstract": "Knowledge-based visual question answering (KB-VQA) lets vision-language systems answer questions that exceed their parametric knowledge by conditioning a reader on passages retrieved from a Wikipedia-derived knowledge base. In pure-text long-context LLMs, retrieved-context use follows the U-shaped lost-in-the-middle effect of Liu et al. (2024): information at the start and end of context is used, the middle is lost. Whether this transfers to deployed multimodal KB-VQA is open. To close this gap, we design the first controlled probe of reader-side position dependence in multimodal KB-VQA: a gold-position protocol in which only the gold passage's prompt slot varies within question. We run it on three open-source 7B/8B VLM readers and two KB-VQA benchmarks with up to 20 retrieved passages. The shape flips from U to primacy: gold-at-first beats gold-at-last by 16 to 26 points on all six combinations of reader and benchmark, an effect we call Lost at the End; the gap holds at every scale we test, 3B to 32B, attenuating at 32B. Three targeted ablations narrow the cause. A text-only control that removes the image and changes nothing else shows the primacy is already present in text mode and does not depend on the image. Image-position and distractor-shuffle ablations trace the effect to prompt slot 0 of the instruction-tuned reader, where a second answer-bearing passage placed later is largely wasted. On a frozen reader, three retrieval-side fixes (MMR, oracle reranking, rank-based reordering) all fail to improve on the deployment default. Our findings indicate that recall@k is the wrong metric for deployed KB-VQA and that the remaining headroom sits on the reader side; we release our protocol as a controlled instrument for evaluating reader-side interventions.",
+    "publicationDate": "2026-06-15T09:57:48.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.07127",
+    "title": "The Position Curse: LLMs Struggle to Locate the Last Few Items in a List",
+    "abstract": "Modern large language models (LLMs) can find a needle in a haystack (locating a single relevant fact buried among hundreds of thousands of irrelevant tokens) with near-saturated accuracy, yet fail to retrieve the last few items in a short list. We call this failure the Position Curse. For instance, even in a two-line code snippet, Claude Opus 4.6 misidentifies the second-to-last line most of the time. To characterize this failure, we evaluated two complementary queries: given a position in a sequence (of letters or words), retrieve the corresponding item; and given an item, return its position. Each position is specified as a forward or backward offset from an anchor, either an endpoint of the list (its start or end) or another item in the list. Across both open-source and frontier closed-source models, backward retrieval substantially lags forward retrieval. To test whether this capability can be rescued by post-training, we constructed PosBench, a position-focused training dataset. LoRA fine-tuning improves both forward and backward retrieval and generalizes to a held-out code-understanding benchmark (PyIndex), yet absolute performance remains far from saturated. As LLM coding agents increasingly operate over large codebases where precise indexing becomes essential for code understanding and editing, position-based retrieval emerges as a key capability for future pretraining objectives and model design.",
+    "publicationDate": "2026-05-08T02:04:22.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.16837",
+    "title": "A Structural Theory of Position Bias in Transformers",
+    "abstract": "Transformer models systematically favor certain token positions, yet the architectural origins of this position bias remain poorly understood. This bias is closely connected to the Lost-in-the-Middle phenomenon, where models underutilize information placed in the middle of the context. We show that causal Transformer architectures induce a systematic position-bias prior that can help explain the influence profiles associated with Lost-in-the-Middle. To characterize this prior, we develop a structural theory based on cumulative attention rollout with layerwise residual mixing. At finite depth, we isolate the competing positional drifts induced by causal masking, residual mixing, and positional encoding. Their interaction produces broad, often U-shaped profiles. At infinite depth, prior work predicts inevitable collapse under attention-only theory and identifies the discrepancy with observed Transformer behavior as an open problem. Under the stated boundedness assumptions, our residual-aware analysis replaces inevitable collapse with a dichotomy governed by cumulative attention mixing. Empirically, across 30 model-dataset settings, our adaptive residual-aware rollout closely matches measured input-token influence and reduces the average profile discrepancy by approximately 85% relative to both the attention-only and fixed-residual rollout baselines.",
+    "publicationDate": "2026-02-18T20:01:39.000Z",
+    "votes": 9
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2402.00943",
+    "title": "Approximate Nearest Neighbor Search with Window Filters",
+    "abstract": "We define and investigate the problem of $\\textit{c-approximate window search}$: approximate nearest neighbor search where each point in the dataset has a numeric label, and the goal is to find nearest neighbors to queries within arbitrary label ranges. Many semantic search problems, such as image and document search with timestamp filters, or product search with cost filters, are natural examples of this problem. We propose and theoretically analyze a modular tree-based framework for transforming an index that solves the traditional c-approximate nearest neighbor problem into a data structure that solves window search. On standard nearest neighbor benchmark datasets equipped with random label values, adversarially constructed embeddings, and image search embeddings with real timestamps, we obtain up to a $75\\times$ speedup over existing solutions at the same level of recall.",
+    "publicationDate": "2024-06-04T15:38:08.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.15058",
+    "title": "Fast Label-Filtering Approximate Nearest Neighbor Search via Progressive Label Set Stratification",
+    "abstract": "Approximate nearest neighbor search (ANNS) retrieves the most similar vectors to a query vector in high-dimensional space. Label-filtering ANNS (LFANNS) extends ANNS with a label filter that the labels of base vectors must satisfy a set relation (e.g., equality, containment, or overlap) with the query labels. Existing LFANNS indices suffer from inconsistent performance across different filter types and degraded scalability under varying label scale and distribution. In this paper, we define label-stratified similarity graph (LSSG), where edges connect neighboring vectors whose label sets fall within stratified similarity thresholds. To implement LSSG efficiently, we design an incremental insertion algorithm to prune redundant edges in both vector and label spaces, and leverage a MinHash structure to ensure scalability for large-scale labels. We analyze stepwise probabilities under explicit label models and explain why stricter label tiers reduce ineffective in-filtering expansions. Benchmark experiments show that LSSG achieves ideal optimality for equality queries, and 1.06x-92.9x and 1.08x-84.1x faster than the best competing index for containment and overlap, respectively, in query speed with identical accuracy and 0.35x index size.",
+    "publicationDate": "2026-09-14T05:23:52.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2507.21989",
+    "title": "Benchmarking Filtered Approximate Nearest Neighbor Search Algorithms on Transformer-based Embedding Vectors",
+    "abstract": "Advances in embedding models for text, image, audio, and video drive progress across multiple domains, including retrieval-augmented generation, recommendation systems, and others. Many of these applications require an efficient method to retrieve items that are close to a given query in the embedding space while satisfying a filter condition based on the item's attributes, a problem known as filtered approximate nearest neighbor search (FANNS). By performing an in-depth literature analysis on FANNS, we identify a key gap in the research landscape: publicly available datasets with embedding vectors from state-of-the-art transformer-based text embedding models that contain abundant real-world attributes covering a broad spectrum of attribute types and value distributions. To fill this gap, we introduce the arxiv-for-fanns dataset of transformer-based embedding vectors for the abstracts of over 2.7 million arXiv papers, enriched with 11 real-world attributes such as authors and categories. We benchmark eleven different FANNS methods on our new dataset to evaluate their performance across different filter types, numbers of retrieved neighbors, dataset scales, and query selectivities. We distill our findings into eight key observations that guide users in selecting the most suitable FANNS method for their specific use cases.",
+    "publicationDate": "2025-07-29T16:39:54.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.16263",
+    "title": "Attribute Filtering in Approximate Nearest Neighbor Search: An In-depth Experimental Study",
+    "abstract": "With the growing integration of structured and unstructured data, new methods have emerged for performing similarity searches on vectors while honoring structured attribute constraints, i.e., a process known as Filtering Approximate Nearest Neighbor (Filtering ANN) search. Since many of these algorithms have only appeared in recent years and are designed to work with a variety of base indexing methods and filtering strategies, there is a pressing need for a unified analysis that identifies their core techniques and enables meaningful comparisons.\nIn this work, we present a unified Filtering ANN search interface that encompasses the latest algorithms and evaluate them extensively from multiple perspectives. First, we propose a comprehensive taxonomy of existing Filtering ANN algorithms based on attribute types and filtering strategies. Next, we analyze their key components, i.e., index structures, pruning strategies, and entry point selection, to elucidate design differences and tradeoffs. We then conduct a broad experimental evaluation on 10 algorithms and 12 methods across 4 datasets (each with up to 10 million items), incorporating both synthetic and real attributes and covering selectivity levels from 0.1% to 100%. Finally, an in-depth component analysis reveals the influence of pruning, entry point selection, and edge filtering costs on overall performance. Based on our findings, we summarize the strengths and limitations of each approach, provide practical guidelines for selecting appropriate methods, and suggest promising directions for future research. Our code is available at: this https URL.",
+    "publicationDate": "2025-08-22T09:54:57.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.17992",
+    "title": "PipeANN-Filter: An Efficient Filtered Vector Search System on SSD",
+    "abstract": "We propose PipeANN-Filter, an efficient filtered vector search system on SSD. Unlike existing systems that explore only valid vectors (i.e., those satisfying the attribute constraints) during search, PipeANN-Filter explores a superset of valid vectors, and performs attribute verification after getting the top-k closest result vectors. This allows PipeANN-Filter to leverage probabilistic data structures (e.g., Bloom filters) to identify the superset, trading off a small number of false-positive vector explorations for a massive reduction in SSD I/O for attribute reading. Evaluations show that PipeANN-Filter improves search latency and throughput compared to state-of-the-art systems. PipeANN-Filter is open-source at this https URL",
+    "publicationDate": "2026-05-18T07:48:53.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2505.06501",
+    "title": "Survey of Filtered Approximate Nearest Neighbor Search over the  Vector-Scalar Hybrid Data",
+    "abstract": "Filtered approximate nearest neighbor search (FANNS), an extension of\napproximate nearest neighbor search (ANNS) that incorporates scalar filters,\nhas been widely applied to constrained retrieval of vector data. Despite its\ngrowing importance, no dedicated survey on FANNS over the vector-scalar hybrid\ndata currently exists, and the field has several problems, including\ninconsistent definitions of the search problem, insufficient framework for\nalgorithm classification, and incomplete analysis of query difficulty. This\nsurvey paper formally defines the concepts of hybrid dataset and hybrid query,\nas well as the corresponding evaluation metrics. Based on these, a\npruning-focused framework is proposed to classify and summarize existing\nalgorithms, providing a broader and finer-grained classification framework\ncompared to the existing ones. In addition, a review is conducted on\nrepresentative hybrid datasets, followed by an analysis on the difficulty of\nhybrid queries from the perspective of distribution relationships between data\nand queries. This paper aims to establish a structured foundation for FANNS\nover the vector-scalar hybrid data, facilitate more meaningful comparisons\nbetween FANNS algorithms, and offer practical recommendations for\npractitioners. The code used for downloading hybrid datasets and analyzing\nquery difficulty is available at this https URL",
+    "publicationDate": "2025-05-10T04:02:14.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.06721",
+    "title": "E2E: Efficient Filtered AKNN Search via Adaptive Termination",
+    "abstract": "Approximate k-Nearest Neighbor (AKNN) search is widely used in vector databases. When vectors carry additional attributes (e.g., labels or numerical values), filtered AKNN search retrieves the nearest vectors to a query vector under attribute constraints. Most existing methods use a fixed termination condition, searching the entire index while respecting attribute filters. However, this leads to substantial redundant computations, since different queries require different amounts of search effort, and thus misses early termination opportunities for easy queries. This paper proposes a lightweight model to estimate the search cost of filtered AKNN queries and enable adaptive termination: For easy queries, the search stops early to reduce latency, while for hard queries, it continues longer to preserve accuracy. The key challenge is accurate cost prediction under attribute filters. To address this, we show that information collected during an early probing phase (e.g., attribute distributions and intermediate distance statistics) can effectively predict the overall search cost. Experiments on six real-world datasets demonstrate 1.1-3.7 speedup over state-of-the-art baselines at 95% recall, while maintaining search accuracy.",
+    "publicationDate": "2026-02-06T14:14:00.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.05441",
+    "title": "Filtered Vector Search in a Disaggregated Lakehouse: Composing Table-Format Pruning with Per-File ANN",
+    "abstract": "Approximate nearest-neighbor (ANN) search increasingly runs alongside structured data - \"find the 10 nearest documents where tenant='acme' AND lang='en'\" - yet similarity and filtering are usually bolted together: a specialized vector index for one, a separate filter step for the other. We ask what happens when both live inside an open lakehouse table (Apache Iceberg over Parquet on object storage), where the engine already owns a mature file-pruning stack (partition pruning, zone-maps, a bitmap index). We embed an IVF index in place in each Parquet file's footer and make filtered vector queries fast not with a new filtering algorithm but by composing the table's existing file pruning with per-file ANN: the planner prunes data files by the predicate first, then runs IVF only over the survivors. The index is built distributed and non-destructively - a metadata-only Iceberg replace that every other engine still reads - and a rendezvous-hashed per-file cache keeps object-store read latency from swamping the algorithmic win. The payoff comes entirely from file pruning. On an 11.5M x 768 table, warm IVF search is ~32x faster than brute force at recall@10 >= 0.90, a selective predicate having pruned 355 of 444 data files before ANN runs; on 5M real IBM Granite embeddings, a filter arriving across a join prunes four of five region partitions and runs nearly two orders of magnitude (~94x: 14.7 s -> 157 ms) faster than the query-time join at identical top-k, once the reduction is materialized into a region-partitioned layout. We characterize when the composition pays off - it requires file-level locality on the filter column, and the residual predicate is only safe to push into the search over a provably pure (partitioned) column, not a merely sorted one - and report the failure modes we hit bolting ANN onto a lakehouse engine.",
+    "publicationDate": "2026-08-05T22:20:01.000Z",
+    "votes": 4
+  }
+]

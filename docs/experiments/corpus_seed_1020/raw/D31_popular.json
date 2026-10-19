@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2501.12789",
+    "title": "Generating Diverse Q&A Benchmarks for RAG Evaluation with DataMorgana",
+    "abstract": "Evaluating Retrieval-Augmented Generation (RAG) systems, especially in domain-specific contexts, requires benchmarks that address the distinctive requirements of the applicative scenario. Since real data can be hard to obtain, a common strategy is to use LLM-based methods to generate synthetic data. Existing solutions are general purpose: given a document, they generate a question to build a Q&A pair. However, although the generated questions can be individually good, they are typically not diverse enough to reasonably cover the different ways real end-users can interact with the RAG system. We introduce here DataMorgana, a tool for generating highly customizable and diverse synthetic Q&A benchmarks tailored to RAG applications. DataMorgana enables detailed configurations of user and question categories and provides control over their distribution within the benchmark. It uses a lightweight two-stage process, ensuring efficiency and fast iterations, while generating benchmarks that reflect the expected traffic. We conduct a thorough line of experiments, showing quantitatively and qualitatively that DataMorgana surpasses existing tools and approaches in producing lexically, syntactically, and semantically diverse question sets across domain-specific and general-knowledge corpora. DataMorgana will be made available to selected teams in the research community, as first beta testers, in the context of the upcoming SIGIR'2025 LiveRAG challenge to be announced in early February 2025.",
+    "publicationDate": "2025-01-22T18:47:08.000Z",
+    "votes": 60
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2411.19710",
+    "title": "Know Your RAG: Dataset Taxonomy and Generation Strategies for Evaluating RAG Systems",
+    "abstract": "Retrieval Augmented Generation (RAG) systems are a widespread application of Large Language Models (LLMs) in the industry. While many tools exist empowering developers to build their own systems, measuring their performance locally, with datasets reflective of the system's use cases, is a technological challenge. Solutions to this problem range from non-specific and cheap (most public datasets) to specific and costly (generating data from local documents). In this paper, we show that using public question and answer (Q&A) datasets to assess retrieval performance can lead to non-optimal systems design, and that common tools for RAG dataset generation can lead to unbalanced data. We propose solutions to these issues based on the characterization of RAG datasets through labels and through label-targeted data generation. Finally, we show that fine-tuned small LLMs can efficiently generate Q&A datasets. We believe that these observations are invaluable to the know-your-data step of RAG systems development.",
+    "publicationDate": "2024-11-29T13:57:07.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.18202",
+    "title": "SAGE: Steerable Agentic Data Generation for Deep Search with Execution Feedback",
+    "abstract": "Deep search agents, which aim to answer complex questions requiring reasoning across multiple documents, can significantly speed up the information-seeking process. Collecting human annotations for this application is prohibitively expensive due to long and complex exploration trajectories. We propose an agentic pipeline that automatically generates high quality, difficulty-controlled deep search question-answer pairs for a given corpus and a target difficulty level. Our pipeline, SAGE, consists of a data generator which proposes QA pairs and a search agent which attempts to solve the generated question and provide execution feedback for the data generator. The two components interact over multiple rounds to iteratively refine the question-answer pairs until they satisfy the target difficulty level. Our intrinsic evaluation shows SAGE generates questions that require diverse reasoning strategies, while significantly increases the correctness and difficulty of the generated data. Our extrinsic evaluation demonstrates up to 23% relative performance gain on popular deep search benchmarks by training deep search agents with our synthetic data. Additional experiments show that agents trained on our data can adapt from fixed-corpus retrieval to Google Search at inference time, without further training.",
+    "publicationDate": "2026-01-26T06:37:56.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.04473",
+    "title": "Ground-Truth Subgraphs for Better Training and Evaluation of Knowledge Graph Augmented LLMs",
+    "abstract": "Retrieval of information from graph-structured knowledge bases represents a promising direction for improving the factuality of LLMs. While various solutions have been proposed, a comparison of methods is difficult due to the lack of challenging QA datasets with ground-truth targets for graph retrieval. We present SynthKGQA, an LLM-powered framework for generating high-quality Knowledge Graph Question Answering datasets from any Knowledge Graph, providing the full set of ground-truth facts in the KG to reason over questions. To demonstrate its utility, we apply SynthKGQA to ogbl-wikikg2, a Wikidata-derived KG, and validate generated items against an up-to-date dump of Wikidata to create GTSQA. This new dataset is specifically designed to test zero-shot generalization with respect to unseen graph structures and relation types, enabling us to analyze the abilities and limitations of SOTA graph retrieval approaches at an unprecedented level of granularity. We also show that KG retrievers trained on GTSQA can transfer to a human-curated benchmark, and that the ground-truth subgraphs produced by SynthKGQA provide a better training supervision signal than previously-used heuristics.",
+    "publicationDate": "2025-11-06T15:45:18.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2403.12145",
+    "title": "Syn-QA2: Evaluating False Assumptions in Long-tail Questions with  Synthetic QA Datasets",
+    "abstract": "Sensitivity to false assumptions (or false premises) in information-seeking\nquestions is critical for robust question-answering (QA) systems. Recent work\nhas shown that false assumptions in naturally occurring questions pose\nchallenges to current models, with low performance on both generative QA and\nsimple detection tasks (Kim et al. 2023). However, the focus of existing work\non naturally occurring questions leads to a gap in the analysis of model\nbehavior on the long tail of the distribution of possible questions. To this\nend, we introduce Syn-(QA)$^2$, a set of two synthetically generated QA\ndatasets: one generated using perturbed relations from Wikidata, and the other\nby perturbing HotpotQA (Yang et al. 2018). Our findings from evaluating a range\nof large language models are threefold: (1) false assumptions in QA are\nchallenging, echoing the findings of prior work, (2) the binary detection task\nis challenging even compared to the difficulty of generative QA itself,\npossibly due to the linguistic structure of the problem, and (3) the detection\ntask is more challenging with long-tail questions compared to naturally\noccurring questions, highlighting the utility of our synthetic datasets and\ngeneration method.",
+    "publicationDate": "2024-03-18T18:01:26.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2209.12944",
+    "title": "On the Impact of Speech Recognition Errors in Passage Retrieval for  Spoken Question Answering",
+    "abstract": "Interacting with a speech interface to query a Question Answering (QA) system\nis becoming increasingly popular. Typically, QA systems rely on passage\nretrieval to select candidate contexts and reading comprehension to extract the\nfinal answer. While there has been some attention to improving the reading\ncomprehension part of QA systems against errors that automatic speech\nrecognition (ASR) models introduce, the passage retrieval part remains\nunexplored. However, such errors can affect the performance of passage\nretrieval, leading to inferior end-to-end performance. To address this gap, we\naugment two existing large-scale passage ranking and open domain QA datasets\nwith synthetic ASR noise and study the robustness of lexical and dense\nretrievers against questions with ASR noise. Furthermore, we study the\ngeneralizability of data augmentation techniques across different domains; with\neach domain being a different language dialect or accent. Finally, we create a\nnew dataset with questions voiced by human users and use their transcriptions\nto show that the retrieval performance can further degrade when dealing with\nnatural ASR noise instead of synthetic ASR noise.",
+    "publicationDate": "2022-09-26T18:29:36.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2410.17952",
+    "title": "SimRAG: Self-Improving Retrieval-Augmented Generation for Adapting Large Language Models to Specialized Domains",
+    "abstract": "Retrieval-augmented generation (RAG) enhances the question-answering (QA) abilities of large language models (LLMs) by integrating external knowledge. However, adapting general-purpose RAG systems to specialized fields such as science and medicine poses unique challenges due to distribution shifts and limited access to domain-specific data. To tackle this, we propose SimRAG, a self-training approach that equips the LLM with joint capabilities of question answering and question generation for domain adaptation. Our method first fine-tunes the LLM on instruction-following, question-answering, and search-related data. Then, it prompts the same LLM to generate diverse domain-relevant questions from unlabeled corpora, with an additional filtering strategy to retain high-quality synthetic examples. By leveraging these self-generated synthetic examples, the LLM can improve their performance on domain-specific RAG tasks. Experiments on 11 datasets, spanning two backbone sizes and three domains, demonstrate that SimRAG outperforms baselines by 1.2\\%--8.6\\%.",
+    "publicationDate": "2024-10-23T15:24:16.000Z",
+    "votes": 21
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2407.02233",
+    "title": "Synthetic Multimodal Question Generation",
+    "abstract": "Multimodal Retrieval Augmented Generation (MMRAG) is a powerful approach to question-answering over multimodal documents. A key challenge with evaluating MMRAG is the paucity of high-quality datasets matching the question styles and modalities of interest. In light of this, we propose SMMQG, a synthetic data generation framework. SMMQG leverages interplay between a retriever, large language model (LLM) and large multimodal model (LMM) to generate question and answer pairs directly from multimodal documents, with the questions conforming to specified styles and modalities. We use SMMQG to generate an MMRAG dataset of 1024 questions over Wikipedia documents and evaluate state-of-the-art models using it, revealing insights into model performance that are attainable only through style- and modality-specific evaluation data. Next, we measure the quality of data produced by SMMQG via a human study. We find that the quality of SMMQG-generated synthetic data is on par with the quality of the crowdsourced benchmark MMQA and that downstream evaluation results using both datasets strongly concur.",
+    "publicationDate": "2024-10-03T19:08:37.000Z",
+    "votes": 5
+  }
+]

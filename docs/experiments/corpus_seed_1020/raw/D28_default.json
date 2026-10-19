@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2608.14648",
+    "title": "Stop Indexing at Full Precision: Revisiting Clustering for Vector Embeddings",
+    "abstract": "In this study, we revisit three widely used techniques in vector search and utilize them to optimize vector embedding indexing through clustering: dimensionality reduction, quantization, and dimension pruning. We propose an indexing pipeline in which these techniques are applied before clustering, and we focus on how they affect storage footprint, clustering time, and the quality of the resulting centroids for vector search tasks. Our results reveal that using full-precision vectors for clustering is excessive, as even 1-bit codes can achieve near-optimal clustering quality (within 1% of ideal) while reducing storage requirements by 60x and delivering attractive performance gains (Figure 1). We open-source our implementations at this https URL.",
+    "publicationDate": "2026-07-30T12:59:55.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.15957",
+    "title": "To GPU or Not to GPU: Vector Search in Relational Engines",
+    "abstract": "Vector search (VS) is now available in most database engines. However, while vector search is a common feature in AI/ML/LLMs where the dominant computing platforms are GPUs, existing database engines operate on CPUs even when implementing vector search. This raises the question of whether integrating vector processing on GPUs as part of the engine would be a better design. In this paper, we explore this question in detail. First, we extend the TPC-H benchmark with vector data (from text and images) and propose a number of representative SQL+VS queries. Second, we develop a modular execution engine that can run SQL+VS queries across CPU and GPU. Third, we perform extensive experiments on a number of deployments: running the SQL+VS queries across CPU and/or GPU, with data residing in CPU or GPU memory, with existing indices and novel, optimized versions, as well as across different GPUs and interconnects (PCIe, NVLink). The results provide actionable and counter-intuitive insights on how to run such queries over CPUs and GPUs. For instance, the relational components benefit much more from running on the GPU than the vector search part. In addition, when the vector search involves moving data and indexes, using the GPU is not the best option, even with fast interconnects. Thus, we develop an alternative organization of vector index and embeddings that reduces the size of the index, making GPU-based vector search more competitive. With these improvements, the final result is that both the relational and vector search components are faster on the GPU, particularly on fast interconnects, in contrast with the architecture used in existing engines.",
+    "publicationDate": "2026-05-15T13:50:42.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.09173",
+    "title": "Decoupling Vector Data and Index Storage for Space Efficiency",
+    "abstract": "Managing large-scale vector datasets with disk-resident graph approximate nearest neighbor search (ANNS) systems incurs substantial storage overhead due to the co-location of vector data and auxiliary index metadata, which prevents the storage layer from exploiting their distinct compressibility. We present COMPASS, a component-aware compressed storage framework for disk-resident graph vector search. Leveraging data-index decoupling as a foundation, COMPASS losslessly compresses each component according to its distinct compressibility characteristics, thereby significantly reducing storage space. It further adapts the search and update paths to preserve their performance under compressed storage layouts. Evaluation on real-world public and proprietary billion-scale datasets shows that COMPASS reduces storage space by up to 58.7%, while delivering improved or competitive search and update performance compared to state-of-the-art disk-resident graph ANNS systems.",
+    "publicationDate": "2026-04-10T09:58:17.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.17099",
+    "title": "Reverse Neighbor Sliding and Order Selection for Efficient Multi-Proximity Graph Merging",
+    "abstract": "Approximate k Nearest Neighbor (AKNN) search in high-dimensional space is a foundational problem in vector databases with widespread applications. Among the numerous AKNN indexes, Proximity Graph-based indexes achieve state-of-the-art search efficiency across various benchmarks. In many real-world scenarios, datasets are maintained as multiple segment-level graph indexes to support continuous writes and segment management. However, these fragmented indexes complicate maintenance and degrade search efficiency, making fast graph index merging essential. In this paper, we focus on the efficient merging of multiple existing graph indexes into a single one. To achieve this, we propose a Reverse Neighbor Sliding Merge (RNSM) that exploits structural information to boost merging efficiency. We further propose Merge Order Selection (MOS) to minimize total merge cost across multiple indexes by eliminating redundant operations. Experiments show that our approach yields up to a 3.86x speedup over existing index merge methods and a 9.92x speedup over index reconstruction, while maintaining comparable search performance. Moreover, our method scales to merging up to 50 sub-indexes on datasets of 100 million vectors, maintaining consistent speedups.",
+    "publicationDate": "2026-02-19T05:50:34.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.01937",
+    "title": "Vector Search for the Future: From Memory-Resident, Static Heterogeneous Storage, to Cloud-Native Architectures",
+    "abstract": "Vector search (VS) has become a fundamental component in multimodal data management, enabling core functionalities such as image, video, and code retrieval. As vector data scales rapidly, VS faces growing challenges in balancing search, latency, scalability, and cost. The evolution of VS has been closely driven by changes in storage architecture. Early VS methods rely on all-in-memory designs for low latency, but scalability is constrained by memory capacity and cost. To address this, recent research has adopted heterogeneous architectures that offload space-intensive vectors and index structures to SSDs, while exploiting block locality and I/O-efficient strategies to maintain high search performance at billion scale. Looking ahead, the increasing demand for trillion-scale vector retrieval and cloud-native elasticity is driving a further shift toward memory-SSD-object storage architectures, which enable cost-efficient data tiering and seamless scalability.\nIn this tutorial, we review the evolution of VS techniques from a storage-architecture perspective. We first review memory-resident methods, covering classical IVF, hash, quantization, and graph-based designs. We then present a systematic overview of heterogeneous storage VS techniques, including their index designs, block-level layouts, query strategies, and update mechanisms. Finally, we examine emerging cloud-native systems and highlight open research opportunities for future large-scale vector retrieval systems.",
+    "publicationDate": "2026-01-05T09:40:54.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.14748",
+    "title": "Cloud-Native Vector Search: A Comprehensive Performance Analysis",
+    "abstract": "Vector search has been widely employed in recommender system and retrieval-augmented-generation pipelines, commonly performed with vector indexes to efficiently find similar items in large datasets. Recent growths in both data and task complexity have motivated placing vector indexes onto remote storage -- cloud-native vector search, which cloud providers have recently introduced services for. Yet, despite varying workload characteristics and various available vector index forms, providers default to using cluster-based indexes, which on paper do adapt well to differences between disk and cloud-based environment: their fetch granularities and lack of notable intra-query dependencies aligns with the large optimal fetch sizes and minimizes costly round-trips (i.e., as opposed to graph-based indexes) to remote storage, respectively.\nThis paper systematically studies cloud-native vector search: What and how should indexes be built and used for on-cloud vector search? We analyze bottlenecks of two common index classes, cluster and graph indexes, on remote storage, and show that despite current standardized adoption of cluster indexes on the cloud, graph indexes are favored in workloads requiring high concurrency and recall, or operating on high-dimensional data or large datatypes. We further find that on-cloud search demands significantly different indexing and search parameterizations versus on-disk search for optimal performance. Finally, we incorporate existing cloud-based caching setups into vector search and find that certain index optimizations work against caching, and study how this can be mitigated to maximize gains under various available cache sizes.",
+    "publicationDate": "2025-11-18T18:50:15.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2505.05885",
+    "title": "Cost-Effective, Low Latency Vector Search with Azure Cosmos DB",
+    "abstract": "Vector indexing enables semantic search over diverse corpora and has become an important interface to databases for both users and AI agents. Efficient vector search requires deep optimizations in database systems. This has motivated a new class of specialized vector databases that optimize for vector search quality and cost. Instead, we argue that a scalable, high-performance, and cost-efficient vector search system can be built inside a cloud-native operational database like Azure Cosmos DB while leveraging the benefits of a distributed database such as high availability, durability, and scale. We do this by deeply integrating DiskANN, a state-of-the-art vector indexing library, inside Azure Cosmos DB NoSQL. This system uses a single vector index per partition stored in existing index trees, and kept in sync with underlying data. It supports &lt; 20ms query latency over an index spanning 10 million vectors, has stable recall over updates, and offers approximately 43x and 12x lower query cost compared to Pinecone and Zilliz serverless enterprise products. It also scales out to billions of vectors via automatic partitioning. This convergent design presents a point in favor of integrating vector indices into operational databases in the context of recent debates on specialized vector databases, and offers a template for vector indexing in other databases.",
+    "publicationDate": "2025-05-09T08:53:59.000Z",
+    "votes": 20
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.20018",
+    "title": "MINT: Multi-Vector Search Index Tuning",
+    "abstract": "Vector search plays a crucial role in many real-world applications. In addition to single-vector search, multi-vector search becomes important for multi-modal and multi-feature scenarios today. In a multi-vector database, each row is an item, each column represents a feature of items, and each cell is a high-dimensional vector. In multi-vector databases, the choice of indexes can have a significant impact on performance. Although index tuning for relational databases has been extensively studied, index tuning for multi-vector search remains unclear and challenging. In this paper, we define multi-vector search index tuning and propose a framework to solve it. Specifically, given a multi-vector search workload, we develop algorithms to find indexes that minimize latency and meet storage and recall constraints. Compared to the baseline, our latency achieves 2.1X to 8.3X speedup.",
+    "publicationDate": "2025-04-28T17:36:06.000Z",
+    "votes": 19
+  }
+]

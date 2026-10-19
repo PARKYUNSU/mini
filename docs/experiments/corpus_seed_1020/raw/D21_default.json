@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.20122",
+    "title": "XViewRank: Overlap-Conditioned Score Fusion for LLM-Augmented Sparse Retrieval",
+    "abstract": "Large language models can reduce vocabulary mismatch in sparse retrieval by generating alternative views of a query. Once these views are searched independently, however, their ranked lists may be complementary, redundant, or affected by query drift, making fixed fusion suboptimal. We present XViewRank, a lightweight retrieval-side method for conditionally fusing BM25 results from an original query, a hypothesis view, and a step-back view. For each pooled candidate, XViewRank retains three normalized BM25 scores and three query-level overlaps between the retrieved result sets. A small nonlinear scorer uses the overlaps as context that changes how the view-specific scores are interpreted, without jointly encoding query and passage text. Under a matched-input protocol, XViewRank improves nDCG@10 and MAP numerically over reciprocal rank fusion on both TREC DL 2019 and 2020, with a statistically significant MAP gain on DL19. Additional analyses show that the clearest benefit occurs when the view rankings have low agreement, while the evidence on DL20 is weaker. The results support overlap-conditioned score fusion as a compact retrieval-side alternative to fixed fusion, while also delimiting where its advantage is empirically established.",
+    "publicationDate": "2026-10-14T12:44:51.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.15143",
+    "title": "Top-K Is Not a Budget for Hybrid Retrieval",
+    "abstract": "Modern hybrid retrieval for RAG typically fuses the Top-$L$ results from dense and sparse retrievers, but a fixed truncation depth may not transfer across changing queries and corpora. Exact fusion removes the dependence on a fixed depth, yet completing a specified Top-$K$ still incurs variable access costs. We present DiBud, which takes an access budget directly as input and incrementally certifies and returns an exact prefix of the RRF ranking over the full lists. Selective access increases certified output within the budget, while budgeted stopping bounds accesses per request. Experiments on five query sets reveal long-tailed costs for completing exact Top-20. At a budget of 2048 accesses, DiBud increases mean certified output within the first 100 positions by 7.86% over balanced access. After budget calibration for 95% quality retention, held-out queries retain 95.05%--97.68% of mean nDCG@20 while using 65.92%--99.53% fewer accesses than completing exact Top-20.",
+    "publicationDate": "2026-09-14T07:18:40.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.15851",
+    "title": "Query Expansion Should Be Coordinated: Dense Expands, Sparse Anchors",
+    "abstract": "Retrieval-augmented generation (RAG) systems rely on retrieval modules to ground large language model (LLM) outputs. LLM-based query expansion enriches retrieval with document-like passages, but evaluations of hybrid retrieval often fuse fixed top-L prefixes of dense and sparse rankings. Because L controls cross-channel contributions and ranking access, it can alter measured expansion gains. We therefore evaluate complete-list effectiveness and record per-channel replay stopping depths required to certify the ordered top-K. This changes the design: because both rankings determine the fused result, their query constructions should be coordinated rather than designed independently. We present DESA (Dense Expansion and Sparse Anchoring), which shares generated references across channels but specializes their integration. Orthogonal residual expansion adds new semantic directions to the dense query, whereas score-product anchoring reorders the original sparse support without admitting expansion-only matches. The same references thus play complementary roles: Dense expands; Sparse anchors. Across seven BEIR datasets, DESA improves nDCG@10 and Recall@20 over the unexpanded query by 3.82% and 2.38%, while reducing dense and sparse replay stopping depths by 36.90% and 36.56%.",
+    "publicationDate": "2026-08-16T16:43:49.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.07152",
+    "title": "Exact Adaptive Hybrid Retrieval Without Fixed Top-L Cutoffs",
+    "abstract": "Modern retrieval-augmented generation (RAG) systems often fuse fixed Top-$L$ results from dense and sparse retrievers, treating later contributions as zero. The cutoff therefore determines both the ranking and its execution cost. Yet truncated fusion is not generally equivalent to complete-list fusion: unread cross-list ranks can change Top-$K$ membership or order even when the observed candidates contain every item in the complete-list Top-$K$. Because channel rankings vary across queries and corpus updates, a depth selected from historical queries may not transfer reliably. We propose Exact Adaptive Hybrid Retrieval (EAHR), which fixes the ordered Top-$K$ defined by complete-list weighted RRF as the retrieval target and treats channel depth as request-specific execution state. Per-Vector Scalar Quantization (PVS) and Posting Block-Max (PBM) produce resumable exact dense and sparse rankings. Fusion bounds unread contributions and requests further ranks only while they can change the Top-$K$. Every successful request therefore matches complete-list fusion without a preset Top-$L$; otherwise, execution continues safely to list exhaustion. Across five test collections and five temporal corpus snapshots, complete-list weighted RRF remained competitive, whereas fixed depths selected from historical queries did not transfer reliably. EAHR reproduced the complete-list ordered Top-20 in all 150 query-snapshot combinations. Under a warm-cache, interleaved, order-balanced protocol, the paired geometric-mean latency ratios of exhaustive batch execution to EAHR were 23.35 on TREC-DL 2019 and 30.28 on TREC-DL 2020. Anti-correlated rankings exhausted both lists, and some difficult queries were slower with EAHR. EAHR does not guarantee a speedup for every request; it fixes the exact result while adapting execution depth to the current rankings.",
+    "publicationDate": "2026-08-07T12:14:39.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.00183",
+    "title": "Evidence-Unit Fairness and the Limits of Query-Adaptive Sparse-Dense Fusion in Financial Document Retrieval",
+    "abstract": "Retrieval over financial filings is difficult because queries are short and acronym-heavy while the answer-bearing evidence sits inside long, table-dense documents. We study sparse-dense hybrid retrieval on FinDER, a benchmark of expert-annotated questions over corporate 10-K filings. Our first finding is methodological: if the retrieval unit is larger than the dense encoder's input window, the dense model never sees a large share of the labeled evidence, confounding comparison against a full-text sparse baseline. We measure this directly and reduce the imbalance with windows chosen for the encoder budget. On this corpus, fusing BM25 and a compact dense encoder improves reference-level Hit@10 by roughly 28 percent over either component, and training-free, untuned reciprocal rank fusion exceeds the equal-weight blend in an exploratory comparison. We then ask whether choosing the fusion weight per query helps: an oracle over the interpolation-weight grid shows headroom of 21.8 percent, yet none of the three lightweight adaptive routers (a score-confidence heuristic, a random forest over query features, and a ridge regressor over query embeddings) establishes a statistically reliable improvement over the fixed blend under company-grouped cross-validation with cluster-robust inference. Simple fusion is a strong baseline here, and we discuss why per-query weighting does not capture the available headroom.",
+    "publicationDate": "2026-07-31T18:06:58.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.13728",
+    "title": "Hybrid Retrieval for COVID-19 Literature: Comparing Rank Fusion and Projection Fusion with Diversity Reranking",
+    "abstract": "We present a hybrid retrieval system for COVID-19 scientific literature, evaluated on the TREC-COVID benchmark (171,332 papers, 50 expert queries). The system implements six retrieval configurations spanning sparse (SPLADE), dense (BGE), rank-level fusion (RRF), and a projection-based vector fusion (B5) approach. RRF fusion achieves the best relevance (nDCG@10 = 0.828), outperforming dense-only by 6.1% and sparse-only by 14.9%. Our projection fusion variant reaches nDCG@10 = 0.678 on expert queries while being 33% faster (847 ms vs. 1271 ms) and producing 2.2x higher ILD@10 than RRF. Evaluation across 400 queries -- including expert, machine-generated, and three paraphrase styles -- shows that B5 delivers the largest relative gain on keyword-heavy reformulations (+8.8%), although RRF remains best in absolute nDCG@10. On expert queries, MMR reranking increases intra-list diversity by 23.8-24.5% at a 20.4-25.4% nDCG@10 cost. Both fusion pipelines evaluated for latency remain below the sub-2 s target across all query sets. The system is deployed as a Streamlit web application backed by Pinecone serverless indices.",
+    "publicationDate": "2026-04-15T11:05:46.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.16351",
+    "title": "Training for Compositional Sensitivity Reduces Dense Retrieval Generalization",
+    "abstract": "Dense retrieval compresses texts into single embeddings ranked by cosine similarity. While efficient for recall, this interface is brittle for identity-level matching: minimal compositional edits (negation, role swaps) flip meaning yet retain high similarity. Motivated by geometric results for unit-sphere cosine spaces (Kang et al., 2025), we test this retrieval-composition tension in text-only retrieval. Across four dual-encoder backbones, adding structure-targeted negatives consistently reduces zero-shot NanoBEIR retrieval (8-9% mean nDCG@10 drop on small backbones; up to 40% on medium ones), while only partially improving pooled-space separation. Treating pooled cosine as a recall interface, we then benchmark verifiers scoring token--token cosine maps. MaxSim (late interaction) excels at reranking but fails to reject structural near-misses, whereas a small Transformer over similarity maps reliably separates near-misses under end-to-end training.",
+    "publicationDate": "2026-03-16T20:25:39.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.15518",
+    "title": "DS@GT at TREC TOT 2025: Bridging Vague Recollection with Fusion Retrieval and Learned Reranking",
+    "abstract": "We develop a two-stage retrieval system that combines multiple complementary retrieval methods with a learned reranker and LLM-based reranking, to address the TREC Tip-of-the-Tongue (ToT) task. In the first stage, we employ hybrid retrieval that merges LLM-based retrieval, sparse (BM25), and dense (BGE-M3) retrieval methods. We also introduce topic-aware multi-index dense retrieval that partitions the Wikipedia corpus into 24 topical domains. In the second stage, we evaluate both a trained LambdaMART reranker and LLM-based reranking. To support model training, we generate 5000 synthetic ToT queries using LLMs. Our best system achieves recall of 0.66 and NDCG@1000 of 0.41 on the test set by combining hybrid retrieval with Gemini-2.5-flash reranking, demonstrating the effectiveness of fusion retrieval.",
+    "publicationDate": "2026-01-21T23:09:17.000Z",
+    "votes": 3
+  }
+]

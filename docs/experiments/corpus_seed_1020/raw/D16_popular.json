@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2504.01346",
+    "title": "RAG over Tables: Hierarchical Memory Index, Multi-Stage Retrieval, and Benchmarking",
+    "abstract": "Retrieval-Augmented Generation (RAG) enhances Large Language Models (LLMs) by integrating them with an external knowledge base to improve the answer relevance and accuracy. In real-world scenarios, beyond pure text, a substantial amount of knowledge is stored in tables, and user questions often require retrieving answers that are distributed across multiple tables. Retrieving knowledge from a table corpora (i.e., various individual tables) for a question remains nascent, at least, for (i) how to understand intra- and inter-table knowledge effectively, (ii) how to filter unnecessary tables and how to retrieve the most relevant tables efficiently, (iii) how to prompt LLMs to infer over the retrieval, (iv) how to evaluate the corresponding performance in a realistic setting. Facing the above challenges, in this paper, we first propose a table-corpora-aware RAG framework, named T-RAG, which consists of the hierarchical memory index, multi-stage retrieval, and graph-aware prompting for effective and efficient table knowledge retrieval and inference. Further, we first develop a multi-table question answering benchmark named MultiTableQA, which spans 3 different task types, 57,193 tables, and 23,758 questions in total, and the sources are all from real-world scenarios. Based on MultiTableQA, we did the holistic comparison over table retrieval methods, RAG methods, and table-to-graph representation learning methods, where T-RAG shows the leading accuracy, recall, and running time performance. Also, under T-RAG, we evaluate the inference ability upgrade of different LLMs. Code and Data are available at this https URL",
+    "publicationDate": "2025-04-02T04:24:41.000Z",
+    "votes": 169
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.12345",
+    "title": "General Table Question Answering via Answer-Formula Joint Generation",
+    "abstract": "Advanced table question answering (TableQA) methods prompt large language models (LLMs) to generate answer text, SQL query, Python code, or custom operation, which impressively improve the complex reasoning problems in the TableQA task. However, these methods lack the versatility to cope with specific question types or table structures. In contrast, the Spreadsheet Formula, the widely used and well-defined operation language for tabular data, has not been thoroughly explored to solve TableQA. In this paper, we first attempt to use the Formula as the executable representation for solving complex reasoning on tables with different structures. Specifically, we construct \\texttt{FromulaQA}, a large Formula-annotated TableQA dataset from existing datasets. In addition, we propose \\texttt{TabAF}, a general table answering framework to solve multiple types of tasks over multiple types of tables simultaneously, which decodes answers and Formulas with a single LLM backbone. Extensive experiments demonstrate the versatility and generalization of \\texttt{TabAF}. Under the same model size, \\texttt{TabAF} achieves new state-of-the-art performance on the WikiTableQuestion, HiTab, and TabFact.",
+    "publicationDate": "2025-03-16T03:51:06.000Z",
+    "votes": 34
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2407.05952",
+    "title": "H-STAR: LLM-driven Hybrid SQL-Text Adaptive Reasoning on Tables",
+    "abstract": "Tabular reasoning involves interpreting natural language queries about\ntabular data, which presents a unique challenge of combining language\nunderstanding with structured data analysis. Existing methods employ either\ntextual reasoning, which excels in semantic interpretation but struggles with\nmathematical operations, or symbolic reasoning, which handles computations well\nbut lacks semantic understanding. This paper introduces a novel algorithm\nH-STAR that integrates both symbolic and semantic (textual) approaches in a\ntwo-stage process to address these limitations. H-STAR employs: (1) step-wise\ntable extraction using `multi-view' column retrieval followed by row\nextraction, and (2) adaptive reasoning that adapts reasoning strategies based\non question types, utilizing semantic reasoning for direct lookup and complex\nlexical queries while augmenting textual reasoning with symbolic reasoning\nsupport for quantitative and logical tasks. Our extensive experiments\ndemonstrate that H-STAR significantly outperforms state-of-the-art methods\nacross three tabular question-answering (QA) and fact-verification datasets,\nunderscoring its effectiveness and efficiency.",
+    "publicationDate": "2024-06-29T21:24:19.000Z",
+    "votes": 17
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2207.03637",
+    "title": "OmniTab: Pretraining with Natural and Synthetic Data for Few-shot Table-based Question Answering",
+    "abstract": "The information in tables can be an important complement to text, making table-based question answering (QA) systems of great value. The intrinsic complexity of handling tables often adds an extra burden to both model design and data annotation. In this paper, we aim to develop a simple table-based QA model with minimal annotation effort. Motivated by the fact that table-based QA requires both alignment between questions and tables and the ability to perform complicated reasoning over multiple table elements, we propose an omnivorous pretraining approach that consumes both natural and synthetic data to endow models with these respective abilities. Specifically, given freely available tables, we leverage retrieval to pair them with relevant natural sentences for mask-based pretraining, and synthesize NL questions by converting SQL sampled from tables for pretraining with a QA loss. We perform extensive experiments in both few-shot and full settings, and the results clearly demonstrate the superiority of our model OmniTab, with the best multitasking approach achieving an absolute gain of 16.2% and 2.7% in 128-shot and full settings respectively, also establishing a new state-of-the-art on WikiTableQuestions. Detailed ablations and analyses reveal different characteristics of natural and synthetic data, shedding light on future directions in omnivorous pretraining. Code, pretraining data, and pretrained models are available at this https URL.",
+    "publicationDate": "2022-07-08T01:23:45.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2206.01347",
+    "title": "MultiHiertt: Numerical Reasoning over Multi Hierarchical Tabular and Textual Data",
+    "abstract": "Numerical reasoning over hybrid data containing both textual and tabular content (e.g., financial reports) has recently attracted much attention in the NLP community. However, existing question answering (QA) benchmarks over hybrid data only include a single flat table in each document and thus lack examples of multi-step numerical reasoning across multiple hierarchical tables. To facilitate data analytical progress, we construct a new large-scale benchmark, MultiHiertt, with QA pairs over Multi Hierarchical Tabular and Textual data. MultiHiertt is built from a wealth of financial reports and has the following unique characteristics: 1) each document contain multiple tables and longer unstructured texts; 2) most of tables contained are hierarchical; 3) the reasoning process required for each question is more complex and challenging than existing benchmarks; and 4) fine-grained annotations of reasoning processes and supporting facts are provided to reveal complex numerical reasoning. We further introduce a novel QA model termed MT2Net, which first applies facts retrieving to extract relevant supporting facts from both tables and text and then uses a reasoning module to perform symbolic reasoning over retrieved facts. We conduct comprehensive experiments on various baselines. The experimental results show that MultiHiertt presents a strong challenge for existing baselines whose results lag far behind the performance of human experts. The dataset and code are publicly available at this https URL.",
+    "publicationDate": "2024-12-05T03:06:42.399Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2105.07624",
+    "title": "TAT-QA: A Question Answering Benchmark on a Hybrid of Tabular and Textual Content in Finance",
+    "abstract": "Hybrid data combining both tabular and textual content (e.g., financial reports) are quite pervasive in the real world. However, Question Answering (QA) over such hybrid data is largely neglected in existing research. In this work, we extract samples from real financial reports to build a new large-scale QA dataset containing both Tabular And Textual data, named TAT-QA, where numerical reasoning is usually required to infer the answer, such as addition, subtraction, multiplication, division, counting, comparison/sorting, and the compositions. We further propose a novel QA model termed TAGOP, which is capable of reasoning over both tables and text. It adopts sequence tagging to extract relevant cells from the table along with relevant spans from the text to infer their semantics, and then applies symbolic reasoning over them with a set of aggregation operators to arrive at the final answer. TAGOPachieves 58.0% inF1, which is an 11.1% absolute increase over the previous best baseline model, according to our experiments on TAT-QA. But this result still lags far behind performance of expert human, i.e.90.8% in F1. It is demonstrated that our TAT-QA is very challenging and can serve as a benchmark for training and testing powerful QA models that address hybrid form data.",
+    "publicationDate": "2021-05-17T06:12:06.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2412.11757",
+    "title": "SCITAT: A Question Answering Benchmark for Scientific Tables and Text Covering Diverse Reasoning Types",
+    "abstract": "Scientific question answering (SQA) is an important task aimed at answering questions based on papers. However, current SQA datasets have limited reasoning types and neglect the relevance between tables and text, creating a significant gap with real scenarios. To address these challenges, we propose a QA benchmark for scientific tables and text with diverse reasoning types (SciTaT). To cover more reasoning types, we summarize various reasoning types from real-world questions. To involve both tables and text, we require the questions to incorporate tables and text as much as possible. Based on SciTaT, we propose a strong baseline (CaR), which combines various reasoning methods to address different reasoning types and process tables and text at the same time. CaR brings average improvements of 12.9% over other baselines on SciTaT, validating its effectiveness. Error analysis reveals the challenges of SciTaT, such as complex numerical calculations and domain knowledge.",
+    "publicationDate": "2024-12-16T13:21:57.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2312.09039",
+    "title": "TAP4LLM: Table Provider on Sampling, Augmenting, and Packing  Semi-structured Data for Large Language Model Reasoning",
+    "abstract": "Table reasoning tasks have shown remarkable progress with the development of\nlarge language models (LLMs), which involve interpreting and drawing\nconclusions from tabular data based on natural language (NL) questions.\nExisting solutions mainly tested on smaller tables face scalability issues and\nstruggle with complex queries due to incomplete or dispersed data across\ndifferent table sections. To alleviate these challenges, we propose TAP4LLM as\na versatile pre-processor suite for leveraging LLMs in table-based tasks\neffectively. It covers several distinct components: (1) table sampling to\ndecompose large tables into manageable sub-tables based on query semantics, (2)\ntable augmentation to enhance tables with additional knowledge from external\nsources or models, and (3) table packing & serialization to convert tables into\nvarious formats suitable for LLMs' understanding. In each module, we design and\ncompare several common methods under various usage scenarios, aiming to shed\nlight on the best practices for leveraging LLMs for table-reasoning tasks. Our\nexperiments show that our method improves LLMs' reasoning capabilities in\nvarious tabular tasks and enhances the interaction between LLMs and tabular\ndata by employing effective pre-processing.",
+    "publicationDate": "2023-12-14T15:37:04.000Z",
+    "votes": 8
+  }
+]

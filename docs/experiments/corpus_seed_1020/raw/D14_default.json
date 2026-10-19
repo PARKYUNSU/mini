@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.19536",
+    "title": "Typed Decision Models on Tabular Data",
+    "abstract": "Typed decision models are language models that answer a question with a fixed set of possible answers by returning a probability for each answer instead of generating text. We study them on tabular data and compare four decision models with three large language models (LLMs) on row classification, fact verification and anomaly detection. Every request is sent in its original form and under 21 types of rewrite that keep its content, such as renaming the options or writing the table in another format. The decision models perform as well as the LLMs at a lower cost. Three of them are also far more robust to how the question is formulated. No model we test is robust to how the table is organized. For every model, at least a third of the row decisions change under some rewrite of the table or the question. The decisions to which a decision model gives low probability are the ones most likely to change. Decision models are a practical choice for tabular decisions, but their robustness remains an open problem.",
+    "publicationDate": "2026-10-14T03:54:19.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.23966",
+    "title": "From Tables to Quantified Statements: Evaluating LLM Inference Generation through Executable Verification",
+    "abstract": "LLMs can generate fluent descriptions from tables, but their outputs may remain logically unsupported by the structured data. We introduce STAT-TO-TEXT, a controlled task in which LLMs generate quantified natural language inferences from statistical tables using quantified constructions such as all, some, no, and most. To evaluate these inferences, we use an LLM generated Python checker code which when executed verifies the corresponding truth conditions against the table. We compare four open-weight LLMs across model families and scales, evaluating faithfulness, logical accuracy, table coverage, and diversity. Our results show that model scale and family matter, with the largest model (GPT-OSS-120B) consistently producing the most faithful inferences without sacrificing greater table coverage and quantifier diversity, as opposed to smaller models. These findings are supported by human annotation, which shows that the automated checker closely aligns with human judgments.",
+    "publicationDate": "2026-09-21T00:36:36.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.09578",
+    "title": "TABVERSE: Benchmarking Cross-Format Table Understanding in LLMs and VLMs",
+    "abstract": "Large Language Models (LLMs) and Vision-Language Models (VLMs) are increasingly evaluated on table reasoning tasks, but the role of table representation remains under-explored. In practice, the same table content may appear in different structural formats, such as HTML, Markdown, and LaTeX, or as rendered images. However, existing evaluations often let content, format, layout, and modality vary together, making it difficult to isolate representation effects. We introduce TABVERSE, a controlled multimodal table benchmark that aligns the same table content across multiple structural formats and rendered images, with question category and difficulty tags. This design enables systematic evaluation of representation effects while holding table content fixed. We evaluate LLMs and VLMs across three tasks: Question Answering (QA), Structural Understanding Capability (SUC), and Structure Reconstruction (SR). Our results show that representation choice substantially affects table understanding. Models generally perform better with structured text than with rendered images, but the size of this gap depends on the task, model, and format. HTML is often the most robust text format, while row-sensitive structural tasks and syntactically usable LaTeX reconstruction remain challenging. These findings show that table representation is a key factor in reliable table evaluation.",
+    "publicationDate": "2026-06-08T14:52:46.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.29676",
+    "title": "Notation Matters: A Benchmark Study of Token-Optimized Formats in Agentic AI Systems",
+    "abstract": "Large language models in Agentic AI systems consume tool schemas and execution results and emit tool invocations as structured data. The default language for that exchange, JSON, was designed for application-to-application interchange rather than token efficiency, so its structural elements impose substantial token overhead. Recent work proposes token-optimized alternatives such as TOON (Token-Oriented Object Notation) and TRON (Token Reduced Object Notation) as more compact replacements, but these formats have been evaluated only on isolated comprehension or generation tasks. Whether their token reductions hold inside end-to-end agentic loops therefore remains an open question. We evaluate TOON and TRON on four agentic benchmarks (BFCL, MCPToolBenchPP, MCP-Universe, StableToolBench) and five open-weight LLMs, decoupling input compression from output compression to measure comprehension and generation independently. TRON reduces tokens by up to 27% with accuracy within 14pp of the JSON baseline. TOON achieves up to 18% reduction at a similar 9pp accuracy cost, but additionally cascades on multi-turn parsing failures and collapses parallel tool-call output for most models. The code is available at: this https URL",
+    "publicationDate": "2026-05-28T09:38:13.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.24040",
+    "title": "Improving Robustness of Tabular Retrieval via Representational Stability",
+    "abstract": "Transformer-based table retrieval systems flatten structured tables into token sequences, making retrieval sensitive to the choice of serialization even when table semantics remain unchanged. We show that semantically equivalent serializations, such as $\\texttt{csv}$, $\\texttt{tsv}$, $\\texttt{html}$, $\\texttt{markdown}$, and $\\texttt{ddl}$, can produce substantially different embeddings and retrieval results across multiple benchmarks and retriever families. To address this instability, we treat serialization embedding as noisy views of a shared semantic signal and use its centroid as a canonical target representation. We show that centroid averaging suppresses format-specific variation and can recover the semantic content common to different serializations when format-induced shifts differ across tables. Empirically, centroid representations outrank individual formats in aggregate pairwise comparisons across $\\texttt{MPNet}$, $\\texttt{BGE-M3}$, $\\texttt{ReasonIR}$, and $\\texttt{SPLADE}$. We further introduce a lightweight residual bottleneck adapter on top of a frozen encoder that maps single-serialization embeddings towards centroid targets while preserving variance and enforcing covariance regularization. The adapter improves robustness for several dense retrievers, though gains are model-dependent and weaker for sparse lexical retrieval. These results identify serialization sensitivity as a major source of retrieval variance and show the promise of post hoc geometric correction for serialization-invariant table retrieval.",
+    "publicationDate": "2026-04-27T04:52:48.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.15402",
+    "title": "A Closer Look into LLMs for Table Understanding",
+    "abstract": "Despite the success of Large Language Models (LLMs) in table understanding, their internal mechanisms remain unclear. In this paper, we conduct an empirical study on 16 LLMs, covering general LLMs, specialist tabular LLMs, and Mixture-of-Experts (MoE) models, to explore how LLMs understand tabular data and perform downstream tasks. Our analysis focus on 4 dimensions including the attention dynamics, the effective layer depth, the expert activation, and the impacts of input designs. Key findings include: (1) LLMs follow a three-phase attention pattern -- early layers scan the table broadly, middle layers localize relevant cells, and late layers amplify their contributions; (2) tabular tasks require deeper layers than math reasoning to reach stable predictions; (3) MoE models activate table-specific experts in middle layers, with early and late layers sharing general-purpose experts; (4) Chain-of-Thought prompting increases table attention, further enhanced by table-tuning. We hope these findings and insights can facilitate interpretability and future research on table-related tasks.",
+    "publicationDate": "2026-03-16T15:16:38.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.05865",
+    "title": "JTON: A Token-Efficient JSON Superset with Zen Grid Tabular Encoding for Large Language Models",
+    "abstract": "When LLMs process structured data, the serialization format directly affects cost and context utilization. Standard JSON wastes tokens repeating key names in every row of a tabular array--overhead that scales linearly with row count. This paper presents JTON (JSON Tabular Object Notation), a strict JSON superset whose main idea, Zen Grid, factors column headers into a single row and encodes values with semicolons, preserving JSON's type system while cutting redundancy. Across seven real-world domains, Zen Grid reduces token counts by 15-60% versus JSON compact (28.5% average; 32% with bare_strings). Comprehension tests on 10 LLMs show a net +0.3 pp accuracy gain over JSON: four models improve, three hold steady, and three dip slightly. Generation tests on 12 LLMs yield 100% syntactic validity in both few-shot and zero-shot settings. A Rust/PyO3 reference implementation adds SIMD-accelerated parsing at 1.4x the speed of Python's json module. Code, a 683-vector test suite, and all experimental data are publicly available.",
+    "publicationDate": "2026-04-07T13:26:23.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.08548",
+    "title": "How Do Language Models Understand Tables? A Mechanistic Analysis of Cell Location",
+    "abstract": "While Large Language Models (LLMs) are increasingly deployed for table-related tasks, the internal mechanisms enabling them to process linearized two-dimensional structured tables remain opaque. In this work, we investigate the process of table understanding by dissecting the atomic task of cell location. Through activation patching and complementary interpretability techniques, we delineate the table understanding mechanism into a sequential three-stage pipeline: Semantic Binding, Coordinate Localization, and Information Extraction. We demonstrate that models locate the target cell via an ordinal mechanism that counts discrete delimiters to resolve coordinates. Furthermore, column indices are encoded within a linear subspace that allows for precise steering of model focus through vector arithmetic. Finally, we reveal that models generalize to multi-cell location tasks by multiplexing the identical attention heads identified during atomic location. Our findings provide a comprehensive explanation of table understanding within Transformer architectures.",
+    "publicationDate": "2026-02-09T11:47:34.000Z",
+    "votes": 3
+  }
+]

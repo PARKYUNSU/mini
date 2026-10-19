@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2607.24236",
+    "title": "CAGE: Cognitive Attribution Graphs for Faithful Inline Citation Generation in Long-Form Question Answering",
+    "abstract": "Long-form question answering increasingly relies on retrieved evidence to make LLM outputs verifiable, with inline citations tracing claims to source documents. However, existing systems often attach citations that are topically related but insufficient to support their claims. We identify attribution ambiguity as a structural challenge: end-to-end generation must implicitly resolve combinatorial claim--document assignments, obscuring evidential boundaries and increasing the risk of evidence-boundary overrun, where claims exceed cited support. To address this challenge, we propose CAGE (Cognitive Attribution Graphs for Citation Generation), a two-stage framework that introduces an explicit cognitive attribution map before answer generation. CAGE first trains a plug-and-play Cognitive Map Induction Model to construct answer-centered support subgraphs, aligning each semantic answer unit with supporting documents through explicit relations. A Structured Citation Reasoning Model then realizes these units as sentence-level claims with map-aligned citations. Experiments on ASQA, ELI5, and ExpertQA show that CAGE achieves state-of-the-art performance, demonstrating the effectiveness of attribution-space contraction and map-guided citation generation.",
+    "publicationDate": "2026-07-27T10:14:45.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.07130",
+    "title": "Explicit Evidence Grounding via Structured Inline Citation Generation",
+    "abstract": "As AI systems become more widely adopted, the demand for factual and faithful generation grows. Properly attributing information through citations becomes, therefore, crucial. This work introduces FullCite, a framework that, in contrast to most previous works, generates structured inline citations linking each claim to both its source document and supporting evidence. FullCite proposes three strategies to inline citation generation: prompt-based generation, constrained decoding over a citation grammar, and posthoc span alignment. Using three question answering benchmarks, namely, ASQA, BioASQ, and ExpertQA, we assess citation quality and faithfulness along three dimensions: document-level correctness, evidence span identification, and claim-citation faithfulness. Our evaluation shows that while LLMs are generally effective at identifying relevant documents, they struggle to identify the precise supporting spans within them. This gap suggests that achieving faithful attributed QA will require research to place greater emphasis on precise evidence span identification.",
+    "publicationDate": "2026-06-05T10:42:10.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.04932",
+    "title": "GenProve: Learning to Generate Text with Fine-Grained Provenance",
+    "abstract": "Large language models (LLM) often hallucinate, and while adding citations is a common solution, it is frequently insufficient for accountability as users struggle to verify how a cited source supports a generated claim. Existing methods are typically coarse-grained and fail to distinguish between direct quotes and complex reasoning. In this paper, we introduce Generation-time Fine-grained Provenance, a task where models must generate fluent answers while simultaneously producing structured, sentence-level provenance triples. To enable this, we present ReFInE (Relation-aware Fine-grained Interpretability & Evidence), a dataset featuring expert verified annotations that distinguish between Quotation, Compression, and Inference. Building on ReFInE, we propose GenProve, a framework that combines Supervised Fine-Tuning (SFT) with Group Relative Policy Optimization (GRPO). By optimizing a composite reward for answer fidelity and provenance correctness, GenProve significantly outperforms 14 strong LLMs in joint evaluation. Crucially, our analysis uncovers a reasoning gap where models excel at surface-level quotation but struggle significantly with inference-based provenance, suggesting that verifiable reasoning remains a frontier challenge distinct from surface-level citation.",
+    "publicationDate": "2026-01-08T13:30:30.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.17853",
+    "title": "CiteGuard: Faithful Citation Attribution for LLMs via Retrieval-Augmented Validation",
+    "abstract": "Large Language Models (LLMs) have emerged as powerful assistants for scientific writing. However, concerns remain about the quality and reliability of the generated text, including citation accuracy and faithfulness. While most recent work relies on methods such as LLM-as-a-Judge, the reliability of LLM-as-a-Judge alone is also in doubt. In this work, we reframe citation evaluation as a problem of citation attribution alignment, which assesses whether LLM-generated citations match those a human author would include for the same text. We propose CiteGuard, a retrieval-aware agent framework designed to provide more faithful grounding for citation validation. CiteGuard improves over the prior baseline by 10 percentage points and achieves up to 68.1% accuracy on the CiteME benchmark, approaching human performance (69.2%). It also identifies alternative valid citations and demonstrates generalization ability for cross-domain citation attribution. Our code is available at this https URL.",
+    "publicationDate": "2025-10-15T00:32:26.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2502.09604",
+    "title": "SelfCite: Self-Supervised Alignment for Context Attribution in Large Language Models",
+    "abstract": "We introduce SelfCite, a novel self-supervised approach that aligns LLMs to generate high-quality, fine-grained, sentence-level citations for the statements in their generated responses. Instead of only relying on costly and labor-intensive annotations, SelfCite leverages a reward signal provided by the LLM itself through context ablation: If a citation is necessary, removing the cited text from the context should prevent the same response; if sufficient, retaining the cited text alone should preserve the same response. This reward can guide the inference-time best-of-N sampling strategy to improve citation quality significantly, as well as be used in preference optimization to directly fine-tune the models for generating better citations. The effectiveness of SelfCite is demonstrated by increasing citation F1 up to 5.3 points on the LongBench-Cite benchmark across five long-form question answering tasks. The source code is available at this https URL",
+    "publicationDate": "2025-02-13T18:55:13.000Z",
+    "votes": 45
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.00004",
+    "title": "C$^2$-Cite: Contextual-Aware Citation Generation for Attributed Large Language Models",
+    "abstract": "The attribution technique enhances the credibility of LLMs by adding citations to the generated sentences, enabling users to trace back to the original sources and verify the reliability of the output. However, existing instruction-tuned attributed LLMs often fail to properly interpret the contextual semantics of citation symbols (e.g., [i]) during text generation. This shortcoming arises from their insufficient awareness of the context information surrounding citation markers, which in turn leads to disjointed references and poor integration of retrieved knowledge into the generated content. To address this issue, we propose a novel \\textbf{C}ontextual-aware \\textbf{C}itation generation framework (\\textbf{C$^2$}-\\textbf{Cite}) that explicitly integrates the semantic relationships between citation markers and their referenced content. Specifically, a contextual citation alignment mechanism is adopted: it first encodes the retrieved document contexts into the symbol representation of citations, then aligns the marker numbers by decoding information from a citation router function. This mechanism enables the transformation of citation markers from generic placeholders into active knowledge pointers that link to the referenced source information. Experimental results on the ALCE benchmark across three datasets validate our framework C$^2$-Cite++: it outperforms the SOTA baseline by an average of 5.8\\% in citation quality and 17.4\\% in response correctness. The implementation is publicly available at this https URL",
+    "publicationDate": "2025-11-19T15:46:25.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.21557",
+    "title": "Generation-Time vs. Post-hoc Citation: A Holistic Evaluation of LLM Attribution",
+    "abstract": "Trustworthy Large Language Models (LLMs) must cite human-verifiable sources in high-stakes domains such as healthcare, law, academia, and finance, where even small errors can have severe consequences. Practitioners and researchers face a choice: let models generate citations during decoding, or let models draft answers first and then attach appropriate citations. To clarify this choice, we introduce two paradigms: Generation-Time Citation (G-Cite), which produces the answer and citations in one pass, and Post-hoc Citation (P-Cite), which adds or verifies citations after drafting. We conduct a comprehensive evaluation from zero-shot to advanced retrieval-augmented methods across four popular attribution datasets and provide evidence-based recommendations that weigh trade-offs across use cases. Our results show a consistent trade-off between coverage and citation correctness, with retrieval as the main driver of attribution quality in both paradigms. P-Cite methods achieve high coverage with competitive correctness and moderate latency, whereas G-Cite methods prioritize precision at the cost of coverage and speed. We recommend a retrieval-centric, P-Cite-first approach for high-stakes applications, reserving G-Cite for precision-critical settings such as strict claim verification. Our codes and human evaluation results are available at this https URL",
+    "publicationDate": "2025-09-25T20:39:26.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.11394",
+    "title": "VeriCite: Towards Reliable Citations in Retrieval-Augmented Generation via Rigorous Verification",
+    "abstract": "Retrieval-Augmented Generation (RAG) has emerged as a crucial approach for enhancing the responses of large language models (LLMs) with external knowledge sources. Despite the impressive performance in complex question-answering tasks, RAG still struggles with hallucinations. Attributing RAG-generated content through in-line citations has demonstrated potential in reducing hallucinations and facilitating human verification. Existing citation generation methods primarily rely on either fine-tuning the generator or employing post-processing approaches for citation matching. However, the former approach demands substantial annotated data and computational resources, while the latter often encounters difficulties in managing multiple citations and frequently produces suboptimal results. In this paper, we introduce a novel framework, called VeriCite, designed to rigorously validate supporting evidence and enhance answer attribution. Specifically, VeriCite breaks down into a three-stage generation: 1) The initial answer generation first generates a response based on all available contexts and has its claims verified through the NLI model; 2) the supporting evidence selection assesses the utility of each document and extracts useful supporting evidences; 3) the final answer refinement integrates the initial response and collected evidences to produce the final, refined this http URL conduct experiments across five open-source LLMs and four datasets, demonstrating that VeriCite can significantly improve citation quality while maintaining the correctness of the answers.",
+    "publicationDate": "2025-10-13T13:38:54.000Z",
+    "votes": 6
+  }
+]

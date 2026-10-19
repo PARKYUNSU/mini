@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.18122",
+    "title": "Cheap, Consistent, Calibrated, but Biased? Typed Decision Models as Judges",
+    "abstract": "Typed decision models (TDMs) return a probability for each allowed answer instead of generating text, which makes them candidates for cheaply replacing LLM judges that compare two answers. Whether they share the biases of LLM judges is untested. We run the CALM benchmark's bias tests on eight TDMs and seven LLM judges of 2024 and 2026. Every TDM is biased, in three to eight of twelve tests. Emotional tone affects them most, and rewriting the better answer in such a tone lowers the accuracy of a typical TDM from 99% to 42%. TDMs are more biased than 2026 LLM judges. All eight change verdicts when the answers swap places, which the 2026 LLM judges hardly do, and several side with an answer that most people allegedly prefer or that a famous model allegedly wrote. Yet both kinds of judge are tripped up by the same prompts. The TDMs' probabilities show that most tests mainly flip verdicts the TDM was unsure of, and that good calibration does not protect against bias. As TDMs are more consistent and 37 times cheaper than 2026 LLM judges, our results suggest they can be attractive judges if their biases are tested for the task.",
+    "publicationDate": "2026-10-13T10:35:17.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.11067",
+    "title": "When Noise Fabricates Bias: The Fragility of LLM-as-a-Judge Bias Measurement under Noisy Text",
+    "abstract": "Large language models are increasingly used as judges to measure social bias in text, yet the passages they judge are often noisy, containing typos, informal spelling, and broken punctuation. The consequences of such surface noise for social bias measurement remain unclear. To investigate this question, we apply five realistic noise conditions at multiple intensity levels to 3,822 stereotype-related responses and compare the resulting bias judgments with those on the original text. We find that such surface noise does not degrade bias measurement symmetrically: it is far more likely to turn neutral judgments into biased ones than biased judgments into neutral ones, by up to a 120x margin. We further observe two non-obvious effects across four LLM judges: in the most fragile judge the distortion is at its purest at mild, realistic noise levels, where erasure is scarcest, and as judges grow robust it attenuates toward parity rather than reversing. Bias measured on noisy text is therefore systematically overestimated, most in the categories that matter most for fairness.",
+    "publicationDate": "2026-09-10T04:14:03.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.00054",
+    "title": "The First Token Is Not the Verdict: Hidden Costs of Reading LLM Judges Without Generating",
+    "abstract": "Reading an LLM judge's verdict from the logits of its first generated token is cheap, requires no generation, and is exactly what constrained decoding and likelihood-scoring evaluation harnesses produce. We show that this readout distorts position bias in one direction: it overstates it in every condition we test, so figures obtained this way behave as upper bounds. The mechanism is that judges do not always lead with a verdict token, on 12% to 49% of pairs for three Qwen3 judges and under 3% for Llama-3.1-8B and Phi-3.5-mini, and forcing a read on those pairs returns whichever response was shown first rather than a judgment. Pooled over the 924 pairs where a judge did not commit, the forced read flips on 89.7% of them when the responses are swapped, against 47.5% read after generation (paired difference +0.422, 95% CI [+0.365, +0.467]). The distortion is specific to what is measured: it moves position bias by 42 points while moving judge accuracy by under one point in seven of ten conditions, so it misleads whoever audits a judge rather than whoever uses one. A second, smaller failure occurs even when the judge does lead with a verdict token, since it sometimes opens with one letter and reasons its way to the other, on 0 to 5.5% of pairs at a rate uncorrelated with compliance. We recommend reporting the rate at which a judge leads with a verdict token, which costs one forward pass and no labels, alongside any position-bias figure.",
+    "publicationDate": "2026-09-04T00:45:28.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.09887",
+    "title": "When Does Defendant Statement Matter? A Study of Bias and Persuasion in LLM-Simulated Jurors",
+    "abstract": "LLMs have been used to simulate human decision-making in professional settings, yet their behaviors in common-law jury trials remain unexplored. We study when and how a defendant's courtroom statement affects LLM-simulated jurors, focusing on persuasion, ideological bias, and background-based affinity. To support the analysis, we introduce JuryBench, a benchmark containing controversial criminal cases in U.S. criminal law. In each case, a defendant can claim various plausible justifications to support acquittal or reduced liability. We fix the base case and design defendants of different backgrounds, who give courtroom statements with varying emotional appeal or rebuttal. Jurors with diverse ideological profiles across the spectrum are simulated. We examine 20 frontier LLMs, resulting in a total of 432K decisions and rationales, and quantify changes in verdict severity. Our findings show that LLM-jury simulation echoes many human-jury findings. First, emotional persuasion can be detrimental, since jurors may perceive it as evidence of guilt or inconsistency. Next, we show that background fit between jurors and defendants is a stronger and significant factor than other isolated factors, and that jurors are in general harsher toward opposite-background defendants and lenient toward same-background ones. Finally, we find that juror ideology also strongly shapes severity judgments. These findings highlight both the promise and risks of using LLMs to model jury reasoning and call for careful evaluation. The data and code are available at this https URL",
+    "publicationDate": "2026-09-09T08:43:34.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.16253",
+    "title": "Second-Order Response Laws for LLM Judges: Debiased Estimation of Prompt Instability",
+    "abstract": "LLM judges are often evaluated with a single prompt and only a few repeated calls. When their verdicts vary, it remains unclear whether the variation comes from sampling noise within a prompt or systematic differences across prompts. We formalize this distinction using a second-order response law: the distribution of prompt-conditioned verdict distributions induced by a declared prompt policy. For a quadratic measure of prompt instability, we show that the usual plug-in estimator is biased upward at finite repeat budgets because it confounds within-prompt noise with between-prompt variation. We derive unbiased estimators for both sampled prompts and declared fixed prompt censuses from the difference between within- and across-prompt agreement. Under a crossed prompt-by-answer-order design, the same framework separates prompt, order, interaction, and residual call variation, while retaining invalid completed outputs as outcomes. Known-law simulations and a byte-identical live null recover the predicted finite-$R$ inflation. In a matched Qwen study, corrected low-repeat estimates are closer to an independently acquired $R=16$ reference than plug-in estimates, with the largest gains at small repeat budgets. A matched panel across four frozen judge configurations exhibits configuration-specific inflation magnitudes and component profiles. Prompt robustness can therefore be estimated separately from finite-call noise.",
+    "publicationDate": "2026-08-17T08:25:43.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.12387",
+    "title": "Query Timing Produces Opposite Positional Biases Between LLMs and Humans",
+    "abstract": "Positional biases such as recency and primacy effects have been documented in large language models (LLMs), yet the underlying mechanism by which these models make their evaluations remains poorly understood. Both primacy and recency biases have been observed in human judgments in response to evidence, but recent work suggest that \\emph{when} the listener updates their beliefs -- during the presentation of evidence or only at the end -- influences the presence of such effects. We investigate whether a similar phenomenon holds for LLMs, finding divergence from human behavior. These biases are more exacerbated in newer models compared to their predecessors.",
+    "publicationDate": "2026-08-01T03:23:52.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.08535",
+    "title": "When the Judge Changes, So Does the Measurement: Auditing LLM-as-Judge Reliability",
+    "abstract": "An LLM-as-judge score can move even when the candidate responses stay fixed, simply because the evaluator has changed. We treat this evaluator-replacement ambiguity as a measurement-validity problem. Across four judgment datasets, we compare two upgrade paths available in practice: scaling Qwen3 dense judges from 1.7B to 32B parameters and moving across MiniMax M2-M2.7 released APIs. The main pattern is that judge upgrades are not interchangeable: only Qwen3 1.7B to 4B gives a robust adjacent gain, while MiniMax adjacent releases do not. Stronger judges reduce but do not remove position and verbosity bias. Repeated-sample juries add little when errors are correlated. Structured debate can move decisions substantially, but without parser and fallback logs those shifts cannot be attributed to deliberation. We argue that LLM-as-judge reports should include dataset slices, bias probes, error-dependence estimates, and protocol audit trails.",
+    "publicationDate": "2026-07-09T14:31:05.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.24585",
+    "title": "LLMs Prompted for Legal Context Object More: Overrefusal from Small On-Premises LLMs in Criminal Legal Context",
+    "abstract": "While the validity of LLMs' use in the legal context remains subject to ethical and legal debate, legal professionals are already experimenting with personal LLMs, if only for translation and reformulation. However, even such a seemingly innocuous use can introduce biases through case processing speed if LLM assistants selectively refuse assistance on certain topics. To better anticipate such biases, we investigate several modern small LLMs that are most likely to be used as on-device assistants, to assess the impact of overrefusal on legal prompts.\nSurprisingly, we find that authority-style prefixes (``you are acting as an assistant of the national supreme court'', ``[...] defense lawyer'') systematically increase refusal rates by 2--20x over the no-prefix baseline, while a known role-play jailbreak prefix shows mixed effects, sharply increasing refusals in some models and barely shifting them in others. The finding suggests that small on-prem deployable LLMs are unstable under contextual framings that a real institutional user might naturally introduce, and further investigation is essential to minimize opportunities for bias.",
+    "publicationDate": "2026-06-23T13:47:07.000Z",
+    "votes": 0
+  }
+]

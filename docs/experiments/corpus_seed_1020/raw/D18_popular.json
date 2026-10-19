@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2506.07315",
+    "title": "Towards Competent AI for Fundamental Analysis in Finance: A Benchmark Dataset and Evaluation",
+    "abstract": "Generative AI, particularly large language models (LLMs), is beginning to transform the financial industry by automating tasks and helping to make sense of complex financial information. One especially promising use case is the automatic creation of fundamental analysis reports, which are essential for making informed investment decisions, evaluating credit risks, guiding corporate mergers, etc. While LLMs attempt to generate these reports from a single prompt, the risks of inaccuracy are significant. Poor analysis can lead to misguided investments, regulatory issues, and loss of trust. Existing financial benchmarks mainly evaluate how well LLMs answer financial questions but do not reflect performance in real-world tasks like generating financial analysis reports. In this paper, we propose FinAR-Bench, a solid benchmark dataset focusing on financial statement analysis, a core competence of fundamental analysis. To make the evaluation more precise and reliable, we break this task into three measurable steps: extracting key information, calculating financial indicators, and applying logical reasoning. This structured approach allows us to objectively assess how well LLMs perform each step of the process. Our findings offer a clear understanding of LLMs current strengths and limitations in fundamental analysis and provide a more practical way to benchmark their performance in real-world financial settings.",
+    "publicationDate": "2025-05-22T07:06:20.000Z",
+    "votes": 26
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.08886",
+    "title": "FinAuditing: A Financial Taxonomy-Structured Multi-Document Benchmark for Evaluating LLMs",
+    "abstract": "Going beyond simple text processing, financial auditing requires detecting semantic, structural, and numerical inconsistencies across large-scale disclosures. As financial reports are filed in XBRL, a structured XML format governed by accounting standards, auditing becomes a structured information extraction and reasoning problem involving concept alignment, taxonomy-defined relations, and cross-document consistency. Although large language models (LLMs) show promise on isolated financial tasks, their capability in professional-grade auditing remains unclear. We introduce FinAuditing, a taxonomy-aligned, structure-aware benchmark built from real XBRL filings. It contains 1,102 annotated instances averaging over 33k tokens and defines three tasks: Financial Semantic Matching (FinSM), Financial Relationship Extraction (FinRE), and Financial Mathematical Reasoning (FinMR). Evaluations of 13 state-of-the-art LLMs reveal substantial gaps in concept retrieval, taxonomy-aware relation modeling, and consistent cross-document reasoning. These findings highlight the need for realistic, structure-aware benchmarks. We release the evaluation code at this https URL and the dataset at this https URL. The task currently serves as the official benchmark of an ongoing public evaluation contest at this https URL.",
+    "publicationDate": "2025-10-10T00:41:55.000Z",
+    "votes": 10
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.19225",
+    "title": "FinTradeBench: A Financial Reasoning Benchmark for LLMs",
+    "abstract": "Financial analysis requires reasoning over heterogeneous signals, including company fundamentals from regulatory filings and trading signals derived from market prices. However, existing financial benchmarks focus almost exclusively on regulatory filings, neglecting market dynamics and cross-signal interactions. We introduce FinTradeBench, a benchmark of 1,400 questions covering NASDAQ-100 stocks over a ten-year window. To holistically evaluate financial reasoning, FinTradeBench includes questions in three reasoning categories: fundamentals-focused, trading-signal-focused, and hybrid questions that require cross-signal reasoning. Our benchmark starts with 150 expert-authored seed questions, which are then scaled to 1400. To ensure reliable evaluation, we create a Core400 subset in which every item is expert-reviewed. In zero-shot (No-RAG) response generation, we observe that all models perform substantially worse on trading-focused questions compared to fundamental-focused questions. To identify failure causes, we evaluate LLMs under controlled settings including retrieval-based baselines, tool-assisted computation, oracle conditions, and time-series-specialized pipelines. LLMs' capabilities to do computation and evidence selection contribute most to reasoning failures. Additionally, retrieval significantly improves trading-signal reasoning but does not improve fundamental reasoning, where identifying relevant signals remains the dominant failure mode. Finally, rather than relying on a small, fine-tuned model for time-series reasoning, it is better to summarize the time-series data and leverage LLMs' reasoning capabilities.",
+    "publicationDate": "2026-03-19T17:59:41.000Z",
+    "votes": 14
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.16188",
+    "title": "FinNLI: Novel Dataset for Multi-Genre Financial Natural Language  Inference Benchmarking",
+    "abstract": "We introduce FinNLI, a benchmark dataset for Financial Natural Language\nInference (FinNLI) across diverse financial texts like SEC Filings, Annual\nReports, and Earnings Call transcripts. Our dataset framework ensures diverse\npremise-hypothesis pairs while minimizing spurious correlations. FinNLI\ncomprises 21,304 pairs, including a high-quality test set of 3,304 instances\nannotated by finance experts. Evaluations show that domain shift significantly\ndegrades general-domain NLI performance. The highest Macro F1 scores for\npre-trained (PLMs) and large language models (LLMs) baselines are 74.57% and\n78.62%, respectively, highlighting the dataset's difficulty. Surprisingly,\ninstruction-tuned financial LLMs perform poorly, suggesting limited\ngeneralizability. FinNLI exposes weaknesses in current LLMs for financial\nreasoning, indicating room for improvement.",
+    "publicationDate": "2025-04-22T18:25:17.000Z",
+    "votes": 30
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.05201",
+    "title": "FAITH: A Framework for Assessing Intrinsic Tabular Hallucinations in Finance",
+    "abstract": "Hallucination remains a critical challenge for deploying Large Language Models (LLMs) in finance. Accurate extraction and precise calculation from tabular data are essential for reliable financial analysis, since even minor numerical errors can undermine decision-making and regulatory compliance. Financial applications have unique requirements, often relying on context-dependent, numerical, and proprietary tabular data that existing hallucination benchmarks rarely capture. In this study, we develop a rigorous and scalable framework for evaluating intrinsic hallucinations in financial LLMs, conceptualized as a context-aware masked span prediction task over real-world financial documents. Our main contributions are: (1) a novel, automated dataset creation paradigm using a masking strategy; (2) a new hallucination evaluation dataset derived from S&P 500 annual reports; and (3) a comprehensive evaluation of intrinsic hallucination patterns in state-of-the-art LLMs on financial tabular data. Our work provides a robust methodology for in-house LLM evaluation and serves as a critical step toward building more trustworthy and reliable financial Generative AI systems.",
+    "publicationDate": "2025-08-07T09:37:14.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.11339",
+    "title": "FinRule-Bench: A Benchmark for Joint Reasoning over Financial Tables and Principles",
+    "abstract": "Large language models (LLMs) are increasingly applied to financial analysis, yet their ability to audit structured financial statements under explicit accounting principles remains poorly explored. Existing benchmarks primarily evaluate question answering, numerical reasoning, or anomaly detection on synthetically corrupted data, making it unclear whether models can reliably verify or localize rule compliance on correct financial statements. We introduce FinRule-Bench, a benchmark for evaluating diagnostic completeness in rule-based financial reasoning over real-world financial tables. FinRule-Bench pairs ground-truth financial statements with explicit, human-curated accounting principles and spans four canonical statement types: Balance Sheets, Cash Flow Statements, Income Statements, and Statements of Equity. The benchmark defines three auditing tasks that require progressively stronger reasoning capabilities: (i) rule verification, which tests compliance with a single principle; (ii) rule identification, which requires selecting the violated principle from a provided rule set; and (iii) joint rule diagnosis, which requires detecting and localizing multiple simultaneous violations at the record level. We evaluate LLMs under zero-shot and few-shot prompting, and introduce a causal-counterfactual reasoning protocol that enforces consistency between decisions, explanations, and counterfactual judgments. Across tasks and statement types, we find that while models perform well on isolated rule verification, performance degrades sharply for rule discrimination and multi-violation diagnosis. FinRule-Bench provides a principled and reproducible testbed for studying rule-governed reasoning, diagnostic coverage, and failure modes of LLMs in high-stakes financial analysis.",
+    "publicationDate": "2026-03-11T22:11:12.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.13100",
+    "title": "LEDGER: A Long-Context Benchmark of Corporate Annual Reports for Grounded Financial Retrieval and Extraction",
+    "abstract": "Finance reporting is a natural proving ground for large language models, and the very-long-context capabilities of recent models across all sizes make rigorous evaluation in this domain an increasingly pressing need. Yet most public financial resources reduce the task to plain-text SEC 10-K filings paired with a handful of question-answer items. We release LEDGER (Long-context Evaluation of Documents for Grounded Extraction and Retrieval), a corpus of 4,999 digitized corporate annual reports - full documents with figures, tables, and narrative, not just regulatory filings. Each report is labeled with 31 consolidated financial KPIs to be extracted and linked to the market's reaction at the earnings date. From this data we derive three evaluation benchmarks spanning the difficulty spectrum: a pure page-level KPI retrieval task with TREC-style relevance judgments over 118,048 questions in natural language, a conversational \"needle-in-a-haystack\" single-value lookup, and a full KPI extraction task, both from long, numerically dense reports. We additionally provide human OCR-quality annotations with inter-annotator agreement and the complete extraction, validation, and scoring toolchain. We further demonstrate the dataset's research utility with a case study linking CEO-letter rhetoric to post-publication market impact.",
+    "publicationDate": "2026-06-11T09:28:43.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2109.00122",
+    "title": "FinQA: A Dataset of Numerical Reasoning over Financial Data",
+    "abstract": "The sheer volume of financial statements makes it difficult for humans to access and analyze a business's financials. Robust numerical reasoning likewise faces unique challenges in this domain. In this work, we focus on answering deep questions over financial data, aiming to automate the analysis of a large corpus of financial documents. In contrast to existing tasks on general domain, the finance domain includes complex numerical reasoning and understanding of heterogeneous representations. To facilitate analytical progress, we propose a new large-scale dataset, FinQA, with Question-Answering pairs over Financial reports, written by financial experts. We also annotate the gold reasoning programs to ensure full explainability. We further introduce baselines and conduct comprehensive experiments in our dataset. The results demonstrate that popular, large, pre-trained models fall far short of expert humans in acquiring finance knowledge and in complex multi-step numerical reasoning on that knowledge. Our dataset -- the first of its kind -- should therefore enable significant, new community research into complex application domains. The dataset and code are publicly available\\url{this https URL}.",
+    "publicationDate": "2021-09-01T00:08:14.000Z",
+    "votes": 28
+  }
+]

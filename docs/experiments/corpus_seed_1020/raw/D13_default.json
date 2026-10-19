@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.07622",
+    "title": "DBRAG: Multi-Table Retrieval-Augmented Generation for Complex Database Queries",
+    "abstract": "Recent advancements in large language models have introduced new capabilities for reasoning over structured data, particularly through program-aided tools that can analyze tables. However, many existing methods address single-table scenarios or assume that the relevant tables are already provided. In practice, users often issue complex data exploration queries over entire databases, where relevant information may be distributed across multiple relations. In this work, we introduce DBRAG, a retrieval-augmented generation framework tailored for multi-table question answering. DBRAG first retrieves candidate tables using an offline table index, enriches their summaries with query-relevant rows, and uses an LLM to rerank the candidates. A program-aided reasoner then selects the required tables and executes operations over their full contents, keeping the initial prompt context compact. Experiments on the Spider, GeoQuery, and ATIS datasets used in this study demonstrate improvements in table retrieval and multi-table question answering.",
+    "publicationDate": "2026-10-06T02:12:26.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.34157",
+    "title": "TableSeek: Structure-Preserving Agentic Evidence Seeking over Heterogeneous Table Corpora",
+    "abstract": "Open-domain table retrieval seeks tables that contain sufficient evidence for answering a question or verifying a claim. Yet semantic relevance is often misleading: topically similar tables may lack the required facts, while answer-bearing evidence is often confined to a few cells whose meaning depends on surrounding schema and table context. Heterogeneous schemas, value formats, and serializations further weaken one-shot matching.\nWe present TableSeek, a structure-preserving agentic search framework for heterogeneous table corpora. Instead of ranking tables once, an LLM agent iteratively follows sparse clues, inspects schema-preserving previews, identifies schema- and value-level mismatches, and refines its investigation. TableSeek uses cells and schemas as evidence anchors while retaining complete tables as evidence units, enabling fine-grained localization without losing the context required for interpretation and answerability checking.\nWithout relying on retriever training or a precomputed semantic index, TableSeek produces transparent evidence-seeking trajectories and achieves competitive end-to-end performance against strong retrieval-and-reranking pipelines on heterogeneous table benchmarks. These results suggest that active, structure-preserving evidence seeking is a promising paradigm for open-domain table retrieval.",
+    "publicationDate": "2026-09-28T02:36:25.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.27164",
+    "title": "Query Symbolically or Retrieve Semantically? A Dataset and Method for Semi-Structured Question Answering",
+    "abstract": "Retrieval-Augmented Generation (RAG) systems for question answering typically retrieve evidence by semantic similarity between the query and document chunks. While effective for unstructured text, this approach is less reliable on semi-structured corpora where answering may require exact filtering, aggregation, or exhaustive retrieval over structured attributes across multiple documents. Symbolic approaches support such operations, but they are often brittle on noisy natural-language corpora. We address this gap with DualGraph, a RAG framework that represents documents through two complementary views: a Textual Knowledge Graph for semantic retrieval and a Symbolic Knowledge Graph for symbolic querying over typed subject--predicate--object triples. Building on these two components, we provide multiple strategies for selecting or combining semantic and symbolic this http URL also introduce SpecsQA, a benchmark from a commercial shopping website with semi-structured product documents and manually curated questions spanning open-ended and specification-oriented retrieval. Experiments show that DualGraph consistently outperforms state-of-the-art dense-retrieval, GraphRAG, symbolic, and table-oriented baselines across question this http URL and data are available at this https URL.",
+    "publicationDate": "2026-05-26T15:22:42.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.31550",
+    "title": "Semantic Triplet Restoration: A Novel Protocol for Hierarchical Table Understanding in Large Language Models",
+    "abstract": "Table question answering requires models to recover semantic relations encoded implicitly by two-dimensional layout, merged cells, and hierarchical headers. Current pipelines typically use HTML or Markdown as intermediate table representations, but these layout-oriented serializations introduce markup overhead and require large language models to infer header-cell alignments from row and column spans. We propose Semantic Triplet Restoration (STR), a protocol that rewrites each cell as an atomic fact , where the item path specifies the row-wise entity, the feature path specifies the hierarchical attribute, and the value contains the cell content. We also present TripletQL, a lightweight query-aware router that uses STR to select an appropriate rendering or filtered subset of triplets for each question. Across four Chinese and English table-QA benchmarks, STR matches or improves upon HTML-based baselines while reducing input tokens. The relative benefit grows for smaller language models and longer table contexts, suggesting that explicit semantic representations are especially useful under constrained inference budgets. Code and data are available at this https URL .",
+    "publicationDate": "2026-05-29T17:10:25.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.18766",
+    "title": "Retrieve Only Relevant Tables Whether Few or Many: Adaptive Table Retrieval Method",
+    "abstract": "Retrieving relevant tables from extensive databases for a given natural language query is essential for accurately answering questions in tasks such as text-to-SQL. Existing table retrieval approaches select a pre-determined set of k tables with the highest similarity to the query. However, the number of required tables varies across queries and cannot be known in advance. Enforcing a fixed number of retrieved tables regardless of the query may either retrieve an undersized set, failing to obtain all necessary evidence, or retrieve an oversized pool, including irrelevant tables. To address this issue, we propose an adaptive table retrieval method that adjusts the number of tables retrieved according to the requirements of each query. Specifically, we utilize an adaptive thresholding mechanism to selectively retrieve tables and integrate a sliding-window reranking algorithm to efficiently process a large table corpus. Extensive experiments on Spider, BIRD, and Spider 2.0 demonstrate that our method effectively addresses the limitations of the top-k retrieval strategy, improving performance in retrieval and downstream tasks. Our code and data are available at this https URL.",
+    "publicationDate": "2026-04-12T14:53:56.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.07146",
+    "title": "Fine-Grained Table Retrieval Through the Lens of Complex Queries",
+    "abstract": "Enabling question answering over tables and databases in natural language has become a key capability in the democratization of insights from tabular data sources. These systems first require retrieval of data that is relevant to a given natural language query, for which several methods have been introduced. In this work we present and study a table retrieval mechanism devising fine-grained typed query decomposition and global connectivity-awareness (DCTR), to handle the challenges induced by open-domain question answering over relational databases in complex usage contexts. We evaluate the effectiveness of the two mechanisms through the lens of retrieval complexity which we measure along the axes of query- and data complexity. Our analyses over industry-aligned benchmarks illustrate the robustness of DCTR for highly composite queries and densely connected databases.",
+    "publicationDate": "2026-03-07T10:57:32.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.02248",
+    "title": "HELIOS: Harmonizing Early Fusion, Late Fusion, and LLM Reasoning for Multi-Granular Table-Text Retrieval",
+    "abstract": "Table-text retrieval aims to retrieve relevant tables and text to support open-domain question answering. Existing studies use either early or late fusion, but face limitations. Early fusion pre-aligns a table row with its associated passages, forming \"stars,\" which often include irrelevant contexts and miss query-dependent relationships. Late fusion retrieves individual nodes, dynamically aligning them, but it risks missing relevant contexts. Both approaches also struggle with advanced reasoning tasks, such as column-wise aggregation and multi-hop reasoning. To address these issues, we propose HELIOS, which combines the strengths of both approaches. First, the edge-based bipartite subgraph retrieval identifies finer-grained edges between table segments and passages, effectively avoiding the inclusion of irrelevant contexts. Then, the query-relevant node expansion identifies the most promising nodes, dynamically retrieving relevant edges to grow the bipartite subgraph, minimizing the risk of missing important contexts. Lastly, the star-based LLM refinement performs logical inference at the star graph level rather than the bipartite subgraph, supporting advanced reasoning tasks. Experimental results show that HELIOS outperforms state-of-the-art models with a significant improvement up to 42.6\\% and 39.9\\% in recall and nDCG, respectively, on the OTT-QA benchmark.",
+    "publicationDate": "2026-02-25T15:42:24.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.16964",
+    "title": "SAGE: Structure Aware Graph Expansion for Retrieval of Heterogeneous Data",
+    "abstract": "Retrieval-augmented question answering over heterogeneous corpora requires connected evidence across text, tables, and graph nodes. While entity-level knowledge graphs support structured access, they are costly to construct and maintain, and inefficient to traverse at query time. In contrast, standard retriever-reader pipelines use flat similarity search over independently chunked text, missing multi-hop evidence chains across modalities. We propose SAGE (Structure Aware Graph Expansion) framework that (i) constructs a chunk-level graph offline using metadata-driven similarities with percentile-based pruning, and (ii) performs online retrieval by running an initial baseline retriever to obtain k seed chunks, expanding first-hop neighbors, and then filtering the neighbors using dense+sparse retrieval, selecting k' additional chunks. We instantiate the initial retriever using hybrid dense+sparse retrieval for implicit cross-modal corpora and SPARK (Structure Aware Planning Agent for Retrieval over Knowledge Graphs) an agentic retriever for explicit schema graphs. On OTT-QA and STaRK, SAGE improves retrieval recall by 5.7 and 8.5 points over baselines.",
+    "publicationDate": "2026-02-18T23:57:19.000Z",
+    "votes": 5
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2505.15561",
+    "title": "Do RAG Systems Really Suffer From Positional Bias?",
+    "abstract": "Retrieval Augmented Generation enhances LLM accuracy by adding passages retrieved from an external corpus to the LLM prompt. This paper investigates how positional bias - the tendency of LLMs to weight information differently based on its position in the prompt - affects not only the LLM's capability to capitalize on relevant passages, but also its susceptibility to distracting passages. Through extensive experiments on three benchmarks, we show how state-of-the-art retrieval pipelines, while attempting to retrieve relevant passages, systematically bring highly distracting ones to the top ranks, with over 60% of queries containing at least one highly distracting passage among the top-10 retrieved passages. As a result, the impact of the LLM positional bias, which in controlled settings is often reported as very prominent by related works, is actually marginal in real scenarios since both relevant and distracting passages are, in turn, penalized. Indeed, our findings reveal that sophisticated strategies that attempt to rearrange the passages based on LLM positional preferences do not perform better than random shuffling.",
+    "publicationDate": "2025-05-21T14:18:01.000Z",
+    "votes": 30
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.02657",
+    "title": "Less LLM, More Documents: Searching for Improved RAG",
+    "abstract": "Retrieval-Augmented Generation (RAG) couples document retrieval with large language models (LLMs). While scaling generators often improves accuracy, it also increases inference and deployment overhead. We study an orthogonal axis: enlarging the retriever's corpus, and how it trades off with generator scale. Across multiple open-domain QA benchmarks, corpus scaling consistently strengthens RAG and can in many cases match the gains of moving to a larger model tier, though with diminishing returns at larger scales. Small- and mid-sized generators paired with larger corpora often rival much larger models with smaller corpora; mid-sized models tend to gain the most, while tiny and very large models benefit less. Our analysis suggests that these improvements arise primarily from increased coverage of answer-bearing passages, while utilization efficiency remains largely unchanged. Overall, our results characterize a corpus-generator trade-off in RAG and provide empirical guidance on how corpus scale and model capacity interact in this setting.",
+    "publicationDate": "2025-10-03T01:26:13.000Z",
+    "votes": 11
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.14123",
+    "title": "A Systematic Analysis of Chunking Strategies for Reliable Question Answering",
+    "abstract": "We study how document chunking choices impact the reliability of Retrieval-Augmented Generation (RAG) systems in industry. While practice often relies on heuristics, our end-to-end evaluation on Natural Questions systematically varies chunking method (token, sentence, semantic, code), chunk size, overlap, and context length. We use a standard industrial setup: SPLADE retrieval and a Mistral-8B generator. We derive actionable lessons for cost-efficient deployment: (i) overlap provides no measurable benefit and increases indexing cost; (ii) sentence chunking is the most cost-effective method, matching semantic chunking up to ~5k tokens; (iii) a \"context cliff\" reduces quality beyond ~2.5k tokens; and (iv) optimal context depends on the goal (semantic quality peaks at small contexts; exact match at larger ones).",
+    "publicationDate": "2026-01-20T16:19:58.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.07783",
+    "title": "Evaluating RAG Reliability under Clean, Misleading, and Mixed Retrieval",
+    "abstract": "Retrieval-Augmented Generation (RAG) is widely used to improve the factual reliability of large language models (LLMs) by grounding answers in retrieved evidence. In misinformation-rich environments, however, retrieved content may include plausible but incorrect information, raising concerns about the reliability of RAG-based information access systems.\nIn this work, we propose an evaluation protocol to systematically test how the RAG system handles conflicts between parametric knowledge and evidence retrieved from context with varying amounts of misleading information. We target correct answers to factoid questions that the model responds to correctly, even when there is no retrieval, and use this to test the system with clean, poisoned, and mixed evidence.\nThe proposed analytical framework combines parametric override and confidence metrics to assess when and how misleading information affects the generation process of LLMs. This study aims to provide insights into the robustness of RAG systems in information disorder scenarios.",
+    "publicationDate": "2026-06-05T18:54:23.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2411.07396",
+    "title": "Toward Optimal Search and Retrieval for RAG",
+    "abstract": "Retrieval-augmented generation (RAG) is a promising method for addressing some of the memory-related challenges associated with Large Language Models (LLMs). Two separate systems form the RAG pipeline, the retriever and the reader, and the impact of each on downstream task performance is not well-understood. Here, we work towards the goal of understanding how retrievers can be optimized for RAG pipelines for common tasks such as Question Answering (QA). We conduct experiments focused on the relationship between retrieval and RAG performance on QA and attributed QA and unveil a number of insights useful to practitioners developing high-performance RAG pipelines. For example, lowering search accuracy has minor implications for RAG performance while potentially increasing retrieval speed and memory efficiency.",
+    "publicationDate": "2024-11-11T22:06:51.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2407.19794",
+    "title": "Introducing a new hyper-parameter for RAG: Context Window Utilization",
+    "abstract": "This paper introduces a new hyper-parameter for Retrieval-Augmented Generation (RAG) systems called Context Window Utilization. RAG systems enhance generative models by incorporating relevant information retrieved from external knowledge bases, improving the factual accuracy and contextual relevance of generated responses. The size of the text chunks retrieved and processed is a critical factor influencing RAG performance. This study aims to identify the optimal chunk size that maximizes answer generation quality. Through systematic experimentation, we analyze the effects of varying chunk sizes on the efficiency and effectiveness of RAG frameworks. Our findings reveal that an optimal chunk size balances the trade-off between providing sufficient context and minimizing irrelevant information. These insights are crucial for enhancing the design and implementation of RAG systems, underscoring the importance of selecting an appropriate chunk size to achieve superior performance.",
+    "publicationDate": "2024-07-29T08:38:14.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2507.06838",
+    "title": "Shifting from Ranking to Set Selection for Retrieval Augmented Generation",
+    "abstract": "Retrieval in Retrieval-Augmented Generation(RAG) must ensure that retrieved passages are not only individually relevant but also collectively form a comprehensive set. Existing approaches primarily rerank top-k passages based on their individual relevance, often failing to meet the information needs of complex queries in multi-hop question answering. In this work, we propose a set-wise passage selection approach and introduce SETR, which explicitly identifies the information requirements of a query through Chain-of-Thought reasoning and selects an optimal set of passages that collectively satisfy those requirements. Experiments on multi-hop RAG benchmarks show that SETR outperforms both proprietary LLM-based rerankers and open-source baselines in terms of answer correctness and retrieval quality, providing an effective and efficient alternative to traditional rerankers in RAG systems. The code is available at this https URL",
+    "publicationDate": "2025-07-09T13:35:36.000Z",
+    "votes": 22
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.04388",
+    "title": "More Documents, Same Length: Isolating the Challenge of Multiple Documents in RAG",
+    "abstract": "Retrieval-Augmented Generation (RAG) enhances the accuracy of Large Language Model (LLM) responses by leveraging relevant external documents during generation. Although previous studies noted that retrieving many documents can degrade performance, they did not isolate how the quantity of documents affects performance while controlling for context length. We evaluate various language models on custom datasets derived from a multi-hop QA task. We keep the context length and position of relevant information constant while varying the number of documents, and find that increasing the document count in RAG settings poses significant challenges for most LLMs, reducing performance by up to 20%. However, Qwen2.5 maintained consistent results across increasing document counts, indicating better multi-document handling capability. Finally, our results indicate that processing multiple documents is a separate challenge from handling long contexts. We also make the datasets and code available: this https URL .",
+    "publicationDate": "2025-03-06T12:38:17.000Z",
+    "votes": 16
+  }
+]

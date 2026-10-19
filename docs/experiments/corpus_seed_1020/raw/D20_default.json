@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2607.26497",
+    "title": "BM25 Wins at Scale: A Scaling Study of Retrieval-Augmented Generation Paradigms",
+    "abstract": "Retrieval-augmented generation (RAG) spans lexical and dense retrieval, graph-based indexing, and agentic search, but these paradigms are usually evaluated on different benchmarks at one corpus size, leaving their accuracy-cost scaling unclear. To bridge this gap, we present a controlled study that varies corpus size along 28 strictly nested tiers spanning roughly 450-fold, while holding questions and a fixed bedrock of relevant and adversarial documents unchanged. Under one reader model and one judging protocol, we measure official accuracy, construction and query tokens, and latency. The results reveal a scale-dependent crossover rather than an unconditional winner. File-System Agent leads at the smallest shared tiers, but its sequential exploration costs 39 times more query tokens at the bedrock and becomes less effective as the search space grows. Around 10 million corpus tokens, BM25 overtakes it and leads at every larger shared tier, with a margin approaching 20 points at full scale. BM25 also anchors the low-cost end of the Pareto frontier without LLM-based construction. Dense retrieval remains efficient but less accurate, whereas graph-based RAG encounters construction walls before deployment scale and its scalable variants remain below BM25 at shared tiers. Overall, corpus growth increasingly favors global candidate ranking: lexical retrieval is the strongest scalable default, while agentic reasoning works best after ranked discovery rather than in place of it.",
+    "publicationDate": "2026-07-29T05:46:11.000Z",
+    "votes": 53
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.16918",
+    "title": "Sparse Coverage: Semantic Center Representations for Patent Prior-Art Retrieval",
+    "abstract": "Patent prior-art retrieval is a recall-oriented search task over long and highly structured technical documents. Dense retrieval improves semantic matching, but single-vector representations may compress multiple technical components, functions, and constraints into a single embedding. We propose Sparse Coverage, an unsupervised semantic retrieval framework that maps local span embeddings to a sparse vocabulary of embedding-space centers. The centers are selected with a coverage-oriented k-center objective, and spans activate nearby centers to produce sparse representations compatible with inverted-index retrieval. Experiments on CLEF-IP 2013 show that Sparse Coverage matches or exceeds the document-level recall of strong dense patent encoders in several configurations, while remaining competitive for passage-level retrieval. By combining local semantic evidence with sparse inverted-index search, Sparse Coverage provides an effective first-stage retrieval approach for patent search.",
+    "publicationDate": "2026-07-31T09:41:42.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.05781",
+    "title": "Visual Words Meet BM25: Sparse Auto-Encoder Visual Word Scoring for Image Retrieval",
+    "abstract": "Dense image retrieval is accurate but offers limited interpretability and attribution, and it can be compute-intensive at scale. We present \\textbf{BM25-V}, which applies Okapi BM25 scoring to sparse visual-word activations from a Sparse Auto-Encoder (SAE) on Vision Transformer patch features. Across a large gallery, visual-word document frequencies are highly imbalanced and follow a Zipfian-like distribution, making BM25's inverse document frequency (IDF) weighting well suited for suppressing ubiquitous, low-information words and emphasizing rare, discriminative ones. BM25-V retrieves high-recall candidates via sparse inverted-index operations and serves as an efficient first-stage retriever for dense reranking. Across seven benchmarks, BM25-V achieves Recall@200 $\\geq$ 0.993, enabling a two-stage pipeline that reranks only $K{=}200$ candidates per query and recovers near-dense accuracy within $0.2$\\% on average. An SAE trained once on ImageNet-1K transfers zero-shot to seven fine-grained benchmarks without fine-tuning, and BM25-V retrieval decisions are attributable to specific visual words with quantified IDF contributions.",
+    "publicationDate": "2026-03-06T00:21:57.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.16351",
+    "title": "Training for Compositional Sensitivity Reduces Dense Retrieval Generalization",
+    "abstract": "Dense retrieval compresses texts into single embeddings ranked by cosine similarity. While efficient for recall, this interface is brittle for identity-level matching: minimal compositional edits (negation, role swaps) flip meaning yet retain high similarity. Motivated by geometric results for unit-sphere cosine spaces (Kang et al., 2025), we test this retrieval-composition tension in text-only retrieval. Across four dual-encoder backbones, adding structure-targeted negatives consistently reduces zero-shot NanoBEIR retrieval (8-9% mean nDCG@10 drop on small backbones; up to 40% on medium ones), while only partially improving pooled-space separation. Treating pooled cosine as a recall interface, we then benchmark verifiers scoring token--token cosine maps. MaxSim (late interaction) excels at reranking but fails to reject structural near-misses, whereas a small Transformer over similarity maps reliably separates near-misses under end-to-end training.",
+    "publicationDate": "2026-03-16T20:25:39.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.22263",
+    "title": "Efficiency and Effectiveness of SPLADE Models on Billion-Scale Web Document Title",
+    "abstract": "This paper presents a comprehensive comparison of BM25, SPLADE, and Expanded-SPLADE models in the context of large-scale web document retrieval. We evaluate the effectiveness and efficiency of these models on datasets spanning from tens of millions to billions of web document titles. SPLADE and Expanded-SPLADE, which utilize sparse lexical representations, demonstrate superior retrieval performance compared to BM25, especially for complex queries. However, these models incur higher computational costs. We introduce pruning strategies, including document-centric pruning and top-k query term selection, boolean query with term threshold to mitigate these costs and improve the models' efficiency without significantly sacrificing retrieval performance. The results show that Expanded-SPLADE strikes the best balance between effectiveness and efficiency, particularly when handling large datasets. Our findings offer valuable insights for deploying sparse retrieval models in large-scale search engines.",
+    "publicationDate": "2025-11-27T09:40:21.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2004.04906",
+    "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+    "abstract": "Open-domain question answering relies on efficient passage retrieval to select candidate contexts, where traditional sparse vector space models, such as TF-IDF or BM25, are the de facto method. In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework. When evaluated on a wide range of open-domain QA datasets, our dense retriever outperforms a strong Lucene-BM25 system largely by 9%-19% absolute in terms of top-20 passage retrieval accuracy, and helps our end-to-end QA system establish new state-of-the-art on multiple open-domain QA benchmarks.",
+    "publicationDate": "2020-04-10T04:53:17.000Z",
+    "votes": 52
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.09534",
+    "title": "Improving Dense Passage Retrieval with Multiple Positive Passages",
+    "abstract": "By leveraging a dual encoder architecture, Dense Passage Retrieval (DPR) has outperformed traditional sparse retrieval algorithms such as BM25 in terms of passage retrieval accuracy. Recently proposed methods have further enhanced DPR's performance. However, these models typically pair each question with only one positive passage during training, and the effect of associating multiple positive passages has not been examined. In this paper, we explore the performance of DPR when additional positive passages are incorporated during training. Experimental results show that equipping each question with multiple positive passages consistently improves retrieval accuracy, even when using a significantly smaller batch size, which enables training on a single GPU.",
+    "publicationDate": "2025-08-13T06:36:53.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2508.17694",
+    "title": "Semantic Search for Information Retrieval",
+    "abstract": "Information retrieval systems have progressed notably from lexical techniques such as BM25 and TF-IDF to modern semantic retrievers. This survey provides a brief overview of the BM25 baseline, then discusses the architecture of modern state-of-the-art semantic retrievers. Advancing from BERT, we introduce dense bi-encoders (DPR), late-interaction models (ColBERT), and neural sparse retrieval (SPLADE). Finally, we examine MonoT5, a cross-encoder model. We conclude with common evaluation tactics, pressing challenges, and propositions for future directions.",
+    "publicationDate": "2025-08-25T06:03:26.000Z",
+    "votes": 2
+  }
+]

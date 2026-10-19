@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2505.05885",
+    "title": "Cost-Effective, Low Latency Vector Search with Azure Cosmos DB",
+    "abstract": "Vector indexing enables semantic search over diverse corpora and has become an important interface to databases for both users and AI agents. Efficient vector search requires deep optimizations in database systems. This has motivated a new class of specialized vector databases that optimize for vector search quality and cost. Instead, we argue that a scalable, high-performance, and cost-efficient vector search system can be built inside a cloud-native operational database like Azure Cosmos DB while leveraging the benefits of a distributed database such as high availability, durability, and scale. We do this by deeply integrating DiskANN, a state-of-the-art vector indexing library, inside Azure Cosmos DB NoSQL. This system uses a single vector index per partition stored in existing index trees, and kept in sync with underlying data. It supports &lt; 20ms query latency over an index spanning 10 million vectors, has stable recall over updates, and offers approximately 43x and 12x lower query cost compared to Pinecone and Zilliz serverless enterprise products. It also scales out to billions of vectors via automatic partitioning. This convergent design presents a point in favor of integrating vector indices into operational databases in the context of recent debates on specialized vector databases, and offers a template for vector indexing in other databases.",
+    "publicationDate": "2025-05-09T08:53:59.000Z",
+    "votes": 20
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.20018",
+    "title": "MINT: Multi-Vector Search Index Tuning",
+    "abstract": "Vector search plays a crucial role in many real-world applications. In addition to single-vector search, multi-vector search becomes important for multi-modal and multi-feature scenarios today. In a multi-vector database, each row is an item, each column represents a feature of items, and each cell is a high-dimensional vector. In multi-vector databases, the choice of indexes can have a significant impact on performance. Although index tuning for relational databases has been extensively studied, index tuning for multi-vector search remains unclear and challenging. In this paper, we define multi-vector search index tuning and propose a framework to solve it. Specifically, given a multi-vector search workload, we develop algorithms to find indexes that minimize latency and meet storage and recall constraints. Compared to the baseline, our latency achieves 2.1X to 8.3X speedup.",
+    "publicationDate": "2025-04-28T17:36:06.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2502.05575",
+    "title": "Graph-Based Vector Search: An Experimental Evaluation of the State-of-the-Art",
+    "abstract": "Vector data is prevalent across business and scientific applications, and its popularity is growing with the proliferation of learned embeddings. Vector data collections often reach billions of vectors with thousands of dimensions, thus, increasing the complexity of their analysis. Vector search is the backbone of many critical analytical tasks, and graph-based methods have become the best choice for analytical tasks that do not require guarantees on the quality of the answers. We briefly survey in-memory graph-based vector search, outline the chronology of the different methods and classify them according to five main design paradigms: seed selection, incremental insertion, neighborhood propagation, neighborhood diversification, and divide-and-conquer. We conduct an exhaustive experimental evaluation of twelve state-of-the-art methods on seven real data collections, with sizes up to 1 billion vectors. We share key insights about the strengths and limitations of these methods; e.g., the best approaches are typically based on incremental insertion and neighborhood diversification, and the choice of the base graph can hurt scalability. Finally, we discuss open research directions, such as the importance of devising more sophisticated data-adaptive seed selection and diversification strategies.",
+    "publicationDate": "2025-02-08T14:03:43.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.01937",
+    "title": "Vector Search for the Future: From Memory-Resident, Static Heterogeneous Storage, to Cloud-Native Architectures",
+    "abstract": "Vector search (VS) has become a fundamental component in multimodal data management, enabling core functionalities such as image, video, and code retrieval. As vector data scales rapidly, VS faces growing challenges in balancing search, latency, scalability, and cost. The evolution of VS has been closely driven by changes in storage architecture. Early VS methods rely on all-in-memory designs for low latency, but scalability is constrained by memory capacity and cost. To address this, recent research has adopted heterogeneous architectures that offload space-intensive vectors and index structures to SSDs, while exploiting block locality and I/O-efficient strategies to maintain high search performance at billion scale. Looking ahead, the increasing demand for trillion-scale vector retrieval and cloud-native elasticity is driving a further shift toward memory-SSD-object storage architectures, which enable cost-efficient data tiering and seamless scalability.\nIn this tutorial, we review the evolution of VS techniques from a storage-architecture perspective. We first review memory-resident methods, covering classical IVF, hash, quantization, and graph-based designs. We then present a systematic overview of heterogeneous storage VS techniques, including their index designs, block-level layouts, query strategies, and update mechanisms. Finally, we examine emerging cloud-native systems and highlight open research opportunities for future large-scale vector retrieval systems.",
+    "publicationDate": "2026-01-05T09:40:54.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.14748",
+    "title": "Cloud-Native Vector Search: A Comprehensive Performance Analysis",
+    "abstract": "Vector search has been widely employed in recommender system and retrieval-augmented-generation pipelines, commonly performed with vector indexes to efficiently find similar items in large datasets. Recent growths in both data and task complexity have motivated placing vector indexes onto remote storage -- cloud-native vector search, which cloud providers have recently introduced services for. Yet, despite varying workload characteristics and various available vector index forms, providers default to using cluster-based indexes, which on paper do adapt well to differences between disk and cloud-based environment: their fetch granularities and lack of notable intra-query dependencies aligns with the large optimal fetch sizes and minimizes costly round-trips (i.e., as opposed to graph-based indexes) to remote storage, respectively.\nThis paper systematically studies cloud-native vector search: What and how should indexes be built and used for on-cloud vector search? We analyze bottlenecks of two common index classes, cluster and graph indexes, on remote storage, and show that despite current standardized adoption of cluster indexes on the cloud, graph indexes are favored in workloads requiring high concurrency and recall, or operating on high-dimensional data or large datatypes. We further find that on-cloud search demands significantly different indexing and search parameterizations versus on-disk search for optimal performance. Finally, we incorporate existing cloud-based caching setups into vector search and find that certain index optimizations work against caching, and study how this can be mitigated to maximize gains under various available cache sizes.",
+    "publicationDate": "2025-11-18T18:50:15.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2401.08281",
+    "title": "The Faiss library",
+    "abstract": "Vector databases typically manage large collections of embedding vectors. Currently, AI applications are growing rapidly, and so is the number of embeddings that need to be stored and indexed. The Faiss library is dedicated to vector similarity search, a core functionality of vector databases. Faiss is a toolkit of indexing methods and related primitives used to search, cluster, compress and transform vectors. This paper describes the trade-off space of vector search and the design principles of Faiss in terms of structure, approach to optimization and interfacing. We benchmark key features of the library and discuss a few selected applications to highlight its broad applicability.",
+    "publicationDate": "2024-09-06T15:08:03.000Z",
+    "votes": 32
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2310.11703",
+    "title": "A Comprehensive Survey on Vector Database: Storage and Retrieval Technique, Challenge",
+    "abstract": "As high-dimensional vector data increasingly surpasses the processing capabilities of traditional database management systems, Vector Databases (VDBs) have emerged and become tightly integrated with large language models, being widely applied in modern artificial intelligence systems. However, existing research has primarily focused on underlying technologies such as approximate nearest neighbor search, with relatively few studies providing a systematic architectural-level review of VDBs or analyzing how these core technologies collectively support the overall capacity of VDBs. This survey aims to offer a comprehensive overview of the core designs and algorithms of VDBs, establishing a holistic understanding of this rapidly evolving field. First, we systematically review the key technologies and design principles of VDBs from the two core dimensions of storage and retrieval, tracing their technological evolution. Next, we conduct an in-depth comparison of several mainstream VDB architectures, summarizing their strengths, limitations, and typical application scenarios. Finally, we explore emerging directions for integrating VDBs with large language models, including open research challenges and trends such as novel indexing strategies. This survey serves as a systematic reference guide for researchers and practitioners, helping readers quickly grasp the technological landscape and development trends in the field of vector databases, and promoting further innovation in both theoretical and applied aspects.",
+    "publicationDate": "2023-10-18T04:31:06.000Z",
+    "votes": 24
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2310.14021",
+    "title": "Survey of Vector Database Management Systems",
+    "abstract": "There are now over 20 commercial vector database management systems (VDBMSs),\nall produced within the past five years. But embedding-based retrieval has been\nstudied for over ten years, and similarity search a staggering half century and\nmore. Driving this shift from algorithms to systems are new data intensive\napplications, notably large language models, that demand vast stores of\nunstructured data coupled with reliable, secure, fast, and scalable query\nprocessing capability. A variety of new data management techniques now exist\nfor addressing these needs, however there is no comprehensive survey to\nthoroughly review these techniques and systems. We start by identifying five\nmain obstacles to vector data management, namely vagueness of semantic\nsimilarity, large size of vectors, high cost of similarity comparison, lack of\nnatural partitioning that can be used for indexing, and difficulty of\nefficiently answering hybrid queries that require both attributes and vectors.\nOvercoming these obstacles has led to new approaches to query processing,\nstorage and indexing, and query optimization and execution. For query\nprocessing, a variety of similarity scores and query types are now well\nunderstood; for storage and indexing, techniques include vector compression,\nnamely quantization, and partitioning based on randomization, learning\npartitioning, and navigable partitioning; for query optimization and execution,\nwe describe new operators for hybrid queries, as well as techniques for plan\nenumeration, plan selection, and hardware accelerated execution. These\ntechniques lead to a variety of VDBMSs across a spectrum of design and runtime\ncharacteristics, including native systems specialized for vectors and extended\nsystems that incorporate vector capabilities into existing systems. We then\ndiscuss benchmarks, and finally we outline research challenges and point the\ndirection for future work.",
+    "publicationDate": "2023-10-21T14:09:48.000Z",
+    "votes": 16
+  }
+]

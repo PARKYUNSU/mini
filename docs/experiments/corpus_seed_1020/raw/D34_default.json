@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.02899",
+    "title": "Contamination Inflates Scores but Rarely Reorders Large Language Model Leaderboards",
+    "abstract": "Benchmark contamination, the leakage of test items into training data, is widely described as a threat to the reliability of large language model (LLM) leaderboards. We argue that this concern conflates two distinct questions: whether contamination inflates absolute scores, and whether it reorders the ranking of models. We recast contamination as a violation of anchor-item invariance and measure it through the differential functioning of original versus semantically equivalent paraphrased items, a within-item contrast that holds the measured skill fixed and isolates memorization from capability. Using per-instance responses from 47 publicly released models and 74 models finetuned with a known dose of contamination, across four benchmarks (ARC, GSM8K, HellaSwag, MMLU), we first calibrate the measure against ground truth: it recovers injected contamination dose-responsively (a corrected effect of +0.187 accuracy points for test-set leakage) and never flags a negative-control model trained only on the legitimate training split (-0.012). We then quantify leaderboard impact: the rank correlation between a standard leaderboard and a paraphrase-controlled leaderboard is 0.997, and a sensitivity analysis shows that the observed differential contamination is far below the level needed to move rankings, with only 3 of 188 model-by-benchmark cases showing differential contamination corroborated across two references. Contamination among these public models is therefore largely uniform: it inflates absolute scores without reordering the leaderboard, and ranking distortion requires the rare case of differential contamination. We provide a calibrated invariance audit, released as a reference implementation, and recommend that leaderboards report paraphrase-controlled rankings alongside confidence intervals.",
+    "publicationDate": "2026-07-05T00:55:18.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.03305",
+    "title": "The Reliability Gap in Benchmark Auditing: Distribution Shift and Scale as Failure Modes of Contamination Detection",
+    "abstract": "Benchmark contamination, where evaluation examples appear in a model's training data, threatens the validity of LLM assessment. Statistical tools for detecting training-data membership exist, but have been validated almost exclusively in controlled academic regimes: large, homogeneous pre-training corpora and transparent, single-stage training pipelines. Whether these methods remain reliable in realistic auditing scenarios remains unclear. We identify two under-studied failure modes: distribution shift, which arises when suspect and validation sets violate the IID assumption, and scale constraints, which arise because benchmarks are orders of magnitude smaller than pre-training corpora. We systematically evaluate three leading paradigms, LLM Dataset Inference, Post-Hoc Dataset Inference, and CoDeC, across 25 models from multiple families (including Pythia, OLMo 2, and specialised cultural and medical LLMs) and scales (up to 27B). We then further extend our analysis to frontier industry models. Across 335 evaluations, only 201 yield correct outcomes. LLM Dataset Inference results in false positives under distribution shift, Post-Hoc Dataset Inference is underpowered at benchmark scale, and CoDeC provides only coarse provenance signals that are insufficient to verify individual benchmark splits. Our results reveal a systematic reliability gap between controlled validation and practical benchmark auditing, and show that statistical detection cannot yet replace transparent data provenance. We open-source our benchmark for further research.",
+    "publicationDate": "2026-06-02T08:21:22.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.19999",
+    "title": "LLM Benchmark Datasets Should Be Contamination-Resistant",
+    "abstract": "Benchmark datasets are critical for reproducible, reliable, and discriminative evaluation of LLMs. However, recent studies reveal that many benchmark datasets are included in pretraining corpora, i.e., $\\textit{contaminated}$, which diminishes their value as reliable measures of model generalization. In this paper, we argue that benchmark datasets should be $\\textit{contamination-resistant}$, i.e., $\\textit{unlearnable}$, but support $\\textit{inference}$. To accomplish this, we first highlight the wide prevalence of benchmark dataset contamination and outline the properties of contamination-resistant datasets. Second, we highlight how the asymmetry between the inference and training pipelines in the Transformer architecture can be leveraged to support contamination-resistance. Third, we outline mathematical advancements to make these datasets interoperable across various LLM architectures. Based on the above, we call on the community to ensure the reliability of LLM benchmarking by: (i) advancing novel contamination-resistant methodologies, (ii) developing supporting methods and platforms, and (iii) adopting contamination-resistant benchmarks into existing evaluation pipelines.",
+    "publicationDate": "2026-05-19T15:33:16.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.12413",
+    "title": "Soft Contamination Means Benchmarks Test Shallow Generalization",
+    "abstract": "If LLM training data is polluted with benchmark test data, then benchmark performance gives biased estimates of out-of-distribution (OOD) generalization. Typical decontamination filters use n-gram matching which fail to detect semantic duplicates: sentences with equivalent (or near-equivalent) content that are not close in string space. We study this soft contamination of training data by semantic duplicates. Among other experiments, we embed the Olmo3 training corpus and find that: 1) contamination remains widespread, e.g. we find semantic duplicates for 78% of CodeForces and exact duplicates for 50% of ZebraLogic problems; 2) including semantic duplicates of benchmark data in training does improve benchmark performance; and 3) when finetuning on duplicates of benchmark datapoints, performance also improves on truly-held-out datapoints from the same benchmark. We argue that recent benchmark gains are thus confounded: the prevalence of soft contamination means gains reflect both genuine capability improvements and the accumulation of test data and effective test data in growing training corpora.",
+    "publicationDate": "2026-02-12T21:12:53.000Z",
+    "votes": 21
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.21636",
+    "title": "Silicon Bureaucracy and AI Test-Oriented Education: Contamination Sensitivity and Score Confidence in LLM Benchmarks",
+    "abstract": "Public benchmarks increasingly govern how large language models (LLMs) are ranked, selected, and deployed. We frame this benchmark-centered regime as Silicon Bureaucracy and AI Test-Oriented Education, and argue that it rests on a fragile assumption: that benchmark scores directly reflect genuine generalization. In practice, however, such scores may conflate exam-oriented competence with principled capability, especially when contamination and semantic leakage are difficult to exclude from modern training pipelines. We therefore propose an audit framework for analyzing contamination sensitivity and score confidence in LLM benchmarks. Using a router-worker setup, we compare a clean-control condition with noisy conditions in which benchmark problems are systematically deleted, rewritten, and perturbed before being passed downstream. For a genuinely clean benchmark, noisy conditions should not consistently outperform the clean-control baseline. Yet across multiple models, we find widespread but heterogeneous above-baseline gains under noisy conditions, indicating that benchmark-related cues may be reassembled and can reactivate contamination-related memory. These results suggest that similar benchmark scores may carry substantially different levels of confidence. Rather than rejecting benchmarks altogether, we argue that benchmark-based evaluation should be supplemented with explicit audits of contamination sensitivity and score confidence.",
+    "publicationDate": "2026-03-23T07:03:07.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.09259",
+    "title": "Detecting Data Contamination from Reinforcement Learning Post-training for Large Language Models",
+    "abstract": "Data contamination poses a significant threat to the reliable evaluation of Large Language Models (LLMs). This issue arises when benchmark samples may inadvertently appear in training sets, compromising the validity of reported performance. While detection methods have been developed for the pre-training and Supervised Fine-Tuning stages, a critical research gap exists for the increasingly significant phase of Reinforcement Learning (RL) post-training. As RL post-training becomes pivotal for advancing LLM reasoning, the absence of specialized contamination detection methods in this paradigm presents a critical vulnerability. To address this, we conduct the first systematic study of data detection within RL post-training scenario and propose Self-Critique. Our method is motivated by a key observation: after RL phase, the output entropy distribution of LLMs tends to collapse into highly specific and sparse modes. Self-Critique probes for the underlying policy collapse, i.e., the model's convergence to a narrow reasoning path, which causes this entropy reduction. To facilitate this research, we also introduce RL-MIA, a benchmark constructed to simulate this specific contamination scenario. Extensive experiments show that Self-Critique significantly outperforms baseline methods across multiple models and contamination tasks, achieving an AUC improvement of up to 30%. Whereas existing methods are close to a random guess for RL-phase contamination, our method makes detection possible.",
+    "publicationDate": "2025-10-10T10:58:50.000Z",
+    "votes": 21
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.19334",
+    "title": "When Benchmarks Leak: Inference-Time Decontamination for LLMs",
+    "abstract": "Benchmark-based evaluation is the de facto standard for comparing large language models (LLMs). However, its reliability is increasingly threatened by test set contamination, where test samples or their close variants leak into training data and artificially inflate reported performance. To address this issue, prior work has explored two main lines of mitigation. One line attempts to identify and remove contaminated benchmark items before evaluation, but this inevitably alters the evaluation set itself and becomes unreliable when contamination is moderate or severe. The other line preserves the benchmark and instead suppresses contaminated behavior at evaluation time; however, such interventions often interfere with normal inference and lead to noticeable performance degradation on clean inputs. We propose DeconIEP, a decontamination framework that operates entirely during evaluation by applying small, bounded perturbations in the input embedding space. Guided by a relatively less-contaminated reference model, DeconIEP learns an instance-adaptive perturbation generator that steers the evaluated model away from memorization-driven shortcut pathways. Across multiple open-weight LLMs and benchmarks, extensive empirical results show that DeconIEP achieves strong decontamination effectiveness while incurring only minimal degradation in benign utility.",
+    "publicationDate": "2026-01-27T08:19:40.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.13626",
+    "title": "Benchmark Leakage Trap: Can We Trust LLM-based Recommendation?",
+    "abstract": "The expanding integration of Large Language Models (LLMs) into recommender systems poses critical challenges to evaluation reliability. This paper identifies and investigates a previously overlooked issue: benchmark data leakage in LLM-based recommendation. This phenomenon occurs when LLMs are exposed to and potentially memorize benchmark datasets during pre-training or fine-tuning, leading to artificially inflated performance metrics that fail to reflect true model performance. To validate this phenomenon, we simulate diverse data leakage scenarios by conducting continued pre-training of foundation models on strategically blended corpora, which include user-item interactions from both in-domain and out-of-domain sources. Our experiments reveal a dual-effect of data leakage: when the leaked data is domain-relevant, it induces substantial but spurious performance gains, misleadingly exaggerating the model's capability. In contrast, domain-irrelevant leakage typically degrades recommendation accuracy, highlighting the complex and contingent nature of this contamination. Our findings reveal that data leakage acts as a critical, previously unaccounted-for factor in LLM-based recommendation, which could impact the true model performance. We release our code at this https URL.",
+    "publicationDate": "2026-02-14T06:34:19.000Z",
+    "votes": 1
+  }
+]

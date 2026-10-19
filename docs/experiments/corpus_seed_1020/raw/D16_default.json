@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2604.02444",
+    "title": "From Textual Columns to Query Plans: A Unified Relational-Semantic Execution Framework for Hybrid Query Processing",
+    "abstract": "Real-world table question answering often involves hybrid schemas in which some query-relevant information is explicit in relational columns, while other attributes, predicates, or join conditions are only implicit in free-form text. Existing systems struggle with this setting: Text-to-SQL methods scale to large and multi-table databases but require fully structured schemas, whereas direct LLM-based methods can interpret textual content but are costly and unreliable when applied to large databases. We present OmniTQA, a unified framework for semi-structured table question answering that treats semantic reasoning as a first-class operation within relational query execution. OmniTQA compiles natural-language questions into directed acyclic graphs of relational and LLM-based semantic operators. This enables ambiguity-aware plan diversification, cost-aware optimization, and dual-engine execution over structured and textual data. Across structured and semi-structured benchmarks, OmniTQA consistently improves performance in hybrid settings, outperforming the strongest baselines by 14 accuracy points on average and by 27 points on the most challenging subset, while maintaining competitive accuracy on fully structured datasets.",
+    "publicationDate": "2026-04-02T18:16:11.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.08444",
+    "title": "Beyond Linearization: Attributed Table Graphs for Table Reasoning",
+    "abstract": "Table reasoning, a task to answer questions by reasoning over data presented in tables, is an important topic due to the prevalence of knowledge stored in tabular formats. Recent solutions use Large Language Models (LLMs) for their semantic understanding and reasoning capabilities. A common paradigm of such solutions linearizes tables to form plain texts that are served as input to LLMs. This paradigm has critical issues. It requires LLMs to infer row-column-cell relations from serialized inputs, makes evidence paths harder to trace, and is subject to the \"lost-in-the-middle\" issue. To address these issues, we propose Table Graph Reasoner (TabGR), a model that represents tables as an Attributed Table Graph (ATG) without task-specific training. The ATG explicitly preserves row-column-cell structure while enabling graph-based reasoning over traceable evidence paths. We further propose a Question-Guided Personalized PageRank (QG-PPR) mechanism to rerank tabular data and mitigate the lost-in-the-middle issue. Extensive experiments across multiple table reasoning benchmarks show that TabGR consistently outperforms state-of-the-art models by up to 9.7% in accuracy. Our code is available at: this https URL.",
+    "publicationDate": "2026-01-13T11:14:43.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.01346",
+    "title": "RAG over Tables: Hierarchical Memory Index, Multi-Stage Retrieval, and Benchmarking",
+    "abstract": "Retrieval-Augmented Generation (RAG) enhances Large Language Models (LLMs) by integrating them with an external knowledge base to improve the answer relevance and accuracy. In real-world scenarios, beyond pure text, a substantial amount of knowledge is stored in tables, and user questions often require retrieving answers that are distributed across multiple tables. Retrieving knowledge from a table corpora (i.e., various individual tables) for a question remains nascent, at least, for (i) how to understand intra- and inter-table knowledge effectively, (ii) how to filter unnecessary tables and how to retrieve the most relevant tables efficiently, (iii) how to prompt LLMs to infer over the retrieval, (iv) how to evaluate the corresponding performance in a realistic setting. Facing the above challenges, in this paper, we first propose a table-corpora-aware RAG framework, named T-RAG, which consists of the hierarchical memory index, multi-stage retrieval, and graph-aware prompting for effective and efficient table knowledge retrieval and inference. Further, we first develop a multi-table question answering benchmark named MultiTableQA, which spans 3 different task types, 57,193 tables, and 23,758 questions in total, and the sources are all from real-world scenarios. Based on MultiTableQA, we did the holistic comparison over table retrieval methods, RAG methods, and table-to-graph representation learning methods, where T-RAG shows the leading accuracy, recall, and running time performance. Also, under T-RAG, we evaluate the inference ability upgrade of different LLMs. Code and Data are available at this https URL",
+    "publicationDate": "2025-04-02T04:24:41.000Z",
+    "votes": 169
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.04292",
+    "title": "SQuARE: Structured Query & Adaptive Retrieval Engine For Tabular Formats",
+    "abstract": "Accurate question answering over real spreadsheets remains difficult due to multirow headers, merged cells, and unit annotations that disrupt naive chunking, while rigid SQL views fail on files lacking consistent schemas. We present SQuARE, a hybrid retrieval framework with sheet-level, complexity-aware routing. It computes a continuous score based on header depth and merge density, then routes queries either through structure-preserving chunk retrieval or SQL over an automatically constructed relational representation. A lightweight agent supervises retrieval, refinement, or combination of results across both paths when confidence is low. This design maintains header hierarchies, time labels, and units, ensuring that returned values are faithful to the original cells and straightforward to verify. Evaluated on multi-header corporate balance sheets, a heavily merged World Bank workbook, and diverse public datasets, SQuARE consistently surpasses single-strategy baselines and ChatGPT-4o on both retrieval precision and end-to-end answer accuracy while keeping latency predictable. By decoupling retrieval from model choice, the system is compatible with emerging tabular foundation models and offers a practical bridge toward a more robust table understanding.",
+    "publicationDate": "2025-12-03T22:11:45.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.07098",
+    "title": "TALENT: Table VQA via Augmented Language-Enhanced Natural-text Transcription",
+    "abstract": "Table Visual Question Answering (Table VQA) is typically addressed by large vision-language models (VLMs). While such models can answer directly from images, they often miss fine-grained details unless scaled to very large sizes, which are computationally prohibitive, especially for mobile deployment. A lighter alternative is to have a small VLM perform OCR and then use a large language model (LLM) to reason over structured outputs such as Markdown tables. However, these representations are not naturally optimized for LLMs and still introduce substantial errors. We propose TALENT (Table VQA via Augmented Language-Enhanced Natural-text Transcription), a lightweight framework that leverages dual representations of tables. TALENT prompts a small VLM to produce both OCR text and natural language narration, then combines them with the question for reasoning by an LLM. This reframes Table VQA as an LLM-centric multimodal reasoning task, where the VLM serves as a perception-narration module rather than a monolithic solver. Additionally, we construct ReTabVQA, a more challenging Table VQA dataset requiring multi-step quantitative reasoning over table images. Experiments show that TALENT enables a small VLM-LLM combination to match or surpass a single large VLM at significantly lower computational cost on both public datasets and ReTabVQA.",
+    "publicationDate": "2025-10-08T14:56:42.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.12345",
+    "title": "General Table Question Answering via Answer-Formula Joint Generation",
+    "abstract": "Advanced table question answering (TableQA) methods prompt large language models (LLMs) to generate answer text, SQL query, Python code, or custom operation, which impressively improve the complex reasoning problems in the TableQA task. However, these methods lack the versatility to cope with specific question types or table structures. In contrast, the Spreadsheet Formula, the widely used and well-defined operation language for tabular data, has not been thoroughly explored to solve TableQA. In this paper, we first attempt to use the Formula as the executable representation for solving complex reasoning on tables with different structures. Specifically, we construct \\texttt{FromulaQA}, a large Formula-annotated TableQA dataset from existing datasets. In addition, we propose \\texttt{TabAF}, a general table answering framework to solve multiple types of tasks over multiple types of tables simultaneously, which decodes answers and Formulas with a single LLM backbone. Extensive experiments demonstrate the versatility and generalization of \\texttt{TabAF}. Under the same model size, \\texttt{TabAF} achieves new state-of-the-art performance on the WikiTableQuestion, HiTab, and TabFact.",
+    "publicationDate": "2025-03-16T03:51:06.000Z",
+    "votes": 34
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2407.05952",
+    "title": "H-STAR: LLM-driven Hybrid SQL-Text Adaptive Reasoning on Tables",
+    "abstract": "Tabular reasoning involves interpreting natural language queries about\ntabular data, which presents a unique challenge of combining language\nunderstanding with structured data analysis. Existing methods employ either\ntextual reasoning, which excels in semantic interpretation but struggles with\nmathematical operations, or symbolic reasoning, which handles computations well\nbut lacks semantic understanding. This paper introduces a novel algorithm\nH-STAR that integrates both symbolic and semantic (textual) approaches in a\ntwo-stage process to address these limitations. H-STAR employs: (1) step-wise\ntable extraction using `multi-view' column retrieval followed by row\nextraction, and (2) adaptive reasoning that adapts reasoning strategies based\non question types, utilizing semantic reasoning for direct lookup and complex\nlexical queries while augmenting textual reasoning with symbolic reasoning\nsupport for quantitative and logical tasks. Our extensive experiments\ndemonstrate that H-STAR significantly outperforms state-of-the-art methods\nacross three tabular question-answering (QA) and fact-verification datasets,\nunderscoring its effectiveness and efficiency.",
+    "publicationDate": "2024-06-29T21:24:19.000Z",
+    "votes": 17
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.20747",
+    "title": "Towards Probabilistic Question Answering Over Tabular Data",
+    "abstract": "Progress in question answering (QA) over tabular data has enabled reliable factual retrieval from relational tables. However, many real-world questions are probabilistic, requiring reasoning under uncertainty and latent conditional dependencies that are not directly stored in individual cells. We introduce LUCARIO, a large-scale benchmark for probabilistic QA over real-world tabular datasets, covering diverse domains, dependency patterns, and natural language variations. We propose Auto-BN, a fully automatic neuro-symbolic framework that induces a Bayesian Network from raw tables, translates natural-language questions into formal probabilistic queries, and performs exact inference. Experiments across multiple LLM backbones show that Auto-BN consistently outperforms NL2SQL, retrieval-based, and premise-based baselines, while maintaining a near-zero error rate. LUCARIO fills a relevant gap and provides a practical and scalable testbed for advancing probabilistic reasoning over structured data.",
+    "publicationDate": "2025-06-25T18:15:33.000Z",
+    "votes": 3
+  }
+]

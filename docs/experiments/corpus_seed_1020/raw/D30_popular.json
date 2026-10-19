@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2602.02219",
+    "title": "Am I More Pointwise or Pairwise? Revealing Position Bias in Rubric-Based LLM-as-a-Judge",
+    "abstract": "Large language models are widely employed as evaluators, a paradigm commonly referred to as LLM-as-a-judge. Prior research has predominantly examined point-wise or pair-wise evaluation protocols; in contrast, our focus is on rubric-based evaluation, which has been attracting increasing attention owing to its utility for training models in domains where verification is otherwise difficult. In this work, we show that rubric-based evaluation implicitly resembles a multiple-choice setting and therefore exhibits position bias: LLMs tend to prefer score options that appear at specific positions within the rubric list. Through controlled experiments across multiple models and datasets, we demonstrate that this position bias is consistent. Its direction, however, is model-specific: some judges favor the first option, while others favor the last. We further identify a second, orthogonal axis of bias: when a prompt scores several criteria simultaneously, the ordering of the criteria itself shifts the resulting scores. We additionally explore permuting the order of the rubric options as a means of mitigating position bias, and find that although the bias can be attenuated, improvements in the correlation between model judgments and human annotations are obtained primarily for models that exhibit strong bias. Our results recast rubric-based LLM-as-a-judge as a multiple-choice problem with measurable, model-specific position bias, and we further confirm that only a small number of random order permutations are sufficient to reduce the error introduced by this bias for the majority of models.",
+    "publicationDate": "2026-02-02T15:24:37.000Z",
+    "votes": 39
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2410.02736",
+    "title": "Justice or Prejudice? Quantifying Biases in LLM-as-a-Judge",
+    "abstract": "LLM-as-a-Judge has been widely utilized as an evaluation method in various benchmarks and served as supervised rewards in model training. However, despite their excellence in many domains, potential issues are under-explored, undermining their reliability and the scope of their utility. Therefore, we identify 12 key potential biases and propose a new automated bias quantification framework-CALM-which systematically quantifies and analyzes each type of bias in LLM-as-a-Judge by using automated and principle-guided modification. Our experiments cover multiple popular language models, and the results indicate that while advanced models have achieved commendable overall performance, significant biases persist in certain specific tasks. Empirical results suggest that there remains room for improvement in the reliability of LLM-as-a-Judge. Moreover, we also discuss the explicit and implicit influence of these biases and give some suggestions for the reliable application of LLM-as-a-Judge. Our work highlights the need for stakeholders to address these issues and remind users to exercise caution in LLM-as-a-Judge applications.",
+    "publicationDate": "2024-10-03T17:53:30.000Z",
+    "votes": 19
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2504.09946",
+    "title": "Assessing Judging Bias in Large Reasoning Models: An Empirical Study",
+    "abstract": "Large Reasoning Models (LRMs) like DeepSeek-R1 and OpenAI-o1 have\ndemonstrated remarkable reasoning capabilities, raising important questions\nabout their biases in LLM-as-a-judge settings. We present a comprehensive\nbenchmark comparing judging biases between LLMs and LRMs across both subjective\npreference-alignment datasets and objective fact-based datasets. Through\ninvestigation of bandwagon, authority, position, and distraction biases, we\nuncover four key findings: (1) despite their advanced reasoning capabilities,\nLRMs remain susceptible to the above biases; (2) LRMs demonstrate better\nrobustness than LLMs specifically on fact-related datasets; (3) LRMs exhibit\nnotable position bias, preferring options in later positions; and (4) we\nidentify a novel \"superficial reflection bias\" where phrases mimicking\nreasoning (e.g., \"wait, let me think...\") significantly influence model\njudgments. To address these biases, we design and evaluate three mitigation\nstrategies: specialized system prompts that reduce judging biases by up to 19\\%\nin preference alignment datasets and 14\\% in fact-related datasets, in-context\nlearning that provides up to 27\\% improvement on preference tasks but shows\ninconsistent results on factual tasks, and a self-reflection mechanism that\nreduces biases by up to 10\\% in preference datasets and 16\\% in fact-related\ndatasets, with self-reflection proving particularly effective for LRMs. Our\nwork provides crucial insights for developing more reliable LLM-as-a-Judge\nframeworks, especially as LRMs become increasingly deployed as automated\njudges.",
+    "publicationDate": "2025-04-14T07:14:27.000Z",
+    "votes": 447
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.22316",
+    "title": "Evaluating Scoring Bias in LLM-as-a-Judge",
+    "abstract": "The \"LLM-as-a-Judge\" paradigm, using Large Language Models (LLMs) as automated evaluators, is pivotal to LLM development, offering scalable feedback for complex tasks. However, the reliability of these judges is compromised by various biases. Existing research has heavily concentrated on biases in comparative evaluations. In contrast, scoring-based evaluations-which assign an absolute score and are often more practical in industrial applications-remain under-investigated. To address this gap, we undertake the first dedicated examination of scoring bias in LLM judges. We shift the focus from biases tied to the evaluation targets to those originating from the scoring prompt itself. We formally define scoring bias and identify three novel, previously unstudied types: rubric order bias, score ID bias, and reference answer score bias. We propose a comprehensive framework to quantify these biases, featuring a suite of multi-faceted metrics and an automatic data synthesis pipeline to create a tailored evaluation corpus. Our experiments empirically demonstrate that even the most advanced LLMs suffer from these substantial scoring biases. Our analysis yields actionable insights for designing more robust scoring prompts and mitigating these newly identified biases.",
+    "publicationDate": "2025-06-27T15:25:23.000Z",
+    "votes": 16
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2402.10669",
+    "title": "Humans or LLMs as the Judge? A Study on Judgement Biases",
+    "abstract": "Adopting human and large language models (LLM) as judges (a.k.a human- and LLM-as-a-judge) for evaluating the performance of LLMs has recently gained attention. Nonetheless, this approach concurrently introduces potential biases from human and LLMs, questioning the reliability of the evaluation results. In this paper, we propose a novel framework that is free from referencing groundtruth annotations for investigating Misinformation Oversight Bias, Gender Bias, Authority Bias and Beauty Bias on LLM and human judges. We curate a dataset referring to the revised Bloom's Taxonomy and conduct thousands of evaluations. Results show that human and LLM judges are vulnerable to perturbations to various degrees, and that even the cutting-edge judges possess considerable biases. We further exploit these biases to conduct attacks on LLM judges. We hope that our work can notify the community of the bias and vulnerability of human- and LLM-as-a-judge, as well as the urgency of developing robust evaluation systems.",
+    "publicationDate": "2024-02-16T13:21:06.000Z",
+    "votes": 18
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2407.06551",
+    "title": "OffsetBias: Leveraging Debiased Data for Tuning Evaluators",
+    "abstract": "Employing Large Language Models (LLMs) to assess the quality of generated responses, such as prompting instruct-tuned models or fine-tuning judge models, has become a widely adopted evaluation method. It is also known that such evaluators are vulnerable to biases, such as favoring longer responses. While it is important to overcome this problem, the specifics of these biases remain under-explored. In this work, we qualitatively identify six types of biases inherent in various judge models. We propose EvalBiasBench as a meta-evaluation collection of hand-crafted test cases for each bias type. Additionally, we present de-biasing dataset construction methods and the associated preference dataset OffsetBias. Experimental results demonstrate that fine-tuning on our dataset significantly enhances the robustness of judge models against biases and improves performance across most evaluation scenarios. We release our datasets and the fine-tuned judge model to public.",
+    "publicationDate": "2024-10-07T08:49:49.000Z",
+    "votes": 15
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.08091",
+    "title": "Toward Robust LLM-Based Judges: Taxonomic Bias Evaluation and Debiasing Optimization",
+    "abstract": "Large language model (LLM)-based judges are widely adopted for automated evaluation and reward modeling, yet their judgments are often affected by judgment biases. Accurately evaluating these biases is essential for ensuring the reliability of LLM-based judges. However, existing studies typically investigate limited biases under a single judge formulation, either generative or discriminative, lacking a comprehensive evaluation. To bridge this gap, we propose JudgeBiasBench, a benchmark for systematically quantifying biases in LLM-based judges. JudgeBiasBench defines a taxonomy of judgment biases across 4 dimensions, and constructs bias-augmented evaluation instances through a controlled bias injection pipeline, covering 12 representative bias types. We conduct extensive experiments across both generative and discriminative judges, revealing that current judges exhibit significant and diverse bias patterns that often compromise the reliability of automated evaluation. To mitigate judgment bias, we propose bias-aware training that explicitly incorporates bias-related attributes into the training process, encouraging judges to disentangle task-relevant quality from bias-correlated cues. By adopting reinforcement learning for generative judges and contrastive learning for discriminative judges, our methods effectively reduce judgment biases while largely preserving general evaluation capability.",
+    "publicationDate": "2026-03-09T08:32:21.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2409.16788",
+    "title": "Mitigating the Bias of Large Language Model Evaluation",
+    "abstract": "Recently, there has been a trend of evaluating the Large Language Model (LLM) quality in the flavor of LLM-as-a-Judge, namely leveraging another LLM to evaluate the current output quality. However, existing judges are proven to be biased, namely they would favor answers which present better superficial quality (such as verbosity, fluency) while ignoring the instruction following ability. In this work, we propose systematic research about the bias of LLM-as-a-Judge. Specifically, for closed-source judge models, we apply calibration to mitigate the significance of superficial quality, both on probability level and prompt level. For open-source judge models, we propose to mitigate the bias by contrastive training, with curated negative samples that deviate from instruction but present better superficial quality. We apply our methods on the bias evaluation benchmark, and experiment results show our methods mitigate the bias by a large margin while maintaining a satisfactory evaluation accuracy.",
+    "publicationDate": "2024-12-04T13:44:09.287Z",
+    "votes": 6
+  }
+]

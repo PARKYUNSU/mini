@@ -1,0 +1,66 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.11835",
+    "title": "On the Risks of using LLM-Generated Tests for Regression Testing",
+    "abstract": "Software is under constant evolution: developers continuously add features, fix bugs, and refactor code, and any of these changes may break existing functionality. Regression testing guards against such effects by capturing expected behavior in test cases. LLM-based test generation aims to automate this process by generating regression tests directly from the code under test. This is beneficial when the implementation is correct, but problematic when the code contains faults: the generated tests may then encode and preserve incorrect behavior. To investigate this risk, we apply LLM-based regression test generation to pull requests merged into the main branch of software projects and study the impact of the generated tests on subsequent project evolution. We distinguish between fault-revealing tests, which assert correctly implemented behavior, and fault-enforcing tests, which assert faulty behavior. Across 145 pull requests from SciPy, Qiskit, and pandas, 8%-17% of the generated tests are fault-enforcing, while only 2.4%-4.8% reveal faults. Fault-enforcing tests persist over time: after several subsequent commits, 83%-91% of them are still relevant and pass. They also accumulate: when the faults of all pull requests are combined in one codebase, 83%-92% remain enforced at the end of the commit history, and the developer-written test suite detects only 14%-30% of them. Our results reveal a fundamental risk of LLM-generated regression tests: without manual validation, they may encode faulty behavior as expected behavior, allowing bugs to persist across software revisions and largely evade developer-maintained test suites. LLM-based regression testing can thus give rise to a new form of technical debt.",
+    "publicationDate": "2026-10-08T12:27:58.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.01967",
+    "title": "FastCI: Efficient GPU-Intensive CI for LLM Training Frameworks",
+    "abstract": "As large language models (LLMs) keep growing in size and complexity, their training frameworks evolve at a rapid pace as well. Therefore, continuous integration (CI) is critical for maintaining the quality and stability of these frameworks. However, unlike traditional software, CI for LLM training frameworks relies on GPU-intensive tests, which usually involve complete model training or evaluation. This leads CI itself to become a new bottleneck for fast-paced development. In this paper, we introduce FastCI, a framework that improves the efficiency of CI for LLM training frameworks. FastCI leverages runtime evidence to select affected tests and prune tests that execute changed code in equivalent contexts. Then FastCI prioritizes high-risk tests to expose potential failures earlier, and optimizes test workloads along dimensions outside the intended validation scope of each test. Evaluated on the CI workload of our LLM training framework, FastCI reduces the CI latency by 77.5% and the GPU resource usage by 63.9%, while improving the modified code coverage retention by 3.2%, compared with the currently deployed CI pipelines. FastCI has now been integrated into the CI pipelines of our LLM training framework at ByteDance.",
+    "publicationDate": "2026-10-01T16:18:14.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.23209",
+    "title": "Diversity-Guided Search-Based Testing of Large Language Model Applications",
+    "abstract": "Large Language Model (LLM)-based applications are increasingly deployed across domains including customer service, education, and mobility. These systems are prone to inaccurate, fictitious, or harmful responses, and their vast, high-dimensional input space makes systematic testing particularly challenging. In this paper, we present a search-based testing framework for LLM-based applications that incorporates failure diversity as an explicit optimization objective. Building on a discretization along stylistic, content-related, and perturbation dimensions, our framework maintains an archive of generated tests and rewards distance from that archive, while a repopulation operator periodically replaces non-failing tests in the population to sustain exploration. The repopulation operator is parameterized by its sampling strategy: replacement candidates are drawn either uniformly or by greedy distance maximization, two settings we compare empirically.\nWe evaluate both against several baselines across three case studies---LLM safety, in-car navigation, and in-vehicle function control---covering five systems under test, eight LLMs, and 18 distinct test configurations, with over one million executed tests. Our results show that all guided variants detect substantially more failures than random and combinatorial search in nearly all configurations. Among them, diversified search detects fewer failures, but covers a broader range of failure types in all case studies, with greedy repopulation offering the best tradeoff.",
+    "publicationDate": "2026-09-19T20:41:16.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.28750",
+    "title": "DragonCrawl: A Generative, Intent-Based Framework for Scalable Mobile End-to-End Testing",
+    "abstract": "As mobile applications grow in complexity, traditional End-to-End (E2E) testing frameworks struggle with UI volatility, maintenance overhead, and cross-platform scalability. This paper presents DragonCrawl, an AI-driven mobile testing system for continuous regression testing that has evolved from embedding-based similarity matching to generative intent-based reasoning using large language models. Unlike prior LLM-based testing research focused on exploratory testing and crash detection, DragonCrawl validates specific user flows on every code change, blocking commits that break critical functionality. By leveraging GPT-4o's multimodal capabilities, DragonCrawl achieves 91.6% pass rate on iOS and 92.2% on Android across 1,013 automated tests running continuously in CI/CD pipelines. The system reduces test onboarding time from 96-120 hours to under 4 hours and has saved an estimated 27 developer years in test maintenance effort. We present the architectural evolution from V1 (semantic embedding matching) to V2 (generative intent-based reasoning), discuss implementation challenges including token explosion and memory constraints, and report operational experience from production deployment. The integration of multimodal vision for end-state detection and tool calling for backend state transitions enables comprehensive regression testing that bridges UI interactions with system state. Our results demonstrate that AI-driven testing can maintain stability while eliminating the brittleness of traditional automated tests, enabling continuous quality assurance at scale.",
+    "publicationDate": "2026-07-30T18:17:31.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.29557",
+    "title": "Alteron: A Tool for Behavioral Regression Testing Across NLP Classifier Versions",
+    "abstract": "Evaluating evolving Natural Language Processing (NLP) models is important for ensuring reliable behavior across updates, but standard benchmark metrics do not fully capture how model behavior changes across versions. Existing work has focused mainly on testing models in isolation rather than comparing successive versions in continuous integration workflows. We present Alteron, a tool for detecting behavioral regressions across NLP model versions with metamorphic testing. Alteron constructs a test corpus from labeled source examples and compares model versions on metamorphically transformed inputs. In an evaluation spanning 10 metamorphic relations (MRs), 4 model versions, and 3 model-update transitions, Alteron identified 16 behavioral regressions, 11 of which were release-blocking. The results show that common model updates can preserve overall task performance while still introducing undesirable behavior changes, and that behavioral checks across model versions can reveal failures that aggregate benchmark metrics alone do not capture. The tool is open-source and available at this https URL. A screencast demonstration is available at this https URL.",
+    "publicationDate": "2026-07-31T15:48:31.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.06713",
+    "title": "Reliable and Developer-Aligned Evaluation of Agents for Software Engineering",
+    "abstract": "Large language models are rapidly moving towards closing the development cycle, transitioning from simple assistive companions to autonomous contributors deeply embedded into collaborative development environments. Despite their accelerated adoption, existing evaluation techniques are limited due to their fragmented nature and distorted projection of true model capabilities, often obtained from hypothetical syntactic scenarios. This research aims to bridge this gap by providing a comprehensive evaluation methodology for LLM-powered agents that is grounded in real-world software development practice. Our evaluation approach focuses on contamination-awareness, in-the-wild agentic behavior assessment, and trajectory-aware benchmarks and metrics capturing realistic coding contexts, human-aligned behavior, and model failure modes.",
+    "publicationDate": "2026-07-07T18:29:50.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.02755",
+    "title": "Acceptance-Test-Driven Evaluation Protocols for Business-Centric LLM Systems",
+    "abstract": "Large language model (LLM) applications are increasingly expected to satisfy deterministic institutional requirements while relying on probabilistic generative components. This mismatch makes ordinary post-hoc benchmarking insufficient for systems that must be safe, reliable, auditable, and economically useful. This paper contributes an evaluation-protocol extension for operational LLM systems grounded in acceptance-test-driven development, safety engineering, and business-centric validation. The extension translates stakeholder goals into executable behavioral contracts, release gates, monitoring signals, and evidence artifacts before prompt, model, retrieval, or agent changes are accepted. It adapts the red-green-refactor discipline of test-driven development to a red-train-green lifecycle: first define failing acceptance tests for desired behavior, then improve the LLM system through prompt changes, retrieval design, fine-tuning, guardrails, or data augmentation, and finally release only when multidimensional gates are satisfied. The contribution is a governance-oriented metric stack, reference architecture, and empirical protocol for comparing acceptance-test-driven LLM development against prompt-first and benchmark-after workflows.",
+    "publicationDate": "2026-06-01T18:21:10.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.13898",
+    "title": "Bidirectional Empowerment of Metamorphic Testing and Large Language Models: A Systematic Survey",
+    "abstract": "Large language models (LLMs) have introduced substantial challenges to software quality assurance due to their generative, probabilistic, and open-ended nature, which intensifies the oracle problem and limits the applicability of traditional testing methods. Metamorphic testing (MT), which checks necessary relations among multiple related executions rather than relying on exact expected outputs, has emerged as a promising approach for testing LLMs and other oracle-deficient systems. At the same time, the strong semantic understanding, reasoning, and code generation capabilities of LLMs create new opportunities to automate the traditionally labor-intensive phases of MT. This survey systematically reviews 93 primary studies and characterizes this reciprocal relationship as the bidirectional empowerment of MT and LLMs. We propose a taxonomy spanning two complementary directions: MT for LLMs, which uses MT to verify, validate, assess, and understand LLMs and LLM-based systems across issues such as hallucination, fairness, robustness, code reliability, retrieval-augmented generation, dialogue, and autonomous agents; and LLMs for MT, which leverages LLMs to support metamorphic relation discovery, input transformation and synthesis, executable test implementation, and agentic closed-loop testing. By synthesizing these developments, this survey provides a structured foundation for understanding the evolving synergy between MT and LLMs and highlights future directions for building more rigorous, scalable, and trustworthy AI quality assurance methodologies.",
+    "publicationDate": "2026-05-12T13:47:26.000Z",
+    "votes": 4
+  }
+]
