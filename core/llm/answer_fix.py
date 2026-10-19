@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import re
 
-__all__ = ["drop_contradicted_no_doc"]
+__all__ = ["drop_contradicted_no_doc", "renumber_body_items"]
 
 # 서론의 '문서에 없다' 문장 (v12 가 쓰는 변형들). 문장 끝 마침표까지 지운다.
 _NO_DOC_SENT = re.compile(
@@ -49,3 +49,27 @@ def drop_contradicted_no_doc(answer: str) -> tuple[str, bool]:
     # 서론 첫 줄이 비면 머리 바로 뒤 줄바꿈만 남긴다.
     new_intro = re.sub(r"^(\n?)[ \t]+", r"\1", new_intro)
     return answer[:m_intro.end()] + new_intro + answer[m_body.start():], True
+
+
+# 본론 번호 다시 매기기 (2026-10-20 실제 사용 피드백): 목록 번호 칸 템플릿(list_slots_1016)에서 모델이
+# 관련 없는 칸을 빼고도 남은 칸의 원래 번호(1, 4, 7, 8)를 그대로 썼다. 본론 안의 "N. " 항목만 1부터 다시 매긴다.
+_ITEM = re.compile(r"^(\s*)(\d{1,2})\.(\s+)")
+
+
+def renumber_body_items(answer: str) -> tuple[str, bool]:
+    """본론 머리와 결론 머리 사이의 번호 항목을 1, 2, 3… 으로 다시 매긴다. 바뀌었으면 True."""
+    b, c = _find("본론", answer), _find("결론", answer)
+    if not b:
+        return answer, False
+    end = c.start() if c and c.start() > b.end() else len(answer)
+    body = answer[b.end():end]
+    lines, n, changed = body.split("\n"), 0, False
+    for k, line in enumerate(lines):
+        m = _ITEM.match(line)
+        if not m:
+            continue
+        n += 1
+        if int(m.group(2)) != n:
+            lines[k] = f"{m.group(1)}{n}.{m.group(3)}" + line[m.end():]
+            changed = True
+    return (answer[:b.end()] + "\n".join(lines) + answer[end:], changed) if changed else (answer, False)

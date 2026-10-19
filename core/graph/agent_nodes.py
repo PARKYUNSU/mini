@@ -47,7 +47,7 @@ from core.llm.agent_llm import (
     get_rag_answer_llm,
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
-from core.llm.answer_fix import drop_contradicted_no_doc
+from core.llm.answer_fix import drop_contradicted_no_doc, renumber_body_items
 from core.llm.presence_judge import (
     NO_DOC_HINT,
     gate_types,
@@ -1174,6 +1174,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             answer, _nd = drop_contradicted_no_doc(answer)
             if _nd:
                 print("[DEBUG] DirectAnswer: 서론의 모순된 '문서에 없다' 문장 제거")
+            answer, _rn = renumber_body_items(answer)
+            if _rn:
+                print("[DEBUG] DirectAnswer: 본론 번호 다시 매김")
             # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_MULTI_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
