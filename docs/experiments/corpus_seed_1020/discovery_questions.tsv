@@ -1,0 +1,34 @@
+D01	RAG 답변이 검색된 문서에 근거하는지(faithfulness) 자동으로 검증하는 연구 있어?	automatic verification of faithfulness and groundedness of RAG answers to retrieved documents
+D02	LLM 답변에 문장 단위 인용(citation)을 정확하게 붙이게 하는 방법 찾아줘	sentence-level citation and attribution generation for LLM answers with citation precision and recall
+D03	검색 문서에 답이 없을 때 모른다고 답하게(abstention) 만드는 연구들 정리해줘	RAG abstention and negative rejection when retrieved context is insufficient or the question is unanswerable
+D04	외부 지식 없이 샘플링 일관성으로 환각을 탐지하는 방법 알려줘	zero-resource hallucination detection via sampling consistency of LLM outputs
+D05	모델이 답을 만든 뒤 검증 질문을 스스로 만들어 사실을 확인하는 연구 있어?	LLM self-verification by generating verification questions after answering (chain of verification)
+D06	LLM 환각 탐지 연구 동향 정리해줘	survey of hallucination detection and mitigation in large language models
+D07	긴 컨텍스트 중간에 있는 정보를 LLM이 놓치는 문제를 다룬 연구 있어?	lost in the middle: position bias of information in long context LLMs
+D08	RAG에서 검색된 문서의 순서나 개수가 답변 품질에 주는 영향을 분석한 연구 찾아줘	effect of number and order of retrieved passages on RAG answer quality
+D09	프롬프트를 압축해서 컨텍스트 길이를 줄이면서 성능을 유지하는 방법 알려줘	prompt compression for long context LLMs preserving performance
+D10	롱 컨텍스트 LLM이랑 RAG 중 어느 쪽이 나은지 비교한 연구 있어?	long-context LLMs versus retrieval-augmented generation comparison
+D11	검색 전에 질문을 재작성하거나 가상 답변을 만들어 검색 품질을 높이는 방법 찾아줘	query rewriting and hypothetical document embeddings to improve retrieval for RAG
+D12	관련 없는 문서가 섞였을 때 RAG가 흔들리지 않게 하는 연구들 정리해줘	robustness of RAG to irrelevant or noisy retrieved documents
+D13	표가 포함된 문서에서 질의응답 성능을 높이는 RAG 연구 있어?	retrieval-augmented question answering over tables and semi-structured documents
+D14	표를 LLM에 넣을 때 어떤 형식으로 직렬화하는 게 좋은지 비교한 연구 찾아줘	table serialization formats for large language models comparison
+D15	PDF 문서에서 표와 레이아웃을 보존하며 파싱하는 방법 알려줘	PDF document parsing preserving tables and layout for RAG
+D16	표와 텍스트를 함께 보고 수치 추론하는 QA 연구 동향 정리해줘	hybrid table-text question answering with numerical reasoning
+D17	차트나 도표가 있는 문서를 검색하는 멀티모달 RAG 논문 5개 찾아줘	multimodal RAG over visually rich documents with charts and figures
+D18	재무 보고서처럼 수치가 많은 문서에서 LLM이 계산을 틀리지 않게 하는 연구 있어?	numerical reasoning over financial reports with LLMs
+D19	RAG 문서 청킹 전략(고정 길이, 의미 단위 등)을 비교한 연구 있어?	document chunking strategies for retrieval-augmented generation comparison
+D20	BM25랑 dense retrieval 차이가 뭐야?	BM25 sparse retrieval versus dense passage retrieval
+D21	하이브리드 검색에서 희소·밀집 검색 결과를 합치는 방법 연구 찾아줘	hybrid sparse dense retrieval fusion methods
+D22	cross-encoder 재순위랑 ColBERT 차이가 뭐야?	cross-encoder reranking versus late interaction ColBERT retrieval
+D23	도메인 특화 문서용으로 임베딩 모델을 파인튜닝하는 연구들 정리해줘	domain adaptation fine-tuning of text embedding models for retrieval
+D24	여러 문서를 거쳐야 답이 나오는 multi-hop RAG 연구 동향 정리해줘	multi-hop retrieval-augmented generation
+D25	HNSW 인덱스 파라미터가 검색 정확도와 속도에 주는 영향을 분석한 연구 있어?	HNSW approximate nearest neighbor index parameters recall latency tradeoff
+D26	임베딩 벡터를 양자화해서 메모리를 줄이면서 검색 성능을 유지하는 방법 찾아줘	embedding quantization for vector search memory reduction product quantization binary embeddings
+D27	메타데이터 필터링과 근사 최근접 검색을 같이 할 때 성능 문제를 다룬 연구 있어?	filtered approximate nearest neighbor search with metadata constraints
+D28	벡터 검색 인덱스 최적화 연구들 정리해줘	vector database indexing optimization survey
+D29	RAG 시스템을 검색과 생성 단계로 나눠 평가하는 프레임워크 연구 있어?	evaluation framework for RAG separating retrieval and generation quality
+D30	LLM-as-a-judge의 편향(위치 편향, 길이 편향)을 분석한 연구 찾아줘	biases of LLM-as-a-judge position bias verbosity bias
+D31	RAG 평가용 질문-정답 데이터를 LLM으로 합성하는 방법 알려줘	synthetic question answer generation for RAG evaluation datasets
+D32	검색 평가 지표 nDCG랑 recall@k 차이가 뭐야?	information retrieval evaluation metrics nDCG recall at k
+D33	LLM 애플리케이션 회귀 테스트나 지속 평가 방법 연구들 정리해줘	regression testing and continuous evaluation of LLM applications
+D34	벤치마크 데이터 오염 때문에 평가가 부풀려지는 문제를 다룬 연구 있어?	benchmark data contamination in LLM evaluation

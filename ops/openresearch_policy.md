@@ -22,6 +22,10 @@ alphaXiv OpenResearch CLI 를 **문헌 조사 도구**로만 쓴다. 근거와 �
 - `orx exp` · `orx up` 실험 트리, `orx compute` · `orx instance` 원격 실행, `orx agent spawn` — 자동 실험·자동 채택 금지. 채택은 지금처럼 **사전 등록 → 짝 검정 → 사용자 승인**.
 - `orx login` 및 계정·관리형 컴퓨트.
 
+## 승인된 추가 용도 (2026-10-20 사용자 승인)
+
+- **코퍼스 수집 후보 찾기**: `orx discover` 로 질문별 후보 논문(arXiv ID)을 찾아 목록을 만든다(docs/experiments/corpus_seed_1020). `orx` 는 목록만 만들고, 실제 수집은 우리 파이프라인(`apps/backfill/ingest_classics.py --ids`)이 한다 — 운영 DB 에 `orx` 를 붙이지 않는 원칙은 그대로.
+
 ## 나중에 검토 (승인 필요)
 
 - 실험 트리 기능을 우리 저장소에 붙일지(Git 저장소 단위로 동작).
