@@ -425,6 +425,30 @@ def _llm_model_label(llm) -> str:
 
 
 def _extract_english_rag_query(user_request: str, session_context: str = "") -> str:
+    """검색어 추출. ``RAG_QUERY_CLEAN=1`` 이면 프롬프트는 그대로 두고 앞뒤 정리만 (docs/experiments/query_clean_1021)."""
+    if os.getenv("RAG_QUERY_CLEAN", "0").strip() != "1":
+        return _extract_english_rag_query_base(user_request, session_context)
+    req = (user_request or "").strip()
+    q = _extract_english_rag_query_base(_LIST_NUMBER.sub("", req).strip() or req, session_context)
+    return _drop_generic_words(q)
+
+
+def _drop_generic_words(query: str) -> str:
+    """외부 검색 v3 와 같은 일반어를 뺀다. 쉼표 구 구분은 남기고, 3단어 미만이 되면 원래대로."""
+    from core.rag.external_search import _GENERIC
+
+    if re.search(r"[가-힣]", query or ""):
+        return query  # 한국어 원문 폴백은 건드리지 않는다
+    phrases = []
+    for ph in re.split(r"\s*,\s*", query or ""):
+        kept = [w for w in ph.split() if w.lower() not in _GENERIC]
+        if kept:
+            phrases.append(" ".join(kept))
+    out = ", ".join(phrases)
+    return out if len(out.replace(",", " ").split()) >= 3 else query
+
+
+def _extract_english_rag_query_base(user_request: str, session_context: str = "") -> str:
     """
     Chroma 검색 직전: 질문을 3~5개 영어 핵심 키워드로 압축.
     LLM 출력이 비정상이면 원문을 그대로 반환(안전 폴백).
