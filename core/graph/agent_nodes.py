@@ -432,6 +432,8 @@ def _extract_english_rag_query(user_request: str, session_context: str = "") -> 
     req = (user_request or "").strip()
     if not req:
         return req
+    if os.getenv("RAG_QUERY_V2", "0").strip() == "1":
+        return _extract_english_rag_query_v2(req, session_context)
     prompt = f"""Extract 3-5 core English search keywords for academic RAG retrieval.
 Return ONLY one comma-separated line in English.
 No Korean, no explanations, no numbering.
@@ -480,6 +482,44 @@ Recent context:
 
 
 _RAG_QUERY_MAX_WORDS = 12
+
+# 검색어 추출 v2 (RAG_QUERY_V2, docs/experiments/query_extract_1021): 실제 사용에서 질문 앞 "1." 만으로 다른
+# 논문이 나왔고, 일반어(research · academic · paper …)가 붙어 일반 논문을 끌어왔으며, "인용"을 참고문헌으로 읽었다.
+_LIST_NUMBER = re.compile(r"^\s*(?:\d{1,2}\s*[.)]|[①-⑳]|[-•*])\s*")
+_QUERY_V2_PROMPT = """Write ONE English search query for finding research papers that answer the user's question.
+Rules:
+- 4 to 10 words, separated by spaces, no commas, no quotes.
+- Keep the specific technique, task, data type, and conditions stated in the question.
+- Translate Korean technical terms into the standard English research terms, e.g. 근거/충실성 -> faithfulness grounding, 인용 -> citation attribution, 모른다고 답하기 -> abstention unanswerable, 환각 -> hallucination.
+- Do NOT add generic words: research, paper, papers, academic, study, survey, keywords, method, approach, trends.
+- Ignore list numbers and request words such as 찾아줘, 정리해줘, 알려줘, 있어.
+Return only the query line.
+
+User question:
+{req}
+
+Recent context:
+{ctx}
+"""
+
+
+def _extract_english_rag_query_v2(req: str, session_context: str = "") -> str:
+    from core.rag.external_search import clean_query
+
+    q = _LIST_NUMBER.sub("", req).strip() or req
+    prompt = _QUERY_V2_PROMPT.format(req=q, ctx=session_context[:500] if session_context else "(none)")
+    raw = ""
+    for llm_getter in (get_rag_query_rewrite_llm, get_executor_llm):
+        try:
+            raw = (normalize_ai_message_content(llm_getter().invoke([HumanMessage(content=prompt)])) or "").strip()
+            if raw:
+                break
+        except Exception:
+            continue
+    words = re.sub(r"[^A-Za-z0-9\-\s]", " ", raw.splitlines()[0] if raw else "").lower().split()
+    if len(words) < 3:
+        return q
+    return " ".join(clean_query(" ".join(words)).split()[:_RAG_QUERY_MAX_WORDS])
 
 
 def _paper_knowledge_heuristic(user_request: str, req_lower: str) -> bool:
