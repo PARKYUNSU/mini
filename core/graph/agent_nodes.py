@@ -48,6 +48,7 @@ from core.llm.agent_llm import (
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.answer_fix import drop_contradicted_no_doc, renumber_body_items
+from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
 from core.llm.presence_judge import (
     NO_DOC_HINT,
     gate_types,
@@ -924,6 +925,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
         return {}
 
     _da_timeout = DIRECT_ANSWER_TIMEOUT_SEC if DIRECT_ANSWER_TIMEOUT_SEC > 0 else None
+    _ext = None  # DB 밖 외부 검색 (RAG_EXTERNAL_SEARCH, docs/experiments/external_search_1020)
     try:
         answer = ""
         if router_choice == "A":
@@ -1119,6 +1121,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 doc_count=len(_doc_ids),
                 list_mode=list_mode_active(user_request, prefer_single_hit=prefer_single_hit),
             )
+            _pick = None
             if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request):
                 # 답변과 같은 앞부분으로 판정하면 답변 호출이 컨텍스트를 다시 읽지 않는다 (docs/experiments/judge_cache_1017)
                 if shared_prefix_active() and not image_base64:
@@ -1128,6 +1131,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 print(f"[DEBUG] DirectAnswer: 정답 유무 판정 = {_pick}")
                 if _pick == "없음":
                     system_prompt = system_prompt + NO_DOC_HINT
+            # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다
+            if external_search_active() and (
+                _pick == "없음" or list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
+            ):
+                _ext = ExternalSearch(rag_query, set(_doc_ids))
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
             if _da_timeout is None:
@@ -1177,6 +1185,12 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             answer, _rn = renumber_body_items(answer)
             if _rn:
                 print("[DEBUG] DirectAnswer: 본론 번호 다시 매김")
+            if _ext is not None:
+                _ext_items, _ext_wait = _ext.result()
+                print(f"[DEBUG] DirectAnswer: 외부 검색 {len(_ext_items)}편 (답변 뒤 대기 {_ext_wait:.1f}s)")
+                if _ext_items:
+                    answer = answer.rstrip() + format_section(_ext_items)
+                    record_candidates(user_request, _ext_items)
             # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_MULTI_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"
