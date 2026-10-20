@@ -59,6 +59,7 @@
 | [`engine_bench_1019/`](engine_bench_1019/) | 추론 엔진 속도 비교 Ollama · MLX · uzu (Qwen3.5 9B 4bit, 맥미니 M2) | **기각** — 답 하나 41.7 · 42.4 · 43.6s. 생성은 MLX · uzu 가 13% 빠르나 읽기가 16~22% 느림. uzu 는 앞부분 재사용 안 됨 |
 | [`history_gate_1019/`](history_gate_1019/) | 이어지는 질문에만 대화 기록 (`RAG_HISTORY_GATE`) + 다회차 평가 | **채택 · 운영 (사용자 결정, 주 지표 유의 X · 시간 +7s)** — 오염 4 → 0, 비교 두 편 인용 5 → 20/25, 검색 59 → 62, 이어지는 질문은 둘 다 0/10 |
 | [`corpus_seed_1020/`](corpus_seed_1020/) | 직무 분야 핵심 논문 173편 추가 수집(orx 후보) | **주 지표 유의 X · 162 −2(경계), 사용자 결정 대기** — held-out '2' 질문 15 → 17, 직무 질문 20 → 27/34(p .016), '2' 논문 47 → 80 |
+| [`external_search_1020/`](external_search_1020/) | DB 밖 OpenAlex 검색 덧붙이기 (`RAG_EXTERNAL_SEARCH`) | **주 통과 · 무관 37% 로 보호 미달** — 트리거 질문 56% 에 직접 맞는 외부 논문, DB 에 없던 정답 8건 |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -187,7 +188,8 @@ docs/experiments/
 ├─ status_1018/            ← 현재 수준 재측정 (성적표 10-18)
 ├─ engine_bench_1019/      ← 추론 엔진 속도 비교 (기각)
 ├─ history_gate_1019/      ← 대화 기록 게이트 · 다회차 평가 (채택 · 운영)
-├─ corpus_seed_1020/       ← 직무 분야 논문 추가 수집 (1단계)
+├─ corpus_seed_1020/       ← 직무 분야 논문 추가 수집 (1단계, 수집분 유지)
+├─ external_search_1020/   ← DB 밖 OpenAlex 검색 (2단계)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
