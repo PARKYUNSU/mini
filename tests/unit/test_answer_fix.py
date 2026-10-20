@@ -53,3 +53,30 @@ def test_denial_outside_intro_untouched():
 def test_missing_sections_untouched():
     text = "제공된 문서에는 질문에서 찾는 연구가 없습니다."
     assert drop_contradicted_no_doc(text) == (text, False)
+
+
+# 같은 논문 항목 합치기 (docs/experiments/merge_same_paper_1021)
+from core.llm.answer_fix import merge_same_paper_items, renumber_body_items
+
+SPLIT = (
+    "<b>서론</b>\nDDC 소개.\n\n<b>본론</b>\n"
+    "1. <b>DDC</b>: 폭과 깊이를 같이 본다[2605.15100v1].\n"
+    "2. <b>Other</b>: 다른 논문[2401.00001v1].\n"
+    "3. <b>DDC</b>: 토큰을 10배 줄였다[2605.15100v1].\n"
+    "4. <b>Both</b>: 둘 다[2605.15100v1][2401.00001v1].\n\n"
+    "<b>결론</b>\n10배."
+)
+
+
+def test_merges_same_single_paper_items():
+    out, ch = merge_same_paper_items(SPLIT)
+    out, _ = renumber_body_items(out)
+    assert ch
+    assert "1. <b>DDC</b>: 폭과 깊이를 같이 본다[2605.15100v1]. 토큰을 10배 줄였다[2605.15100v1].\n" in out
+    assert "2. <b>Other</b>" in out and "3. <b>Both</b>: 둘 다" in out  # 두 편 인용 항목은 그대로
+    assert out.count("<b>DDC</b>") == 1 and out.endswith("<b>결론</b>\n10배.")
+
+
+def test_no_merge_when_distinct():
+    md = SPLIT.replace("3. <b>DDC</b>: 토큰을 10배 줄였다[2605.15100v1].\n", "")
+    assert merge_same_paper_items(md) == (md, False)

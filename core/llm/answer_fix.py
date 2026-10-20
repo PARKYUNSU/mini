@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import re
 
-__all__ = ["drop_contradicted_no_doc", "renumber_body_items"]
+__all__ = ["drop_contradicted_no_doc", "merge_same_paper_items", "renumber_body_items"]
 
 # 서론의 '문서에 없다' 문장 (v12 가 쓰는 변형들). 문장 끝 마침표까지 지운다.
 _NO_DOC_SENT = re.compile(
@@ -73,3 +73,32 @@ def renumber_body_items(answer: str) -> tuple[str, bool]:
             lines[k] = f"{m.group(1)}{n}.{m.group(3)}" + line[m.end():]
             changed = True
     return (answer[:b.end()] + "\n".join(lines) + answer[end:], changed) if changed else (answer, False)
+
+
+# 같은 논문 항목 합치기 (docs/experiments/merge_same_paper_1021): 판정이 한 편을 고르면 모델이 그 논문을
+# "1. **X**: 방법" / "2. **X**: 결과" 로 나눠 써서(수치 질문 19/26) 항목 수가 논문 수처럼 읽혔다.
+_CITED = re.compile(r"\[\s*(\d{4}\.\d{4,5})(?:v\d+)?\s*\]")
+_ITEM_HEAD = re.compile(r"^\d{1,2}\.\s+(?:(?:<b>[^<\n]*</b>|\*\*[^*\n]*\*\*)\s*[:：]\s*)?")
+
+
+def merge_same_paper_items(answer: str) -> tuple[str, bool]:
+    """본론에서 논문 한 편만 인용한 항목이 앞 항목과 같은 한 편이면 앞 항목에 붙인다. 번호는 renumber_body_items 가."""
+    b, c = _find("본론", answer), _find("결론", answer)
+    if not b:
+        return answer, False
+    end = c.start() if c and c.start() > b.end() else len(answer)
+    chunks = re.split(r"(?m)^(?=[ \t]*\d{1,2}\.\s)", answer[b.end():end])
+    out, owner, changed = [chunks[0]], {}, False
+    for ch in chunks[1:]:
+        ids = set(_CITED.findall(ch))
+        pid = next(iter(ids)) if len(ids) == 1 else None
+        if pid in owner:
+            k = owner[pid]
+            tail = out[k][len(out[k].rstrip()):]
+            out[k] = out[k].rstrip() + " " + _ITEM_HEAD.sub("", ch.strip(), count=1) + tail
+            changed = True
+            continue
+        if pid:
+            owner[pid] = len(out)
+        out.append(ch)
+    return (answer[:b.end()] + "".join(out) + answer[end:], True) if changed else (answer, False)

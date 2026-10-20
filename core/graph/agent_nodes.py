@@ -47,7 +47,7 @@ from core.llm.agent_llm import (
     get_rag_answer_llm,
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
-from core.llm.answer_fix import drop_contradicted_no_doc, renumber_body_items
+from core.llm.answer_fix import drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
 from core.llm.presence_judge import (
     NO_DOC_HINT,
@@ -1295,6 +1295,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             answer, _nd = drop_contradicted_no_doc(answer)
             if _nd:
                 print("[DEBUG] DirectAnswer: 서론의 모순된 '문서에 없다' 문장 제거")
+            if os.getenv("RAG_MERGE_SAME_PAPER", "0").strip() == "1":  # docs/experiments/merge_same_paper_1021
+                answer, _mg = merge_same_paper_items(answer)
+                if _mg:
+                    print("[DEBUG] DirectAnswer: 같은 논문 본론 항목 합침")
             answer, _rn = renumber_body_items(answer)
             if _rn:
                 print("[DEBUG] DirectAnswer: 본론 번호 다시 매김")
