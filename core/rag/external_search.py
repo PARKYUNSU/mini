@@ -110,7 +110,7 @@ def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout:
     except Exception as exc:  # 외부 장애는 답변을 막지 않는다
         print(f"[DEBUG] external_search 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return []
-    ex = {re.sub(r"v\d+$", "", i) for i in (exclude_ids or set())}
+    ex = {re.sub(r"v\d+$", "", str(i)) for i in (exclude_ids or set())}
     cands: list[dict] = []
     seen: set[str] = set()
     for w in works:

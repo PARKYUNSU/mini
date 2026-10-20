@@ -99,3 +99,9 @@ def test_clean_query():
     assert X.clean_query("table-to-chart generation llm research paper table visualization chart creation from text large") == \
         "table-to-chart generation llm table visualization chart creation from text"
     assert X.clean_query("academic research papers") == "academic research papers"  # 3단어 미만이면 원래대로
+
+
+def test_exclude_ids_tolerates_non_str(monkeypatch):
+    monkeypatch.setattr(X.requests, "get", lambda *a, **k: _R(WORKS))
+    out = X.search_openalex("q", {1, 2, "2401.00001v1"}, per_page=8, min_sim=None, dedupe=False, clean=False)
+    assert "In Context Already" not in [o["title"] for o in out]
