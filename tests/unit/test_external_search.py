@@ -22,7 +22,7 @@ class _R:
 
 def test_filters_and_ids(monkeypatch):
     monkeypatch.setattr(X.requests, "get", lambda *a, **k: _R(WORKS))
-    out = X.search_openalex("q", {"2401.00001v2"})
+    out = X.search_openalex("q", {"2401.00001v2"}, per_page=8, min_sim=None, dedupe=False)
     assert [o["title"] for o in out] == ["Enabling LLMs to Generate Text with Citations", "Journal Only"]
     assert out[0]["arxiv"] == "2305.14627" and out[0]["abstract"] == "We cite"
     assert out[1]["url"] == "https://doi.org/10.1/x"
@@ -50,3 +50,30 @@ def test_parallel_wait_bounded(monkeypatch):
 def test_flag(monkeypatch):
     monkeypatch.delenv("RAG_EXTERNAL_SEARCH", raising=False)
     assert not X.external_search_active()
+
+
+def test_v2_sim_filter_and_dedupe(monkeypatch):
+    works = {"results": [
+        {"id": "W1", "title": "Generic RAG Survey", "publication_year": 2024, "ids": {}, "locations": []},
+        {"id": "W2", "title": "Exact Match Paper", "publication_year": 2024, "ids": {}, "locations": []},
+        {"id": "W3", "title": "exact match paper", "publication_year": 2025, "ids": {}, "locations": []},
+        {"id": "W4", "title": "Close Paper", "publication_year": 2023, "ids": {}, "locations": []},
+    ]}
+    monkeypatch.setattr(X.requests, "get", lambda *a, **k: _R(works))
+    sims = {"Generic RAG Survey": 0.30, "Exact Match Paper": 0.80, "Close Paper": 0.55}
+    def fake_embed(texts):
+        out = [[1.0, 0.0]]
+        for t in texts[1:]:
+            s = sims[t.split(".")[0]]
+            out.append([s, (1 - s * s) ** 0.5])
+        return out
+    monkeypatch.setattr(X, "_embed", fake_embed)
+    out = X.search_openalex("q", min_sim=0.47)
+    assert [o["title"] for o in out] == ["Exact Match Paper", "Close Paper"]  # 문턱 아래 · 중복 빠짐, 높은 순
+
+
+def test_v2_embed_failure_returns_empty(monkeypatch):
+    monkeypatch.setattr(X.requests, "get", lambda *a, **k: _R(WORKS))
+    def boom(t): raise RuntimeError("x")
+    monkeypatch.setattr(X, "_embed", boom)
+    assert X.search_openalex("q") == []

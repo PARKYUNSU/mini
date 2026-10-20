@@ -23,6 +23,10 @@ OPENALEX_URL = "https://api.openalex.org/works"
 TIMEOUT_SEC = 6.0
 MAX_ITEMS = 4
 MIN_YEAR = 2017
+# v2 (docs/experiments/external_search_v2_1020): 검색어 ↔ 제목+초록 유사도 문턱 · 같은 제목 합치기.
+# v1 은 무관 37% — 'RAG 서베이' 같은 일반 논문이 반복해 끼었다. 문턱은 v1 판정 124편으로 정했다.
+MIN_SIM = float(os.getenv("RAG_EXTERNAL_MIN_SIM", "0.47"))
+PER_PAGE = 10
 _ARXIV = re.compile(r"(?:arxiv\.org/abs/|10\.48550/arxiv\.)(\d{4}\.\d{4,5})", re.I)
 
 
@@ -48,15 +52,39 @@ def _abstract(work: dict) -> str:
     return " ".join(w for _, w in pos)
 
 
+def _embed(texts: list[str]):
+    """운영 검색과 같은 임베딩 모델(이미 올라온 것을 다시 쓴다). 정규화된 벡터."""
+    try:
+        from core.rag.agent_chroma_rag import _get_chroma_singleton
+
+        fn = _get_chroma_singleton()._embedding_fn
+    except Exception:
+        from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+
+        from core.config.agent_config import EMBEDDING_MODEL
+
+        fn = SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL, device="cpu", normalize_embeddings=True)
+    return fn(texts)
+
+
+def _title_key(title: str) -> str:
+    return re.sub(r"\W+", "", title.lower())
+
+
 def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout: float = TIMEOUT_SEC,
-                    limit: int = MAX_ITEMS) -> list[dict]:
-    """OpenAlex 검색 → 컨텍스트에 없는 최근(2017~) 논문 최대 ``limit`` 편. 실패하면 []."""
+                    limit: int = MAX_ITEMS, per_page: int = PER_PAGE, min_sim: float | None = MIN_SIM,
+                    dedupe: bool = True) -> list[dict]:
+    """OpenAlex 검색 → 컨텍스트에 없는 최근(2017~) 논문 최대 ``limit`` 편. 실패하면 [].
+
+    ``min_sim`` 이 있으면 검색어와 "제목. 초록" 의 유사도가 그 이상인 것만, 높은 순으로 고른다.
+    v1 동작은 ``per_page=8, min_sim=None, dedupe=False``.
+    """
     q = (query or "").strip()
     if not q:
         return []
     try:
         r = requests.get(OPENALEX_URL, params={
-            "search": q[:300], "per-page": 8,
+            "search": q[:300], "per-page": per_page,
             "select": "id,title,ids,doi,publication_year,locations,abstract_inverted_index",
         }, timeout=timeout)
         r.raise_for_status()
@@ -65,18 +93,32 @@ def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout:
         print(f"[DEBUG] external_search 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return []
     ex = {re.sub(r"v\d+$", "", i) for i in (exclude_ids or set())}
-    out: list[dict] = []
+    cands: list[dict] = []
+    seen: set[str] = set()
     for w in works:
         title = re.sub(r"\s+", " ", (w.get("title") or "")).strip()
         year = w.get("publication_year") or 0
         ax = _arxiv_id(w)
         if not title or year < MIN_YEAR or (ax and ax in ex):
             continue
+        if dedupe:
+            k = _title_key(title)
+            if k in seen:
+                continue
+            seen.add(k)
         url = f"https://arxiv.org/abs/{ax}" if ax else ((w.get("ids") or {}).get("doi") or w.get("id") or "")
-        out.append({"title": title, "year": year, "arxiv": ax, "url": url, "abstract": _abstract(w)[:1200]})
-        if len(out) >= limit:
-            break
-    return out
+        cands.append({"title": title, "year": year, "arxiv": ax, "url": url, "abstract": _abstract(w)[:1200]})
+    if min_sim is not None and cands:
+        try:
+            vecs = _embed([q] + [(c["title"] + ". " + c["abstract"])[:600] for c in cands])
+            qv = vecs[0]
+            for c, v in zip(cands, vecs[1:]):
+                c["sim"] = float(sum(a * b for a, b in zip(qv, v)))
+            cands = sorted((c for c in cands if c["sim"] >= min_sim), key=lambda c: -c["sim"])
+        except Exception as exc:  # 유사도 계산이 실패하면 붙이지 않는다(거르지 못한 결과는 소음)
+            print(f"[DEBUG] external_search 유사도 실패: {type(exc).__name__}: {str(exc)[:120]}")
+            return []
+    return cands[:limit]
 
 
 def format_section(items: list[dict]) -> str:
