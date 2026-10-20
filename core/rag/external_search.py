@@ -83,10 +83,12 @@ def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout:
     if not q:
         return []
     try:
+        # 키가 있으면 헤더로(무료 일일 예산은 IP 공용이라 쉽게 바닥난다 — 2026-10-20). 키는 URL 에 넣지 않는다.
+        key = os.getenv("OPENALEX_API_KEY", "").strip()
         r = requests.get(OPENALEX_URL, params={
             "search": q[:300], "per-page": per_page,
             "select": "id,title,ids,doi,publication_year,locations,abstract_inverted_index",
-        }, timeout=timeout)
+        }, headers={"Authorization": f"Bearer {key}"} if key else None, timeout=timeout)
         r.raise_for_status()
         works = r.json().get("results") or []
     except Exception as exc:  # 외부 장애는 답변을 막지 않는다

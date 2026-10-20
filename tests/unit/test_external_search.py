@@ -77,3 +77,17 @@ def test_v2_embed_failure_returns_empty(monkeypatch):
     def boom(t): raise RuntimeError("x")
     monkeypatch.setattr(X, "_embed", boom)
     assert X.search_openalex("q") == []
+
+
+def test_api_key_sent_as_header(monkeypatch):
+    seen = {}
+    def fake_get(url, params=None, headers=None, timeout=None):
+        seen["headers"], seen["params"] = headers, params
+        return _R({"results": []})
+    monkeypatch.setattr(X.requests, "get", fake_get)
+    monkeypatch.setenv("OPENALEX_API_KEY", "k123")
+    X.search_openalex("q", min_sim=None)
+    assert seen["headers"] == {"Authorization": "Bearer k123"} and "api_key" not in seen["params"]
+    monkeypatch.delenv("OPENALEX_API_KEY")
+    X.search_openalex("q", min_sim=None)
+    assert seen["headers"] is None
