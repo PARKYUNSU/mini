@@ -17,7 +17,7 @@ from pathlib import Path
 
 import requests
 
-__all__ = ["external_search_active", "search_openalex", "format_section", "record_candidates", "ExternalSearch"]
+__all__ = ["external_search_active", "clean_query", "search_openalex", "format_section", "record_candidates", "ExternalSearch"]
 
 OPENALEX_URL = "https://api.openalex.org/works"
 TIMEOUT_SEC = 6.0
@@ -27,6 +27,22 @@ MIN_YEAR = 2017
 # v1 은 무관 37% — 'RAG 서베이' 같은 일반 논문이 반복해 끼었다. 문턱은 v1 판정 124편으로 정했다.
 MIN_SIM = float(os.getenv("RAG_EXTERNAL_MIN_SIM", "0.47"))
 PER_PAGE = 10
+# v3 (docs/experiments/external_search_v3_1020): 검색어 추출이 붙이는 일반어를 OpenAlex 에 보내기 전에 뺀다.
+# 예 "… research paper academic search keywords query" — 'RAG 서베이' 류 일반 논문을 끌어왔다.
+_GENERIC = frozenset(
+    "research researches academic paper papers study studies survey surveys keywords keyword summary trend trends "
+    "overview literature article articles publication publications recent latest methods method approach approaches "
+    "best practices guidelines".split()
+)
+
+
+def clean_query(query: str) -> str:
+    """일반어를 뺀 검색어. 3단어 미만이 되면 원래 검색어."""
+    toks = [t for t in re.split(r"[\s,]+", query or "") if t]
+    kept = [t for t in toks if t.lower() not in _GENERIC]
+    while kept and kept[-1].lower() == "large":
+        kept.pop()
+    return " ".join(kept) if len(kept) >= 3 else (query or "").strip()
 _ARXIV = re.compile(r"(?:arxiv\.org/abs/|10\.48550/arxiv\.)(\d{4}\.\d{4,5})", re.I)
 
 
@@ -73,13 +89,13 @@ def _title_key(title: str) -> str:
 
 def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout: float = TIMEOUT_SEC,
                     limit: int = MAX_ITEMS, per_page: int = PER_PAGE, min_sim: float | None = MIN_SIM,
-                    dedupe: bool = True) -> list[dict]:
+                    dedupe: bool = True, clean: bool = True) -> list[dict]:
     """OpenAlex 검색 → 컨텍스트에 없는 최근(2017~) 논문 최대 ``limit`` 편. 실패하면 [].
 
     ``min_sim`` 이 있으면 검색어와 "제목. 초록" 의 유사도가 그 이상인 것만, 높은 순으로 고른다.
-    v1 동작은 ``per_page=8, min_sim=None, dedupe=False``.
+    v1 동작은 ``per_page=8, min_sim=None, dedupe=False, clean=False``, v2 는 ``clean=False``.
     """
-    q = (query or "").strip()
+    q = clean_query(query) if clean else (query or "").strip()
     if not q:
         return []
     try:

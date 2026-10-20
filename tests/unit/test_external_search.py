@@ -22,7 +22,7 @@ class _R:
 
 def test_filters_and_ids(monkeypatch):
     monkeypatch.setattr(X.requests, "get", lambda *a, **k: _R(WORKS))
-    out = X.search_openalex("q", {"2401.00001v2"}, per_page=8, min_sim=None, dedupe=False)
+    out = X.search_openalex("q", {"2401.00001v2"}, per_page=8, min_sim=None, dedupe=False, clean=False)
     assert [o["title"] for o in out] == ["Enabling LLMs to Generate Text with Citations", "Journal Only"]
     assert out[0]["arxiv"] == "2305.14627" and out[0]["abstract"] == "We cite"
     assert out[1]["url"] == "https://doi.org/10.1/x"
@@ -91,3 +91,11 @@ def test_api_key_sent_as_header(monkeypatch):
     monkeypatch.delenv("OPENALEX_API_KEY")
     X.search_openalex("q", min_sim=None)
     assert seen["headers"] is None
+
+
+def test_clean_query():
+    assert X.clean_query("question difficulty adjustment benchmark automatic generation research paper academic search keywords query") == \
+        "question difficulty adjustment benchmark automatic generation search query"
+    assert X.clean_query("table-to-chart generation llm research paper table visualization chart creation from text large") == \
+        "table-to-chart generation llm table visualization chart creation from text"
+    assert X.clean_query("academic research papers") == "academic research papers"  # 3단어 미만이면 원래대로
