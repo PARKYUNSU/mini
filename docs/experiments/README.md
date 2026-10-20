@@ -62,6 +62,7 @@
 | [`external_search_1020/`](external_search_1020/) | DB 밖 OpenAlex 검색 덧붙이기 (`RAG_EXTERNAL_SEARCH`) | **주 통과 · 무관 37% 로 보호 미달** — 트리거 질문 56% 에 직접 맞는 외부 논문, DB 에 없던 정답 8건 |
 | [`external_search_v2_1020/`](external_search_v2_1020/) | 외부 검색 v2 — 유사도 필터 · 중복 제거, 새 질문 30 | **주 1 통과 · 주 2 미달** — 직접 맞는 논문 질문 62%, 무관 32%(기준 30%). OpenAlex 키 도입(하루 ≈ 1,000회) |
 | [`external_search_v3_1020/`](external_search_v3_1020/) | 외부 검색 v3 — OpenAlex 검색어 일반어 빼기, 새 질문 M30 | **채택 · 운영** — 직접 맞는 논문 질문 80%, 무관 26%, 실패 0, 답변 뒤 대기 0s (운영 경로 버그 수정 포함) |
+| [`query_extract_1021/`](query_extract_1021/) | 검색어 추출 v2 프롬프트(전문 용어 예시 · 일반어 금지) | **기각** — 정답 검색 236 중 197 → 181 (28 : 12). 프롬프트 예시 용어가 무관한 질문에 새어 듦 |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -194,6 +195,7 @@ docs/experiments/
 ├─ external_search_1020/   ← DB 밖 OpenAlex 검색 (2단계)
 ├─ external_search_v2_1020/ ← 외부 검색 v2 (유사도 필터)
 ├─ external_search_v3_1020/ ← 외부 검색 v3 (검색어 정리, 채택 · 운영)
+├─ query_extract_1021/     ← 검색어 추출 프롬프트 v2 (기각)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
