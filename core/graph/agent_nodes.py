@@ -312,6 +312,43 @@ def rag_history_allowed(user_request: str) -> bool:
     return is_followup(user_request)
 
 
+# 이어지는 질문이 직전 답의 논문을 가리키면 새로 검색하지 않고 직전 컨텍스트를 다시 쓴다
+# (RAG_FOLLOWUP_REUSE, docs/experiments/followup_reuse_1021). 새로 검색하면 직전 논문을 못 찾았다(0/10).
+_NEW_PAPERS_RE = re.compile(r"다른\s*(논문|연구)|비슷한|최신|동향|추천|더\s*(찾아|있어)")
+_ORDINAL_RE = re.compile(r"(첫|두|세|네|다섯)\s*번째|(\d+)\s*번")
+_ORDINALS = {"첫": 1, "두": 2, "세": 3, "네": 4, "다섯": 5}
+_CITE_RE = re.compile(r"\[\s*(\d{4}\.\d{4,5})(?:v\d+)?\s*\]")
+
+
+def body_item_ids(answer: str) -> list[str | None]:
+    """본론 항목마다 처음 인용한 논문 ID(판 없이). 인용이 없는 항목은 None — 번호가 밀리지 않게."""
+    body = (answer or "").split("본론", 1)[-1].split("결론", 1)[0]
+    items = re.split(r"\n\s*\d+\.\s", "\n" + body)[1:]
+    return [(_CITE_RE.findall(it) or [None])[0] for it in items]
+
+
+def followup_reuse_context(session, user_request: str) -> str:
+    """직전 답의 컨텍스트(서수가 있으면 그 번째 항목 논문 블록만). 다시 쓰지 않으면 ""."""
+    if os.getenv("RAG_FOLLOWUP_REUSE", "0").strip() != "1" or not getattr(session, "last_rag", None):
+        return ""
+    prev_q, ctx, item_ids = session.last_rag
+    # 직전 턴이 그 RAG 답일 때만 — 잡담·도구 뒤의 "그거"가 오래된 논문을 끌어오지 않게
+    if not session.recent_messages or session.recent_messages[-1][0] != f"User: {prev_q}":
+        return ""
+    if not is_followup(user_request) or _NEW_PAPERS_RE.search(user_request):
+        return ""
+    m = _ORDINAL_RE.search(user_request)
+    if not m:
+        return ctx
+    n = _ORDINALS[m.group(1)] if m.group(1) else int(m.group(2))
+    blocks = [b for b in ctx.split(_RAG_HIT_SEP) if b.strip()]
+    pid = item_ids[n - 1] if 0 < n <= len(item_ids) else None
+    hit = [b for b in blocks if pid and pid in b]
+    if hit:
+        return hit[0]
+    return blocks[n - 1] if 0 < n <= len(blocks) else ctx
+
+
 def list_mode_active(user_request: str, *, prefer_single_hit: bool = False) -> bool:
     """목록·동향 질문 모드 (RAG_LIST_MODE, docs/experiments/list_mode_1016) — list 게이트 질문만."""
     if os.getenv("RAG_LIST_MODE", "0").strip() != "1" or prefer_single_hit:
@@ -797,6 +834,9 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         user_request = str(state.get("user_request") or "").strip()
         req_lower = user_request.lower().strip()
         print(f"[DEBUG] Router: user_request={user_request[:80]}...")
+        if followup_reuse_context(get_session(chat_id), user_request):
+            print("[DEBUG] Router: 직전 답 논문을 가리키는 이어지는 질문 → RAG(B)")
+            return {"route_type": "direct_answer", "router_choice": "B"}
 
         # 1단계: 명백한 하드룰
         result = router_step1_hard_rules(user_request, req_lower, chat_id, is_scheduled=is_scheduled)
@@ -1088,7 +1128,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             else:
                 cached_rag = (state.get("rag_context") or "").strip()
                 _list_mode = list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
-                if _list_mode:
+                _reuse = followup_reuse_context(session, user_request)
+                if _reuse:
+                    rag_context = _reuse
+                    _da_trace("rag_context reused from previous answer", f"len={len(rag_context)}")
+                elif _list_mode:
                     # 목록 질문: 라우터 컨텍스트(3편)를 쓰지 않고 10편 다시 검색 (docs/experiments/list_mode_1016)
                     _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
                     rag_context = rag.search(
@@ -1110,7 +1154,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     _da_trace("after rag.search()", f"len={len(rag_context)}")
                 # 비교 질문: 두 대상을 각각 검색해 앞에 합친다 — 라우터가 넘긴 컨텍스트에도 적용
                 # (RAG_COMPARE_SPLIT, docs/experiments/compare_split_1015)
-                if os.getenv("RAG_COMPARE_SPLIT", "0").strip() == "1" and "cmp" in gate_types(user_request):
+                if not _reuse and os.getenv("RAG_COMPARE_SPLIT", "0").strip() == "1" and "cmp" in gate_types(user_request):
                     _targets = _extract_comparison_targets(user_request)
                     _da_trace("compare split targets", repr(_targets))
                     if _targets:
@@ -1124,7 +1168,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                         else:
                             _extras = [_search_target(t) for t in _targets]
                         rag_context = _merge_rag_blocks(rag_context, _extras)
-                if prefer_single_hit and wants_depth:
+                if _reuse:
+                    pass  # 직전 답에서 이미 걸러진 컨텍스트
+                elif prefer_single_hit and wants_depth:
                     rag_context = _rag_context_same_paper_all_chunks(rag_context)
                     _da_trace("rag_context same-paper merged (depth)", f"len={len(rag_context)}")
                 elif prefer_single_hit:
@@ -1165,6 +1211,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
             # 번호 라벨은 **필터가 끝난 뒤** 붙인다 — 위 _rag_context_* 변환이 블록을
             # 걸러내므로 조립 시점에 매기면 [1],[3],[7] 처럼 구멍이 생긴다 (protocol §5.4).
+            _ctx_plain = rag_context
             rag_context, _doc_ids = number_context_papers(rag_context)
             # 목록 질문: 문서마다 번호 칸 하나인 템플릿 (docs/experiments/list_slots_1016)
             if (
@@ -1234,6 +1281,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             # 모델이 ID 를 옮겨 적다가 자릿수를 흘려 20~36% 가 없는 ID 였다 — 사용자가
             # 그 ID 로 논문을 찾으면 없으므로 출처로 쓸 수 없다. 애매하면 고치지 않고 지운다.
             answer, _cit = fix_citations(answer, rag_context, doc_ids=_doc_ids)
+            if _doc_ids:  # 다음 이어지는 질문이 다시 쓸 수 있게 (RAG_FOLLOWUP_REUSE)
+                session.last_rag = (user_request, _ctx_plain, body_item_ids(answer))
             if _cit.get("fixed") or _cit.get("dropped") or _cit.get("bad_refs"):
                 print(
                     f"[DEBUG] DirectAnswer: 인용 교정 kept={_cit['kept']} "

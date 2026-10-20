@@ -209,6 +209,9 @@ class SessionMemory:
     recent_messages: deque = field(default_factory=lambda: deque(maxlen=MEMORY_BUFFER))
     summary: str = ""
     _llm: ChatOllama | None = None
+    # (질문, 번호 붙이기 전 컨텍스트, 본론 항목별 논문 ID) — RAG_FOLLOWUP_REUSE.
+    # shortcut: 메모리에만 둔다(재시작하면 사라짐), 재시작 직후 이어 묻기가 잦으면 chat_memory.db 에 저장
+    last_rag: tuple | None = None
 
     def save(self) -> None:
         """현재 상태를 chat_memory.db에 즉시 저장 (수동 업데이트 후 호출)"""

@@ -31,3 +31,40 @@ def test_gate_off_always_allows(monkeypatch):
 def test_gate_on(monkeypatch):
     monkeypatch.setenv("RAG_HISTORY_GATE", "1")
     assert not N.rag_history_allowed(NEW[1]) and N.rag_history_allowed(FOLLOW[0])
+
+
+# RAG_FOLLOWUP_REUSE — 직전 답 컨텍스트 다시 쓰기 (docs/experiments/followup_reuse_1021)
+from core.session.agent_session import SessionMemory
+
+CTX = "[2401.00001v1] A\n초록 A\n\n---\n\n[2401.00002v2] B\n초록 B"
+ANS = "<b>서론</b> 둘 다 [2401.00002v2]\n<b>본론</b>\n1. <b>B</b>: ... [2401.00002v2]\n2. <b>A</b>: ... [2401.00001v1]\n<b>결론</b> 끝"
+
+
+def _sess(prev_q="RAG 논문 알려줘"):
+    s = SessionMemory(chat_id="t")
+    s.recent_messages.append((f"User: {prev_q}", "Assistant: ..."))
+    s.last_rag = (prev_q, CTX, N.body_item_ids(ANS))
+    return s
+
+
+def test_body_item_ids():
+    assert N.body_item_ids(ANS) == ["2401.00002", "2401.00001"]
+
+
+def test_reuse(monkeypatch):
+    monkeypatch.setenv("RAG_FOLLOWUP_REUSE", "1")
+    s = _sess()
+    assert N.followup_reuse_context(s, "그 논문의 한계는 뭐야?") == CTX
+    assert N.followup_reuse_context(s, "그 중 첫 번째 논문 자세히 설명해줘").startswith("[2401.00002v2]")  # 본론 1번 = B
+    assert N.followup_reuse_context(s, "두 번째 항목은 어떤 실험을 했어?").startswith("[2401.00001v1]")
+    assert N.followup_reuse_context(s, "다른 논문도 추천해줘") == ""  # 새 논문을 원함 → 새로 검색
+    assert N.followup_reuse_context(s, "KV 캐시 양자화 연구 있어?") == ""  # 새 질문
+
+
+def test_reuse_only_right_after_rag_turn(monkeypatch):
+    monkeypatch.setenv("RAG_FOLLOWUP_REUSE", "1")
+    s = _sess()
+    s.recent_messages.append(("User: 배고파", "Assistant: ..."))
+    assert N.followup_reuse_context(s, "그거 실제로 써먹으려면 뭐가 필요해?") == ""
+    monkeypatch.delenv("RAG_FOLLOWUP_REUSE")
+    assert N.followup_reuse_context(_sess(), "그 논문의 한계는 뭐야?") == ""
