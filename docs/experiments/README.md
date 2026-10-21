@@ -65,7 +65,7 @@
 | [`query_extract_1021/`](query_extract_1021/) | 검색어 추출 v2 프롬프트(전문 용어 예시 · 일반어 금지) | **기각** — 정답 검색 236 중 197 → 181 (28 : 12). 프롬프트 예시 용어가 무관한 질문에 새어 듦 |
 | [`query_clean_1021/`](query_clean_1021/) | 검색어 후처리만(목록 번호 · 일반어 빼기, `RAG_QUERY_CLEAN`) | **주 유의 X(보호 통과)** — held-out '2' 59 → 62 (5 : 3), 정답 검색 198 → 199 |
 | [`followup_reuse_1021/`](followup_reuse_1021/) | 이어지는 질문이면 직전 답 컨텍스트 재사용 (`RAG_FOLLOWUP_REUSE`) + 다회차 평가 | **측정 중** |
-| [`merge_same_paper_1021/`](merge_same_paper_1021/) | 같은 한 편을 인용한 본론 항목 합치기 (`RAG_MERGE_SAME_PAPER`, 후처리 · 오프라인) | **사전 기준 통과 · 승인 대기** — 중복 답 47 → 0, 인용 · 숫자 · N/C/T 변화 0, 직접 읽기 어색 2/10 |
+| [`merge_same_paper_1021/`](merge_same_paper_1021/) | 같은 한 편을 인용한 본론 항목 합치기 (`RAG_MERGE_SAME_PAPER`, 후처리 · 오프라인) | **채택 · 운영 (10-21 12:27)** — 중복 답 47 → 0, 인용 · 숫자 · N/C/T 변화 0, 직접 읽기 어색 2/10 |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -201,7 +201,7 @@ docs/experiments/
 ├─ query_extract_1021/     ← 검색어 추출 프롬프트 v2 (기각)
 ├─ query_clean_1021/       ← 검색어 후처리만 (주 유의 X)
 ├─ followup_reuse_1021/    ← 이어지는 질문 직전 컨텍스트 재사용 (측정 중)
-├─ merge_same_paper_1021/  ← 같은 논문 본론 항목 합치기 (승인 대기)
+├─ merge_same_paper_1021/  ← 같은 논문 본론 항목 합치기 (채택 · 운영)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
