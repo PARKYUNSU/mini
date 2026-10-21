@@ -36,3 +36,15 @@ def test_ids_to_doc_refs():
     blocks = cited_blocks(ANS, CTX, IDS)
     assert ids_to_doc_refs("적응형이 72%로 올린다[2603.25333v1]. 기타[2506.16035v2].", blocks) == \
         "적응형이 72%로 올린다[문서 2]. 기타[2506.16035v2]."  # 본론 밖 논문은 그대로 → 검사가 거른다
+
+
+def test_extract_findings_v2():
+    from core.llm.conclusion_rewrite import extract_findings
+
+    blk = ("[문서 1]\n[Distance: 0.4]\n[발행일: 2026-01-20]\n[2601.14123v1] Chunking\n[초록] We study chunking in industry. "
+           "Our end-to-end evaluation on Natural Questions varies chunking method. "
+           "Overlap provides no measurable benefit and increases indexing cost. Sentence chunking is the most cost-effective method.")
+    res, dom = extract_findings(blk)
+    assert res[0].startswith("Overlap provides no measurable benefit") and "cost-effective" in res[1]
+    assert dom.startswith("Our end-to-end evaluation on Natural Questions")
+    assert "Distance" not in " ".join(res)

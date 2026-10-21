@@ -7,13 +7,14 @@
 
 from __future__ import annotations
 
+import os
 import re
 
 from core.llm.answer_fix import _CITED, _find
 from core.llm.citation_fix import RAG_HIT_SEP, fix_citations
 from core.llm.lang_guard import hanzi_count
 
-__all__ = ["cited_blocks", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
+__all__ = ["cited_blocks", "extract_findings", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
 
 SYSTEM = "너는 논문 검색 답변의 결론을 고쳐 쓰는 편집자다. 참고 문서에 적힌 내용만 쓴다."
 
@@ -33,6 +34,34 @@ PROMPT = """[질문]
 - 근거가 약하면(평가 규모가 작거나 정성 평가뿐이면) 그렇다고 쓴다.
 - 본론을 되풀이하지 말고, 질문한 사람이 무엇을 고르면 되는지 알 수 있게 쓴다.
 - 한국어로. 머리말·제목·번호 없이 결론 문장만 출력한다."""
+
+# v2 (§8): 본론을 빼고 논문별 결과 · 대상 문장을 규칙으로 뽑아 준다 — v1 은 본론을 되풀이했다.
+PROMPT_V2 = """[질문]
+{question}
+
+[논문별 핵심 — 초록에서 뽑은 원문 문장]
+{findings}
+
+[할 일]
+위 논문들의 **결과**를 비교해 질문에 대한 결론을 2~4문장으로 써라.
+- 논문 간 결과가 문서 유형·데이터·조건에 따라 같은지, 갈리는지 짚고, 질문에 대한 판단을 내린다.
+- 문장마다 근거 논문을 [문서 N] 으로 인용한다.
+- 수치는 원문 숫자를 그대로 옮기고 계산하지 마라(예: "62-64%에서 72%로").
+- 대상이 좁으면(특정 도메인·비공개 데이터·소규모·정성 평가) 그 점을 밝힌다.
+- 각 논문의 방법을 다시 설명하지 마라.
+- 한국어로. 머리말·제목·번호 없이 결론 문장만 출력한다."""
+
+_RESULT_RE = re.compile(
+    r"outperform|improv|reduc|increas|achiev|surpass|benefit|cost-effective|limit|degrad|drop|cliff|"
+    r"match|better|worse|gain|lower|higher|faster|slower|show|find|found|reveal|demonstrat",
+    re.I,
+)
+_RESULT_NUM = re.compile(r"\d+(?:\.\d+)?\s*(?:%|x|×|times|배|points?)|from \d|\(\d|\d+\s*(?:vs\.?|→)", re.I)
+# 대상 문장: 평가 데이터를 말하는 문장을 먼저, 없으면 도메인을 말하는 문장
+_DOMAIN_RES = (
+    re.compile(r"dataset|corpus|corpora|benchmark|evaluat\w* on|we evaluate|experiments? on", re.I),
+    re.compile(r"domain|documents|industr|enterprise|proprietary|real-world", re.I),
+)
 
 _DOC_N = re.compile(r"\[\s*문서\s*(\d{1,2})\s*\]")
 _NUM = re.compile(r"\d+(?:[.,]\d+)?")
@@ -54,6 +83,29 @@ def cited_blocks(answer: str, numbered_context: str, doc_ids: dict[int, str]) ->
         if m and _bare(doc_ids.get(int(m.group(1)), "")) in ids:
             blocks[int(m.group(1))] = blk.strip()[:_BLOCK_MAX]
     return blocks
+
+
+def extract_findings(block: str) -> tuple[list[str], str]:
+    """블록에서 ``(결과 문장 ≤3, 대상 문장)``. 머리(번호 · 거리 · 날짜 · ID 제목) 뒤 본문만 본다."""
+    lines = block.split("\n")
+    k = next((i for i, l in enumerate(lines) if re.match(r"\[\d{4}\.\d{4,5}", l)), -1)
+    text = re.sub(r"\[초록\]|#+\s*\**abstract\**", " ", "\n".join(lines[k + 1:]), flags=re.I)
+    sents = [x.strip() for x in re.split(r"(?<!vs\.)(?<!al\.)(?<!e\.g\.)(?<=[.!?])\s+", re.sub(r"\s+", " ", text)) if len(x.strip()) > 20]
+    # 첫 문장은 배경이라 뺀다. 결과 수치가 있는 문장 > 결과 동사 문장, 같은 점수면 뒤쪽(초록 끝에 결과가 많다)
+    score = {i: 2 * bool(_RESULT_NUM.search(x)) + bool(_RESULT_RE.search(x)) for i, x in enumerate(sents) if i}
+    top = sorted((i for i in score if score[i]), key=lambda i: (-score[i], -i))[:3]
+    res = [sents[i] for i in sorted(top)] or sents[-2:]
+    dom = next((x for r in _DOMAIN_RES for x in sents if r.search(x)), "")
+    return res, dom
+
+
+def _findings_text(blocks: dict[int, str]) -> str:
+    out = []
+    for n, blk in blocks.items():
+        title = next((l for l in blk.split("\n") if re.match(r"\[\d{4}\.\d{4,5}", l)), "")
+        res, dom = extract_findings(blk)
+        out.append(f"[문서 {n}] {title}\n대상: {dom or '(초록에 없음)'}\n결과: " + " / ".join(res))
+    return "\n\n".join(out)
 
 
 def ids_to_doc_refs(text: str, blocks: dict[int, str]) -> str:
@@ -101,9 +153,12 @@ def rewrite_conclusion(
     from core.config.agent_config import ollama_kwargs
 
     b, c = _find("본론", answer), _find("결론", answer)
-    prompt = PROMPT.format(
-        question=question, blocks=RAG_HIT_SEP.join(blocks.values()), body=answer[b.end():c.start()].strip()
-    )
+    if os.getenv("RAG_CONCLUSION_PROMPT", "v1").strip() == "v2":
+        prompt = PROMPT_V2.format(question=question, findings=_findings_text(blocks))
+    else:
+        prompt = PROMPT.format(
+            question=question, blocks=RAG_HIT_SEP.join(blocks.values()), body=answer[b.end():c.start()].strip()
+        )
     llm = ChatOllama(**ollama_kwargs(model=model, temperature=0.0, seed=0, reasoning=False, num_predict=400))
     try:
         text = str(llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=prompt)]).content or "").strip()
