@@ -17,6 +17,16 @@ _ID = re.compile(r"\[(\d{4}\.\d{4,5})(?:v\d+)?\]")
 _NUM = re.compile(r"\d+(?:[.,]\d+)?")
 
 
+def blocks_by_id(ctx, ids):
+    """논문 ID → 블록 본문. 같은 논문이 여러 번호에 나뉘면 이어 붙인다 (채점기 1차는 덮어써서 N03 을 잘못 셌다)."""
+    out = {}
+    for b in ctx.split(RAG_HIT_SEP):
+        for n, pid in ids.items():
+            if b.strip().startswith(f"[문서 {n}]"):
+                k = re.sub(r"v\d+$", "", pid); out[k] = out.get(k, "") + "\n" + b
+    return out
+
+
 def concl(a):
     c = _find("결론", a)
     return a[c.end():] if c else ""
@@ -24,9 +34,9 @@ def concl(a):
 
 def grounded(a, ctx, ids):
     """결론에 인용 단 문장이 있고, 그 문장의 숫자(1개 이상)가 전부 인용한 블록에 있는가."""
-    blk = {re.sub(r"v\d+$", "", pid): b for b in ctx.split(RAG_HIT_SEP) for n, pid in ids.items() if b.strip().startswith(f"[문서 {n}]")}
+    blk = blocks_by_id(ctx, ids)
     for s in re.split(r"(?<=[.다])\s+", concl(a)):
-        refs = _ID.findall(s); nums = _NUM.findall(_ID.sub("", s))
+        refs = _ID.findall(s); nums = _NUM.findall(re.sub(r"\[\d{1,2}\]", "", _ID.sub("", s)))
         if refs and nums:
             src = "\n".join(blk.get(r, "") for r in refs)
             if all(re.search(rf"(?<![\d.,]){re.escape(t)}(?![\d])", src) for t in nums):
@@ -36,11 +46,11 @@ def grounded(a, ctx, ids):
 
 def outside(a, ctx, ids):
     """결론에 인용 블록 밖 숫자가 있는 문장이 있는가 (인용 단 문장만 본다)."""
-    blk = {re.sub(r"v\d+$", "", pid): b for b in ctx.split(RAG_HIT_SEP) for n, pid in ids.items() if b.strip().startswith(f"[문서 {n}]")}
+    blk = blocks_by_id(ctx, ids)
     for s in re.split(r"(?<=[.다])\s+", concl(a)):
         refs = _ID.findall(s)
         src = "\n".join(blk.get(r, "") for r in refs)
-        if refs and any(not re.search(rf"(?<![\d.,]){re.escape(t)}(?![\d])", src) for t in _NUM.findall(_ID.sub("", s))):
+        if refs and any(not re.search(rf"(?<![\d.,]){re.escape(t)}(?![\d])", src) for t in _NUM.findall(re.sub(r"\[\d{1,2}\]", "", _ID.sub("", s)))):
             return True
     return False
 
@@ -55,7 +65,7 @@ for lbl, d in SETS.items():
     out = []
     for r in rows:
         a, ctx = r.get("answer") or "", r.get("numbered_context") or ""
-        ids = {int(k): v for k, v in (r.get("doc_ids") or {}).items()}
+        ids = dict(enumerate(r.get("doc_ids") or [], 1))  # 저장 형식: 문서 1부터 순서대로 ID 목록
         q = qs.get((d, r["id"]), "")
         t0 = time.time(); new, why = rewrite_conclusion(a, q, ctx, ids, RAG_ANSWER_MODEL) if a and q else (a, "대상 아님"); dt = time.time() - t0
         rec = {"set": lbl, "id": r["id"], "why": why, "sec": round(dt, 1), "before": concl(a), "after": concl(new),

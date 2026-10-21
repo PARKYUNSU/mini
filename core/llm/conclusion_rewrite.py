@@ -13,7 +13,7 @@ from core.llm.answer_fix import _CITED, _find
 from core.llm.citation_fix import RAG_HIT_SEP, fix_citations
 from core.llm.lang_guard import hanzi_count
 
-__all__ = ["cited_blocks", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
+__all__ = ["cited_blocks", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
 
 SYSTEM = "너는 논문 검색 답변의 결론을 고쳐 쓰는 편집자다. 참고 문서에 적힌 내용만 쓴다."
 
@@ -54,6 +54,15 @@ def cited_blocks(answer: str, numbered_context: str, doc_ids: dict[int, str]) ->
         if m and _bare(doc_ids.get(int(m.group(1)), "")) in ids:
             blocks[int(m.group(1))] = blk.strip()[:_BLOCK_MAX]
     return blocks
+
+
+def ids_to_doc_refs(text: str, blocks: dict[int, str]) -> str:
+    """본론 인용 형식을 따라 쓴 ``[2605.15100v1]`` 을 ``[문서 N]`` 으로 — 1차에서 탈락의 대부분이었다 (§5)."""
+    first = {}
+    for n, blk in sorted(blocks.items()):
+        for pid in _CITED.findall(blk[:300]):
+            first.setdefault(pid, n)
+    return _CITED.sub(lambda m: f"[문서 {first[m.group(1)]}]" if m.group(1) in first else m.group(0), text)
 
 
 def check_conclusion(text: str, blocks: dict[int, str]) -> str:
@@ -101,6 +110,7 @@ def rewrite_conclusion(
     except Exception as exc:  # 결론을 못 바꿔도 답은 낸다
         print(f"[DEBUG] conclusion_rewrite 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return answer, "호출 실패"
+    text = ids_to_doc_refs(text, blocks)
     why = check_conclusion(text, blocks)
     if why:
         return answer, why

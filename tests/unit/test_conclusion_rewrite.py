@@ -28,3 +28,11 @@ def test_check_numbers_must_be_in_cited_block():
 
 def test_replace_conclusion():
     assert replace_conclusion(ANS, "새 결론[2601.14123v1].").endswith("<b>결론</b>\n새 결론[2601.14123v1].\n")
+
+
+def test_ids_to_doc_refs():
+    from core.llm.conclusion_rewrite import ids_to_doc_refs
+
+    blocks = cited_blocks(ANS, CTX, IDS)
+    assert ids_to_doc_refs("적응형이 72%로 올린다[2603.25333v1]. 기타[2506.16035v2].", blocks) == \
+        "적응형이 72%로 올린다[문서 2]. 기타[2506.16035v2]."  # 본론 밖 논문은 그대로 → 검사가 거른다
