@@ -2215,9 +2215,12 @@ def _with_abstract(body: str, abstract: str) -> str:
     if not abstract:
         return body
     norm_body = re.sub(r"\s+", " ", body).lower()
-    if abstract[:80].lower() in norm_body:
-        return body
     n = context_abstract_chars()
+    # 초록 중간에서 잘린 Abstract 청크면 앞 80자는 있어도 결과(초록 끝)가 빠진다 — 끝으로 본다
+    # (RAG_ABSTRACT_TAIL_CHECK, docs/experiments/abstract_tail_1021)
+    probe = abstract[:n][-80:] if os.getenv("RAG_ABSTRACT_TAIL_CHECK", "0").strip() == "1" else abstract[:80]
+    if probe.lower() in norm_body:
+        return body
     return f"[초록] {abstract[:n]}\n\n{body}" if body else f"[초록] {abstract[:n]}"
 
 
