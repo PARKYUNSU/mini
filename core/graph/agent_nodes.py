@@ -47,6 +47,7 @@ from core.llm.agent_llm import (
     get_rag_answer_llm,
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
+from core.llm.conclusion_rewrite import rewrite_conclusion
 from core.llm.answer_fix import drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
 from core.llm.presence_judge import (
@@ -1306,6 +1307,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             answer, _rn = renumber_body_items(answer)
             if _rn:
                 print("[DEBUG] DirectAnswer: 본론 번호 다시 매김")
+            if os.getenv("RAG_CONCLUSION_REWRITE", "0").strip() == "1":  # docs/experiments/conclusion_rewrite_1021
+                answer, _cr = rewrite_conclusion(answer, user_request, rag_context, _doc_ids, RAG_ANSWER_MODEL)
+                print(f"[DEBUG] DirectAnswer: 결론 다시 쓰기 = {_cr}")
             if _ext is not None:
                 _ext_items, _ext_wait = _ext.result()
                 print(f"[DEBUG] DirectAnswer: 외부 검색 {len(_ext_items)}편 (답변 뒤 대기 {_ext_wait:.1f}s)")
