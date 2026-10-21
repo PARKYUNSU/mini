@@ -317,6 +317,7 @@ def rag_history_allowed(user_request: str) -> bool:
 _NEW_PAPERS_RE = re.compile(r"다른\s*(논문|연구)|비슷한|최신|동향|추천|더\s*(찾아|있어)")
 _ORDINAL_RE = re.compile(r"(첫|두|세|네|다섯)\s*번째|(\d+)\s*번")
 _ORDINALS = {"첫": 1, "두": 2, "세": 3, "네": 4, "다섯": 5}
+_REUSE_MAX_CHARS = 25  # 공백 뺀 길이
 _CITE_RE = re.compile(r"\[\s*(\d{4}\.\d{4,5})(?:v\d+)?\s*\]")
 
 
@@ -336,6 +337,9 @@ def followup_reuse_context(session, user_request: str) -> str:
     if not session.recent_messages or session.recent_messages[-1][0] != f"User: {prev_q}":
         return ""
     if not is_followup(user_request) or _NEW_PAPERS_RE.search(user_request):
+        return ""
+    # 긴 질문은 자기 주제를 가진 새 질문이다 — "…뭐가 다른 거야?"(45자) 등 3개 오발동 (followup_reuse_1021 §5)
+    if len(re.sub(r"\s", "", user_request)) > _REUSE_MAX_CHARS:
         return ""
     m = _ORDINAL_RE.search(user_request)
     if not m:
