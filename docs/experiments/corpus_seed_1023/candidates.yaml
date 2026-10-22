@@ -1,0 +1,14 @@
+# corpus_seed_1023 후보 — ingest_classics --yaml 용
+classics:
+  - id: "2401.14887"
+    note: "corpus_seed_1023 리뷰 지적 — The Power of Noise (RAG 문서 순서·비율)"
+  - id: "2406.16008"
+    note: "corpus_seed_1023 리뷰 지적 — Found in the Middle"
+  - id: "2403.04797"
+    note: "corpus_seed_1023 리뷰 지적 — Ms-PoE"
+  - id: "2404.16811"
+    note: "corpus_seed_1023 리뷰 지적 — IN2 학습 / FILM"
+  - id: "2404.13781"
+    note: "corpus_seed_1023 외부 후보 — 서로 다른 질문 2개"
+  - id: "2401.17043"
+    note: "corpus_seed_1023 외부 후보 — 서로 다른 질문 2개"
