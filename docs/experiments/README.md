@@ -68,7 +68,7 @@
 | [`merge_same_paper_1021/`](merge_same_paper_1021/) | 같은 한 편을 인용한 본론 항목 합치기 (`RAG_MERGE_SAME_PAPER`, 후처리 · 오프라인) | **채택 · 운영 (10-21 12:27)** — 중복 답 47 → 0, 인용 · 숫자 · N/C/T 변화 0, 직접 읽기 어색 2/10 |
 | [`conclusion_rewrite_1021/`](conclusion_rewrite_1021/) | 결론만 "상황 → 권고 + 근거 결과 [인용]" 으로 다시 쓰기 (`RAG_CONCLUSION_REWRITE`, 보조 호출 · 오프라인) | **채택 · 운영 (10-21 17:43 v1 → 22:53 v2)**(좋은 결론 14 → 31, 재서술 39 → 0, 13.3s) — 근거 결과 결론 3 → 31/66 (p < 0.0001), 인용 밖 숫자 0, +약 18s |
 | [`abstract_tail_1021/`](abstract_tail_1021/) | 잘린 Abstract 청크에도 초록 붙이기 (`RAG_ABSTRACT_TAIL_CHECK`, 버그 수정) + 답 재생성 | **채택 · 운영 (10-22 07:40, 버그 수정)** — 누락 블록 31 → 0, 초록 끝 숫자 사용 4 : 4, 보호 통과, 누락 논문 인용 14 → 23(등록 밖) |
-| [`cite_cleanup_1022/`](cite_cleanup_1022/) | 같은 인용 중복 · 내부 문서 번호 노출 정리 (`RAG_CITE_CLEANUP`, 후처리 · 오프라인) | **사전 기준 통과 · 승인 대기** — 중복 48 → 0, 문서 번호 노출 8 → 0, 인용 · 숫자 · N/C/T 변화 0 |
+| [`cite_cleanup_1022/`](cite_cleanup_1022/) | 같은 인용 중복 · 내부 문서 번호 노출 정리 (`RAG_CITE_CLEANUP`, 후처리 · 오프라인) | **채택 · 운영 (10-22 10:57)** — 중복 48 → 0, 문서 번호 노출 8 → 0, 인용 · 숫자 · N/C/T 변화 0 |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -207,7 +207,7 @@ docs/experiments/
 ├─ merge_same_paper_1021/  ← 같은 논문 본론 항목 합치기 (채택 · 운영)
 ├─ conclusion_rewrite_1021/ ← 결론 다시 쓰기 (채택 · 운영)
 ├─ abstract_tail_1021/     ← 잘린 초록 청크 버그 (채택 · 운영)
-├─ cite_cleanup_1022/      ← 인용 중복 · 문서 번호 노출 정리 (승인 대기)
+├─ cite_cleanup_1022/      ← 인용 중복 · 문서 번호 노출 정리 (채택 · 운영)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
