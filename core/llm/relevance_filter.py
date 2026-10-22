@@ -11,7 +11,7 @@ import re
 
 from core.llm.citation_fix import RAG_HIT_SEP
 
-__all__ = ["PROMPT", "parse_relevant", "filter_relevant"]
+__all__ = ["PROMPT", "parse_relevant", "protected", "filter_relevant"]
 
 PROMPT = """아래는 사용자의 질문으로 검색한 논문 목록이다.
 
@@ -26,6 +26,25 @@ PROMPT = """아래는 사용자의 질문으로 검색한 논문 목록이다.
 - 출력은 정확히 한 줄: `관련: 1, 3` 또는 `관련: 없음`"""
 
 _ABS = 600
+# 질문에 나온 고유 이름(소문자와 함께 대문자가 둘째 자리 뒤에 있거나 숫자가 섞인 말 — World4RL · SLMQuant · DeepFusion).
+# LLM · RAG 같은 일반 약어(소문자 없음)는 아니다. 이 이름이 제목에 든 문서는 늘 남긴다 — 2단계에서 비교 질문의
+# World4RL 을 뺐다 (relevance_filter_1022 §6).
+_NAME = re.compile(r"(?<![A-Za-z0-9])[A-Za-z][A-Za-z0-9\-]*(?![A-Za-z0-9])")  # "World4RL이랑" — 한글 조사가 붙어도
+
+
+def _names(question: str) -> set[str]:
+    return {t.lower() for t in _NAME.findall(question)
+            if len(t) >= 4 and re.search(r"[a-z]", t) and re.search(r"[A-Z0-9]", t[1:])}
+
+
+def _title(block: str) -> str:
+    return next((l for l in block.split("\n") if re.match(r"\[\d{4}\.\d{4,5}", l.strip())), "")
+
+
+def protected(question: str, blocks: list[str]) -> set[int]:
+    """제목에 질문 속 고유 이름이 든 문서 번호(1부터)."""
+    names = _names(question)
+    return {i for i, b in enumerate(blocks, 1) if names and any(n in _title(b).lower() for n in names)}
 
 
 def parse_relevant(raw: str, n: int) -> set[int] | None:
@@ -67,4 +86,5 @@ def filter_relevant(question: str, context: str, model: str) -> tuple[str, str]:
         return context, "못 읽음"
     if not keep:
         return context, "없음"
+    keep |= protected(question, blocks)
     return RAG_HIT_SEP.join(b for i, b in enumerate(blocks, 1) if i in keep), f"{len(blocks)}→{len(keep)}"

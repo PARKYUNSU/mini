@@ -17,3 +17,13 @@ def test_single_block_not_called():
 def test_brief_skips_header():
     b = "[Distance: 0.3]\n[발행일: 2026-01-01]\n[2410.14641v3] LongPiBench\n[초록] Positional bias in long context."
     assert _brief(2, b) == "[2] LongPiBench\n[초록] Positional bias in long context."
+
+
+def test_protected_names():
+    from core.llm.relevance_filter import _names, protected
+
+    q = "World4RL이랑 가변 길이 잠재 월드모델 연구는 어떻게 달라? LLM RAG 기준으로"
+    assert _names(q) == {"world4rl"}  # LLM · RAG 같은 일반 약어는 아니다
+    blocks = ["[2606.21775v1] Variable-length Latent World Models\n…", "[2509.19080v2] World4RL: Diffusion World Models\n…"]
+    assert protected(q, blocks) == {2}
+    assert _names("SLMQuant랑 Block-Sphere Vector Quantization 차이") == {"slmquant", "block-sphere"}
