@@ -48,6 +48,7 @@ from core.llm.agent_llm import (
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.conclusion_rewrite import rewrite_conclusion
+from core.llm.relevance_filter import filter_relevant
 from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
 from core.llm.presence_judge import (
@@ -1216,6 +1217,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
             # 번호 라벨은 **필터가 끝난 뒤** 붙인다 — 위 _rag_context_* 변환이 블록을
             # 걸러내므로 조립 시점에 매기면 [1],[3],[7] 처럼 구멍이 생긴다 (protocol §5.4).
+            if os.getenv("RAG_RELEVANCE_FILTER", "0").strip() == "1":  # docs/experiments/relevance_filter_1022
+                rag_context, _rf = filter_relevant(user_request, rag_context, RAG_ANSWER_MODEL)
+                print(f"[DEBUG] DirectAnswer: 관련 문서 거르기 = {_rf}")
             _ctx_plain = rag_context
             rag_context, _doc_ids = number_context_papers(rag_context)
             # 목록 질문: 문서마다 번호 칸 하나인 템플릿 (docs/experiments/list_slots_1016)
