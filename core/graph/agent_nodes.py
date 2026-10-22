@@ -866,7 +866,9 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         _rag_hist = session_context if rag_history_allowed(user_request) else ""
         rag_query = _extract_english_rag_query(user_request, session_context=_rag_hist)
         _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
-        rag_context = rag.search(rag_query, session_context=_rag_hist, light_rerank=_lr)
+        # 답변 노드가 이 컨텍스트에서 5칸을 쓴다 — 논문 단위면 5편을 가져온다 (RAG_PAPER_BLOCKS, docs/experiments/paper_blocks_1022)
+        _rtk = 5 if os.getenv("RAG_PAPER_BLOCKS", "0").strip() == "1" else RAG_TOP_K
+        rag_context = rag.search(rag_query, top_k=_rtk, session_context=_rag_hist, light_rerank=_lr)
         _trs = get_tool_rag_store()
         tools_context = _trs.format_topk_block(user_request, k=TOOL_RAG_TOP_K)
         tools_list_str = _trs.format_router_tools_tag(user_request, k=TOOL_RAG_TOP_K)

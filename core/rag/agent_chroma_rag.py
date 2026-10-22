@@ -2228,10 +2228,23 @@ def _format_chroma_hits(
     docs: list[str],
     metas: list[dict[str, str]],
     dists: list[float | None] | None = None,
+    *,
+    one_per_paper: bool = False,
 ) -> str:
     if not docs:
         return "관련 문서 없음"
     deduped = _dedupe_hits_by_paper(docs, metas, dists)
+    if one_per_paper:
+        # 같은 논문의 추가 청크가 답변 칸을 먹지 않게 논문당 한 블록만 (docs/experiments/paper_blocks_1022)
+        seen: set[str] = set()
+        kept = []
+        for h in deduped:
+            pid = (h[1].get("paper_id") or "").strip()
+            if pid and pid in seen:
+                continue
+            seen.add(pid)
+            kept.append(h)
+        deduped = kept
     parts: list[str] = []
     for doc, meta, dval in deduped:
         dist_line = _distance_block_line(dval)
@@ -2628,7 +2641,10 @@ class ChromaRAGTool:
                     light_rerank_query=_tbq if light_rerank else "",  # light_rerank_gated_1015
                 )
 
-            hits = _format_chroma_hits(docs_clean, metas_clean, dists_clean)
+            hits = _format_chroma_hits(
+                docs_clean, metas_clean, dists_clean,
+                one_per_paper=not wants_depth and os.getenv("RAG_PAPER_BLOCKS", "0").strip() == "1",
+            )
             _clear_vector_search_disabled()
             return hits
         except Exception as e:
