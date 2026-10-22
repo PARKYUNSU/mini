@@ -1298,8 +1298,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 if _pick == "없음":
                     system_prompt = system_prompt + NO_DOC_HINT
             # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다
+            # 관련 문서가 1편만 남은 답도 외부를 찾아본다 (RAG_EXTERNAL_ON_SINGLE, docs/experiments/external_single_1023)
+            _single = os.getenv("RAG_EXTERNAL_ON_SINGLE", "0").strip() == "1" and len({str(p) for p in _doc_ids.values()}) == 1
             if external_search_active() and (
-                _pick == "없음" or list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
+                _pick == "없음" or list_mode_active(user_request, prefer_single_hit=prefer_single_hit) or _single
             ):
                 _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()})  # _doc_ids 는 {번호: 논문 ID}
             content = _build_message_content(prompt, image_base64)
