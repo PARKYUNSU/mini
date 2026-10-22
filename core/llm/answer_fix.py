@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import re
 
-__all__ = ["drop_contradicted_no_doc", "merge_same_paper_items", "renumber_body_items"]
+__all__ = ["clean_internal_refs", "drop_contradicted_no_doc", "merge_same_paper_items", "renumber_body_items"]
 
 # 서론의 '문서에 없다' 문장 (v12 가 쓰는 변형들). 문장 끝 마침표까지 지운다.
 _NO_DOC_SENT = re.compile(
@@ -102,3 +102,19 @@ def merge_same_paper_items(answer: str) -> tuple[str, bool]:
             owner[pid] = len(out)
         out.append(ch)
     return (answer[:b.end()] + "".join(out) + answer[end:], True) if changed else (answer, False)
+
+
+# 내부 문서 번호 노출 · 같은 인용 중복 정리 (docs/experiments/cite_cleanup_1022): 같은 논문이 두 블록에 나뉘면
+# "[A]과 [A]는" 처럼 같은 인용이 겹치고, 모델이 "(참고: 문서 1·2는 …)" · "문서 1은 …" 으로 내부 번호를 드러냈다.
+_ID_REF = r"\[\d{4}\.\d{4,5}(?:v\d+)?\]"
+_DOC_PAREN = re.compile(r"\s*\((?:참고[:：]?\s*)?[^()\n]*문서\s*\d[^()\n]*\)")
+_DOC_BARE = re.compile(r"(?<![\[\w])문서\s*(\d{1,2})(?!\s*\])")
+_DUP_CITE = re.compile(rf"({_ID_REF})(?:\s*(?:과|와|,|및|그리고)?\s*\1)+")
+
+
+def clean_internal_refs(answer: str, doc_ids: dict[int, str]) -> tuple[str, bool]:
+    """``(고친 답, 바뀌었나)``. doc_ids 는 ``{문서 번호: 논문 ID}``."""
+    out = _DOC_PAREN.sub("", answer)
+    out = _DOC_BARE.sub(lambda m: f"[{doc_ids[int(m.group(1))]}]" if int(m.group(1)) in doc_ids else m.group(0), out)
+    out = _DUP_CITE.sub(r"\1", out)
+    return out, out != answer

@@ -80,3 +80,24 @@ def test_merges_same_single_paper_items():
 def test_no_merge_when_distinct():
     md = SPLIT.replace("3. <b>DDC</b>: 토큰을 10배 줄였다[2605.15100v1].\n", "")
     assert merge_same_paper_items(md) == (md, False)
+
+
+# 내부 문서 번호 · 중복 인용 정리 (docs/experiments/cite_cleanup_1022)
+from core.llm.answer_fix import clean_internal_refs
+
+IDS = {1: "2503.09579v3", 2: "2607.02980v1", 3: "2410.14641v3", 4: "2503.09579v3"}
+
+
+def test_clean_internal_refs():
+    a = ("2. 위치 편향 문제[2503.09579v3][2607.02980v1] (참고: 문서 1·2는 GQA 및 HiLS 연구이며, 질문과 직접 관련이 없습니다).\n"
+         "반면 [2503.09579v3]과 [2503.09579v3]는 FLOPs 를 50% 줄인다. 문서 1과 문서 4 모두 같은 결과다. 문서 3은 벤치마크다[문서 3].")
+    out, ch = clean_internal_refs(a, IDS)
+    assert ch
+    assert "(참고" not in out and "위치 편향 문제[2503.09579v3][2607.02980v1]." in out
+    assert "반면 [2503.09579v3]는 FLOPs 를 50% 줄인다." in out
+    assert "[2503.09579v3] 모두 같은 결과다." in out and "[2410.14641v3]은 벤치마크다[문서 3]." in out  # 대괄호 인용은 그대로
+
+
+def test_clean_internal_refs_noop():
+    a = "참고 문서에는 없다. 결과[2410.14641v3]. 문서 9는 모른다."
+    assert clean_internal_refs(a, IDS) == (a, False)

@@ -48,7 +48,7 @@ from core.llm.agent_llm import (
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.conclusion_rewrite import rewrite_conclusion
-from core.llm.answer_fix import drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
+from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
 from core.llm.presence_judge import (
     NO_DOC_HINT,
@@ -1310,6 +1310,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             if os.getenv("RAG_CONCLUSION_REWRITE", "0").strip() == "1":  # docs/experiments/conclusion_rewrite_1021
                 answer, _cr = rewrite_conclusion(answer, user_request, rag_context, _doc_ids, RAG_ANSWER_MODEL)
                 print(f"[DEBUG] DirectAnswer: 결론 다시 쓰기 = {_cr}")
+            if os.getenv("RAG_CITE_CLEANUP", "0").strip() == "1":  # docs/experiments/cite_cleanup_1022
+                answer, _cc = clean_internal_refs(answer, _doc_ids)
+                if _cc:
+                    print("[DEBUG] DirectAnswer: 내부 문서 번호 · 중복 인용 정리")
             if _ext is not None:
                 _ext_items, _ext_wait = _ext.result()
                 print(f"[DEBUG] DirectAnswer: 외부 검색 {len(_ext_items)}편 (답변 뒤 대기 {_ext_wait:.1f}s)")
