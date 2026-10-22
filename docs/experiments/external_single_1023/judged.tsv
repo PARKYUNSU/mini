@@ -1,0 +1,21 @@
+set	id	idx	grade	title
+as1_real40	N02	0	1	Scale-Plan: Scalable Language-Enabled Task Planning for Heterogeneous Multi-Robot Teams
+as1_real40	N02	1	0	Scalable Multi-Robot Informative Path Planning for Target Mapping via Deep RL
+as1_real40	R03	0	1	LLM Agents for Search via RL with Trajectory-Level Self-Evaluation
+as1_real40	R03	1	0	Rethinking Agentic Reinforcement Learning In Large Language Models
+as1_real40	R03	2	0	Survey on LLM-Enhanced Reinforcement Learning
+as1_real40	R03	3	0	Retrieval Augmented Conversational Recommendation with RL
+as1_real40	R04	0	1	Unsupervised LLM Alignment for IR via Contrastive Feedback
+as1_real40	R04	1	2	Llama2Vec: Unsupervised Adaptation of LLMs for Dense Retrieval
+as1_real40	R04	2	1	Large Language Models for Information Retrieval: A Survey
+as1_real40	R04	3	0	Entropy-Based Decoding for Retrieval-Augmented LLMs
+as1_real40	R05	0	1	XP-MARL: Auxiliary Prioritization in MARL to Address Non-Stationarity
+as1_real40	R05	1	1	Multi-Agent Reinforcement Learning: A Review of Challenges and Applications
+as1_real40	R05	2	1	A Review of Multi-Agent Reinforcement Learning Algorithms
+as1_real40	R05	3	1	Decentralized MARL with networked agents: recent advances
+as1_real2	N10	0	1	Review on Wind Turbine Blade Inspection: Drone and Deep Learning
+as1_real2	N10	1	1	Lightweight vision-based inspection of wind turbine blade defects using UAV imagery
+as1_real2	N10	2	0	Evaluating the use of drones for timber bridge inspection
+as1_real2	N12	0	1	Effect of knowledge graph extraction error on downstream graph analyses
+as1_real2	N12	1	0	Graph Serializations for Reasoning LLMs
+as1_real2	C08	0	0	Between Tokenism and Inclusion
