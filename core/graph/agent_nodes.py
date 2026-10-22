@@ -422,6 +422,38 @@ User question:
     return []
 
 
+# 조건이 여러 개인 질문("순서나 개수")은 조건마다 따로 검색한다 (RAG_ASPECT_SPLIT, docs/experiments/aspect_split_1022).
+# 두 조건을 검색어 하나에 섞으면 둘 다 밀렸다. 예시 용어는 넣지 않는다 — query_extract_1021 에서 무관한 질문에 새어 들었다.
+_ASPECT_RE = re.compile(r"\S(?:이나|나|또는|혹은|및|이랑|랑|와|과)\s")
+
+
+def _extract_aspects(user_request: str) -> list[str]:
+    """조건마다 영어 검색어 한 줄(2~3개). 조건이 하나이거나 실패하면 빈 목록."""
+    prompt = f"""Does the user question ask about two or three DIFFERENT aspects joined by "or"/"and" (for example two different factors, a problem and its solution, attacks and defenses)?
+If yes, return one short English academic search query per aspect. Each query must include the shared topic of the question and the aspect.
+If researchers use a standard technical term for that aspect, use that term. Never add names that are not implied by the question.
+If the question has only one aspect, return exactly: NONE
+Otherwise return 2-3 lines and nothing else:
+1: <query>
+2: <query>
+
+User question:
+{user_request}
+"""
+    for llm_getter in (get_rag_query_rewrite_llm, get_executor_llm):
+        try:
+            raw = (normalize_ai_message_content(llm_getter().invoke([HumanMessage(content=prompt)])) or "").strip()
+        except Exception:
+            continue
+        if re.match(r"\s*NONE\b", raw):
+            return []
+        got = re.findall(r"^\s*\d\s*[:：.]\s*(.+?)\s*$", raw, re.M)
+        got = [re.sub(r"\s+", " ", re.sub(r"[^A-Za-z0-9 .,+\-_/()]", " ", g)).strip() for g in got][:3]
+        got = [g for g in got if len(g) >= 3]
+        return got if len(got) >= 2 else []
+    return []
+
+
 def _merge_rag_blocks(primary: str, extras: list[str], *, per_extra: int = 2) -> str:
     """각 대상 검색 상위 ``per_extra`` 블록을 앞에, 원래 검색 블록을 뒤에 — 같은 논문은 한 번만."""
     seen: set[str] = set()
@@ -1176,6 +1208,18 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                         else:
                             _extras = [_search_target(t) for t in _targets]
                         rag_context = _merge_rag_blocks(rag_context, _extras)
+                if (
+                    not _reuse
+                    and os.getenv("RAG_ASPECT_SPLIT", "0").strip() == "1"
+                    and "cmp" not in gate_types(user_request)
+                    and _ASPECT_RE.search(user_request)
+                ):
+                    _aspects = _extract_aspects(user_request)
+                    _da_trace("aspect split", repr(_aspects))
+                    if _aspects:
+                        rag_context = _merge_rag_blocks(rag_context, [
+                            rag.search(a, top_k=top_k, session_context="", wants_depth=False, light_rerank=False) for a in _aspects
+                        ])
                 if _reuse:
                     pass  # 직전 답에서 이미 걸러진 컨텍스트
                 elif prefer_single_hit and wants_depth:
