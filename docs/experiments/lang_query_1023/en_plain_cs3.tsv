@@ -1,0 +1,4 @@
+R01	Is there research on the problem of LLMs missing information in the middle of a long context?
+R02	Find research that analyzes how the order or number of retrieved documents in RAG affects answer quality.
+R03	Summarize research on adaptive RAG that decides to retrieve only when retrieval is needed.
+R04	Summarize research on metrics that automatically score RAG answer quality without human evaluation.

@@ -1,0 +1,12 @@
+M01	How the position of relevant passages (lost in the middle, positional bias) and the number of retrieved passages (top-k, context length, noise) affect RAG answer quality.
+M02	LLM weight quantization (post-training quantization, weight-only) and KV cache quantization.
+M03	LLM hallucination detection and hallucination mitigation methods.
+M04	RAG document chunking: chunk size and semantic chunking strategies.
+M05	Speculative decoding: training draft models (drafter distillation) and improving verification.
+M06	LLM jailbreak attacks and jailbreak defenses (guardrails, safety alignment).
+M07	Prompt injection attacks and defenses for LLM agents and RAG (indirect prompt injection).
+M08	Communication-efficient federated learning and differentially private federated learning.
+M09	Hallucination mitigation and hallucination detection in large vision-language models (LVLM object hallucination).
+M10	Robustness of RAG to noisy retrieval and distractor passages (irrelevant context, noise filtering).
+M11	LLM agent tool calling decisions (when to call tools) and tool-use benchmarks.
+M12	Watermarking for generative models: image and video watermarking, and LLM text or agent watermarking.

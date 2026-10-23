@@ -1,0 +1,34 @@
+N01	By up to what percentage did RepAct, a re-parameterizable activation function for edge devices, improve accuracy on MobileNetV3-Small ImageNet100?
+N02	How many QA pairs does NeuroQA, a 3D brain MRI question answering benchmark, have?
+N03	A study that reduced prompt-induced hallucinations in VLMs by removing attention heads — by what percentage did it reduce hallucinations?
+N04	In a study on hiring algorithm monoculture, what percentage of Black applicants' applications ended up in disadvantaged positions?
+N05	On an olympiad-level multi-image reasoning benchmark, what is the accuracy of even the strongest model?
+N06	For DeepDA, latent-space data assimilation of sea surface temperature, what percentage did the error increase stay under when only 10% of observations were available?
+N07	In Long-WAM, when the context was extended to 19.2 seconds, the RoboCasa GR-1 success rate rose from what to what?
+N08	In a study of credential leakage in LLM agent skills, what percentage of leaks was due to debug logging?
+N09	In a study on automatic assessment of Korean children's pronunciation, what was NeMo SortFormer's speaker count accuracy?
+N10	By up to what percentage did a distributed system that inspects wind turbine defects with drones improve detection accuracy?
+N11	A training-free method that reduces VLM hallucinations with uncertainty-based re-attention — by how many percentage points did it reduce the hallucination rate?
+N12	In a study evaluating LLM knowledge graph construction, what percentage was the graph matching threshold set to?
+C01	For what purposes do SLMQuant and Block-Sphere Vector Quantization each deal with quantization? Tell me the difference.
+C02	In on-policy distillation, how do the Prefix Replay approach and BranchOPD differ?
+C03	What is the difference between the entropy-regularized probabilistic gate method for finding sparse models in federated learning and DeepFusion?
+C04	Compare the study on whether LLMs are useful for time series analysis with LeForecast.
+C05	What do the study adding conformal prediction to GNN link prediction and Gegenbauer GNN each do?
+C06	In agent memory, what is the difference between LRE eviction and the decoupling-aggregation retrieval approach?
+C07	Compare MKEvolve with the study that improves LLM code generation using test and static analysis feedback.
+C08	How do UNITE and the Context-Aware Tokenization world model each handle the tokenizer?
+C09	How do World4RL and the variable-length latent world model study differ?
+C10	What is the difference between the register token study for Diffusion Transformers and LazyDiT?
+C11	Compare Factored Agents with the study showing that long-context LLMs are weak at long in-context learning.
+C12	How do Masked Self-Distillation, which internalizes CoT, and semi-supervised CoT learning differ?
+C13	Compare the VLA models OmniJARVIS and Xiaomi-Robotics-1.
+C14	Tell me the difference between dynamics-level watermarks for flow matching models and behavioral watermarks for LLM agents.
+T01	Recent LLM quantization research: post-training quantization (PTQ), weight-only quantization, KV cache quantization, low-bit LLMs.
+T02	Trends in knowledge distillation: LLM distillation, on-policy distillation, teacher-student training.
+T03	Federated learning research: decentralized federated learning, communication efficiency, non-IID data, privacy.
+T04	Recent world model research: latent world models, video prediction, world models for reinforcement learning and robotics.
+T05	Find 5 papers on time series forecasting: transformer forecasting, foundation models for time series, LLMs for forecasting.
+T06	LLM code generation research directions: code LLMs, code benchmarks, execution feedback, agentic coding.
+T07	Vision-language-action (VLA) models for robot manipulation: VLA training, benchmarks, embodied foundation models.
+T08	Watermarking for generative models: image and video watermarking, LLM text watermarking, model ownership verification.

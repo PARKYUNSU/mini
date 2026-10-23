@@ -1,0 +1,12 @@
+M01	Find research that analyzes how the order or number of retrieved documents in RAG affects answer quality.
+M02	Tell me about weight quantization and KV cache quantization research in LLM quantization.
+M03	Tell me about research that detects or mitigates LLM hallucinations.
+M04	Is there research on chunk size or semantic-unit splitting in RAG chunking?
+M05	Tell me about research that improves draft model training or the verification stage in speculative decoding.
+M06	Summarize research on LLM jailbreak attacks and defenses.
+M07	Tell me about research on prompt injection attack techniques or defense techniques.
+M08	Is there research on communication efficiency or differential privacy in federated learning?
+M09	Is there research on methods to reduce or detect hallucinations in vision-language models?
+M10	Find research on robustness to noisy or distracting documents in RAG.
+M11	Tell me about research on tool-call decisions or tool-use benchmarks for LLM agents.
+M12	Is there research on image/video watermarks or text/agent watermarks for generative models?

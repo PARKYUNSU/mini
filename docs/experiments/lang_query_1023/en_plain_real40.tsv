@@ -1,0 +1,40 @@
+N01	There's a method called DDC that adjusts sampling width and depth together for inference-time scaling. How much did it reduce tokens?
+N02	An LLM method that plans for heterogeneous multi-robot teams with a knowledge graph — by what percentage did it improve performance on MAT-THOR?
+N03	In a benchmark evaluating LLM cultural competence with health questions, what percentage of culturally appropriate answers did even the best model give?
+N04	There was a study saying coding agents use fewer tokens when the code is clean. How much were tokens reduced?
+N05	How many times faster is MXNorm's kernel than RMSNorm at most?
+N06	In a study of how consistently LLM agents answer inputs with the same meaning but different wording, which model was most stable and what was its rate?
+N07	What was the average attack success rate of the PBI-Attack jailbreak on open-source LVLMs?
+N08	A method that blurs less important image regions based on the prompt before uploading images to a VLM — how much did it reduce the bitrate?
+N09	In trajectory optimization for a space robot arm grasping a rotating object, by what percentage did a transformer warm-start reduce the number of iterations?
+N10	What percentage of vision tokens does LightKV use, and how much computation does it save?
+N11	In a study analyzing job postings to see whether AI increases demand for human skills, how much higher salary do data scientists with skills like resilience earn?
+N12	How much faster is OAT, which learns only from successful trajectories to find agent failure steps, than prompting-based methods?
+N13	A method that verifies LLM hallucinations in materials science in multiple stages — by what percentage did it reduce hallucinations?
+N14	By up to what percentage did Recursive Harness Self-Improvement (RHI) reduce inference cost?
+N15	On HippoCamp, a benchmark for personal-computer file management agents, what is the best commercial model's user profiling accuracy?
+C01	In speculative decoding, how do JetSpec and DSpark differ in the way they create drafts?
+C02	Among methods for reducing the KV cache, what is the difference between LightKV and CommVQ?
+C03	How does the LLM jailbreak method that converts prompts into logical expressions differ from the study that transfers text jailbreaks to audio?
+C04	How do HyperGraphRAG and Plasma GraphRAG each use graph RAG? Compare them.
+C05	Compare Semantic Entropy Probes and ChainPoll for hallucination detection.
+C06	What problems do the process reward models EDU-PRM and DPRM each try to solve, and how do they differ?
+C07	What is the difference in approach between Reasoning-SQL and Solid-SQL for Text-to-SQL?
+C08	Compare DeRAG, which attacks RAG with prompt injection, and Cognitive Firewall, which protects browser agents from injection.
+C09	MoE-Mamba and BlackMamba both add MoE to Mamba — how are they different?
+C10	How do DynamicRAG and DeepEra differ in RAG reranking?
+C11	Compare M-MAD, which uses multi-agent debate for translation evaluation, and PROClaim, which uses it for claim verification.
+T01	Summarize recent research trends in speculative decoding.
+T02	Find and explain 5 papers on KV cache compression.
+T03	Summarize papers on LLM jailbreak attacks.
+T04	Which direction is recent Text-to-SQL research heading?
+T05	Summarize research on prompt injection attacks and defenses.
+T06	Tell me about papers related to LLM reward models.
+T07	Compare and summarize papers on LLM hallucination detection methods.
+T08	Summarize research that improves reranking in RAG.
+R01	Is there a paper on whether a model notices when a tool used by an LLM agent fails without an obvious sign? Explain the key points.
+R02	Find 5 papers on improving RAG retrieval accuracy, and based on them describe in detail 3 research gaps that have not been tried yet.
+R03	Tell me about research that improved search agent performance using only hard, information-rich search trajectory data, without doing everything from pretraining to RL like big companies.
+R04	Tell me about research that turns a decoder-only LLM into a long-document retriever with only unsupervised contrastive learning.
+R05	Summarize papers that review problems like non-stationarity or partial observability in multi-agent reinforcement learning from a game theory perspective (Nash equilibrium, evolutionary dynamics).
+R06	Analyze papers that improve RAG retrieval accuracy and propose 3 'research gaps' that people have not tried yet.

@@ -1,0 +1,4 @@
+R01	The lost-in-the-middle problem: LLMs fail to use relevant information in the middle of long contexts (positional bias in long-context LLMs).
+R02	How the position of relevant passages (lost in the middle, positional bias) and the number of retrieved passages (top-k, context length, noise) affect RAG answer quality.
+R03	Adaptive retrieval-augmented generation: deciding when to retrieve (retrieval necessity, self-reflective / corrective RAG).
+R04	Automatic RAG evaluation metrics without human annotation (LLM-as-a-judge, faithfulness, answer relevance).
