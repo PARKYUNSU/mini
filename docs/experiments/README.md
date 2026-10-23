@@ -73,6 +73,7 @@
 | [`paper_blocks_1022/`](paper_blocks_1022/) | 컨텍스트를 논문당 한 블록 · 라우터 5편 (`RAG_PAPER_BLOCKS`) + 답 재생성 | **채택 · 운영 (10-22 22:38, 효과 없음 · 정리용)** — 중복 칸 답 25 → 1, gold 인용 123 → 125 (7 : 6), 응답 −3s |
 | [`aspect_split_1022/`](aspect_split_1022/) | 조건이 여러 개인 질문은 조건마다 따로 검색 (`RAG_ASPECT_SPLIT`) + 조건 세트 12문항 | **기각** — 조건 커버 10 → 10, 시간 +8.7s; 보조 LLM 이 조건 분리를 12 중 4만 판단(출발점 질문도 놓침) |
 | [`external_single_1023/`](external_single_1023/) | 관련 문서 1편만 남은 답도 외부 검색 (`RAG_EXTERNAL_ON_SINGLE`, 오프라인) | **기각** — '2' 있는 답 1/23, 무관 40%; 1편 답은 대부분 특정 논문 질문 |
+| [`corpus_seed_1023/`](corpus_seed_1023/) | 리뷰 지적 4편 + 외부 후보 2편 수집 (코드 변경 없음) | **주 미달 · 보호 통과** — 수집 논문이 든 문항 1/4(Found in the Middle), Power of Noise 는 색인됐지만 질문 검색어로 안 나옴 |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -216,7 +217,7 @@ docs/experiments/
 ├─ paper_blocks_1022/      ← 논문 단위 컨텍스트 (채택 · 운영)
 ├─ aspect_split_1022/      ← 조건별 분리 검색 (기각)
 ├─ external_single_1023/   ← 1편 답 외부 검색 (기각)
-├─ corpus_seed_1023/       ← 리뷰 지적 논문 수집 (측정 중)
+├─ corpus_seed_1023/       ← 리뷰 지적 논문 수집 (주 미달 · 수집분 유지 제안)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
