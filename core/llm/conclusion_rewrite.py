@@ -14,7 +14,7 @@ from core.llm.answer_fix import _CITED, _find
 from core.llm.citation_fix import RAG_HIT_SEP, fix_citations
 from core.llm.lang_guard import hanzi_count
 
-__all__ = ["cited_blocks", "extract_findings", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
+__all__ = ["brief_findings", "cited_blocks", "extract_findings", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
 
 SYSTEM = "너는 논문 검색 답변의 결론을 고쳐 쓰는 편집자다. 참고 문서에 적힌 내용만 쓴다."
 
@@ -85,12 +85,42 @@ def cited_blocks(answer: str, numbered_context: str, doc_ids: dict[int, str]) ->
     return blocks
 
 
+def _sentences(text: str) -> list[str]:
+    text = re.sub(r"\[초록\]|#+\s*\**abstract\**", " ", text, flags=re.I)
+    return [x.strip() for x in re.split(r"(?<!vs\.)(?<!al\.)(?<!e\.g\.)(?<=[.!?])\s+", re.sub(r"\s+", " ", text)) if len(x.strip()) > 20]
+
+
+_ACCOUNT = re.compile(r"\baccounts? for\b", re.I)
+_PROPOSE = re.compile(r"\b(we|this (paper|work|study))\b[^.]{0,60}\b(propose|present|introduce|develop|build|design)", re.I)
+
+
+def brief_findings(text: str, max_chars: int) -> str:
+    """초록을 ``max_chars`` 안에서 제안 · 결과 · 대상 문장으로 줄인다(원래 순서). 목록 모드 블록용
+    (docs/experiments/list_findings_1023) — 앞 500자 자르기는 배경 문장만 남겼다. 고를 문장이 없으면 앞부분."""
+    sents = _sentences(text.replace("\\%", "%"))  # LaTeX "40.1\%" 도 수치로
+    # "accounts for most of …" 같은 결론 문장도 결과로 본다(결론 v2 의 extract_findings 는 그대로 둔다)
+    score = {i: 2 * bool(_RESULT_NUM.search(x)) + bool(_RESULT_RE.search(x) or _ACCOUNT.search(x)) for i, x in enumerate(sents) if i}
+    want = [i for i, x in enumerate(sents) if _PROPOSE.search(x)][:1]
+    want += sorted((i for i in score if score[i]), key=lambda i: (-score[i], -i))[:3]
+    want += [next((i for r in _DOMAIN_RES for i, x in enumerate(sents) if r.search(x)), -1)]
+    keep, used = {}, 0
+    for i in dict.fromkeys(i for i in want if i >= 0):
+        room = max_chars - used - 1
+        if len(sents[i]) <= room:
+            keep[i] = sents[i]
+        elif i in score and score[i] and room >= 120:  # 긴 결과 문장은 버리지 말고 남은 칸만큼
+            keep[i] = sents[i][: room - 1].rstrip() + "…"
+        else:
+            continue
+        used += len(keep[i]) + 1
+    return " ".join(keep[i] for i in sorted(keep)) if keep else re.sub(r"\s+", " ", text).strip()[:max_chars]
+
+
 def extract_findings(block: str) -> tuple[list[str], str]:
     """블록에서 ``(결과 문장 ≤3, 대상 문장)``. 머리(번호 · 거리 · 날짜 · ID 제목) 뒤 본문만 본다."""
     lines = block.split("\n")
     k = next((i for i, l in enumerate(lines) if re.match(r"\[\d{4}\.\d{4,5}", l)), -1)
-    text = re.sub(r"\[초록\]|#+\s*\**abstract\**", " ", "\n".join(lines[k + 1:]), flags=re.I)
-    sents = [x.strip() for x in re.split(r"(?<!vs\.)(?<!al\.)(?<!e\.g\.)(?<=[.!?])\s+", re.sub(r"\s+", " ", text)) if len(x.strip()) > 20]
+    sents = _sentences("\n".join(lines[k + 1:]))
     # 첫 문장은 배경이라 뺀다. 결과 수치가 있는 문장 > 결과 동사 문장, 같은 점수면 뒤쪽(초록 끝에 결과가 많다)
     score = {i: 2 * bool(_RESULT_NUM.search(x)) + bool(_RESULT_RE.search(x)) for i, x in enumerate(sents) if i}
     top = sorted((i for i in score if score[i]), key=lambda i: (-score[i], -i))[:3]

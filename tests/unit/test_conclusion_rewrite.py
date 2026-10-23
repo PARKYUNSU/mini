@@ -48,3 +48,28 @@ def test_extract_findings_v2():
     assert res[0].startswith("Overlap provides no measurable benefit") and "cost-effective" in res[1]
     assert dom.startswith("Our end-to-end evaluation on Natural Questions")
     assert "Distance" not in " ".join(res)
+
+
+def test_brief_findings_picks_result_over_background():
+    from core.llm.conclusion_rewrite import brief_findings
+
+    ab = ("Retrieval-augmented generation is routinely extended with methods meant to improve retrieval. "
+          "The benefits reported for these methods come almost exclusively from homogeneous corpora. "
+          "To study this directly, we build HetDocQA, a heterogeneous benchmark with span-overlap labels. "
+          "A strong cross-encoder reranker accounts for most of the pipeline's quality. "
+          "Beyond it, only two methods yield reliable gains: query expansion and SSCC.")
+    out = brief_findings(ab, 300)
+    assert len(out) <= 300
+    assert "we build HetDocQA" in out and "accounts for most" in out
+    assert not out.startswith("Retrieval-augmented generation is routinely")  # 앞 배경 문장은 밀린다
+    assert brief_findings("짧은 초록.", 300) == "짧은 초록."  # 고를 문장이 없으면 앞부분
+
+
+def test_brief_findings_long_result_truncated_not_dropped():
+    from core.llm.conclusion_rewrite import brief_findings
+
+    ab = ("LLM agents rely on long-term memory to support extended interactions. "
+          "In this paper, we propose TrustMem, a framework designed to improve the trustworthiness of memory consolidation. "
+          "Extensive experiments demonstrate that TrustMem improves memory utility: " + "x " * 150 + "and reduces omission by 40.1\\%.")
+    out = brief_findings(ab, 300)
+    assert len(out) <= 300 and "we propose TrustMem" in out and out.endswith("…")

@@ -47,7 +47,7 @@ from core.llm.agent_llm import (
     get_rag_answer_llm,
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
-from core.llm.conclusion_rewrite import rewrite_conclusion
+from core.llm.conclusion_rewrite import brief_findings, rewrite_conclusion
 from core.llm.relevance_filter import filter_relevant
 from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
@@ -382,6 +382,9 @@ def _compact_list_blocks(rag_context: str, *, abs_chars: int = LIST_MODE_ABS_CHA
         if "[초록] " in b:
             head, rest = b.split("[초록] ", 1)
             abstract = rest.split("\n\n", 1)[0]
+            # 앞 500자는 배경 문장뿐이라 제안 · 결과 · 대상 문장을 고른다 (RAG_LIST_FINDINGS, docs/experiments/list_findings_1023)
+            if os.getenv("RAG_LIST_FINDINGS", "0").strip() == "1":
+                abstract = brief_findings(abstract, abs_chars)
             out.append(f"{head}[초록] {abstract[:abs_chars]}".strip())
         else:
             lines = b.split("\n")
