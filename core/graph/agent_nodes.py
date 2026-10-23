@@ -338,7 +338,9 @@ def followup_reuse_context(session, user_request: str) -> str:
     # 직전 턴이 그 RAG 답일 때만 — 잡담·도구 뒤의 "그거"가 오래된 논문을 끌어오지 않게
     if not session.recent_messages or session.recent_messages[-1][0] != f"User: {prev_q}":
         return ""
-    if not is_followup(user_request) or _NEW_PAPERS_RE.search(user_request):
+    # 지시어가 있어야 한다 — is_followup 의 "8자 이하" 규칙은 기록 게이트용(애매하면 기록)이라, 재사용에 쓰면
+    # 논문 답 뒤의 "요즘 날씨 어때?" · "고마워" 도 직전 논문으로 답했다 (2026-10-23 실사용 job 128)
+    if not _FOLLOWUP_RE.search(user_request) or _NEW_PAPERS_RE.search(user_request):
         return ""
     # 긴 질문은 자기 주제를 가진 새 질문이다 — "…뭐가 다른 거야?"(45자) 등 3개 오발동 (followup_reuse_1021 §5)
     if len(re.sub(r"\s", "", user_request)) > _REUSE_MAX_CHARS:

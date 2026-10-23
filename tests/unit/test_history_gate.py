@@ -59,6 +59,9 @@ def test_reuse(monkeypatch):
     assert N.followup_reuse_context(s, "두 번째 항목은 어떤 실험을 했어?").startswith("[2401.00001v1]")
     assert N.followup_reuse_context(s, "다른 논문도 추천해줘") == ""  # 새 논문을 원함 → 새로 검색
     assert N.followup_reuse_context(s, "KV 캐시 양자화 연구 있어?") == ""  # 새 질문
+    assert N.followup_reuse_context(s, "요즘 날씨 어때?") == ""  # 짧은 잡담은 지시어가 없다 (job 128)
+    assert N.followup_reuse_context(s, "고마워") == ""
+    assert N.followup_reuse_context(s, "더 알려줘") == CTX
     # 긴 독립 질문 속 지시어는 재사용하지 않는다 (followup_reuse_1021 §5 오발동)
     assert N.followup_reuse_context(s, "LLM 탈옥에서 논리식으로 바꿔서 뚫는 방법이랑, 텍스트 탈옥을 오디오로 옮기는 연구는 뭐가 다른 거야?") == ""
 
