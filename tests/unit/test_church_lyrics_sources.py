@@ -89,3 +89,11 @@ def test_proofread_bad_answer_changes_nothing(fake):
     for answer in ("not json", "[]", '{"spacing": "x", "typos": null}'):
         fake["answer"] = answer
         assert sources.proofread("아무 가사") == ([], [])
+
+
+def test_naver_blogs_and_daum_cafes_count_per_owner():
+    assert sources.site("https://m.blog.naver.com/si2pas/220344062079") == sources.site(
+        "https://m.blog.naver.com/PostView.nhn?isHttpsRedirect=true&blogId=si2pas&logNo=1")
+    assert sources.site("https://m.blog.naver.com/97grace/1") != sources.site("https://blog.naver.com/js_cjw/2")
+    assert sources.site("https://m.cafe.daum.net/speakjesus/RdMN/47") != sources.site("https://cafe.daum.net/lordfirst/IJYq/1")
+    assert sources.site("https://inamen.tistory.com/4521") == "inamen.tistory.com"

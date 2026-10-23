@@ -50,7 +50,20 @@ def youtube_title(url: str) -> str | None:
         return None
 
 
-def search(query: str, max_results: int = 6) -> list[dict]:
+def site(url: str) -> str:
+    """같은 출처인지 가리는 이름. 네이버 블로그·다음 카페는 주소 앞부분이 같아도 주인(블로그·카페)마다 다른 출처입니다."""
+    u = urllib.parse.urlparse(url)
+    host = u.netloc.removeprefix("m.")
+    first = u.path.strip("/").split("/")[0]
+    if host == "blog.naver.com":
+        owner = urllib.parse.parse_qs(u.query).get("blogId", [""])[0]
+        return f"{host}/{owner or first}"
+    if host == "cafe.daum.net":
+        return f"{host}/{first}"
+    return host
+
+
+def search(query: str, max_results: int = 10) -> list[dict]:
     from tavily import TavilyClient
 
     res = TavilyClient(api_key=_tavily_key()).search(
@@ -109,9 +122,9 @@ def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int 
         text = hit["raw_content"][:MAX_CHARS]
         if domain.endswith(EXCLUDED_DOMAINS):
             continue
-        if domain in domains or norm(title) not in norm(text):  # 곡명이 없는 페이지는 모델에 보내지 않음
+        if site(hit["url"]) in domains or norm(title) not in norm(text):  # 곡명이 없는 페이지는 모델에 보내지 않음
             continue
-        domains.add(domain)
+        domains.add(site(hit["url"]))
         hits.append((hit["url"], [ln.rstrip() for ln in text.splitlines()][:MAX_LINES]))
         if len(hits) >= max_docs:
             break
