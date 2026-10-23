@@ -1,5 +1,5 @@
 """paper_ce_1023 오프라인 (맥미니): 운영 논문 순위 상위 30편을 MiniLM-L6 cross-encoder 로 다시 매긴다."""
-import glob, json, re, statistics as st, sys, time
+import glob, json, os, re, statistics as st, sys, time
 from math import comb
 from pathlib import Path
 sys.path.insert(0, ".")
@@ -20,7 +20,7 @@ for f in ["raw_data_queue/crawled_papers.jsonl"] + glob.glob("raw_data_queue/pro
         AB.setdefault(bare(d.get("paper_id", "")), re.sub(r"\s+", " ", d.get("abstract") or ""))
 ce = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 col = _get_chroma_singleton()._collection
-TOP = 30
+TOP = int(os.getenv("PCE_TOP", "30"))  # 2차(§6): 100
 
 
 def rerank(q):
@@ -51,7 +51,7 @@ for r in map(json.loads, open(R / "as1_m12.jsonl")):
     q = (r.get("rag_queries") or [""])[0]
     if q:
         out.append({"set": "m12", "id": r["id"], "query": q, "aspects": ASP[r["id"]], **rerank(q)})
-with open(D / "results.jsonl", "w") as w:
+with open(D / ("results.jsonl" if TOP == 30 else f"results_top{TOP}.jsonl"), "w") as w:
     w.writelines(json.dumps(x, ensure_ascii=False) + "\n" for x in out)
 
 hit = lambda x, arm, k: bool(set(x[arm][:k]) & set(x["gold"]))
