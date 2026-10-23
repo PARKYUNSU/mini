@@ -75,6 +75,7 @@
 | [`external_single_1023/`](external_single_1023/) | 관련 문서 1편만 남은 답도 외부 검색 (`RAG_EXTERNAL_ON_SINGLE`, 오프라인) | **기각** — '2' 있는 답 1/23, 무관 40%; 1편 답은 대부분 특정 논문 질문 |
 | [`corpus_seed_1023/`](corpus_seed_1023/) | 리뷰 지적 4편 + 외부 후보 2편 수집 (코드 변경 없음) | **주 미달 · 보호 통과** — 수집 논문이 든 문항 1/4(Found in the Middle), Power of Noise 는 색인됐지만 질문 검색어로 안 나옴 |
 | [`list_findings_1023/`](list_findings_1023/) | 목록 모드 블록을 제안 · 결과 · 대상 문장으로 (`RAG_LIST_FINDINGS`) + 답 재생성 | **보류 (사용자 결정)** — 자동 주 통과 · 눈가림 · 보호 미달 — 근거 수치 항목 7 → 41 (15 : 1), 결과 · 기여 항목 80 → 96%, 숫자 오기 0 → 2, 응답 +16s |
+| [`final_select_1023/`](final_select_1023/) | 최종 선택 진단 (위치 측정, LLM 없음) | **진단** — real 두 세트 운영 정답 64/68, 놓친 26문항 원인 5갈래(점수 상위인데 뒤 단계에서 빠짐 8 · 청크 하나짜리 정답 5 · 경계 6 · 풀에 없음 3 · 경로 1) |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -220,6 +221,7 @@ docs/experiments/
 ├─ external_single_1023/   ← 1편 답 외부 검색 (기각)
 ├─ corpus_seed_1023/       ← 리뷰 지적 논문 수집 (주 미달 · 수집분 유지 제안)
 ├─ list_findings_1023/     ← 목록 블록 결과 문장 (보류)
+├─ final_select_1023/      ← 최종 선택 진단
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
