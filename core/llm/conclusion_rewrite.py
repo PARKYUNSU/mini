@@ -248,4 +248,4 @@ def rewrite_conclusion(
     if why:
         return _dropped(answer, why)
     text, _ = fix_citations(text, numbered_context, doc_ids=doc_ids)
-    return replace_conclusion(answer, text), "바꿈"
+    return _dropped(replace_conclusion(answer, text), "바꿈")
