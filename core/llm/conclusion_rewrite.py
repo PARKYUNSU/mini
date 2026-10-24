@@ -199,19 +199,20 @@ def replace_conclusion(answer: str, text: str) -> str:
 
 
 def _dropped(answer: str, why: str) -> tuple[str, str]:
-    if os.getenv("RAG_CONCLUSION_DROP_BUNDLED", "0").strip() != "1":  # docs/experiments/conclusion_drop_1025
+    mode = os.getenv("RAG_CONCLUSION_DROP_BUNDLED", "0").strip()  # docs/experiments/conclusion_overgen_1025
+    if mode not in ("1", "overgen"):
         return answer, why
-    answer, n = drop_bundled(answer)
+    answer, n = drop_bundled(answer, bundled=mode == "1")
     return answer, f"{why} · 묶기 {n} 지움" if n else why
 
 
-def drop_bundled(answer: str) -> tuple[str, int]:
-    """원래 결론에서 서로 다른 논문 둘 이상을 인용한 문장 · 과잉 일반화 문장을 지운다. 인용 문장이 안 남으면 그대로."""
+def drop_bundled(answer: str, bundled: bool = True) -> tuple[str, int]:
+    """결론에서 과잉 일반화 문장(``bundled`` 면 서로 다른 논문 둘 이상을 인용한 문장도)을 지운다. 인용 문장이 안 남으면 그대로."""
     c = _find("결론", answer)
     if not c:
         return answer, 0
     sents = [x for x in re.split(r"(?<=[.!?。])\s+|\n+", answer[c.end():]) if x.strip()]
-    keep = [x for x in sents if len(set(_CITED.findall(x))) < 2 and not _OVERGEN.search(x)]
+    keep = [x for x in sents if not (bundled and len(set(_CITED.findall(x))) >= 2) and not _OVERGEN.search(x)]
     if len(keep) == len(sents) or not any(_CITED.search(x) for x in keep):
         return answer, 0
     return replace_conclusion(answer, " ".join(x.strip() for x in keep)), len(sents) - len(keep)

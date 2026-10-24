@@ -94,3 +94,10 @@ def test_drop_bundled():
     assert drop_bundled(head + "같은 논문[2603.25333v1][2603.25333v2] 은 묶기 아님.") == (head + "같은 논문[2603.25333v1][2603.25333v2] 은 묶기 아님.", 0)
     only = head + "A 와 B 는 높였다[2601.14123v1][2603.25333v1]. 이는 흥미롭다."
     assert drop_bundled(only) == (only, 0)  # 인용 문장이 안 남으면 그대로
+
+
+def test_drop_overgen_only():
+    from core.llm.conclusion_rewrite import drop_bundled
+
+    a = "<b>결론</b>\nA 와 B 는 높였다[2601.14123v1][2603.25333v1]. 모든 연구가 같은 방향을 보인다."
+    assert drop_bundled(a, bundled=False) == ("<b>결론</b>\nA 와 B 는 높였다[2601.14123v1][2603.25333v1].\n", 1)
