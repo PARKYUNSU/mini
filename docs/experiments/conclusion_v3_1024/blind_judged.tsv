@@ -1,0 +1,266 @@
+sid	label	note
+Q01A.0	O	
+Q01A.1	O	
+Q01A.2	F	
+Q01B.0	O	
+Q01B.1	O	
+Q01B.2	O	
+Q02A.0	O	
+Q02A.1	O	
+Q02A.2	O	
+Q02B.0	O	
+Q02B.2	O	
+Q02B.4	O	
+Q03A.0	O	
+Q03A.2	O	
+Q03B.0	O	
+Q03B.1	O	
+Q04A.0	O	
+Q04A.1	E	vanilla 를 "바나나"
+Q04A.2	O	
+Q04B.0	O	
+Q04B.1	E	vanilla 를 "바나나"
+Q04B.2	O	
+Q05A.0	O	
+Q05A.1	O	
+Q05A.2	O	
+Q05B.0	O	
+Q05B.1	O	
+Q05B.2	O	
+Q06A.0	O	
+Q06A.1	O	
+Q06A.2	O	
+Q06B.0	O	
+Q06B.1	E	추론 경로가 아니라 "모델"을 선별한다고
+Q06B.2	E	같은 오류
+Q07A.0	O	
+Q07A.1	O	
+Q07A.2	O	
+Q07B.0	O	
+Q07B.1	O	
+Q08A.0	U	"짧은 토큰으로도" — 문서에 없음
+Q08A.1	X	공격·방어 두 논문을 한 문장에 묶어 "상황에 따라 선택"
+Q08B.0	?	가독성 인식 접미사 · MLM 음의 로그 가능도 — 보인 블록 밖
+Q08B.2	O	
+Q08B.4	O	
+Q09A.0	O	
+Q09A.1	O	
+Q09A.2	O	
+Q09B.0	O	
+Q09B.1	O	
+Q09B.2	X	두 논문이 서로 비교하지 않았는데 BlackMamba 우위
+Q10A.0	?	300K · 두 자리 향상 — 블록 밖
+Q10A.1	E	DPS 를 DynamicRAG 로 부름
+Q10A.2	E	같은 혼동 반복
+Q10B.0	?	
+Q10B.1	?	30.06% · 15.4% — 블록 밖
+Q10B.2	O	
+Q11A.0	O	
+Q11A.1	O	
+Q11A.2	O	
+Q11B.0	O	
+Q11B.1	O	
+Q11B.2	O	
+Q13A.0	F	
+Q13A.1	O	
+Q13A.2	O	
+Q13A.3	O	
+Q13A.4	X	KeyDiff 와 KVSculpt 의 서로 다른 주장을 한 문장에 묶음
+Q13A.5	X	한 논문 결과로 "방법의 성능이 크게 달라진다" 일반화
+Q13B.0	F	
+Q13B.1	O	
+Q13B.2	O	
+Q13B.3	O	
+Q13B.4	X	두 논문을 한 문장에 묶음
+Q13B.5	X	한 논문 결과로 일반화
+Q14A.0	F	
+Q14A.1	O	
+Q14A.2	O	
+Q14A.3	O	
+Q14A.4	X	일반화
+Q14B.0	F	
+Q14B.1	O	
+Q14B.2	O	
+Q14B.3	O	
+Q14B.4	X	일반화
+Q15A.0	O	
+Q15A.1	X	PURPLE·장문맥 두 논문 주장을 섞어 묶음
+Q15A.2	X	"모두 … 공통점"
+Q15B.0	O	
+Q15B.1	O	
+Q15B.2	O	
+Q15B.3	O	
+Q15B.4	O	
+Q15B.5	O	
+Q15B.6	O	
+Q15B.7	O	
+Q15B.8	O	
+Q15B.9	O	
+Q15B.10	O	
+Q16A.0	F	
+Q16A.1	O	
+Q16A.2	E	일반화·위양성 지적은 WARD 만, PI-Hunter 에 잘못 붙임
+Q16A.3	O	
+Q16A.4	X	한 논문 결과를 연구 전체로 일반화
+Q16B.0	O	
+Q16B.1	E	PI-Hunter 가 "제한된 가시성만 제공" — 기존 문제를 논문 결과로 오독
+Q16B.2	O	
+Q16B.3	O	
+Q16B.4	O	
+Q17A.0	X	두 논문 "공통된 방향성" 묶음, 서베이는 보상 모델 아님
+Q17A.1	O	
+Q17A.2	X	"다양한 연구에서 … 공유" 일반화
+Q17B.0	X	같음
+Q17B.1	O	
+Q17B.2	X	같음
+Q18A.0	X	여섯 논문을 세 흐름으로 묶어 "공통점"
+Q18A.1	X	"모두 … 결론을 공유"
+Q18A.2	F	
+Q18B.0	X	같음
+Q18B.1	X	같음
+Q18B.2	F	
+Q19A.0	O	
+Q19A.1	O	
+Q19B.0	O	
+Q19B.1	F	
+Q20A.0	O	
+Q20A.1	O	
+Q20A.2	O	
+Q20B.0	F	
+Q20B.1	O	
+Q20B.2	O	
+Q20B.3	O	
+Q21A.0	O	
+Q21A.1	O	
+Q21A.2	E	같은 논문 중복 블록을 두 논문으로 씀
+Q21B.0	O	
+Q22A.0	O	
+Q22A.1	O	
+Q22A.2	X	"모두 … 주목" 일반화
+Q22B.0	O	
+Q22B.1	O	
+Q22B.2	X	같음
+Q24A.0	O	
+Q24A.1	O	
+Q24B.0	O	
+Q24B.1	?	10개 모델·네 벤치마크 — 블록 밖
+Q24B.2	O	
+Q26A.0	?	4배 — 블록 밖
+Q26A.1	F	인용만 있는 줄
+Q26A.2	O	
+Q26A.3	F	인용만 있는 줄
+Q26A.4	O	
+Q26B.0	?	
+Q26B.1	?	18.55·13.8 블록 밖
+Q26B.2	O	
+Q27A.0	?	
+Q27A.1	?	
+Q27A.2	O	
+Q27B.0	?	
+Q27B.1	?	
+Q28A.0	O	
+Q28A.1	?	
+Q28A.2	X	"공통된 결론"
+Q28B.0	O	
+Q28B.1	O	
+Q28B.2	O	
+Q30A.0	?	
+Q30A.1	?	
+Q30A.2	O	
+Q30B.0	O	
+Q30B.1	?	
+Q30B.2	?	
+Q30B.3	O	
+Q31A.0	?	35% 블록 밖
+Q31A.1	F	인용만 있는 줄
+Q31A.2	?	
+Q31A.3	F	인용만 있는 줄
+Q31A.4	O	
+Q31B.0	O	
+Q31B.1	O	
+Q32A.0	?	
+Q32A.1	?	
+Q32A.2	O	
+Q32B.0	?	
+Q32B.1	?	
+Q32B.2	O	
+Q33A.0	O	
+Q33A.1	O	
+Q33A.2	O	
+Q33B.0	O	
+Q33B.1	O	
+Q33B.2	?	
+Q34A.0	O	
+Q34A.1	?	
+Q34A.2	O	
+Q34B.0	O	두 논문 한 문장이지만 대비만, 오귀속 없음
+Q34B.1	O	
+Q34B.2	X	근거 없는 우위 추론
+Q35A.0	E	SFT 의 "일반화 감소"를 MSD 결과처럼 섞음
+Q35A.1	?	
+Q35A.2	O	
+Q35B.0	?	
+Q35B.1	?	
+Q35B.2	O	
+Q36A.0	O	
+Q36A.1	E	16.8% 는 이전 방법(AgentMark) 결과인데 SBW 결과처럼 씀
+Q36B.0	E	"키가 없어도 메시지 복구" — 키 없으면 우연 수준
+Q36B.1	?	
+Q36B.2	O	
+Q37A.0	O	
+Q37A.1	O	
+Q37A.2	O	
+Q37A.3	O	
+Q37A.4	O	
+Q37B.0	O	
+Q37B.1	O	
+Q37B.2	X	RaanA·KronQ 두 논문 묶고 "최근 연구들" 일반화
+Q38A.0	X	두 논문을 "지식 증류 연구는"으로 묶음
+Q38A.1	X	두 논문 묶음
+Q38A.2	X	근거 없는 일반화
+Q38B.0	X	같음
+Q38B.1	X	같음
+Q38B.2	X	같음
+Q39A.0	F	
+Q39A.1	X	두 논문 묶음
+Q39A.2	O	
+Q39A.3	O	
+Q39A.4	X	"공통점"
+Q39B.0	F	
+Q39B.1	X	같음
+Q39B.2	O	
+Q39B.3	O	
+Q39B.4	X	같음
+Q40A.0	O	
+Q40A.1	O	
+Q40A.2	X	두 논문 묶음, "공통된 정의"는 WAM 서베이만
+Q40A.3	X	일반화
+Q40B.0	O	
+Q40B.1	O	
+Q40B.2	X	같음
+Q40B.3	X	같음
+Q41A.0	O	
+Q41A.1	O	
+Q41A.2	O	
+Q41A.3	O	
+Q41A.4	O	
+Q41B.0	O	
+Q41B.1	F	
+Q42A.0	O	
+Q42A.1	F	인용만 있는 줄
+Q42A.2	O	
+Q42A.3	F	인용만 있는 줄
+Q42A.4	O	
+Q42B.0	O	
+Q42B.1	O	
+Q42B.2	X	두 논문으로 분야 전체 방향 일반화
+Q44A.0	O	
+Q44A.1	O	
+Q44A.2	O	
+Q44A.3	O	
+Q44A.4	F	
+Q44B.0	O	
+Q44B.1	O	
+Q44B.2	O	
+Q44B.3	O	
+Q44B.4	F	
