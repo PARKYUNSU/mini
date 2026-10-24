@@ -51,6 +51,34 @@ PROMPT_V2 = """[질문]
 - 각 논문의 방법을 다시 설명하지 마라.
 - 한국어로. 머리말·제목·번호 없이 결론 문장만 출력한다."""
 
+# v3 (docs/experiments/conclusion_v3_1024): 논문마다 한 문장 · 여러 논문 묶기 금지. v2 결론의 사실 오류 다수가
+# 한 논문의 주장을 두 논문의 공통 주장으로 묶은 것이었다(answer_judge_1024).
+PROMPT_V3 = """[질문]
+{question}
+
+[논문별 핵심 — 초록에서 뽑은 원문 문장]
+{findings}
+
+[할 일]
+위 논문들로 질문에 대한 결론을 써라.
+- 논문마다 정확히 한 문장: 그 논문의 결과와 대상(데이터 · 도메인)을 쓰고, 그 논문 하나만 [문서 N] 으로 인용한다.
+- 한 문장에 두 논문 이상을 인용하지 마라. 한 논문의 내용을 다른 논문의 것처럼 쓰지 마라.
+- 마지막에 한 문장으로 논문들이 무엇이 다른지 쓴다 — 새 사실이나 수치를 넣지 말고, 인용하지 않는다.
+- "모든 연구", "공통", "모두" 같은 일반화를 쓰지 마라.
+- 수치는 원문 숫자를 그대로 옮기고 계산하지 마라.
+- 한국어로. 머리말·제목·번호 없이 결론 문장만 출력한다."""
+
+_OVERGEN = re.compile(r"모든\s*(연구|논문|문서|방법)|공통(된|으로|적|점)|모두[^.]{0,30}(공유|같|일치|보여)")
+
+
+def _v3_violation(text: str) -> str:
+    """v3 추가 검사: 한 문장에 서로 다른 문서 둘 이상 인용 · 과잉 일반화."""
+    for sent in re.split(r"(?<=[.!?。])\s+", text):
+        if len(set(_DOC_N.findall(sent))) >= 2:
+            return "여러 논문 묶음"
+    return "과잉 일반화" if _OVERGEN.search(text) else ""
+
+
 _RESULT_RE = re.compile(
     r"outperform|improv|reduc|increas|achiev|surpass|benefit|cost-effective|limit|degrad|drop|cliff|"
     r"match|better|worse|gain|lower|higher|faster|slower|show|find|found|reveal|demonstrat",
@@ -183,8 +211,9 @@ def rewrite_conclusion(
     from core.config.agent_config import ollama_kwargs
 
     b, c = _find("본론", answer), _find("결론", answer)
-    if os.getenv("RAG_CONCLUSION_PROMPT", "v1").strip() == "v2":
-        prompt = PROMPT_V2.format(question=question, findings=_findings_text(blocks))
+    mode = os.getenv("RAG_CONCLUSION_PROMPT", "v1").strip()
+    if mode in ("v2", "v3"):
+        prompt = (PROMPT_V3 if mode == "v3" else PROMPT_V2).format(question=question, findings=_findings_text(blocks))
     else:
         prompt = PROMPT.format(
             question=question, blocks=RAG_HIT_SEP.join(blocks.values()), body=answer[b.end():c.start()].strip()
@@ -196,7 +225,7 @@ def rewrite_conclusion(
         print(f"[DEBUG] conclusion_rewrite 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return answer, "호출 실패"
     text = ids_to_doc_refs(text, blocks)
-    why = check_conclusion(text, blocks)
+    why = check_conclusion(text, blocks) or (_v3_violation(text) if mode == "v3" else "")
     if why:
         return answer, why
     text, _ = fix_citations(text, numbered_context, doc_ids=doc_ids)

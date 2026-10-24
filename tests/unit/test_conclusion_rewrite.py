@@ -73,3 +73,12 @@ def test_brief_findings_long_result_truncated_not_dropped():
           "Extensive experiments demonstrate that TrustMem improves memory utility: " + "x " * 150 + "and reduces omission by 40.1\\%.")
     out = brief_findings(ab, 300)
     assert len(out) <= 300 and "we propose TrustMem" in out and out.endswith("…")
+
+
+def test_v3_violation():
+    from core.llm.conclusion_rewrite import _v3_violation
+
+    assert _v3_violation("A 는 72% 를 얻었다[문서 1]. B 는 PDF 에서 낫다[문서 2]. 두 논문은 대상이 다르다.") == ""
+    assert _v3_violation("A 와 B 는 정확도를 높였다[문서 1][문서 2].") == "여러 논문 묶음"
+    assert _v3_violation("A 는 72%[문서 1]. 모든 연구가 같은 방향을 보인다.") == "과잉 일반화"
+    assert _v3_violation("두 연구는 공통된 결론을 제시한다[문서 1].") == "과잉 일반화"
