@@ -14,7 +14,7 @@ from core.llm.answer_fix import _CITED, _find
 from core.llm.citation_fix import RAG_HIT_SEP, fix_citations
 from core.llm.lang_guard import hanzi_count
 
-__all__ = ["brief_findings", "cited_blocks", "extract_findings", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
+__all__ = ["brief_findings", "cited_blocks", "extract_findings", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion", "drop_bundled"]
 
 SYSTEM = "너는 논문 검색 답변의 결론을 고쳐 쓰는 편집자다. 참고 문서에 적힌 내용만 쓴다."
 
@@ -198,6 +198,25 @@ def replace_conclusion(answer: str, text: str) -> str:
     return answer[:c.end()] + "\n" + text.strip() + "\n" if c else answer
 
 
+def _dropped(answer: str, why: str) -> tuple[str, str]:
+    if os.getenv("RAG_CONCLUSION_DROP_BUNDLED", "0").strip() != "1":  # docs/experiments/conclusion_drop_1025
+        return answer, why
+    answer, n = drop_bundled(answer)
+    return answer, f"{why} · 묶기 {n} 지움" if n else why
+
+
+def drop_bundled(answer: str) -> tuple[str, int]:
+    """원래 결론에서 서로 다른 논문 둘 이상을 인용한 문장 · 과잉 일반화 문장을 지운다. 인용 문장이 안 남으면 그대로."""
+    c = _find("결론", answer)
+    if not c:
+        return answer, 0
+    sents = [x for x in re.split(r"(?<=[.!?。])\s+|\n+", answer[c.end():]) if x.strip()]
+    keep = [x for x in sents if len(set(_CITED.findall(x))) < 2 and not _OVERGEN.search(x)]
+    if len(keep) == len(sents) or not any(_CITED.search(x) for x in keep):
+        return answer, 0
+    return replace_conclusion(answer, " ".join(x.strip() for x in keep)), len(sents) - len(keep)
+
+
 def rewrite_conclusion(
     answer: str, question: str, numbered_context: str, doc_ids: dict[int, str], model: str
 ) -> tuple[str, str]:
@@ -223,10 +242,10 @@ def rewrite_conclusion(
         text = str(llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=prompt)]).content or "").strip()
     except Exception as exc:  # 결론을 못 바꿔도 답은 낸다
         print(f"[DEBUG] conclusion_rewrite 실패: {type(exc).__name__}: {str(exc)[:120]}")
-        return answer, "호출 실패"
+        return _dropped(answer, "호출 실패")
     text = ids_to_doc_refs(text, blocks)
     why = check_conclusion(text, blocks) or (_v3_violation(text) if mode == "v3" else "")
     if why:
-        return answer, why
+        return _dropped(answer, why)
     text, _ = fix_citations(text, numbered_context, doc_ids=doc_ids)
     return replace_conclusion(answer, text), "바꿈"
