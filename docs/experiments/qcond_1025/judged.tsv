@@ -1,0 +1,52 @@
+qid	idx	label	ctx	note
+K01	0	U	Y	9편 컨텍스트에 3편만, 편수 부족 밝히지 않음
+K01	1	D	?	감소율 없다고 밝힘(블록 잘림)
+K02	0	D	N	2편뿐이라고 밝힘
+K02	1	D	?	배수 없다고 밝힘
+K03	0	S	Y	
+K04	0	F	Y	"6편" 이라 하고 5편, 그중 공격 논문 2편(Poisoned LangChain · LogiBreak)을 방어로
+K05	0	F	Y	2024·2025 논문을 2026 년 연구로 소개
+K06	0	S	Y	
+K07	0	U	N	2024-06 · 2024-12 논문, 기간 조건 언급 없음
+K07	1	S	Y	
+K08	0	D	N	
+K09	0	S	Y	
+K10	0	S	Y	
+K11	0	S	Y	
+K12	0	S	Y	
+K13	0	D	?	"없다"고 했지만 Gecko(LLM 합성 · 재라벨)는 해당될 수 있음
+K14	0	S	Y	
+K15	0	S	Y	
+K16	0	S	Y	
+K17	0	S	?	AUROC 0.781 (블록 잘림)
+K18	0	D	N	
+K19	0	S	Y	
+K20	0	N/A		planner 경로, 답 없음
+K21	0	D	N	지어낸 이름 — 없다고 밝힘
+K22	0	D	N	지어낸 이름 — 없다고 밝힘
+K22	1	D	N	
+K23	0	F	N	지어낸 이름 — 서론은 없다더니 결론에서 AirCache 결과를 HyperKV 로
+K23	1	D	N	
+K24	0	D	N	지어낸 이름 — 언급 없다고 밝힘
+K24	1	D	N	
+K25	0	S	Y	
+K25	1	S	Y	
+K26	0	S	Y	
+K26	1	S	Y	
+K27	0	S	Y	
+K27	1	S	Y	
+K28	0	N/A		경로 A, 답 없음
+K28	1	N/A		
+K29	0	S	Y	
+K29	1	U	?	논문마다 한계 안 씀
+K30	0	S	Y	
+K31	0	D	Y	"나눌 정보 부족" — 간접 · 웹 인젝션으로 나눌 수 있었음(과잉 부정)
+K32	0	D	N	컨텍스트가 RAG 논문뿐, 밝힘
+K33	0	S	Y	
+K34	0	F	?	"모두 오픈소스 모델만" — Solid-SQL 은 근거 없음
+K35	0	S	Y	
+K36	0	D	N	
+K37	0	D	?	없다면서 본론에 LabVLA 실제 실행이라고 — 모순
+K38	0	D	N	
+K39	0	S	Y	
+K40	0	D	N	
