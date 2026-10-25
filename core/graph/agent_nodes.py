@@ -49,6 +49,7 @@ from core.llm.agent_llm import (
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.conclusion_rewrite import brief_findings, rewrite_conclusion
 from core.llm.relevance_filter import filter_relevant
+from core.llm.question_conditions import count_notice, filter_by_year
 from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
 from core.llm.presence_judge import (
@@ -1271,6 +1272,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             if os.getenv("RAG_RELEVANCE_FILTER", "0").strip() == "1":  # docs/experiments/relevance_filter_1022
                 rag_context, _rf = filter_relevant(user_request, rag_context, RAG_ANSWER_MODEL)
                 print(f"[DEBUG] DirectAnswer: 관련 문서 거르기 = {_rf}")
+            _yf = ""
+            if os.getenv("RAG_COND_CHECK", "0").strip() == "1":  # docs/experiments/qcond_rule_1025
+                rag_context, _yf = filter_by_year(user_request, rag_context)
+                print(f"[DEBUG] DirectAnswer: 기간 거르기 = {_yf}")
             _ctx_plain = rag_context
             rag_context, _doc_ids = number_context_papers(rag_context)
             # 목록 질문: 문서마다 번호 칸 하나인 템플릿 (docs/experiments/list_slots_1016)
@@ -1371,6 +1376,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 answer, _cc = clean_internal_refs(answer, _doc_ids)
                 if _cc:
                     print("[DEBUG] DirectAnswer: 내부 문서 번호 · 중복 인용 정리")
+            if os.getenv("RAG_COND_CHECK", "0").strip() == "1":
+                answer, _cn = count_notice(user_request, answer, _yf)
+                if _cn:
+                    print(f"[DEBUG] DirectAnswer: 조건 고지 = {_cn}")
             if _ext is not None:
                 _ext_items, _ext_wait = _ext.result()
                 print(f"[DEBUG] DirectAnswer: 외부 검색 {len(_ext_items)}편 (답변 뒤 대기 {_ext_wait:.1f}s)")
