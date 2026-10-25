@@ -84,6 +84,7 @@
 | [`conclusion_drop_1025/`](conclusion_drop_1025/) | 결론 다시 쓰기 탈락 시 묶기 문장 지우기 | **기각** — 탈락 11 답 중 걸린 답 0; 묶기는 통과한 v2 결론 안에 있음(사후: v2 결론에 적용 시 7 답 중 6 개선) |
 | [`conclusion_drop2_1025/`](conclusion_drop2_1025/) | 통과한 v2 결론에도 묶기 · 일반화 문장 지우기 (새 질문 30) | **기각** — E+X 11:0(p=0.001)이나 지운 문장 O 53%·근거 잃음 2; 일반화 규칙만은 7/7 X(사후) |
 | [`conclusion_overgen_1025/`](conclusion_overgen_1025/) | 결론 일반화 문장만 지우기 (새 질문 40) | **기각** — E+X 5:0(p=0.0625), 지운 7 문장 X 5·O 2, 걸린 답 7/32 |
+| [`conclusion_misattr_1025/`](conclusion_misattr_1025/) | 결론 논문 이름 오귀속 검사 (개발 세트) | **중단** — 190 답 중 걸린 답 1(정밀하지만 드묾), 사전 등록 안 함 |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -238,6 +239,7 @@ docs/experiments/
 ├─ conclusion_drop_1025/   ← 탈락 시 묶기 지우기 (기각)
 ├─ conclusion_drop2_1025/  ← 통과 결론에도 지우기 (기각, 일반화 규칙만 유망)
 ├─ conclusion_overgen_1025/ ← 일반화 문장만 지우기 (기각, p 0.0625)
+├─ conclusion_misattr_1025/ ← 이름 오귀속 검사 (개발 세트에서 중단)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
