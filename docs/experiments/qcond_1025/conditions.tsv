@@ -1,0 +1,52 @@
+qid	type	condition
+K01	편수	4편
+K01	수치	각 논문 메모리 감소 %
+K02	편수	3편만
+K02	수치	속도 향상 배수
+K03	편수	5편
+K04	편수	6편
+K05	기간	2026년 발행
+K06	기간	2025년 이후 발행만
+K07	기간	2024년 이전 발행
+K07	주제	통신 효율화
+K08	도메인	의료 데이터 실험
+K09	도메인	한국어 데이터셋 평가
+K10	도메인	금융 분야
+K11	도메인	코드 데이터 실험
+K12	제약	추가 학습 없음
+K13	제약	사람 라벨 없음
+K14	제약	강화학습 없음
+K15	제약	GPU 없이 CPU만
+K16	제약	재학습 없음
+K17	수치	ChainPoll 수치
+K18	수치	파라미터 감소 배수
+K19	수치	비교 대상 모델 크기
+K20	수치	AUROC 값
+K21	이름	FlashRerank-XL
+K22	이름	QuantumRAG
+K22	수치	검색 정확도 향상량
+K23	이름	HyperKV
+K23	이름	SnapKV
+K24	이름	MetaJailGuard
+K24	수치	공격 성공률 %
+K25	이름	DMQR-RAG
+K25	이름	Rewrite-Retrieve-Read
+K26	이름	jina-reranker-v3
+K26	이름	RAG Playground
+K27	이름	World4RL
+K27	이름	Looped World Models
+K28	이름	TradingAgents
+K28	이름	BMW Agents
+K29	편수	3편
+K29	과제	논문마다 한계 하나
+K30	과제	안 풀린 문제 2가지 제안
+K31	과제	공격 유형별로 나누기
+K32	과제	학습 필요 여부로 나누기
+K33	선별	다국어 지원만
+K34	선별	오픈소스 모델로만 실험
+K35	선별	7B 이하 모델 실험
+K36	선별	동영상 실험
+K37	선별	실제 로봇 실험만
+K38	선별	실제 서비스 로그 평가
+K39	선별	강건성 수치 보고
+K40	선별	학생이 교사보다 나음
