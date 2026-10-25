@@ -50,6 +50,7 @@ from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.conclusion_rewrite import brief_findings, rewrite_conclusion
 from core.llm.relevance_filter import filter_relevant
 from core.llm.question_conditions import count_notice, filter_by_year
+from core.llm.body_numbers import check_body_numbers
 from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
 from core.llm.presence_judge import (
@@ -369,12 +370,14 @@ LIST_MODE_TOP_K = 10
 LIST_MODE_ABS_CHARS = 500
 
 
-def _compact_list_blocks(rag_context: str, *, abs_chars: int = LIST_MODE_ABS_CHARS) -> str:
+def _compact_list_blocks(rag_context: str, *, abs_chars: int | None = None) -> str:
     """블록마다 머리(`[ID] 제목` 등) + 초록 앞 ``abs_chars`` 자만 남기고 본문 청크는 뺀다.
 
     목록 질문은 논문 수가 중요하고 답변 모델 n_ctx 가 4,096 토큰이라 블록을 짧게 한다.
     초록이 없는 블록은 본문 앞 ``abs_chars`` 자를 남긴다.
     """
+    if abs_chars is None:  # docs/experiments/list_findings_v2_1026
+        abs_chars = int(os.getenv("RAG_LIST_ABS_CHARS", str(LIST_MODE_ABS_CHARS)))
     s = (rag_context or "").strip()
     if not s or s == "관련 문서 없음":
         return rag_context
@@ -1369,6 +1372,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             answer, _rn = renumber_body_items(answer)
             if _rn:
                 print("[DEBUG] DirectAnswer: 본론 번호 다시 매김")
+            if os.getenv("RAG_BODY_NUM_CHECK", "0").strip() == "1":  # docs/experiments/list_findings_v2_1026
+                answer, _bn = check_body_numbers(answer, rag_context, _doc_ids)
+                if _bn:
+                    print(f"[DEBUG] DirectAnswer: 본론 숫자 대조 = {_bn}문장 뺌")
             if os.getenv("RAG_CONCLUSION_REWRITE", "0").strip() == "1":  # docs/experiments/conclusion_rewrite_1021
                 answer, _cr = rewrite_conclusion(answer, user_request, rag_context, _doc_ids, RAG_ANSWER_MODEL)
                 print(f"[DEBUG] DirectAnswer: 결론 다시 쓰기 = {_cr}")
