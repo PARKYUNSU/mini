@@ -236,6 +236,9 @@ def router_python_three_tier(user_request: str, req_lower: str) -> Optional[dict
     has_kw = any(kw in user_request for kw in coding_keywords)
     if not explicit and not has_kw:
         return None
+    # "과학 연구 자동화 연구들 정리해줘"가 planner(C)로 갔다 (2026-10-27 router_audit)
+    if not explicit and is_academic_query_full(user_request):
+        return None
     if not explicit and any(f in user_request for f in followup_indicators) and len(user_request) <= 50:
         return None
 
@@ -423,6 +426,10 @@ def is_smalltalk_or_memory_request(user_request: str, req_lower: str) -> bool:
         k in user_request or k in req_lower for k in ("print", "돌려", "실행")
     ):
         return False
+    # 학술 질문은 잡담이 아니다 — "정체성 연구" · "응원 메시지 생성 연구" · "피곤함 감지 모델" · "위로 올라가는 …"이
+    # 정체 · 응원 · 피곤 · 위로 부분 일치로 A 로 갔다 (2026-10-27 router_audit)
+    if is_academic_query_full(user_request) and "기억해" not in user_request:  # "기억해 둬: 나는 RAG를 좋아해"는 기억 요청
+        return False
     greetings = ("안녕", "헬로", "반가", "굿모닝", "굿나잇", "하이", "좋은 아침")
     # "윤수르"는 호칭(윤수르, …)에 항상 들어가 오분류되므로 제외. "윤수르 누구야" 등은 다른 키워드로 잡힘.
     identity_q = ("누구야", "누구니", "누구세요", "자기소개", "정체", "이름이 뭐야", "뭐하는")
@@ -430,7 +437,7 @@ def is_smalltalk_or_memory_request(user_request: str, req_lower: str) -> bool:
     comfort = ("위로", "힘들어", "피곤", "지쳤어", "격려", "응원", "배고프", "출출", "졸려", "졸리", "심심해", "심심하")
     memory_q = ("아까", "방금", "기억", "말했었지", "말했지", "좋아하는 분야", "기억해 둬")
     capability = ("할 줄 아는 게 뭐야", "할 수 있어", "어디 서버", "기분이 어때", "기분은 어때", "너의 기분은 어때", "기분이 어떠니", "기분은 어떠니", "기분이 어떠냐고")
-    memory_blockers = ("도구", "성경", "창세기", "요한복음", "환율", "가격", "주가", "날씨", "논문", "api", "비트코인", "이더리움")
+    memory_blockers = ("도구", "성경", "창세기", "요한복음", "환율", "가격", "주가", "날씨", "논문", "연구", "api", "비트코인", "이더리움")
     weather_smalltalk_markers = ("날씨 좋네", "날씨 좋다", "오늘 날씨 좋네", "오늘 날씨 좋다", "덥네", "춥네", "비 오네", "날씨가 좋네")
     weather_query_markers = ("알려줘", "어때", "조회", "확인", "가져와", "예보", "몇 도", "온도", "미세먼지")
 
@@ -637,7 +644,10 @@ def match_whitelisted_tool(
             return "schedule_add_job"
 
     # 주제 검색(찾아/검색 등)은 RAG — '목록+알려줘'만으로 인벤토리 화이트리스트에 걸리지 않게 함.
-    _paper_topic_search = any(w in req_lower for w in ("검색", "요약", "설명", "찾아")) or _names_paper_topic(user_request)
+    _paper_topic_search = (
+        any(w in req_lower for w in ("검색", "요약", "설명", "찾아")) or _names_paper_topic(user_request)
+        or re.search(r"\d+\s*(?:개|편)", user_request)  # "로봇 조작 학습 논문 8개 알려줘"는 목록이 아니라 검색
+    )
     if (
         not _paper_topic_search
         and ("chromadb" in req_lower or "논문" in user_request or "db에" in req_lower or "db 목록" in req_lower)
@@ -693,6 +703,9 @@ def router_step1_hard_rules(
     """1단계: 명백한 하드룰. 매칭 시 즉시 반환, None이면 2단계로."""
     d = deps.agent_tools_dir
     has_url = bool(re.search(r"https?://\S+", user_request))
+    # 학술 질문은 글쓰기 · 도구 · 일정 · 목록 하드룰에 걸리지 않게 한다 — "도구 사용 연구" · "스케줄링 연구" ·
+    # "섹션에 써줘" · "논문 8개 알려줘"가 RAG 밖으로 샜다 (2026-10-27 router_audit)
+    acad = is_academic_query_full(user_request) and not is_explicit_python_coding_request(user_request, req_lower)
 
     if is_smalltalk_or_memory_request(user_request, req_lower):
         return {"route_type": "direct_answer", "router_choice": "A"}
@@ -748,10 +761,10 @@ def router_step1_hard_rules(
         "써 줘",
         "써줘",
     )
-    if any(m in user_request for m in text_creation_markers):
+    if any(m in user_request for m in text_creation_markers) and not acad:
         return {"route_type": "direct_answer", "router_choice": "A"}
     text_targets = ("문자", "이메일", "메일", "인사말", "글", "초안", "내용", "메시지")
-    if ("만들어" in user_request or "써" in user_request or "작성" in user_request) and any(t in user_request for t in text_targets):
+    if not acad and ("만들어" in user_request or "써" in user_request or "작성" in user_request) and any(t in user_request for t in text_targets):
         if not any(c in user_request for c in ("코드", "크롤링", "스크래핑", "API", "파이썬", "스크립트", "도구")):
             return {"route_type": "direct_answer", "router_choice": "A"}
     action_keywords = (
@@ -775,7 +788,7 @@ def router_step1_hard_rules(
             return py_route
         return {"route_type": "planner", "router_choice": "C"}
     existing_tool_keywords = ("기존 도구", "저장된 도구", "agent_tools", "이미 있는 도구", "만들어진 도구")
-    if any(kw in user_request for kw in existing_tool_keywords) or ("도구" in user_request and "사용" in user_request):
+    if any(kw in user_request for kw in existing_tool_keywords) or ("도구" in user_request and "사용" in user_request and not acad):
         if any(kw in user_request for kw in existing_tool_keywords) and any(
             a in req_lower for a in ("목록", "검색", "조회", "보여", "알려", "뭐 있어", "뭐있어")
         ):
@@ -784,12 +797,16 @@ def router_step1_hard_rules(
         return {"route_type": "use_existing_tool", "router_choice": "B"}
     if not is_scheduled:
         schedule_keywords = ("매일", "매주", "매월", "정기적으로", "스케줄", "예약", "알람", "리마인더")
-        if any(kw in user_request for kw in schedule_keywords) and (d / "schedule_add_job.py").exists():
+        # 학술 질문의 "스케줄"(학습률 스케줄 · 서빙 스케줄링)은 일정 등록이 아니다 — 매일 · 예약 등은 그대로 본다
+        kws = [k for k in schedule_keywords if not (acad and k == "스케줄")]
+        if any(kw in user_request for kw in kws) and (d / "schedule_add_job.py").exists():
             return {"route_type": "use_existing_tool", "router_choice": "B", "used_tool_name": "schedule_add_job"}
     # 주제·조건이 있는 논문 찾기/검색은 RAG(B) — '목록으로 알려줘'만 있는 문장이 인벤토리보다 먼저 걸리지 않게 순서 우선.
     if ("chromadb" in req_lower or "논문" in user_request) and (
         any(w in req_lower for w in ("검색", "요약", "설명", "찾아")) or _names_paper_topic(user_request)
     ):
+        return {"route_type": "direct_answer", "router_choice": "B"}
+    if acad and re.search(r"\d+\s*(?:개|편)", user_request):  # "로봇 조작 학습 논문 8개 알려줘"는 DB 목록이 아니라 검색
         return {"route_type": "direct_answer", "router_choice": "B"}
     paper_list_actions = ("목록", "알려줘", "뭐 있어", "뭐있어", "조회", "보여")
     if ("chromadb" in req_lower or "논문" in user_request) and any(w in req_lower for w in paper_list_actions):

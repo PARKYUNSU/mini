@@ -169,3 +169,16 @@ def test_hybrid_is_not_greeting():
     assert is_smalltalk_or_memory_request("하이~", "하이~")
     assert is_smalltalk_or_memory_request("하이 윤수르", "하이 윤수르")
     assert is_smalltalk_or_memory_request("안녕하세요", "안녕하세요")
+
+
+def test_academic_questions_skip_chat_and_tool_rules():
+    # router_audit(2026-10-27): 부분 일치로 학술 질문이 잡담 · 도구 · planner 로 샜다
+    from core.graph.agent_router_rules import router_python_three_tier
+
+    for q in ("LLM 정체성 연구 정리해줘", "피곤함 감지 모델 연구 알려줘", "LLM 응원 메시지 생성 연구 있어?",
+              "LLM 메모리·장기 기억 연구들 정리해줘"):
+        assert not is_smalltalk_or_memory_request(q, q.lower()), q
+    assert is_smalltalk_or_memory_request("힘들어", "힘들어")
+    assert is_smalltalk_or_memory_request("기억해 둬: 나는 RAG를 좋아해", "기억해 둬: 나는 rag를 좋아해")
+    q = "LLM 기반 과학 연구 자동화 연구들 정리해줘"
+    assert router_python_three_tier(q, q.lower()) is None
