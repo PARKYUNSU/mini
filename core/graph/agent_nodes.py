@@ -1316,7 +1316,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             if external_search_active() and (
                 _pick == "없음" or list_mode_active(user_request, prefer_single_hit=prefer_single_hit) or _single
             ):
-                _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()})  # _doc_ids 는 {번호: 논문 ID}
+                # 학회판(arXiv ID 없음)은 제목으로 거른다 — job 129 · 130 에서 본론 2406.01549 의 ACL 판이 다시 실렸다
+                _titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context))
+                _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles)  # _doc_ids 는 {번호: 논문 ID}
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
             if _da_timeout is None:

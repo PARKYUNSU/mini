@@ -41,7 +41,7 @@ def test_format_uses_bracket_ids():
 
 
 def test_parallel_wait_bounded(monkeypatch):
-    monkeypatch.setattr(X, "search_openalex", lambda q, ex, timeout=6: time.sleep(0.2) or [{"title": "t"}])
+    monkeypatch.setattr(X, "search_openalex", lambda q, ex, timeout=6, **k: time.sleep(0.2) or [{"title": "t"}])
     e = X.ExternalSearch("q", set(), timeout=1.0)
     items, waited = e.result()
     assert items == [{"title": "t"}] and waited < 1.0
@@ -105,3 +105,11 @@ def test_exclude_ids_tolerates_non_str(monkeypatch):
     monkeypatch.setattr(X.requests, "get", lambda *a, **k: _R(WORKS))
     out = X.search_openalex("q", {1, 2, "2401.00001v1"}, per_page=8, min_sim=None, dedupe=False, clean=False)
     assert "In Context Already" not in [o["title"] for o in out]
+
+
+def test_excludes_context_titles(monkeypatch):
+    # 학회판(arXiv ID 없음)은 컨텍스트 제목과 같으면 뺀다 (job 129 · 130 의 2406.01549 ACL 판)
+    monkeypatch.setattr(X.requests, "get", lambda *a, **k: _R(WORKS))
+    out = X.search_openalex("q", set(), per_page=8, min_sim=None, dedupe=False, clean=False,
+                            exclude_titles={"Journal Only", "Enabling LLMs to Generate Text with Citations and More"})
+    assert [o["title"] for o in out] == ["In Context Already"]

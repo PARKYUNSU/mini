@@ -87,9 +87,16 @@ def _title_key(title: str) -> str:
     return re.sub(r"\W+", "", title.lower())
 
 
+def _known(title: str, keys: set[str]) -> bool:
+    """컨텍스트에 이미 있는 논문인가 — arXiv ID 없는 학회판(ACL 등)은 제목으로만 알 수 있다.
+    컨텍스트 제목이 잘렸을 수 있어 30자 이상 앞부분이 겹치면 같은 논문으로 본다."""
+    k = _title_key(title)
+    return any(k == t or (min(len(k), len(t)) >= 30 and (k.startswith(t) or t.startswith(k))) for t in keys)
+
+
 def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout: float = TIMEOUT_SEC,
                     limit: int = MAX_ITEMS, per_page: int = PER_PAGE, min_sim: float | None = MIN_SIM,
-                    dedupe: bool = True, clean: bool = True) -> list[dict]:
+                    dedupe: bool = True, clean: bool = True, exclude_titles: set[str] | None = None) -> list[dict]:
     """OpenAlex 검색 → 컨텍스트에 없는 최근(2017~) 논문 최대 ``limit`` 편. 실패하면 [].
 
     ``min_sim`` 이 있으면 검색어와 "제목. 초록" 의 유사도가 그 이상인 것만, 높은 순으로 고른다.
@@ -111,13 +118,14 @@ def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout:
         print(f"[DEBUG] external_search 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return []
     ex = {re.sub(r"v\d+$", "", str(i)) for i in (exclude_ids or set())}
+    ex_titles = {_title_key(t) for t in (exclude_titles or set()) if t}
     cands: list[dict] = []
     seen: set[str] = set()
     for w in works:
         title = re.sub(r"\s+", " ", (w.get("title") or "")).strip()
         year = w.get("publication_year") or 0
         ax = _arxiv_id(w)
-        if not title or year < MIN_YEAR or (ax and ax in ex):
+        if not title or year < MIN_YEAR or (ax and ax in ex) or _known(title, ex_titles):
             continue
         if dedupe:
             k = _title_key(title)
@@ -167,14 +175,15 @@ def record_candidates(question: str, items: list[dict], path: Path | None = None
 class ExternalSearch:
     """답변 생성과 동시에 OpenAlex 를 부르고, 답변이 끝나면 남은 시간만 기다린다."""
 
-    def __init__(self, query: str, exclude_ids: set[str], timeout: float = TIMEOUT_SEC):
+    def __init__(self, query: str, exclude_ids: set[str], timeout: float = TIMEOUT_SEC,
+                 exclude_titles: set[str] | None = None):
         self._items: list[dict] = []
         self._deadline = time.time() + timeout
-        self._t = threading.Thread(target=self._run, args=(query, exclude_ids, timeout), daemon=True)
+        self._t = threading.Thread(target=self._run, args=(query, exclude_ids, timeout, exclude_titles), daemon=True)
         self._t.start()
 
-    def _run(self, query, exclude_ids, timeout):
-        self._items = search_openalex(query, exclude_ids, timeout=timeout)
+    def _run(self, query, exclude_ids, timeout, exclude_titles):
+        self._items = search_openalex(query, exclude_ids, timeout=timeout, exclude_titles=exclude_titles)
 
     def result(self) -> tuple[list[dict], float]:
         """(결과, 답변 뒤 더 기다린 초)."""

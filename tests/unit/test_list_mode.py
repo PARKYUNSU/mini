@@ -16,7 +16,8 @@ def test_gate(monkeypatch):
     assert not N.list_mode_active("LLM 탈옥 공격 논문들 정리해줘")
 
 
-def test_compact_blocks_keep_head_and_short_abstract():
+def test_compact_blocks_keep_head_and_short_abstract(monkeypatch):
+    monkeypatch.delenv("RAG_LIST_ABS_CHARS", raising=False)  # 운영 .env 값(400)과 무관하게 기본값을 잰다
     out = N._compact_list_blocks(SEP.join([BLOCK, BLOCK.replace("2601.00001", "2601.00002")]))
     blocks = out.split(SEP)
     assert len(blocks) == 2
@@ -25,7 +26,8 @@ def test_compact_blocks_keep_head_and_short_abstract():
     assert len(blocks[0].split("[초록] ")[1]) == N.LIST_MODE_ABS_CHARS
 
 
-def test_compact_without_abstract_keeps_body_head():
+def test_compact_without_abstract_keeps_body_head(monkeypatch):
+    monkeypatch.delenv("RAG_LIST_ABS_CHARS", raising=False)
     b = "[2601.00003] Title C\n" + "x" * 900
     out = N._compact_list_blocks(b)
     assert out.startswith("[2601.00003] Title C\n") and len(out) == len("[2601.00003] Title C\n") + 500
