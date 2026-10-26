@@ -160,3 +160,12 @@ if __name__ == "__main__":
     test_hello_inside_string_literal_not_greeting_smalltalk()
     test_three_tier_feedback_matrix()
     print("OK: intentional_syntax_and_router")
+
+
+def test_hybrid_is_not_greeting():
+    # "하이브리드"의 "하이"를 인사로 보고 잡담(A)으로 보냈다 (2026-10-27, job 132)
+    q = "하이브리드 검색에서 희소·밀집 검색 결과를 합치는 방법 연구 찾아줘"
+    assert not is_smalltalk_or_memory_request(q, q.lower())
+    assert is_smalltalk_or_memory_request("하이~", "하이~")
+    assert is_smalltalk_or_memory_request("하이 윤수르", "하이 윤수르")
+    assert is_smalltalk_or_memory_request("안녕하세요", "안녕하세요")

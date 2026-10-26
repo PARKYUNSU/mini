@@ -436,7 +436,8 @@ def is_smalltalk_or_memory_request(user_request: str, req_lower: str) -> bool:
 
     if _ascii_greeting_in_smalltalk(req_lower):
         return True
-    if any(x in req_lower for x in greetings):
+    # "하이"는 뒤에 한글이 이어지면 인사가 아니다 — "하이브리드 검색 …"이 잡담(A)으로 갔다 (2026-10-27, job 132)
+    if any(x in req_lower for x in greetings if x != "하이") or re.search(r"하이(?![가-힣])", req_lower):
         return True
     if any(x in user_request for x in identity_q):
         return True
