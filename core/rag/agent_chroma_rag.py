@@ -1029,6 +1029,22 @@ def _paper_score_from_sorted_chunk_scores(
     return paper_sc
 
 
+def _fusion_protect_pids(
+    metas: list[dict[str, str]], dists: list[float | None] | None, bm25_pid_scores: dict[str, float], k: int
+) -> set[str]:
+    """벡터(논문별 최소 거리) · BM25 논문 순위가 둘 다 k 안인 paper_id (fusion_protect_1027)."""
+    if k < 1 or not dists or len(dists) != len(metas) or not bm25_pid_scores:
+        return set()
+    best: dict[str, float] = {}
+    for m, d in zip(metas, dists):
+        pid = (m.get("paper_id") or "").strip()
+        if pid and d is not None and (pid not in best or d < best[pid]):
+            best[pid] = float(d)
+    vec = {_normalize_pid(p): p for p in sorted(best, key=best.get)[:k]}
+    bm = sorted(bm25_pid_scores, key=lambda p: -bm25_pid_scores[p])[:k]
+    return {vec[p] for p in bm if p in vec}
+
+
 def _paper_max_one_chunk_per_paper(
     docs: list[str],
     metas: list[dict[str, str]],
@@ -1043,6 +1059,7 @@ def _paper_max_one_chunk_per_paper(
     chunks_per_paper_out: int | None = None,
     light_rerank_query: str = "",
     light_rerank_max_input_chars: int | None = None,
+    protect_pids: set[str] | None = None,
 ) -> tuple[list[str], list[dict[str, str]], list[float | None] | None]:
     """paper_id별 논문 집계 점수로 순위를 정하고, 논문당 상위 청크 K개까지 유지.
 
@@ -1150,6 +1167,11 @@ def _paper_max_one_chunk_per_paper(
                 max_combined_text_chars=light_rerank_max_input_chars,
             )
     cap = max(top_k_papers, 1)
+    if protect_pids:  # 벡터·BM25 둘 다 상위인데 잘린 논문은 상위 cap 끝자리에 넣는다
+        miss = [r for r in paper_best[cap:] if r[2] in protect_pids][:cap]
+        if miss:
+            print(f"[ChromaRAG TRACE] fusion protect: {[r[2] for r in miss]}", flush=True)
+            paper_best = paper_best[: cap - len(miss)] + miss
     paper_best = paper_best[:cap]
 
     out_docs: list[str] = []
@@ -2639,6 +2661,9 @@ class ChromaRAGTool:
                     title_query=_tbq,
                     chunks_per_paper_out=HYBRID_CHUNKS_PER_PAPER,
                     light_rerank_query=_tbq if light_rerank else "",  # light_rerank_gated_1015
+                    protect_pids=_fusion_protect_pids(
+                        metas_clean, dists_clean, bm25_pid_scores, int(os.getenv("RAG_FUSION_PROTECT_K", "3"))
+                    ) if os.getenv("RAG_FUSION_PROTECT", "0").strip() == "1" else None,
                 )
 
             hits = _format_chroma_hits(
