@@ -510,11 +510,26 @@ def _llm_model_label(llm) -> str:
 
 def _extract_english_rag_query(user_request: str, session_context: str = "") -> str:
     """검색어 추출. ``RAG_QUERY_CLEAN=1`` 이면 프롬프트는 그대로 두고 앞뒤 정리만 (docs/experiments/query_clean_1021)."""
+    if os.getenv("RAG_QUERY_NORAG", "0").strip() == "1":  # docs/experiments/query_norag_1027
+        return drop_unasked_rag(user_request, _extract_english_rag_query_base(user_request, session_context))
     if os.getenv("RAG_QUERY_CLEAN", "0").strip() != "1":
         return _extract_english_rag_query_base(user_request, session_context)
     req = (user_request or "").strip()
     q = _extract_english_rag_query_base(_LIST_NUMBER.sub("", req).strip() or req, session_context)
     return _drop_generic_words(q)
+
+
+_ASKS_RAG = re.compile(r"rag|retrieval[- ]augmented|검색\s*증강|리트리벌", re.I)
+_RAG_TERMS = re.compile(r"\b(?:in|for|of)?\s*(?:retrieval[- ]augmented generation|rag)(?:\s+(?:retrieval|systems?|pipelines?))?\b", re.I)
+
+
+def drop_unasked_rag(question: str, query: str) -> str:
+    """질문에 RAG 가 없는데 검색어에 붙은 rag · retrieval-augmented generation 을 지운다 (query_norag_1027).
+    지우고 2단어 미만이면 원래 검색어."""
+    if _ASKS_RAG.search(question or "") or re.search(r"[가-힣]", query or ""):
+        return query
+    out = ", ".join(x for x in (re.sub(r"\s+", " ", _RAG_TERMS.sub(" ", ph)).strip() for ph in re.split(r"\s*,\s*", query or "")) if x)
+    return out if len(out.replace(",", " ").split()) >= 2 else query
 
 
 def _drop_generic_words(query: str) -> str:
@@ -542,7 +557,9 @@ def _extract_english_rag_query_base(user_request: str, session_context: str = ""
         return req
     if os.getenv("RAG_QUERY_V2", "0").strip() == "1":
         return _extract_english_rag_query_v2(req, session_context)
-    prompt = f"""Extract 3-5 core English search keywords for academic RAG retrieval.
+    # "RAG" 가 프롬프트에 있으면 질문에 없어도 검색어에 rag retrieval 이 붙는다 (docs/experiments/query_norag_1027)
+    _target = "an academic paper search" if os.getenv("RAG_QUERY_NORAG", "0").strip() == "1" else "academic RAG retrieval"
+    prompt = f"""Extract 3-5 core English search keywords for {_target}.
 Return ONLY one comma-separated line in English.
 No Korean, no explanations, no numbering.
 
