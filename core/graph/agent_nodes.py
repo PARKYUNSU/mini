@@ -1182,6 +1182,12 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             )
             rag = get_chroma_rag_tool()
             _da_trace("after get_chroma_rag_tool()", "ok")
+            # 관련 문서 거르기를 상위 5 자르기 앞(15편)에서 한다 (RAG_FILTER_BEFORE_CUT, docs/experiments/filter_before_cut_1028)
+            _filter_first = (
+                os.getenv("RAG_RELEVANCE_FILTER", "0").strip() == "1"
+                and os.getenv("RAG_FILTER_BEFORE_CUT", "0").strip() == "1"
+            )
+            _rf_pre = ""
 
             if (
                 prefer_single_hit
@@ -1258,6 +1264,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     rag_context = _compact_list_blocks(_rag_context_top_n_hits(rag_context, n=LIST_MODE_TOP_K))
                     _da_trace("rag_context list mode (compact top-10)", f"len={len(rag_context)}")
                 else:
+                    if _filter_first:
+                        rag_context, _rf_pre = filter_relevant(user_request, rag_context, RAG_ANSWER_MODEL)
+                        print(f"[DEBUG] DirectAnswer: 관련 문서 거르기(자르기 앞) = {_rf_pre}")
                     rag_context = _rag_context_top_n_hits(rag_context, n=5)
                     _da_trace("rag_context top-5 only", f"len={len(rag_context)}")
 
@@ -1289,7 +1298,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
             # 번호 라벨은 **필터가 끝난 뒤** 붙인다 — 위 _rag_context_* 변환이 블록을
             # 걸러내므로 조립 시점에 매기면 [1],[3],[7] 처럼 구멍이 생긴다 (protocol §5.4).
-            if os.getenv("RAG_RELEVANCE_FILTER", "0").strip() == "1":  # docs/experiments/relevance_filter_1022
+            if os.getenv("RAG_RELEVANCE_FILTER", "0").strip() == "1" and not _rf_pre:  # docs/experiments/relevance_filter_1022
                 rag_context, _rf = filter_relevant(user_request, rag_context, RAG_ANSWER_MODEL)
                 print(f"[DEBUG] DirectAnswer: 관련 문서 거르기 = {_rf}")
             _yf = ""
