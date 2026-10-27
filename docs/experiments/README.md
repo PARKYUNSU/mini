@@ -91,6 +91,7 @@
 | [`router_audit_1027/`](router_audit_1027/) | 라우터 1단계 하드룰 부분 일치 점검 (버그 수정) | 학술인데 RAG 밖 10→0 — 도구 사용 · 스케줄링 · 써줘 · 기억 · 자동화 · 논문 N개 · 정체/응원/피곤/위로 |
 | [`user_suite_1027/`](user_suite_1027/) | 사용자 질문 34 운영 점검 | 좋음 10 · 보통 19 · 나쁨 5 — 나쁨 4 개는 검색 놓침(DB 에 있는데 컨텍스트에 없음) |
 | [`query_norag_1027/`](query_norag_1027/) | 검색어에서 질문에 없는 RAG 빼기 | **기각** — '2' 수 27 : 23, p 0.67. rag 섞임은 66 문항 중 7 뿐, 프롬프트 한 줄에 검색어 89/98 이 흔들림 · 새 말 "academic paper search"가 샘 |
+| [`fusion_protect_1027/`](fusion_protect_1027/) | 벡터 · BM25 둘 다 상위 3 논문 지키기 | **기각** — 바뀐 자리 '2' 들어옴 2 · 빠짐 3, 주 1 : 2. 운영 검색은 top_k=15 라 U1-4 정답이 이미 안에 있었음 — 자르는 곳은 15 → 5 단계 |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -252,6 +253,7 @@ docs/experiments/
 ├─ router_audit_1027/      ← 라우터 하드룰 점검 (수정)
 ├─ user_suite_1027/        ← 사용자 질문 34 점검
 ├─ query_norag_1027/       ← 검색어 RAG 빼기 (기각)
+├─ fusion_protect_1027/    ← 융합 보호 (기각)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
