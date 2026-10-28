@@ -1212,7 +1212,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                         wants_depth=False, light_rerank=_lr,
                     )
                     _da_trace("list mode search", f"len={len(rag_context)}")
-                elif cached_rag and cached_rag != "관련 문서 없음":
+                # 라우터 5편 대신 15편 다시 검색해 거르기 (RAG_ROUTER_RESEARCH, docs/experiments/router_research_1028)
+                elif cached_rag and cached_rag != "관련 문서 없음" and not (
+                    _filter_first and os.getenv("RAG_ROUTER_RESEARCH", "0").strip() == "1"
+                ):
                     rag_context = cached_rag
                     _da_trace("rag_context reused from router", f"len={len(rag_context)}")
                 else:
