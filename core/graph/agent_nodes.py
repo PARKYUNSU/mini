@@ -1407,7 +1407,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 answer, _bn = check_body_numbers(answer, rag_context, _doc_ids)
                 if _bn:
                     print(f"[DEBUG] DirectAnswer: 본론 숫자 대조 = {_bn}문장 뺌")
-            if os.getenv("RAG_CONCLUSION_REWRITE", "0").strip() == "1":  # docs/experiments/conclusion_rewrite_1021
+            # '없음' 판정이면 "찾을 수 없습니다" 결론을 덮어쓰지 않는다 (RAG_NODOC_KEEP_CONCLUSION, docs/experiments/nodoc_conclusion_1029)
+            _keep_nodoc = _pick == "없음" and os.getenv("RAG_NODOC_KEEP_CONCLUSION", "0").strip() == "1"
+            if os.getenv("RAG_CONCLUSION_REWRITE", "0").strip() == "1" and not _keep_nodoc:  # docs/experiments/conclusion_rewrite_1021
                 answer, _cr = rewrite_conclusion(answer, user_request, rag_context, _doc_ids, RAG_ANSWER_MODEL)
                 print(f"[DEBUG] DirectAnswer: 결론 다시 쓰기 = {_cr}")
             if os.getenv("RAG_CITE_CLEANUP", "0").strip() == "1":  # docs/experiments/cite_cleanup_1022
