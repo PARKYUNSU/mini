@@ -17,7 +17,7 @@ from pathlib import Path
 
 import requests
 
-__all__ = ["external_search_active", "clean_query", "search_openalex", "format_section", "record_candidates", "ExternalSearch"]
+__all__ = ["external_search_active", "clean_query", "search_openalex", "format_section", "record_candidates", "ExternalSearch", "term_query"]
 
 OPENALEX_URL = "https://api.openalex.org/works"
 TIMEOUT_SEC = 6.0
@@ -170,6 +170,31 @@ def record_candidates(question: str, items: list[dict], path: Path | None = None
             f.write(json.dumps({"ts": time.strftime("%Y-%m-%d %H:%M:%S"), "question": question[:300], "arxiv": ids}, ensure_ascii=False) + "\n")
     except OSError:
         pass
+
+
+# '없음' 판정 질문의 외부 검색어를 분야 용어로 (RAG_EXTERNAL_TERM_QUERY, docs/experiments/external_term_1029)
+TERM_PROMPT = """다음 질문이 찾는 연구 분야를 학계에서 부르는 표준 영어 용어로 OpenAlex 검색어 한 줄을 써라.
+- 질문이 예로 든 기술이나 상황(예: RAG)은 질문의 핵심이 아니면 뺀다.
+- 영어 3–8 단어. 설명 · 따옴표 없이 검색어만.
+
+질문: {question}
+검색어:"""
+
+
+def term_query(question: str, model: str) -> str:
+    """분야 용어 검색어 한 줄. 실패 · 형식 밖이면 ""(호출 쪽은 원래 검색어)."""
+    from langchain_ollama import ChatOllama
+
+    from core.config.agent_config import ollama_kwargs
+
+    llm = ChatOllama(**ollama_kwargs(model=model, temperature=0.0, seed=0, reasoning=False, num_predict=32))
+    try:
+        raw = str(llm.invoke(TERM_PROMPT.format(question=question)).content or "")
+    except Exception as exc:  # 검색어를 못 만들어도 원래 검색어로 찾는다
+        print(f"[DEBUG] term_query 실패: {type(exc).__name__}: {str(exc)[:120]}")
+        return ""
+    line = raw.strip().splitlines()[0].strip().strip("\"'`") if raw.strip() else ""
+    return line if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 \-/+.,]{5,120}", line) else ""
 
 
 class ExternalSearch:

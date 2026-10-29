@@ -52,7 +52,7 @@ from core.llm.relevance_filter import filter_relevant
 from core.llm.question_conditions import count_notice, filter_by_year
 from core.llm.body_numbers import check_body_numbers
 from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
-from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
+from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates, term_query
 from core.llm.presence_judge import (
     NO_DOC_HINT,
     gate_types,
@@ -1347,7 +1347,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             ):
                 # 학회판(arXiv ID 없음)은 제목으로 거른다 — job 129 · 130 에서 본론 2406.01549 의 ACL 판이 다시 실렸다
                 _titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context))
-                _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles)  # _doc_ids 는 {번호: 논문 ID}
+                _ext_q = rag_query
+                if _pick == "없음" and os.getenv("RAG_EXTERNAL_TERM_QUERY", "0").strip() == "1":  # docs/experiments/external_term_1029
+                    _ext_q = term_query(user_request, RAG_ANSWER_MODEL) or rag_query
+                    print(f"[DEBUG] DirectAnswer: 외부 검색어(분야 용어) = {_ext_q}")
+                _ext = ExternalSearch(_ext_q, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles)  # _doc_ids 는 {번호: 논문 ID}
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
             if _da_timeout is None:
