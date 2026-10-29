@@ -24,7 +24,7 @@
 
 ## 3. 사용자 맥락 (2026-10-29 사용자 확인)
 
-사용자 직무는 **LLM · RAG** — 질문 속 "RAG" 는 대개 진짜 맥락이다(평가 세트에서도 RAG 언급 73/336). 그래서 고치는 방향은 **RAG 를 빼는 것이 아니라 RAG 와 분야 용어를 둘 다 살리는 것**: 손 검색어 C(`rag, near-duplicate detection across two large document databases`)처럼 쉼표로 구를 나누면 RAG 를 남겨도 상위 5 중 4 가 수집 논문. 문제는 'rag search …' 가 한 덩어리로 맨 앞에 붙어 나머지 뜻을 묻는 것. 사용자가 원하는 답은 두 쪽 모두 — 대형 DB 간 중복 · 유사 탐지 연구 + RAG 에서의 쓰임(검색 문서 중복 제거 · 여러 출처 RAG).
+사용자 직무는 **LLM · RAG** — 질문 속 "RAG" 는 대개 진짜 맥락이다(평가 세트에서도 RAG 언급 73/336). 그래서 고치는 방향은 **RAG 를 빼는 것이 아니라 RAG 와 분야 용어를 둘 다 살리는 것**: 손 검색어 C(`rag, near-duplicate detection across two large document databases`)는 RAG 를 남겨도 상위 5 중 4 가 수집 논문 — 쉼표 덕이 아니라 `near-duplicate detection` 이라는 분야 용어 덕(§5). 사용자가 원하는 답은 두 쪽 모두 — 대형 DB 간 중복 · 유사 탐지 연구 + RAG 에서의 쓰임(검색 문서 중복 제거 · 여러 출처 RAG).
 
 ## 4. 결론
 
