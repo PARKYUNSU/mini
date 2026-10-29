@@ -509,6 +509,15 @@ def _llm_model_label(llm) -> str:
 
 
 def _extract_english_rag_query(user_request: str, session_context: str = "") -> str:
+    q = _extract_english_rag_query_inner(user_request, session_context)
+    if os.getenv("RAG_QUERY_GLOSSARY", "0").strip() == "1":  # docs/experiments/query_glossary_1029
+        from core.rag.query_glossary import add_field_terms
+
+        q = add_field_terms(user_request, q)
+    return q
+
+
+def _extract_english_rag_query_inner(user_request: str, session_context: str = "") -> str:
     """검색어 추출. ``RAG_QUERY_CLEAN=1`` 이면 프롬프트는 그대로 두고 앞뒤 정리만 (docs/experiments/query_clean_1021)."""
     if os.getenv("RAG_QUERY_NORAG", "0").strip() == "1":  # docs/experiments/query_norag_1027
         return drop_unasked_rag(user_request, _extract_english_rag_query_base(user_request, session_context))

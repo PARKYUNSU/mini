@@ -1,0 +1,7 @@
+{"id": "A061", "stratum": "A", "query": "dynamically choosing context compression rate by query complexity in RAG", "relevant_papers": ["2507.22931"], "title_jaccard": 0.273}
+{"id": "A077", "stratum": "A", "query": "free energy based subgoal discovery with state aggregation in hierarchical reinforcement learning", "relevant_papers": ["2412.16687"], "title_jaccard": 0.455}
+{"id": "A117", "stratum": "A", "query": "determinantal point processes to choose diverse relevant chunks for RAG context", "relevant_papers": ["2604.03240"], "title_jaccard": 0.071}
+{"id": "R04", "stratum": "R", "relevant_papers": []}
+{"id": "H19", "stratum": "heldout", "relevant_papers": []}
+{"id": "D07", "stratum": "discovery", "relevant_papers": []}
+{"id": "D12", "stratum": "discovery", "relevant_papers": []}

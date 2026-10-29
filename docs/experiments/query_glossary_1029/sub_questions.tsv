@@ -1,0 +1,7 @@
+A061	질의 난이도에 따라 RAG 컨텍스트 압축률을 동적으로 바꾸는 방법 설명해줘
+A077	계층적 강화학습에서 자유 에너지와 상태 집계로 하위 목표를 찾는 방법 설명해줘
+A117	RAG 컨텍스트에 다양하면서도 관련 있는 청크를 고르려고 DPP를 쓰는 방법 있어?
+R04	디코더 전용 LLM을 비지도 대조학습만으로 긴 문서 검색기로 바꾸는 연구 알려줘
+H19	긴 문서를 한 번에 임베딩해서 문맥을 살리는 late chunking 같은 방법 있어?
+D07	긴 컨텍스트 중간에 있는 정보를 LLM이 놓치는 문제를 다룬 연구 있어?	lost in the middle: position bias of information in long context LLMs
+D12	관련 없는 문서가 섞였을 때 RAG가 흔들리지 않게 하는 연구들 정리해줘	robustness of RAG to irrelevant or noisy retrieved documents
