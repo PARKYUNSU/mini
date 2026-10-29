@@ -1,0 +1,82 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2607.08382",
+    "title": "H3D: Benchmarking Unsupervised Text Hashing for Fine-Grained Document Deduplication",
+    "abstract": "Document hashing provides compact representations for efficient similarity search and document deduplication, but existing studies rarely compare hashing pipelines under a unified protocol for fine-grained scientific documents. H3D is an unsupervised text hashing benchmark for fine-grained document deduplication. It evaluates representative unsupervised non-learning hashing approaches (MinHash, SimHash, Winnowing, FuzzyHash, FlyHash) together with semantic-sensitive methods built from frozen BGE embeddings and two quantization strategies (BGE-BIHash and BGE-LSHash). The non-learning methods generate hash fingerprints through manually designed mathematical rules without training or labeled similarity pairs, which distinguishes them from neural semantic hashing models. We benchmark all methods on CSFCube and RELISH, two datasets that provide complementary evaluation settings: facet-level analysis for scientific-document similarity and larger-scale split-level evaluation for biomedical similarity search. H3D jointly reports ranking quality (MAP, NDCG@20), efficiency, and robustness under controlled text compression. The results show a consistent trade-off: lexical and structural fingerprints are competitive for near-duplicate matching, while semantic-sensitive representations better preserve similarity under content rewriting, at higher computational cost. We further analyze when different similarity measures become rank-equivalent for specific hash representations, improving the interpretability and reproducibility of method comparisons.",
+    "publicationDate": "2026-07-09T12:01:40.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.01601",
+    "title": "SemHash-LLM: A Multi-Granularity Semantic Hashing Framework for Document Deduplication",
+    "abstract": "Large scale document deduplication must preserve semantic equivalence while remaining efficient over massive corpora. We present SemHash LLM, a multi granularity framework that unifies semantic projection hashing, attention weighted MinHash, contrastive boundary learning, and selective LLM based adjudication. The method combines character, token, and document level signals through gated fusion, then applies a cascaded filtering pipeline for efficient candidate reduction. Semantic projection hashing learns compact binary codes in distilled LLM embedding space, while attention weighted Min- Hash suppresses boilerplate and emphasizes informative content. Adaptive decision boundaries and uncertainty estimation further improve robustness across template pollution, short text perturbation, containment, and viral fragments. Experiments show that SemHash LLM achieves strong duplicate detection quality with less than one percent neural verification cost.",
+    "publicationDate": "2026-07-02T02:00:06.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2102.08942",
+    "title": "A Survey on Locality Sensitive Hashing Algorithms and their Applications",
+    "abstract": "Finding nearest neighbors in high-dimensional spaces is a fundamental operation in many diverse application domains. Locality Sensitive Hashing (LSH) is one of the most popular techniques for finding approximate nearest neighbor searches in high-dimensional spaces. The main benefits of LSH are its sub-linear query performance and theoretical guarantees on the query accuracy. In this survey paper, we provide a review of state-of-the-art LSH and Distributed LSH techniques. Most importantly, unlike any other prior survey, we present how Locality Sensitive Hashing is utilized in different application domains.",
+    "publicationDate": "2021-02-17T18:56:03.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2409.08519",
+    "title": "Fast Comparative Analysis of Merge Trees Using Locality Sensitive  Hashing",
+    "abstract": "Scalar field comparison is a fundamental task in scientific visualization. In\ntopological data analysis, we compare topological descriptors of scalar fields\n-- such as persistence diagrams and merge trees -- because they provide\nsuccinct and robust abstract representations. Several similarity measures for\ntopological descriptors seem to be both asymptotically and practically\nefficient with polynomial time algorithms, but they do not scale well when\nhandling large-scale, time-varying scientific data and ensembles. In this\npaper, we propose a new framework to facilitate the comparative analysis of\nmerge trees, inspired by tools from locality sensitive hashing (LSH). LSH\nhashes similar objects into the same hash buckets with high probability. We\npropose two new similarity measures for merge trees that can be computed via\nLSH, using new extensions to Recursive MinHash and subpath signature,\nrespectively. Our similarity measures are extremely efficient to compute and\nclosely resemble the results of existing measures such as merge tree edit\ndistance or geometric interleaving distance. Our experiments demonstrate the\nutility of our LSH framework in applications such as shape matching,\nclustering, key event detection, and ensemble summarization.",
+    "publicationDate": "2024-09-13T03:36:15.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2307.11496",
+    "title": "Identifying document similarity using a fast estimation of the  Levenshtein Distance based on compression and signatures",
+    "abstract": "Identifying document similarity has many applications, e.g., source code\nanalysis or plagiarism detection. However, identifying similarities is not\ntrivial and can be time complex. For instance, the Levenshtein Distance is a\ncommon metric to define the similarity between two documents but has quadratic\nruntime which makes it impractical for large documents where large starts with\na few hundred kilobytes. In this paper, we present a novel concept that allows\nestimating the Levenshtein Distance: the algorithm first compresses documents\nto signatures (similar to hash values) using a user-defined compression ratio.\nSignatures can then be compared against each other (some constrains apply)\nwhere the outcome is the estimated Levenshtein Distance. Our evaluation shows\npromising results in terms of runtime efficiency and accuracy. In addition, we\nintroduce a significance score allowing examiners to set a threshold and\nidentify related documents.",
+    "publicationDate": "2023-07-21T11:04:20.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.03001",
+    "title": "FOLD: Fuzzy Online Deduplication for Very Large Evolving Datasets via Approximate Nearest Neighbor Search",
+    "abstract": "Fuzzy deduplication is key to constructing large language model training corpora. However, classic Locality-Sensitive Hashing (LSH) pipelines scale poorly as corpora grow and are ill-suited to continuous ingestion. The main issue is that each new document batch must be checked against the admitted corpus before insertion. As the corpus grows, the LSH buckets grow: each query can hit several large buckets and must scan the returned candidates. To solve this problem, we present RAD (Retrieval-Augmented Deduplication), an online fuzzy deduplication system that delivers both high recall and throughput for evolving datasets. RAD maintains an incrementally updated HNSW index over admitted documents, retrieving a small, high-quality candidate neighborhood for each incoming document instead of repeatedly re-scanning the accumulated corpus. RAD is the first online fuzzy deduplication system to use HNSW, leading to stable throughput as datasets grow. However, it is not easy to maintain high recall when using HNSW-style indexes. The core issue is the distance metric between graph nodes. Jaccard similarity, the metric used for fuzzy deduplication, yields low recall when applied out-of-the-box with an HNSW index. It leads to distance score crowding, making graph traversal unreliable within a bounded number of steps. RAD addresses this with a bitmap representation that provides a more discriminative, Jaccard-aligned signal during HNSW search. Across four LLM-scale datasets (LM1B, C4, RealNews, and Common Crawl), RAD preserves the scaling trajectory needed for online fuzzy deduplication: at 30M documents, it maintains 0.94-0.97 recall relative to state-of-the-art LSH solutions, and delivers up to an 8x throughput increase.",
+    "publicationDate": "2026-06-02T01:16:26.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2210.04261",
+    "title": "Noise-Robust De-Duplication at Scale",
+    "abstract": "Identifying near duplicates within large, noisy text corpora has a myriad of\napplications that range from de-duplicating training datasets, reducing privacy\nrisk, and evaluating test set leakage, to identifying reproduced news articles\nand literature within large corpora. Across these diverse applications, the\noverwhelming majority of work relies on N-grams. Limited efforts have been made\nto evaluate how well N-gram methods perform, in part because it is unclear how\none could create an unbiased evaluation dataset for a massive corpus. This\nstudy uses the unique timeliness of historical news wires to create a 27,210\ndocument dataset, with 122,876 positive duplicate pairs, for studying\nnoise-robust de-duplication. The time-sensitivity of news makes comprehensive\nhand labelling feasible - despite the massive overall size of the corpus - as\nduplicates occur within a narrow date range. The study then develops and\nevaluates a range of de-duplication methods: hashing and N-gram overlap (which\npredominate in the literature), a contrastively trained bi-encoder, and a\nre-rank style approach combining a bi- and cross-encoder. The neural approaches\nsignificantly outperform hashing and N-gram overlap. We show that the\nbi-encoder scales well, de-duplicating a 10 million article corpus on a single\nGPU card in a matter of hours. We also apply our pre-trained model to the\nRealNews and patent portions of C4 (Colossal Clean Crawled Corpus),\nillustrating that a neural approach can identify many near duplicates missed by\nhashing, in the presence of various types of noise. The public release of our\nNEWS-COPY de-duplication dataset, codebase, and the pre-trained models will\nfacilitate further research and applications.",
+    "publicationDate": "2022-10-09T13:30:42.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2101.00314",
+    "title": "SetSketch: Filling the Gap between MinHash and HyperLogLog",
+    "abstract": "MinHash and HyperLogLog are sketching algorithms that have become\nindispensable for set summaries in big data applications. While HyperLogLog\nallows counting different elements with very little space, MinHash is suitable\nfor the fast comparison of sets as it allows estimating the Jaccard similarity\nand other joint quantities. This work presents a new data structure called\nSetSketch that is able to continuously fill the gap between both use cases. Its\ncommutative and idempotent insert operation and its mergeable state make it\nsuitable for distributed environments. Fast, robust, and easy-to-implement\nestimators for cardinality and joint quantities, as well as the ability to use\nSetSketch for similarity search, enable versatile applications. The presented\njoint estimator can also be applied to other data structures such as MinHash,\nHyperLogLog, or HyperMinHash, where it even performs better than the\ncorresponding state-of-the-art estimators in many cases.",
+    "publicationDate": "2021-01-01T20:14:33.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2212.08035",
+    "title": "Hamming Distributions of Popular Perceptual Hashing Techniques",
+    "abstract": "Content-based file matching has been widely deployed for decades, largely for\nthe detection of sources of copyright infringement, extremist materials, and\nabusive sexual media. Perceptual hashes, such as Microsoft's PhotoDNA, are one\nautomated mechanism for facilitating detection, allowing for machines to\napproximately match visual features of an image or video in a robust manner.\nHowever, there does not appear to be much public evaluation of such approaches,\nparticularly when it comes to how effective they are against content-preserving\nmodifications to media files. In this paper, we present a million-image scale\nevaluation of several perceptual hashing archetypes for popular algorithms\n(including Facebook's PDQ, Apple's Neuralhash, and the popular pHash library)\nagainst seven image variants. The focal point is the distribution of Hamming\ndistance scores between both unrelated images and image variants to better\nunderstand the problems faced by each approach.",
+    "publicationDate": "2022-12-15T18:45:14.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.00627",
+    "title": "Near-Duplicate Text Alignment under Weighted Jaccard Similarity",
+    "abstract": "Near-duplicate text alignment is the task of identifying, among the texts in a corpus, all the subsequences (substrings) that are similar to a given query. Traditional approaches rely on seeding-extension-filtering heuristics, which lack accuracy guarantees and require many hard-to-tune parameters. Recent methods leverage min-hash techniques under a hash-based framework: group subsequences by their min-hash, and for any query, find all sketches similar to the query's sketch. These methods guarantee to report all subsequences whose estimated unweighted Jaccard similarity with the query exceeds a user-provided threshold and are efficient. However, they fail to account for token importance or frequency, which limits their use in real scenarios where tokens carry weights, such as TF-IDF. To address this, we propose MONO, an approach that supports weighted Jaccard similarity using consistent weighted sampling. MONO achieves optimality within the hash-based framework. For example, when token weights are proportional to frequencies, MONO generates O(n + n log f) groups in expectation for a text of length n, where f is the maximum token frequency. Each group takes O(1) space and represents a few subsequences sharing the same sampling. We prove this bound is tight: any algorithm must produce Omega(n + n log f) groups in expectation in the worst case. Experiments show that MONO outperforms the state of the art by up to 26x in index construction time, reduces index size by up to 30 percent, and improves query latency by up to 3x, while scaling well.",
+    "publicationDate": "2025-08-30T22:54:07.000Z",
+    "votes": 1
+  }
+]

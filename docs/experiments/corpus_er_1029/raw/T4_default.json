@@ -1,0 +1,82 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.05126",
+    "title": "Selecting Repetition Counts Across Model Scales in Data-Constrained Pretraining",
+    "abstract": "The repetition count that works best for a small language model may not remain best at a larger scale. We study this effect in pretraining with a finite target corpus mixed with generic data at a fixed target fraction. On Wikipedia-derived data and Proof-Pile-2, the ranking of measured repetition counts changes with model size, and a 520M Proof-Pile-2 experiment confirms that reducing repetition from sixteen to eight improves loss while using fewer training tokens. We use loss curves from several smaller models to retain a short list of promising repetition counts for evaluation at a larger scale. On PubMed and Caselaw, candidate sets fixed before target-model training retain the lowest-loss measured count on the original evaluation grids at both 200M and 520M. This supports candidate retention as a practical alternative to exact point prediction. We also relate the pruning regression to an empirical scaling model with two opposing repetition-dependent loss terms. A first-order expansion in log model size yields the linear form used by the selection rule, providing a scaling-based interpretation of the candidate-selection procedure.",
+    "publicationDate": "2026-10-04T11:16:04.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.24998",
+    "title": "Internal Data Repetition Destroys Language Models",
+    "abstract": "Language models are running out of high-quality training data, and even aggressively deduplicated corpora retain some amount of repetition. Earlier controlled studies predated Chinchilla-style scaling laws and could only measure the cost of repetition indirectly. We revisit repetition in the Chinchilla era, using a fitted no-repetition scaling law to report Compute-Equivalent Gain and Compute-Equivalent Loss. We show that under this modernized paradigm, repetition damage is systematic in three ways. First, holding compute allocated to repeated data constant, eval loss peaks at an intermediate repeat count $\\Rep$; repeating a moderately sized subset a moderate number of times damages performance more than repeating a large subset a few times or a small subset many times. Second, the location of this peak is well-fit by a power law in model size; this scaling law reveals that the most damaging number of repeated data grows more quickly than compute. Finally, when repeated documents consume 10\\% of the FLOPs budget in a controlled exact-document repetition setting, the compute-equivalent loss can be large: on FineWeb-Edu-Dedup, the most damaging repeat count for a Qwen3-style 344M-parameter model at $\\OT=1$ matches the loss of a no-repetition run using 67% of the FLOPs. We demonstrate that these phenomena are not language-model-specific, and can be analytically understood in a simple statistical model: a misspecified linear regression with verbatim duplicates reproduces the same qualitative loss peak, quantifying how such peaks can arise from a statistical tradeoff between memorization and generalization. Our findings add precision to the study of duplication in language models, allowing practitioners to quantify the wasted compute incurred by the presence and repeat structure of duplicates in pretraining corpora.",
+    "publicationDate": "2026-06-23T16:02:40.000Z",
+    "votes": 23
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.03089",
+    "title": "Scalable Frequency- and Length-Aware Subdocument Deduplication for Large Language Model Pretraining",
+    "abstract": "Large-scale pretraining corpora contain substantial duplicate content. Although document-level deduplication is widely used, removing subdocument-level redundancy remains challenging. At corpus scale, suffix-array-based methods are commonly applied independently within shards, leaving cross-shard duplicates undetected and making the resulting retention behavior sensitive to the sharding configuration. Hash-based methods enable global exact duplicate counting, but often rely on fixed copy-retention policies that cannot accommodate heterogeneous repetition patterns. We propose a scalable subdocument deduplication framework that decouples duplicate detection from copy retention. It identifies duplicate groups through natural-boundary segmentation, normalized exact hashing, and distributed aggregation, and then applies an explicit frequency- and length-aware retention policy that allocates an adaptive copy budget to each group, retaining more copies of low-frequency or short repetitions while more aggressively deleting high-frequency or long ones. Experiments on FineWeb-Edu and a code-containing web corpus show that models trained on data processed by our method achieve the best overall performance among the evaluated settings. These results underscore the importance of explicit copy-retention control.",
+    "publicationDate": "2026-08-04T04:02:28.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.12413",
+    "title": "Soft Contamination Means Benchmarks Test Shallow Generalization",
+    "abstract": "If LLM training data is polluted with benchmark test data, then benchmark performance gives biased estimates of out-of-distribution (OOD) generalization. Typical decontamination filters use n-gram matching which fail to detect semantic duplicates: sentences with equivalent (or near-equivalent) content that are not close in string space. We study this soft contamination of training data by semantic duplicates. Among other experiments, we embed the Olmo3 training corpus and find that: 1) contamination remains widespread, e.g. we find semantic duplicates for 78% of CodeForces and exact duplicates for 50% of ZebraLogic problems; 2) including semantic duplicates of benchmark data in training does improve benchmark performance; and 3) when finetuning on duplicates of benchmark datapoints, performance also improves on truly-held-out datapoints from the same benchmark. We argue that recent benchmark gains are thus confounded: the prevalence of soft contamination means gains reflect both genuine capability improvements and the accumulation of test data and effective test data in growing training corpora.",
+    "publicationDate": "2026-02-12T21:12:53.000Z",
+    "votes": 22
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.21545",
+    "title": "Data Efficacy for Language Model Training",
+    "abstract": "Data is fundamental to the training of language models (LM). Recent research has been dedicated to data efficiency, which aims to maximize performance by selecting a minimal or optimal subset of training data. Techniques such as data filtering, sampling, and selection play a crucial role in this area. To complement it, we define Data Efficacy, which focuses on maximizing performance by optimizing the organization of training data and remains relatively underexplored. This work introduces a general paradigm, DELT, for considering data efficacy in LM training, which highlights the significance of training data organization. DELT comprises three components: Data Scoring, Data Selection, and Data Ordering. Among these components, we design Learnability-Quality Scoring (LQS), as a new instance of Data Scoring, which considers both the learnability and quality of each data sample from the gradient consistency perspective. We also devise Folding Ordering (FO), as a novel instance of Data Ordering, which addresses issues such as model forgetting and data distribution bias. Comprehensive experiments validate the data efficacy in LM training, which demonstrates the following: Firstly, various instances of the proposed DELT enhance LM performance to varying degrees without increasing the data scale and model size. Secondly, among these instances, the combination of our proposed LQS for data scoring and Folding for data ordering achieves the most significant improvement. Lastly, data efficacy can be achieved together with data efficiency by applying data selection. Therefore, we believe that data efficacy is a promising foundational area in LM training.",
+    "publicationDate": "2025-06-26T17:59:07.000Z",
+    "votes": 138
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.06603",
+    "title": "Scale Dependent Data Duplication",
+    "abstract": "Data duplication during pretraining can degrade generalization and lead to memorization, motivating aggressive deduplication pipelines. However, at web scale, it is unclear what constitutes a ``duplicate'': beyond surface-form matches, semantically equivalent documents (e.g. translations) may induce redundant training signals once models become sufficiently capable. Practically, this means that semantic duplicates operate increasingly like exact duplicates during training. We present evidence that duplication is scale-dependent in two ways. First, as model capability increases, cross-entropy loss gradients for semantically equivalent documents become more aligned. Smaller models, by contrast, produce gradients that reflect surface similarity (e.g., shared tokens) rather than semantic similarity. Second, we embedded all 192 million FineWeb-Edu-Dedup documents using EmbeddingGemma-300m. For moderate corpus sizes, the cosine similarity between nearest-neighbors follows an isotropic power law baseline. However, as corpus size grows to hundreds of billions of tokens, the nearest-neighbor similarities deviate sharply, indicating accelerated semantic collisions. Finally, controlled pretraining on data sampled with replacement from pools of finite unique documents shows that limited uniqueness yields mild degradation for small models, but rapidly increasing loss penalties for larger models, breaking naive scaling extrapolation. We derive explicit scaling laws that allow practitioners to estimate deviation from expected scaling due to limited semantic uniqueness of the pretraining corpus. Our results identify and resolve an unstudied source of scale-dependence, allowing for more accurate prediction at scale.",
+    "publicationDate": "2026-02-18T05:22:58.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.07879",
+    "title": "Datasets, Documents, and Repetitions: The Practicalities of Unequal Data Quality",
+    "abstract": "Data filtering has become a powerful tool for improving model performance while reducing computational cost. However, as large language model compute budgets continue to grow, the limited data volume provided by heavily filtered and deduplicated datasets will become a practical constraint. In efforts to better understand how to proceed, we study model performance at various compute budgets and across multiple pre-training datasets created through data filtering and deduplication. We find that, given appropriate modifications to the training recipe, repeating existing aggressively filtered datasets for up to ten epochs can outperform training on the ten times larger superset for a single epoch across multiple compute budget orders of magnitude. While this finding relies on repeating the dataset for many epochs, we also investigate repeats within these datasets at the document level. We find that not all documents within a dataset are equal, and we can create better datasets relative to a token budget by explicitly manipulating the counts of individual documents. We conclude by arguing that even as large language models scale, data filtering remains an important direction of research.",
+    "publicationDate": "2025-03-10T21:51:17.000Z",
+    "votes": 82
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.00808",
+    "title": "Predictive Data Selection: The Data That Predicts Is the Data That Teaches",
+    "abstract": "Language model pretraining involves training on extensive corpora, where data quality plays a pivotal role. In this work, we aim to directly estimate the contribution of data during pretraining and select pretraining data in an efficient manner. Specifically, we draw inspiration from recent findings showing that compression efficiency (i.e., the normalized loss) of diverse models on certain text correlates strongly with their downstream performance, when the text domain aligns with the downstream benchmarks(Huang et al., 2024). Building on this observation, we hypothesize that data on which model losses are predictive of downstream abilities also contribute effectively to learning, which shares similar intuition with Thrush et al.(2024). To leverage this insight, we introduce predictive data selection (PreSelect), a lightweight and efficient data selection method that requires training and deploying only a fastText-based scorer. Through comprehensive experiments with 1B and 3B parameter models, we demonstrate that models trained on 30B tokens selected with PreSelect surpass the performance of the vanilla baseline trained on 300B tokens, achieving a 10x reduction in compute requirements. Furthermore, PreSelect significantly outperforms other competitive data selection baselines, such as DCLM and FineWeb-Edu on a scale of 3B models trained on 100B tokens. We open-source our trained data selection scorer along with the curated datasets at this https URL.",
+    "publicationDate": "2025-03-02T09:21:28.000Z",
+    "votes": 52
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2412.14689",
+    "title": "How to Synthesize Text Data without Model Collapse?",
+    "abstract": "Model collapse in synthetic data indicates that iterative training on\nself-generated data leads to a gradual decline in performance. With the\nproliferation of AI models, synthetic data will fundamentally reshape the web\ndata ecosystem. Future GPT-$\\{n\\}$ models will inevitably be trained on a blend\nof synthetic and human-produced data. In this paper, we focus on two questions:\nwhat is the impact of synthetic data on language model training, and how to\nsynthesize data without model collapse? We first pre-train language models\nacross different proportions of synthetic data, revealing a negative\ncorrelation between the proportion of synthetic data and model performance. We\nfurther conduct statistical analysis on synthetic data to uncover\ndistributional shift phenomenon and over-concentration of n-gram features.\nInspired by the above findings, we propose token editing on human-produced data\nto obtain semi-synthetic data. As a proof of concept, we theoretically\ndemonstrate that token-level editing can prevent model collapse, as the test\nerror is constrained by a finite upper bound. We conduct extensive experiments\non pre-training from scratch, continual pre-training, and supervised\nfine-tuning. The results validate our theoretical proof that token-level\nediting improves model performance.",
+    "publicationDate": "2024-12-19T09:43:39.000Z",
+    "votes": 60
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.24356",
+    "title": "Beyond Repetition: Text Simplification and Curriculum Learning for Data-Constrained Pretraining",
+    "abstract": "Most studies on language model pretraining focus on large datasets, leaving open questions about optimization in data-constrained settings. In such settings, the effects of training data order and of including alternative versions of the same text remain underexplored. We address this by studying curriculum learning in pretraining, focusing on text-complexity ordering and data augmentation via simplification. We ask: (1) Does simplifying texts enhance representation quality more than reusing the original data? and (2) Does ordering data by text complexity yield better representations? To answer, we build on a pair of parallel corpora where human-written paragraphs are aligned with LLM-simplified variants, and test four data schedules: repeated exposure, low-to-high complexity, high-to-low, and interleaved. We analyze models' representation quality from a sample efficiency perspective via fine-tuning, as well as its zero-shot performance on linguistic knowledge, entity tracking, world knowledge, and commonsense reasoning. Our findings show that adding simplified data improves fine-tuning and zero-shot performance over a repeated-exposure baseline: smaller models benefit from low-to-high complexity, while larger models perform better with interleaved ordering.",
+    "publicationDate": "2025-09-29T06:54:59.000Z",
+    "votes": 2
+  }
+]

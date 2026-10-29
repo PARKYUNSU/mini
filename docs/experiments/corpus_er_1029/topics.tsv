@@ -1,0 +1,6 @@
+T1	entity resolution and entity matching with deep learning and large language models
+T2	record linkage across databases with noisy names and addresses
+T3	near-duplicate document detection at web scale with MinHash and locality sensitive hashing
+T4	training data deduplication and its effect on language model performance
+T5	similarity join and all-pairs similarity search over large vector sets
+T6	schema matching and column type matching between tables

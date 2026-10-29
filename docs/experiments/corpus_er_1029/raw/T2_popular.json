@@ -1,0 +1,82 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2504.04266",
+    "title": "BlockingPy: approximate nearest neighbours for blocking of records for entity resolution",
+    "abstract": "Entity resolution (probabilistic record linkage, deduplication) is a key step in scientific analysis and data science pipelines involving multiple data sources. The objective of entity resolution is to link records without common unique identifiers that refer to the same entity (e.g., person, company). However, without identifiers, researchers need to specify which records to compare in order to calculate matching probability and reduce computational complexity. One solution is to deterministically block records based on some common variables, such as names, dates of birth or sex or use phonetic algorithms. However, this approach assumes that these variables are free of errors and completely observed, which is often not the case. To address this challenge, we have developed a Python package, BlockingPy, which uses blocking using modern approximate nearest neighbour search and graph algorithms to reduce the number of comparisons. The package supports both CPU and GPU execution. In this paper, we present the design of the package, its functionalities and two case studies related to official statistics. The presented software will be useful for researchers interested in linking data from various sources.",
+    "publicationDate": "2025-04-05T19:45:16.000Z",
+    "votes": 157
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.20601",
+    "title": "A Comprehensive Bayesian Approach to Entity Resolution for Data with Multiple Truths",
+    "abstract": "In many applications, from government to ecology, integrating data from diverse and noisy sources is critical for downstream inference. However, a unique identifier to link records cleanly from the same entity may not exist. Entity resolution (also referred to as de-duplication or record linkage) merges such databases to identify duplicates, allowing for more complete data for inference. A multitude of methods from statistics and computer science in recent years assume a single, immutable true value for each variable used in linkage. We argue this restrictive assumption is often violated in practice, leading researchers to discard useful data and biasing downstream inference. For example, a respondent's education status may truly change between two different surveys, yet existing methods would treat at least one observation as a distorted version of the truth, even though both are correct. In this paper, we propose a novel entity resolution model that comprehensively accommodates \"multiple truths\" by introducing a mixture of exponential family distributions that further handles multiple data types. We provide options to fit the model with Markov chain Monte Carlo routines and variational inference for massive datasets. We demonstrate the method's value via simulation and linking a longitudinal survey of Italian household wealth.",
+    "publicationDate": "2026-08-20T22:41:06.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2404.05566",
+    "title": "Hausdorff Distance-Based Record Linkage for Improved Matching of  Households and Individuals in Different Databases",
+    "abstract": "Matching households and individuals across different databases poses\nchallenges due to the lack of unique identifiers, typographical errors, and\nchanges in attributes over time. Record linkage tools play a crucial role in\novercoming these difficulties. This paper presents a multi-step record linkage\nprocedure that incorporates household information to enhance the\nentity-matching process across multiple databases. Our approach utilizes the\nHausdorff distance to estimate the probability of a match between households in\nmultiple files. Subsequently, probabilities of matching individuals within\nthese households are computed using a logistic regression model based on\nattribute-level distances. These estimated probabilities are then employed in a\nlinear programming optimization framework to infer one-to-one matches between\nindividuals. To assess the efficacy of our method, we apply it to link data\nfrom the Italian Survey of Household Income and Wealth across different years.\nThrough internal and external validation procedures, the proposed method is\nshown to provide a significant enhancement in the quality of the individual\nmatching process, thanks to the incorporation of household information. A\ncomparison with a standard record linkage approach based on direct matching of\nindividuals, which neglects household information, underscores the advantages\nof accounting for such information.",
+    "publicationDate": "2024-04-08T14:39:36.000Z",
+    "votes": 12
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2206.15089",
+    "title": "Fairness and Cost Constrained Privacy-Aware Record Linkage",
+    "abstract": "Record linkage algorithms match and link records from different databases that refer to the same real-world entity based on direct and/or quasi-identifiers, such as name, address, age, and gender, available in the records. Since these identifiers generally contain personal identifiable information (PII) about the entities, record linkage algorithms need to be developed with privacy constraints. Known as privacy-preserving record linkage (PPRL), many research studies have been conducted to perform the linkage on encoded and/or encrypted identifiers. Differential privacy (DP) combined with computationally efficient encoding methods, e.g. Bloom filter encoding, has been used to develop PPRL with provable privacy guarantees. The standard DP notion does not however address other constraints, among which the most important ones are fairness-bias and cost of linkage in terms of number of record pairs to be compared. In this work, we propose new notions of fairness-constrained DP and fairness and cost-constrained DP for PPRL and develop a framework for PPRL with these new notions of DP combined with Bloom filter encoding. We provide theoretical proofs for the new DP notions for fairness and cost-constrained PPRL and experimentally evaluate them on two datasets containing person-specific data. Our experimental results show that with these new notions of DP, PPRL with better performance (compared to the standard DP notion for PPRL) can be achieved with regard to privacy, cost and fairness constraints.",
+    "publicationDate": "2022-06-30T07:47:11.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.21138",
+    "title": "EnsembleLink: Accurate Record Linkage Without Training Data",
+    "abstract": "Record linkage, the process of matching records that refer to the same entity across datasets, is essential to empirical social science but remains methodologically underdeveloped. Researchers treat it as a preprocessing step, applying ad hoc rules without quantifying the uncertainty that linkage errors introduce into downstream analyses. Existing methods either achieve low accuracy or require substantial labeled training data. I present EnsembleLink, a method that achieves high accuracy without any training labels. EnsembleLink leverages pre-trained language models that have learned semantic relationships (e.g., that \"South Ozone Park\" is a neighborhood in \"New York City\" or that \"Lutte ouvriere\" refers to the Trotskyist \"Workers' Struggle\" party) from large text corpora. On benchmarks spanning city names, person names, organizations, multilingual political parties, and bibliographic records, EnsembleLink matches or exceeds methods requiring extensive labeling. The method runs locally on open-source models, requiring no external API calls, and completes typical linkage tasks in minutes.",
+    "publicationDate": "2026-01-29T00:41:11.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2403.12092",
+    "title": "Methods for Matching English Language Addresses",
+    "abstract": "Addresses occupy a niche location within the landscape of textual data, due to the positional importance carried by every word, and the geographical scope it refers to. The task of matching addresses happens everyday and is present in various fields like mail redirection, entity resolution, etc. Our work defines, and formalizes a framework to generate matching and mismatching pairs of addresses in the English language, and use it to evaluate various methods to automatically perform address matching. These methods vary widely from distance based approaches to deep learning models. By studying the Precision, Recall and Accuracy metrics of these approaches, we obtain an understanding of the best suited method for this setting of the address matching task.",
+    "publicationDate": "2024-03-14T10:39:14.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2104.09677",
+    "title": "Large Scale Record Linkage in the Presence of Missing Data",
+    "abstract": "Record linkage is aimed at the accurate and efficient identification of\nrecords that represent the same entity within or across disparate databases. It\nis a fundamental task in data integration and increasingly required for\naccurate decision making in application domains ranging from health analytics\nto national security. Traditional record linkage techniques calculate string\nsimilarities between quasi-identifying (QID) values, such as the names and\naddresses of people. Errors, variations, and missing QID values can however\nlead to low linkage quality because the similarities between records cannot be\ncalculated accurately. To overcome this challenge, we propose a novel technique\nthat can accurately link records even when QID values contain errors or\nvariations, or are missing. We first generate attribute signatures\n(concatenated QID values) using an Apriori based selection of suitable QID\nattributes, and then relational signatures that encapsulate relationship\ninformation between records. Combined, these signatures can uniquely identify\nindividual records and facilitate fast and high quality linking of very large\ndatabases through accurate similarity calculations between records. We evaluate\nthe linkage quality and scalability of our approach using large real-world\ndatabases, showing that it can achieve high linkage quality even when the\ndatabases being linked contain substantial amounts of missing values and\nerrors.",
+    "publicationDate": "2021-04-19T22:57:19.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2008.04443",
+    "title": "(Almost) All of Entity Resolution",
+    "abstract": "Whether the goal is to estimate the number of people that live in a\ncongressional district, to estimate the number of individuals that have died in\nan armed conflict, or to disambiguate individual authors using bibliographic\ndata, all these applications have a common theme - integrating information from\nmultiple sources. Before such questions can be answered, databases must be\ncleaned and integrated in a systematic and accurate way, commonly known as\nrecord linkage, de-duplication, or entity resolution. In this article, we\nreview motivational applications and seminal papers that have led to the growth\nof this area. Specifically, we review the foundational work that began in the\n1940's and 50's that have led to modern probabilistic record linkage. We review\nclustering approaches to entity resolution, semi- and fully supervised methods,\nand canonicalization, which are being used throughout industry and academia in\napplications such as human rights, official statistics, medicine, citation\nnetworks, among others. Finally, we discuss current research topics of\npractical importance.",
+    "publicationDate": "2020-08-10T22:41:20.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2101.10862",
+    "title": "HANA: A HAndwritten NAme Database for Offline Handwritten Text  Recognition",
+    "abstract": "Methods for linking individuals across historical data sets, typically in\ncombination with AI based transcription models, are developing rapidly.\nProbably the single most important identifier for linking is personal names.\nHowever, personal names are prone to enumeration and transcription errors and\nalthough modern linking methods are designed to handle such challenges, these\nsources of errors are critical and should be minimized. For this purpose,\nimproved transcription methods and large-scale databases are crucial\ncomponents. This paper describes and provides documentation for HANA, a newly\nconstructed large-scale database which consists of more than 3.3 million names.\nThe database contain more than 105 thousand unique names with a total of more\nthan 1.1 million images of personal names, which proves useful for transfer\nlearning to other settings. We provide three examples hereof, obtaining\nsignificantly improved transcription accuracy on both Danish and US census\ndata. In addition, we present benchmark results for deep learning models\nautomatically transcribing the personal names from the scanned documents.\nThrough making more challenging large-scale databases publicly available we\nhope to foster more sophisticated, accurate, and robust models for handwritten\ntext recognition.",
+    "publicationDate": "2021-01-22T16:23:01.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2406.14717",
+    "title": "Analysis of Linked Files: A Missing Data Perspective",
+    "abstract": "In many applications, researchers seek to identify overlapping entities\nacross multiple data files. Record linkage algorithms facilitate this task, in\nthe absence of unique identifiers. As these algorithms rely on semi-identifying\ninformation, they may miss records that represent the same entity, or\nincorrectly link records that do not represent the same entity. Analysis of\nlinked files commonly ignores such linkage errors, resulting in biased, or\noverly precise estimates of the associations of interest. We view record\nlinkage as a missing data problem, and delineate the linkage mechanisms that\nunderpin analysis methods with linked files. Following the missing data\nliterature, we group these methods under three categories: likelihood and\nBayesian methods, imputation methods, and weighting methods. We summarize the\nassumptions and limitations of the methods, and evaluate their performance in a\nwide range of simulation scenarios.",
+    "publicationDate": "2024-06-20T20:28:11.000Z",
+    "votes": 0
+  }
+]

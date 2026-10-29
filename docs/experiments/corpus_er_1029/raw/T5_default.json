@@ -1,0 +1,82 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.15058",
+    "title": "Fast Label-Filtering Approximate Nearest Neighbor Search via Progressive Label Set Stratification",
+    "abstract": "Approximate nearest neighbor search (ANNS) retrieves the most similar vectors to a query vector in high-dimensional space. Label-filtering ANNS (LFANNS) extends ANNS with a label filter that the labels of base vectors must satisfy a set relation (e.g., equality, containment, or overlap) with the query labels. Existing LFANNS indices suffer from inconsistent performance across different filter types and degraded scalability under varying label scale and distribution. In this paper, we define label-stratified similarity graph (LSSG), where edges connect neighboring vectors whose label sets fall within stratified similarity thresholds. To implement LSSG efficiently, we design an incremental insertion algorithm to prune redundant edges in both vector and label spaces, and leverage a MinHash structure to ensure scalability for large-scale labels. We analyze stepwise probabilities under explicit label models and explain why stricter label tiers reduce ineffective in-filtering expansions. Benchmark experiments show that LSSG achieves ideal optimality for equality queries, and 1.06x-92.9x and 1.08x-84.1x faster than the best competing index for containment and overlap, respectively, in query speed with identical accuracy and 0.35x index size.",
+    "publicationDate": "2026-09-14T05:23:52.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.06270",
+    "title": "Towards Enabling Distance-Based Memory Addressing",
+    "abstract": "Approximate Nearest-Neighbor Search (ANNS) in high dimensional vector datasets is an application of significant prevalence across different AI applications. However, such an operation is significantly bandwidth limited at large workingset sizes owing to the curse of dimensionality. Traditional indices used to accelerate ANNS rely on search-space pruning as a preprocessing step to alleviate such bandwidth requirement, but such optimization occurs either at the cost of increased bandwidth-inefficiency and/or degradation of search quality. This paper proposes a data-parallel hardware/software mechanism for performing large-scale similarity search in-memory. We propose a novel algorithm to simplify the computation requirement for similarity search across various distance metrics through lightweight primitives to perform a fast and approximate data-parallel brute-force search on the entire vector space. We further build a memory system capable of executing the required operations to generate a distance metric per datapoints, which is then used to enable pruning as a post-processing step. We offer adequate software support for user control over the proposed system. By enabling such search-space pruning as a post-processing step, we achieve near-perfect recall across representative workloads while achieving orders of magnitude performance and energy improvement over state-of-the-art algorithmic approaches on million and billion-scale workloads.",
+    "publicationDate": "2026-09-05T21:43:50.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.24173",
+    "title": "Simple and Fast Algorithm for Graph-based Filtered Approximate Nearest Neighbor Search (Full Version)",
+    "abstract": "It has been common to represent many objects as high-dimensional vectors due to the proliferation of machine learning-based embedding techniques. One of the most important functions for analyzing high-dimensional vectors is approximate nearest neighbor search, which, given a query vector, retrieves the vector that is approximately the most similar to the query vector. In many real-world applications, such as e-commerce, objects have not only vectors but also attributes, e.g., category, color, and brand, and they require a scenario where users can specify a query vector and a value for each attribute of interest. This problem, called filtered approximate nearest neighbor search, retrieves approximate nearest neighbors from a set of objects that have the specified attribute values. Efficiently solving this problem is challenging because it has to accept arbitrary query vectors and attribute values, which are not known in advance. Existing techniques suffer from slow search performance and difficulty in dealing with arbitrary combinations of attributes. This work overcomes these challenges and proposes a new algorithm for this problem. We conduct extensive experiments, and the results demonstrate the efficiency of our algorithm.",
+    "publicationDate": "2026-07-27T08:55:09.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.21645",
+    "title": "Large-Scale Data Parallelization of Product Quantization and Inverted Indexing Using Dask",
+    "abstract": "Large-scale Nearest Neighbor (NN) search, though widely utilized in the similarity search field, remains challenged by the computational limitations inherent in processing large scale data. In an effort to decrease the computational expense needed, Approximate Nearest Neighbor (ANN) search is often used in applications that do not require the exact similarity search, but instead can rely on an approximation. Product Quantization (PQ) is a memory-efficient ANN effective for clustering all sizes of datasets. Clustering large-scale, high dimensional data requires a heavy computational expense, in both memory-cost and execution time. This work focuses on a unique way to divide and conquer the large scale data in Python using PQ, Inverted Indexing and Dask, combining the results without compromising the accuracy and reducing computational requirements to the level required when using medium-scale data.",
+    "publicationDate": "2026-04-23T12:59:30.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.16360",
+    "title": "Fast Approximate Vector Joins via Offline-Online Co-Design",
+    "abstract": "Vector joins - finding all vector pairs between a set of query and data vectors whose distances are below a given threshold - are fundamental to modern vector and vector-relational database systems that power multimodal retrieval and semantic analytics. Existing state-of-the-art approach exploits work sharing among similar queries but still suffers from redundant index traversals and excessive distance computations. We propose a unified framework for efficient approximate vector joins that (1) introduces soft work sharing to reuse traversal results beyond the join results of previous queries, (2) builds a merged index over both query and data vectors to further speedup graph explorations, (3) improves robustness for out-of-distribution queries through an adaptive hybrid search strategy, and (4) further optimizes all these as offloading only the necessary online overhead to offline while minimizing maintenance cost. Experiments on eight datasets demonstrate substantial improvements in efficiency-recall trade-off over the state of the art.",
+    "publicationDate": "2026-03-17T10:47:35.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.09173",
+    "title": "Decoupling Vector Data and Index Storage for Space Efficiency",
+    "abstract": "Managing large-scale vector datasets with disk-resident graph approximate nearest neighbor search (ANNS) systems incurs substantial storage overhead due to the co-location of vector data and auxiliary index metadata, which prevents the storage layer from exploiting their distinct compressibility. We present COMPASS, a component-aware compressed storage framework for disk-resident graph vector search. Leveraging data-index decoupling as a foundation, COMPASS losslessly compresses each component according to its distinct compressibility characteristics, thereby significantly reducing storage space. It further adapts the search and update paths to preserve their performance under compressed storage layouts. Evaluation on real-world public and proprietary billion-scale datasets shows that COMPASS reduces storage space by up to 58.7%, while delivering improved or competitive search and update performance compared to state-of-the-art disk-resident graph ANNS systems.",
+    "publicationDate": "2026-04-10T09:58:17.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.17099",
+    "title": "Reverse Neighbor Sliding and Order Selection for Efficient Multi-Proximity Graph Merging",
+    "abstract": "Approximate k Nearest Neighbor (AKNN) search in high-dimensional space is a foundational problem in vector databases with widespread applications. Among the numerous AKNN indexes, Proximity Graph-based indexes achieve state-of-the-art search efficiency across various benchmarks. In many real-world scenarios, datasets are maintained as multiple segment-level graph indexes to support continuous writes and segment management. However, these fragmented indexes complicate maintenance and degrade search efficiency, making fast graph index merging essential. In this paper, we focus on the efficient merging of multiple existing graph indexes into a single one. To achieve this, we propose a Reverse Neighbor Sliding Merge (RNSM) that exploits structural information to boost merging efficiency. We further propose Merge Order Selection (MOS) to minimize total merge cost across multiple indexes by eliminating redundant operations. Experiments show that our approach yields up to a 3.86x speedup over existing index merge methods and a 9.92x speedup over index reconstruction, while maintaining comparable search performance. Moreover, our method scales to merging up to 50 sub-indexes on datasets of 100 million vectors, maintaining consistent speedups.",
+    "publicationDate": "2026-02-19T05:50:34.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.17264",
+    "title": "Scalable Distributed Vector Search via Accuracy Preserving Index Construction",
+    "abstract": "Scaling Approximate Nearest Neighbor Search (ANNS) to billions of vectors requires distributed indexes that balance accuracy, latency, and throughput. Yet existing index designs struggle with this tradeoff. This paper presents SPIRE, a scalable vector index based on two design decisions. First, it identifies a balanced partition granularity that avoids read-cost explosion. Second, it introduces an accuracy-preserving recursive construction that builds a multi-level index with predictable search cost and stable accuracy. In experiments with up to 8 billion vectors across 46 nodes, SPIRE achieves high scalability and up to 9.64X higher throughput than state-of-the-art systems.",
+    "publicationDate": "2025-12-19T06:29:03.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.17326",
+    "title": "Approximate Nearest Neighbor Search of Large Scale Vectors on Distributed Storage",
+    "abstract": "Approximate Nearest Neighbor Search (ANNS) in high-dimensional space is an essential operator in many online services, such as information retrieval and recommendation. Indices constructed by the state-of-the-art ANNS algorithms must be stored in single machine's memory or disk for high recall rate and throughput, suffering from substantial storage cost, constraint of limited scale and single point of failure. While distributed storage can provide a cost-effective and robust solution, there is no efficient and effective algorithms for indexing vectors in distributed storage scenarios. In this paper, we present a new graph-cluster hybrid indexing and search system which supports Distributed Storage Approximate Nearest Neighbor Search, called DSANN. DSANN can efficiently index, store, search billion-scale vector database in distributed storage and guarantee the high availability of index service. DSANN employs the concurrent index construction method to significantly reduces the complexity of index building. Then, DSANN applies Point Aggregation Graph to leverage the structural information of graph to aggregate similar vectors, optimizing storage efficiency and improving query throughput via asynchronous I/O in distributed storage. Through extensive experiments, we demonstrate DSANN can efficiently and effectively index, store and search large-scale vector datasets in distributed storage scenarios.",
+    "publicationDate": "2025-10-20T09:18:15.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.02278",
+    "title": "Fantasy: Efficient Large-scale Vector Search on GPU Clusters with GPUDirect Async",
+    "abstract": "Vector similarity search has become a critical component in AI-driven applications such as large language models (LLMs). To achieve high recall and low latency, GPUs are utilized to exploit massive parallelism for faster query processing. However, as the number of vectors continues to grow, the graph size quickly exceeds the memory capacity of a single GPU, making it infeasible to store and process the entire index on a single GPU. Recent work uses CPU-GPU architectures to keep vectors in CPU memory or SSDs, but the loading step stalls GPU computation. We present Fantasy, an efficient system that pipelines vector search and data transfer in a GPU cluster with GPUDirect Async. Fantasy overlaps computation and network communication to significantly improve search throughput for large graphs and deliver large query batch sizes.",
+    "publicationDate": "2025-12-01T23:47:51.000Z",
+    "votes": 3
+  }
+]
