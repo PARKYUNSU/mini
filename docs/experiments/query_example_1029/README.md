@@ -28,4 +28,21 @@
 
 ## 4. 결론
 
-라운드 만들지 않음. 병목은 9B 검색어가 "예시로 든 맥락"과 "묻는 주제"를 구분하지 못하는 것 — 이 모양 질문이 실사용에서 더 쌓이면(예: 3 고유 이상) 그때 질문 모아 사전 등록. 그 전까지 사용 팁: "RAG" 는 두고 "중복 탐지 · 개체 매칭" 같은 분야 용어를 함께 넣으면 찾힌다. 후보 방향(측정 전): 검색어가 한 덩어리로 나올 때 쉼표 구로 나누기 — 공백 이어 쓰기 폴백(`agent_nodes.py` `_extract_english_rag_query_base`)이 지금 이 모양을 만든다.
+라운드 만들지 않음. 병목은 9B 검색어가 "예시로 든 맥락"과 "묻는 주제"를 구분하지 못하는 것 — 이 모양 질문이 실사용에서 더 쌓이면(예: 3 고유 이상) 그때 질문 모아 사전 등록. 그 전까지 사용 팁: "RAG" 는 두고 "중복 탐지 · 개체 매칭" 같은 분야 용어를 함께 넣으면 찾힌다. ~~후보 방향: 한 덩어리 검색어를 쉼표 구로 나누기~~ → §5 에서 **반박됨**.
+
+## 5. 진단 2 — 쉼표 · 순서는 원인 아님 (`diag2.py`, 2026-10-29)
+
+검색은 쉼표 구를 따로 검색하지 않는다(한 문자열로 벡터 + BM25). 같은 단어로 쉼표 · 순서만 바꿨다.
+
+| 검색어 | 상위 5 중 수집 논문 |
+|---|---|
+| 운영 그대로 `rag search across multiple databases duplicate content detection in large document collections` | 0 |
+| 같은 단어 + 쉼표 4구 | 0 |
+| 같은 단어, 순서 바꿈(rag search 를 뒤로) | 0 |
+| `rag search` → `rag` 한 단어 + 쉼표 | 2 |
+| `rag search` 뺌 | 3 |
+| (진단 1) 예시 뺀 질문의 운영 검색어 — `similarity search · duplicate document detection` | 4 |
+| (진단 1) 손 C — `rag, near-duplicate detection …` | 4 |
+
+- 쉼표 · 순서는 효과 0. **단어가 결정한다**: `rag search` 두 단어가 강하게 끌고, 그걸 빼도 `duplicate content detection` 은 3. 분야 용어 `near-duplicate detection` · `deduplication` · `duplicate document detection` 이 들어가야 4~5.
+- 그래서 '쉼표 구로 나누기' 안은 사전 등록하지 않는다. 남은 지렛대는 **검색어 단어 선택(일상어 → 분야 용어)** — external_term_1029(9B 는 직역)과 같은 벽.
