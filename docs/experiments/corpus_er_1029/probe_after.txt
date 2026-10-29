@@ -1,0 +1,88 @@
+## entity resolution large language models
+   2401.03426 On Leveraging Large Language Models for Enhancing Entity Resolution: A Cost-efficient Appr
+   1905.06397 End-to-End Entity Resolution for Big Data: A Survey
+   2304.12329 Pre-trained Embeddings for Entity Resolution: An Experimental Analysis 
+   2405.16884 Match, Compare, or Select? An Investigation of Large Language Models for Entity Matching
+   2605.23597 Structure-Guided Entity Resolution: Fine-Tuning LLMs for Robust Name Matching in Complex L
+   2411.09601 Accelerating Knowledge Graph and Ontology Engineering with Large Language Models
+   2403.20329 ReALM: Reference Resolution As Language Modeling
+   2407.16127 Finetuning Generative Large Language Models with Discrimination Instructions for Knowledge
+   2402.02389 KICGPT: Large Language Model with Knowledge in Context for Knowledge Graph Completion
+   2310.11244 Entity Matching using Large Language Models
+## record linkage across databases
+   2104.09677 Large Scale Record Linkage in the Presence of Missing Data
+   2008.04443 (Almost) All of Entity Resolution
+   2404.05566 Hausdorff Distance-Based Record Linkage for Improved Matching of Households and Individual
+   2206.15089 Fairness and Cost Constrained Privacy-Aware Record Linkage
+   2504.04266 BlockingPy: approximate nearest neighbours for blocking of records for entity resolution
+   1905.06397 End-to-End Entity Resolution for Big Data: A Survey
+   2410.01066 From Natural Language to SQL: Review of LLM-based Text-to-SQL Systems
+   2405.16884 Match, Compare, or Select? An Investigation of Large Language Models for Entity Matching
+   2603.16360 Fast Approximate Vector Joins via Offline-Online Co-Design
+   2608.20601 A Comprehensive Bayesian Approach to Entity Resolution for Data with Multiple Truths
+## near-duplicate document detection at scale
+   2307.11496 Identifying document similarity using a fast estimation of the Levenshtein Distance based 
+   2210.04261 Noise-Robust De-Duplication at Scale
+   2606.03001 FOLD: Fuzzy Online Deduplication for Very Large Evolving Datasets via Approximate Nearest 
+   2607.01601 SemHash-LLM: A Multi-Granularity Semantic Hashing Framework for Document Deduplication
+   2107.06499 Deduplicating Training Data Makes Language Models Better
+   2607.08382 H3D: Benchmarking Unsupervised Text Hashing for Fine-Grained Document Deduplication
+   2409.08519 Fast Comparative Analysis of Merge Trees Using Locality Sensitive Hashing
+   2603.00122 NovaLAD: A Fast, CPU-Optimized Document Extraction Pipeline for Generative AI and Data Int
+   2412.20088 An archaeological Catalog Collection Method Based on Large Vision-Language Models
+   2607.21936 Leveraging External Knowledge for Historical Document Restoration via Retrieval-Augmented 
+## similarity join embeddings vector database
+   2401.08281 The Faiss library
+   2603.16360 Fast Approximate Vector Joins via Offline-Online Co-Design
+   2412.18819 LLM-assisted Vector Similarity Search
+   2412.08618 Image Retrieval Methods in the Dissimilarity Space
+   2507.21989 Benchmarking Filtered Approximate Nearest Neighbor Search Algorithms on Transformer-based 
+   2602.07297 Progressive Searching for Retrieval in RAG
+   2502.05575 Graph-Based Vector Search: An Experimental Evaluation of the State-of-the-Art
+   2502.13619 Complex Ontology Matching with Large Language Model Embeddings
+   1702.08734 Billion-scale similarity search with GPUs
+   2412.05447 TOBUGraph: Knowledge Graph-Based Retrieval for Enhanced LLM Performance Beyond RAG
+## deduplication of large text corpora
+   2107.06499 Deduplicating Training Data Makes Language Models Better
+   2210.04261 Noise-Robust De-Duplication at Scale
+   2606.03001 FOLD: Fuzzy Online Deduplication for Very Large Evolving Datasets via Approximate Nearest 
+   2607.01601 SemHash-LLM: A Multi-Granularity Semantic Hashing Framework for Document Deduplication
+   2504.04266 BlockingPy: approximate nearest neighbours for blocking of records for entity resolution
+   2412.14802 Stack Trace Deduplication: Faster, More Accurately, and in More Realistic Scenarios
+   2503.07879 Datasets, Documents, and Repetitions: The Practicalities of Unequal Data Quality
+   2607.08382 H3D: Benchmarking Unsupervised Text Hashing for Fine-Grained Document Deduplication
+   2310.05690 Abstractive Summarization of Large Document Collections Using GPT
+   2309.04564 When Less is More: Investigating Data Pruning for Pretraining LLMs at Scale
+## cross-database record matching retrieval
+   2104.09677 Large Scale Record Linkage in the Presence of Missing Data
+   2504.04266 BlockingPy: approximate nearest neighbours for blocking of records for entity resolution
+   2404.05566 Hausdorff Distance-Based Record Linkage for Improved Matching of Households and Individual
+   2405.16884 Match, Compare, or Select? An Investigation of Large Language Models for Entity Matching
+   2606.07843 RACT: Retrieval Augmented Column-Table Learning and Prediction for Multi-Table Schema Matc
+   2403.01567 ReMatch: Retrieval Enhanced Schema Matching with LLMs
+   2602.07297 Progressive Searching for Retrieval in RAG
+   2511.20285 Schema Matching on Graph: Iterative Graph Exploration for Efficient and Explainable Data I
+   2412.11472 Leveraging Foundation Language Models (FLMs) for Automated Cohort Extraction from Large EH
+   2603.16360 Fast Approximate Vector Joins via Offline-Online Co-Design
+## schema matching ontology alignment
+   2409.14038 OAEI-LLM: A Benchmark Dataset for Understanding Large Language Model Hallucinations in Ont
+   2507.10897 LLMATCH: A Unified Schema Matching Framework with Large Language Models
+   2411.09601 Accelerating Knowledge Graph and Ontology Engineering with Large Language Models
+   2503.21902 OntoAligner: A Comprehensive Modular and Robust Python Toolkit for Ontology Alignment
+   2503.21813 OAEI-LLM-T: A TBox Benchmark Dataset for Understanding Large Language Model Hallucinations
+   2407.11852 Schema Matching with Large Language Models: an Experimental Study
+   2403.01567 ReMatch: Retrieval Enhanced Schema Matching with LLMs
+   2506.01232 Retrieval-Augmented Generation of Ontologies from Relational Databases
+   2502.13619 Complex Ontology Matching with Large Language Model Embeddings
+   2606.07843 RACT: Retrieval Augmented Column-Table Learning and Prediction for Multi-Table Schema Matc
+## semantic deduplication MinHash LSH
+   2107.06499 Deduplicating Training Data Makes Language Models Better
+   2607.01601 SemHash-LLM: A Multi-Granularity Semantic Hashing Framework for Document Deduplication
+   2606.03001 FOLD: Fuzzy Online Deduplication for Very Large Evolving Datasets via Approximate Nearest 
+   2101.00314 SetSketch: Filling the Gap between MinHash and HyperLogLog
+   2210.04261 Noise-Robust De-Duplication at Scale
+   2102.08942 A Survey on Locality Sensitive Hashing Algorithms and their Applications
+   2602.12413 Soft Contamination Means Benchmarks Test Shallow Generalization
+   1905.06397 End-to-End Entity Resolution for Big Data: A Survey
+   2607.08382 H3D: Benchmarking Unsupervised Text Hashing for Fine-Grained Document Deduplication
+   2504.04266 BlockingPy: approximate nearest neighbours for blocking of records for entity resolution

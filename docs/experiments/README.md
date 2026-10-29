@@ -96,6 +96,7 @@
 | [`router_research_1028/`](router_research_1028/) | 라우터 3단계 질문도 15 편 다시 검색해 거르기 | 통과 (27:2, p 1.6e-6, 시간 +7.7 s) · 운영 ON (10-29 07:00) |
 | [`nodoc_conclusion_1029/`](nodoc_conclusion_1029/) | '없음' 판정이면 결론 다시 쓰기 건너뛰기 | 통과 (모순 6→0, 시간 −20 s) · 운영 ON (10-29 08:22) |
 | [`external_term_1029/`](external_term_1029/) | '없음' 판정이면 외부 검색어를 분야 용어로 | 기각 (3:2, p 1.0; '0' 19→7) |
+| [`corpus_er_1029/`](corpus_er_1029/) | 빈 분야(개체 매칭 · 중복 탐지 · 유사도 조인 · 스키마 매칭) 분야 단위 47편 수집 (코드 변경 없음) | **채택 · 수집분 유지** (9:0, p 0.0039; 일상어 질문 중 x272x27 있음 1→10/12; R_134 는 0→0, 검색어가 RAG 로 끌림) |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -262,6 +263,7 @@ docs/experiments/
 ├─ router_research_1028/   ← 라우터 경로 다시 검색 (운영 ON)
 ├─ nodoc_conclusion_1029/  ← '없음' 결론 유지 (운영 ON)
 ├─ external_term_1029/     ← 외부 검색어 분야 용어 (기각)
+├─ corpus_er_1029/         ← 빈 분야 코퍼스 보강 (채택)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
