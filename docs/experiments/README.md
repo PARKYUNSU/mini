@@ -98,6 +98,7 @@
 | [`external_term_1029/`](external_term_1029/) | '없음' 판정이면 외부 검색어를 분야 용어로 | 기각 (3:2, p 1.0; '0' 19→7) |
 | [`corpus_er_1029/`](corpus_er_1029/) | 빈 분야(개체 매칭 · 중복 탐지 · 유사도 조인 · 스키마 매칭) 분야 단위 47편 수집 (코드 변경 없음) | **채택 · 수집분 유지** (9:0, p 0.0039; 일상어 질문 중 '2' 있음 1→10/12; R_134 는 0→0, 검색어가 RAG 로 끌림) |
 | [`query_example_1029/`](query_example_1029/) | R_134 검색어가 질문 속 예시 RAG 에 끌림 (진단만) | 원인 = 검색어 맨 앞 `rag search`; 예시 빼면 상위 5 중 4 가 수집 논문. 이 모양 질문은 실사용 고유 1개라 라운드 안 함 |
+| [`query_glossary_1029/`](query_glossary_1029/) | 일상어 → 분야 용어 사전을 검색어 뒤에 붙이기 (`RAG_QUERY_GLOSSARY`) | 기각 (3:0, p 0.25; 줄어듦 0, 작동 문항 적음) |
 
 기준선 측정은 따로 있다: [`baseline_0925/`](baseline_0925/) · [`baseline_0926/`](baseline_0926/)(출력 상한을 운영과 정렬해 재측정) · [`teacher_check_0927/`](teacher_check_0927/)(Groq 을 교사 후보로 재본 원본) · **[`baseline_0929/`](baseline_0929/)**(문항 70개 확장 후 base·v9·v10 재측정. 3모델을 같은 세션에서 잰 라운드 포함).
 
@@ -266,6 +267,7 @@ docs/experiments/
 ├─ external_term_1029/     ← 외부 검색어 분야 용어 (기각)
 ├─ corpus_er_1029/         ← 빈 분야 코퍼스 보강 (채택)
 ├─ query_example_1029/     ← 질문 속 예시에 끌린 검색어 (진단만)
+├─ query_glossary_1029/    ← 일상어→분야 용어 사전 (기각)
 └─ yunsur_v4 … v14/   ← 라운드별: README(사전 선언·결과) · 05_conclusion(결과, v11 까지) · 04_eval_*(원본)
 ```
 
