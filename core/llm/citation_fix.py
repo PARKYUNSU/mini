@@ -47,6 +47,16 @@ _BARE = re.compile(r"v\d+$")
 # 필터 후 [1],[3],[7] 처럼 구멍이 생긴다.
 RAG_HIT_SEP = "\n\n---\n\n"
 _DOC_REF = re.compile(r"\[\s*문서\s*(\d{1,2})\s*\]")
+# 여러 번호를 한 괄호에 쓴 꼴(`[문서 1·2]` · `[문서 1, 2]`)과 괄호 뒤 번호(`[문서 1]·2`)를 `[문서 1][문서 2]` 로 먼저
+# 쪼갠다 (docs/experiments/answer_review_1030 §4). 안 쪼개면 앞 꼴은 그대로 남고 뒤 꼴은 `[ID]·2` 가 된다.
+_DOC_LIST = re.compile(r"\[\s*문서\s*(\d{1,2}(?:\s*(?:·|,|및|와|과|/)\s*(?:문서\s*)?\d{1,2})+)\s*\]")
+_DOC_TAIL = re.compile(r"\[\s*문서\s*(\d{1,2})\s*\]((?:\s*·\s*\d{1,2}(?!\d|\.\d))+)")
+
+
+def _split_doc_lists(answer: str) -> str:
+    tags = lambda s: "".join(f"[문서 {n}]" for n in re.findall(r"\d{1,2}", s))
+    answer = _DOC_LIST.sub(lambda m: tags(m.group(1)), answer)
+    return _DOC_TAIL.sub(lambda m: tags(m.group(1) + m.group(2)), answer)
 
 
 def number_context_papers(context: str) -> tuple[str, dict[int, str]]:
@@ -130,7 +140,7 @@ def fix_citations(
                 return f"[{pid}]"
             stats_expanded["bad_refs"].append(k)
             return ""
-        answer = _DOC_REF.sub(_exp, answer)
+        answer = _DOC_REF.sub(_exp, _split_doc_lists(answer))
         if stats_expanded["bad_refs"]:
             answer = re.sub(r"[ \t]{2,}", " ", answer)
             answer = re.sub(r"[ \t]+([.,;:)])", r"\1", answer)

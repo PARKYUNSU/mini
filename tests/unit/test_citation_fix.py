@@ -186,3 +186,15 @@ def test_doc_ref_expansion_is_idempotent() -> None:
     once, _ = fix_citations("근거 [문서 1].", nc, doc_ids=mp)
     twice, st = fix_citations(once, nc, doc_ids=mp)
     assert twice == once and st["expanded"] == 0
+
+
+def test_doc_ref_lists_split() -> None:
+    """`[문서 1·2]` · `[문서 1, 2]` · `[문서 1]·2` 는 둘 다 펼친다 (answer_review_1030 §4)."""
+    nc, mp = number_context_papers(CTX2)
+    both = "[2408.08067v2][2407.21059v1]"
+    for a in ("근거 [문서 1·2].", "근거 [문서 1, 2].", "근거 [문서 1]·2.", "근거 [문서 1 및 문서 2]."):
+        out, st = fix_citations(a, nc, doc_ids=mp)
+        assert out == f"근거 {both}.", (a, out)
+        assert st["expanded"] == 2
+    out, _ = fix_citations("[문서 1], 2023년 결과.", nc, doc_ids=mp)
+    assert out == "[2408.08067v2], 2023년 결과."  # 쉼표 뒤 숫자는 괄호 밖이면 안 건드린다

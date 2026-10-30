@@ -108,13 +108,16 @@ def merge_same_paper_items(answer: str) -> tuple[str, bool]:
 # "[A]과 [A]는" 처럼 같은 인용이 겹치고, 모델이 "(참고: 문서 1·2는 …)" · "문서 1은 …" 으로 내부 번호를 드러냈다.
 _ID_REF = r"\[\d{4}\.\d{4,5}(?:v\d+)?\]"
 _DOC_PAREN = re.compile(r"\s*\((?:참고[:：]?\s*)?[^()\n]*문서\s*\d[^()\n]*\)")
-_DOC_BARE = re.compile(r"(?<![\[\w])문서\s*(\d{1,2})(?!\s*\])")
+_DOC_BARE = re.compile(r"(?<![\[\w])문서\s*(\d{1,2}(?:\s*·\s*\d{1,2}(?!\d|\.\d))*)(?!\s*\])")  # `문서 1·2` 도 (answer_review_1030)
 _DUP_CITE = re.compile(rf"({_ID_REF})(?:\s*(?:과|와|,|및|그리고)?\s*\1)+")
 
 
 def clean_internal_refs(answer: str, doc_ids: dict[int, str]) -> tuple[str, bool]:
     """``(고친 답, 바뀌었나)``. doc_ids 는 ``{문서 번호: 논문 ID}``."""
     out = _DOC_PAREN.sub("", answer)
-    out = _DOC_BARE.sub(lambda m: f"[{doc_ids[int(m.group(1))]}]" if int(m.group(1)) in doc_ids else m.group(0), out)
+    def _bare(m: re.Match[str]) -> str:
+        ns = [int(n) for n in re.findall(r"\d{1,2}", m.group(1))]
+        return "".join(f"[{doc_ids[n]}]" for n in ns) if all(n in doc_ids for n in ns) else m.group(0)
+    out = _DOC_BARE.sub(_bare, out)
     out = _DUP_CITE.sub(r"\1", out)
     return out, out != answer

@@ -101,3 +101,8 @@ def test_clean_internal_refs():
 def test_clean_internal_refs_noop():
     a = "참고 문서에는 없다. 결과[2410.14641v3]. 문서 9는 모른다."
     assert clean_internal_refs(a, IDS) == (a, False)
+
+
+def test_clean_internal_refs_bare_list():
+    out, ch = clean_internal_refs("문서 1·2는 같은 결과다. 문서 3·9는 모른다.", IDS)
+    assert out == "[2503.09579v3][2607.02980v1]는 같은 결과다. 문서 3·9는 모른다."
