@@ -1,0 +1,82 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.00581",
+    "title": "Enoki: Efficient Multi-Level Hallucination Detection",
+    "abstract": "Ensuring factuality remains a critical challenge for deploying LLMs in high-stakes settings. Existing hallucination detectors usually operate at a single level: claim-level methods provide interpretable factual units, while span-level methods localize unsupported text. Bridging these views is costly, as LLM-heavy pipelines require multiple decomposition and verification calls, and modular systems need additional claim-to-span alignment. We propose Enoki, an Open Information Extraction framework for multi-level hallucination detection. Enoki extracts text-anchored relational facts, verifies them against evidence, and projects unsupported facts back to hallucinated spans. This shared representation enables claim-level verification and span-level localization without requiring separate alignment. Enoki supports LLM-based, encoder-based, and rule-based extraction regimes, balancing accuracy and inference cost through a common interface. Experiments show that Enoki remains competitive with strong claim-level systems while using fewer resources and achieves superior performance on fine-grained span- and entity-level localization. We also release EnokiQA, a dual-granularity dataset with aligned claim-level verification and span-level localization annotations.",
+    "publicationDate": "2026-09-01T02:21:28.000Z",
+    "votes": 13
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.08267",
+    "title": "Evidence-Aligned Entity Verification for Hallucination Detection in Retrieval-Augmented Generation",
+    "abstract": "Hallucination detection is crucial for large language models (LLMs), as hallucinated content creates significant barriers in applications requiring factual accuracy. Current detection methods mainly depend on internal signals like uncertainty and self-consistency checks, using the model's pre-trained knowledge to identify unreliable outputs. However, pre-trained knowledge may become outdated and has coverage limitations, especially for specialized or recent information. To address these limitations, retrieval-augmented generation (RAG) has emerged as a promising solution by retrieving relevant evidence at inference time, grounding outputs beyond the model's parametric knowledge. In this paper, we target a critical and practical learning problem RAG-based hallucination detection (RHD), where RAG is employed to enhance hallucination detection by addressing information updating challenges. To address RHD, we propose a novel method Evidence-Aligned Entity Verification (EAEV), which detects entity-level hallucinations by leveraging RAG to align generated entities with retrieved evidence contexts. Specifically, EAEV evaluates entity-evidence alignment through three complementary dimensions and introduces counterfactual stability analysis to ensure robust alignments under evidence perturbations. Experiments across multiple RAG benchmarks demonstrate that EAEV achieves consistent improvements over existing methods with strong generalization capabilities.",
+    "publicationDate": "2026-09-08T05:22:29.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.05823",
+    "title": "Decomposed Entailment for Factuality Checking and Hallucination Detection",
+    "abstract": "The reliability of Large Language Models (LLMs) is often compromised by factual inconsistencies, including hallucinations---cases where generated content is not supported by the underlying source. We present HallDetect, a lightweight, reference-free, and black-box framework for hallucination detection that we evaluate not only on summarization but across a broader range of source-grounded generation settings. HallDetect builds on decomposition-based factuality evaluation: generated content is decomposed into atomic claims, each verified by a compact encoder-based entailment model through a contrastive formulation over a multi-scale library of source chunks, and aggregated with an asymmetric score in which a single confidently contradicted claim flags the response. Under a controlled protocol in which all methods share the same 4-bit quantized backbones and consumer-grade hardware budget, HallDetect outperforms comparably resourced generative and embedding-based baselines on three of four benchmarks while remaining stable across backbone families, and yields a claim-to-span audit trail that localizes each error.",
+    "publicationDate": "2026-08-06T09:52:09.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.22474",
+    "title": "Not All Claims Are Equally Risky: FACTOR for Adaptive Verification in Factual Long-Form Generation",
+    "abstract": "Large Language Models (LLMs) generate fluent long-form text, however, often add unsupported factual claims. Existing verification techniques improve factuality by grounding generation in external evidence. However, the same verification policy usually applies to all claims despite being differences in hallucination risks. We propose \\textit{FACTOR} (\\textit{FACTuality-Oriented Risk-aware Verification}), an inference-time model that adapts verification criteria according to claim-level uncertainty. FACTOR combines uncertainty estimation, adaptive language inference verification, and candidate re-ranking to allocate verification effort where it is most needed. We evaluate \\textit{FACTOR} on FactScore benchmark showing that adaptive verification improves factuality while reducing verification cost simultaneously. We further perform different ablation studies to identify the primary driver of these gains. Our results show the effective and model-agnostic performance of \\textit{FACTOR} for improving factuality in long-form generation.",
+    "publicationDate": "2026-06-21T12:34:03.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.27752",
+    "title": "Retromorphic Testing with Hierarchical Verification for Hallucination Detection in RAG",
+    "abstract": "Large language models can still hallucinate in retrieval-augmented generation (RAG), producing claims that are unsupported by or conflict with the retrieved context. Detecting such errors remains challenging when faithfulness is judged solely against the retrieved context: many existing detectors return holistic answer-level scores, while others target open-domain factuality or fail to provide evidence-grounded diagnostics.\nWe present RT4CHART, a retromorphic testing framework for context-faithfulness assessment. RT4CHART decomposes an answer into independently verifiable claims, performs hierarchical local-to-global verification against the retrieved context, and assigns each claim one of three labels: entailed, contradicted, or baseless. It further maps these claim-level decisions back to specific answer spans and returns explicit context-side evidence, enabling fine-grained auditing rather than opaque scoring.\nWe evaluate RT4CHART on RAGTruth++ (408 samples) and our re-annotated RAGTruth-Enhance (2,675 samples). RT4CHART achieves the best answer-level hallucination-detection F1 score among the evaluated baselines. On RAGTruth++, it attains a precision of 0.845, a recall of 0.718, and an F1 score of 0.776, representing an 83% relative improvement over the strongest baseline. It also achieves a span-level F1 score of 47.5% on RAGTruth-Enhance.\nAblation studies show that claim-based local processing drives most of the observed improvement, while global verification provides selective benefits across datasets. Finally, our re-annotation identifies 1.68X more hallucination cases than the original labels, suggesting that commonly used benchmarks substantially underestimate the prevalence of hallucination.",
+    "publicationDate": "2026-03-29T16:12:18.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.06666",
+    "title": "A Graph-Enhanced Defense Framework for Explainable Fake News Detection with LLM",
+    "abstract": "Explainable fake news detection aims to assess the veracity of news claims while providing human-friendly explanations. Existing methods incorporating investigative journalism are often inefficient and struggle with breaking news. Recent advances in large language models (LLMs) enable leveraging externally retrieved reports as evidence for detection and explanation generation, but unverified reports may introduce inaccuracies. Moreover, effective explainable fake news detection should provide a comprehensible explanation for all aspects of a claim to assist the public in verifying its accuracy. To address these challenges, we propose a graph-enhanced defense framework (G-Defense) that provides fine-grained explanations based solely on unverified reports. Specifically, we construct a claim-centered graph by decomposing the news claim into several sub-claims and modeling their dependency relationships. For each sub-claim, we use the retrieval-augmented generation (RAG) technique to retrieve salient evidence and generate competing explanations. We then introduce a defense-like inference module based on the graph to assess the overall veracity. Finally, we prompt an LLM to generate an intuitive explanation graph. Experimental results demonstrate that G-Defense achieves state-of-the-art performance in both veracity detection and the quality of its explanations.",
+    "publicationDate": "2026-04-08T04:34:19.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.21857",
+    "title": "Distill and Align Decomposition for Enhanced Claim Verification",
+    "abstract": "Complex claim verification requires decomposing sentences into verifiable subclaims, yet existing methods struggle to align decomposition quality with verification performance. We propose a reinforcement learning (RL) approach that jointly optimizes decomposition quality and verifier alignment using Group Relative Policy Optimization (GRPO). Our method integrates: (i) structured sequential reasoning; (ii) supervised finetuning on teacher-distilled exemplars; and (iii) a multi-objective reward balancing format compliance, verifier alignment, and decomposition quality. Across six evaluation settings, our trained 8B decomposer improves downstream verification performance to (71.75%) macro-F1, outperforming prompt-based approaches ((+1.99), (+6.24)) and existing RL methods ((+5.84)). Human evaluation confirms the high quality of the generated subclaims. Our framework enables smaller language models to achieve state-of-the-art claim verification by jointly optimising for verification accuracy and decomposition quality.",
+    "publicationDate": "2026-02-25T12:32:04.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.16555",
+    "title": "Retrieve-Refine-Calibrate: A Framework for Complex Claim Fact-Checking",
+    "abstract": "Fact-checking aims to verify the truthfulness of a claim based on the retrieved evidence. Existing methods typically follow a decomposition paradigm, in which a claim is broken down into sub-claims that are individually verified. However, the decomposition paradigm may introduce noise to the verification process due to irrelevant entities or evidence, ultimately degrading verification accuracy. To address this problem, we propose a Retrieve-Refine-Calibrate (RRC) framework based on large language models (LLMs). Specifically, the framework first identifies the entities mentioned in the claim and retrieves evidence relevant to them. Then, it refines the retrieved evidence based on the claim to reduce irrelevant information. Finally, it calibrates the verification process by re-evaluating low-confidence predictions. Experiments on two popular fact-checking datasets (HOVER and FEVEROUS-S) demonstrate that our framework achieves superior performance compared with competitive baselines.",
+    "publicationDate": "2026-01-23T08:48:52.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.19310",
+    "title": "JointCQ: Improving Factual Hallucination Detection with Joint Claim and Query Generation",
+    "abstract": "Current large language models (LLMs) often suffer from hallucination issues, i,e, generating content that appears factual but is actually unreliable. A typical hallucination detection pipeline involves response decomposition (i.e., claim extraction), query generation, evidence collection (i.e., search or retrieval), and claim verification. However, existing methods exhibit limitations in the first two stages, such as context loss during claim extraction and low specificity in query generation, resulting in degraded performance across the hallucination detection pipeline. In this work, we introduce JointCQ this https URL, a joint claim-and-query generation framework designed to construct an effective and efficient claim-query generator. Our framework leverages elaborately designed evaluation criteria to filter synthesized training data, and finetunes a language model for joint claim extraction and query generation, providing reliable and informative inputs for downstream search and verification. Experimental results demonstrate that our method outperforms previous methods on multiple open-domain QA hallucination detection benchmarks, advancing the goal of more trustworthy and transparent language model systems.",
+    "publicationDate": "2025-10-22T07:15:37.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.05243",
+    "title": "CLATTER: Comprehensive Entailment Reasoning for Hallucination Detection",
+    "abstract": "A common approach to hallucination detection casts it as a natural language\ninference (NLI) task, often using LLMs to classify whether the generated text\nis entailed by corresponding reference texts. Since entailment classification\nis a complex reasoning task, one would expect that LLMs could benefit from\ngenerating an explicit reasoning process, as in CoT reasoning or the explicit\n``thinking'' of recent reasoning models. In this work, we propose that guiding\nsuch models to perform a systematic and comprehensive reasoning process -- one\nthat both decomposes the text into smaller facts and also finds evidence in the\nsource for each fact -- allows models to execute much finer-grained and\naccurate entailment decisions, leading to increased performance. To that end,\nwe define a 3-step reasoning process, consisting of (i) claim decomposition,\n(ii) sub-claim attribution and entailment classification, and (iii) aggregated\nclassification, showing that such guided reasoning indeed yields improved\nhallucination detection. Following this reasoning framework, we introduce an\nanalysis scheme, consisting of several metrics that measure the quality of the\nintermediate reasoning steps, which provided additional empirical evidence for\nthe improved quality of our guided reasoning scheme.",
+    "publicationDate": "2025-06-05T17:02:52.000Z",
+    "votes": 20
+  }
+]

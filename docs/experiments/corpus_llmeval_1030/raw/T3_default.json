@@ -1,0 +1,82 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.20086",
+    "title": "AFCS: Atomic-Fact-Conditioned Synthesis for Factual Knowledge Pretraining",
+    "abstract": "Synthetic data is increasingly used in language-model pretraining. Existing knowledge-corpus synthesis pipelines, including WRAP and Nemotron-CC, usually take a source passage or document segment as input and generate rewritten or QA-style samples from that text. This can improve surface form and prompt diversity, but it does not explicitly require fine-grained source facts -- especially secondary entities, list/table entries, and precise temporal attributes -- to appear in the synthesized corpus. We propose AFCS (Atomic-Fact-Conditioned Synthesis), a pipeline that first extracts source-supported atomic facts and then uses each retained fact to drive generation. AFCS uses structure-aware extraction over the document tree, source-grounded verification, local context expansion, and multi-format generation. In continued-pretraining experiments with OLMo-3-7B and a 32B base on the same FineWiki source corpus, AFCS outperforms WRAP and Nemotron-CC on SimpleQA, SimpleQA Verified, PopQA, and HotpotQA. Granularity ablations show that fact-level synthesis improves over chunk-level, paragraph-level, and entity-level synthesis; and a 100B-token mid-training integration improves factual benchmarks and raises the 12-task general benchmark average by +1.09.",
+    "publicationDate": "2026-10-14T12:24:40.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.05228",
+    "title": "TriQua: Reconciling Granularity and Context in Factuality Evaluation",
+    "abstract": "The \"decompose-then-verify\" paradigm for LLM factuality evaluation faces a fundamental trade-off: atomic facts, i.e., one sentence conveying one unit of information, often omit essential context, while broader statements lack the granularity needed for precise assessment. To address this, we introduce TriQua, a framework that flexibly models facts based on their complexity. Simple claims are extracted as standard triples, while complex claims are represented as hyperrelational facts by attaching auxiliary contextual qualifiers. This adaptive structure preserves the necessary context for accurate retrieval and verification without sacrificing atomicity. Furthermore, TriQua's verification process directly annotates concrete errors within specific triples and qualifiers, providing fine-grained explainability for error detection. Alongside the framework, we propose TriQuaScore to quantify the factuality of these structured fact units. Empirical evaluations show that TriQuaScore strongly aligns with human annotated factuality scores, TriQua achieves robust decomposition quality, and outperforms existing decomposition-based frameworks in evidence-based fact verification.",
+    "publicationDate": "2026-08-05T12:22:28.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.22474",
+    "title": "Not All Claims Are Equally Risky: FACTOR for Adaptive Verification in Factual Long-Form Generation",
+    "abstract": "Large Language Models (LLMs) generate fluent long-form text, however, often add unsupported factual claims. Existing verification techniques improve factuality by grounding generation in external evidence. However, the same verification policy usually applies to all claims despite being differences in hallucination risks. We propose \\textit{FACTOR} (\\textit{FACTuality-Oriented Risk-aware Verification}), an inference-time model that adapts verification criteria according to claim-level uncertainty. FACTOR combines uncertainty estimation, adaptive language inference verification, and candidate re-ranking to allocate verification effort where it is most needed. We evaluate \\textit{FACTOR} on FactScore benchmark showing that adaptive verification improves factuality while reducing verification cost simultaneously. We further perform different ablation studies to identify the primary driver of these gains. Our results show the effective and model-agnostic performance of \\textit{FACTOR} for improving factuality in long-form generation.",
+    "publicationDate": "2026-06-21T12:34:03.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.26118",
+    "title": "ElementCheck: Complexity-Aware Long-Form Text Factuality Evaluation via Sentence Elements",
+    "abstract": "Existing long-form factuality evaluation relies on the decompose-retrieve-verify pipeline. However, the pipeline suffers from noise from claim decomposition and fixed verification granularity, resulting in unreliable results. We propose ElementCheck, a complexity-aware framework that verifies long-form outputs via sentence elements. Instead of uniformly decomposing sentences into atomic sub-claims, ElementCheck extracts entity pairs that are explicitly linked through verifiable connections in the original sentence as elements, and organizes these into an element graph. The graph topology provides a structural signal for estimating sentence complexity, enabling direct verification for simple sentences and targeted element-level refinement and verification for complex ones. To support fine-grained evaluation, we construct a new benchmark \\textbf{FastFact-Sent} by mapping isolated claims from FastFact-Bench back to their source sentences. Experiments on FastFact-Sent and two domain-specific benchmarks show ElementCheck consistently improves factuality verification across five backbone models while maintaining a favorable accuracy-cost trade-off. Further analyses demonstrate that complexity-aware verification reduces unnecessary re-verification and maintains stability across different backbones. The code is available at \\href{this https URL}{Here}.",
+    "publicationDate": "2026-06-17T16:25:19.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.03141",
+    "title": "Beyond Precision: Importance-Aware Recall for Factuality Evaluation in Long-Form LLM Generation",
+    "abstract": "Evaluating the factuality of long-form output generated by large language models (LLMs) remains challenging, particularly when responses are open-ended and contain many fine-grained factual statements. Existing evaluation methods primarily focus on precision: they decompose a response into atomic claims and verify each claim against external knowledge sources such as Wikipedia. However, this overlooks an equally important dimension of factuality: recall, whether the generated response covers the relevant facts that should be included. We propose a comprehensive factuality evaluation framework that jointly measures precision and recall. Our method leverages external knowledge sources to construct reference facts and determine whether they are captured in generated text. We further introduce an importance-aware weighting scheme based on relevance and salience. Our analysis reveals that current LLMs perform substantially better on precision than on recall, suggesting that factual incompleteness remains a major limitation of long-form generation and that models are generally better at covering highly important facts than the full set of relevant facts.",
+    "publicationDate": "2026-04-03T16:03:56.000Z",
+    "votes": 5
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.07967",
+    "title": "AtomEval: Validity-Aware Atomic Evaluation of Adversarial Claim Rewriting in Fact Verification",
+    "abstract": "Large language models (LLMs) can rewrite refuted claims to evade evidence-based fact verifiers, but conventional attack success rate (ASR) can be inflated when rewrites change, weaken, or correct the false proposition they are supposed to preserve. We introduce AtomEval, a validity-aware evaluation protocol for fixed-evidence adversarial claim rewriting. AtomEval represents claims as subject--relation--object--modifier (SROM) atoms, applies a one-way preservation gate to separate valid verifier evasion from proposition-changing rewrites, and reports validity-aware attack success rate (VASR), which counts only verifier-evasive rewrites that preserve the original false proposition. AtomEval further provides fine-grained diagnostics that explain both proposition-level failures and non-minimal valid rewrites. On FEVER refuted-claim rewriting, AtomEval exposes and explains ASR inflation: many apparent attacks fool the verifier by altering, weakening, or correcting the proposition they should preserve. By making attacked-proposition preservation explicit and measurable, AtomEval provides a stable evaluation target for evaluating adversarial rewriters that must balance verifier evasion with proposition preservation.",
+    "publicationDate": "2026-04-09T08:32:35.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.12839",
+    "title": "FaStfact: Faster, Stronger Long-Form Factuality Evaluations in LLMs",
+    "abstract": "Evaluating the factuality of long-form generations from Large Language Models (LLMs) remains challenging due to efficiency bottlenecks and reliability concerns. Prior efforts attempt this by decomposing text into claims, searching for evidence, and verifying claims, but suffer from critical drawbacks: (1) inefficiency due to overcomplicated pipeline components, and (2) ineffectiveness stemming from inaccurate claim sets and insufficient evidence. To address these limitations, we propose \\textbf{FaStfact}, an evaluation framework that achieves the highest alignment with human evaluation and time/token efficiency among existing baselines. FaStfact first employs chunk-level claim extraction integrated with confidence-based pre-verification, significantly reducing the time and token cost while ensuring reliability. For searching and verification, it collects document-level evidence from crawled web-pages and selectively retrieves it during verification. Extensive experiments based on an annotated benchmark \\textbf{FaStfact-Bench} demonstrate the reliability of FaStfact in both efficiently and effectively evaluating long-form factuality. Code, benchmark data, and annotation interface tool are available at this https URL.",
+    "publicationDate": "2025-10-13T19:00:15.000Z",
+    "votes": 13
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.24779",
+    "title": "MarS-FM: Generative Modeling of Molecular Dynamics via Markov State Models",
+    "abstract": "Molecular Dynamics (MD) is a powerful computational microscope for probing protein functions. However, the need for fine-grained integration and the long timescales of biomolecular events make MD computationally expensive. To address this, several generative models have been proposed to generate surrogate trajectories at lower cost. Yet, these models typically learn a fixed-lag transition density, causing the training signal to be dominated by frequent but uninformative transitions. We introduce a new class of generative models, MSM Emulators, which instead learn to sample transitions across discrete states defined by an underlying Markov State Model (MSM). We instantiate this class with Markov Space Flow Matching (MarS-FM), whose sampling offers more than two orders of magnitude speedup compared to implicit- or explicit-solvent MD simulations. We benchmark Mars-FM ability to reproduce MD statistics through structural observables such as RMSD, radius of gyration, and secondary structure content. Our evaluation spans protein domains (up to 500 residues) with significant chemical and structural diversity, including unfolding events, and enforces strict sequence dissimilarity between training and test sets to assess generalization. Across all metrics, MarS-FM outperforms existing methods, often by a substantial margin.",
+    "publicationDate": "2025-09-29T13:42:25.000Z",
+    "votes": 15
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2512.03634",
+    "title": "AlignCheck: a Semantic Open-Domain Metric for Factual Consistency Assessment",
+    "abstract": "Large Language Models have significantly advanced natural language processing tasks, but remain prone to generating incorrect or misleading but plausible arguments. This issue, known as hallucination, is particularly concerning in high-stakes domains like clinical applications, where factual inaccuracies can have severe consequences. Existing evaluation metrics fail to adequately assess factual consistency and lack interpretability, making diagnosing and mitigating errors difficult. We propose an interpretable framework for factual consistency assessment for in-domain and open-domain texts to address these limitations. Our approach decomposes text into atomic facts and introduces a flexible, schema-free methodology. Unlike previous methods with an absolute metric, we incorporate a weighted metric to enhance factual evaluation. Additionally, we propose a mechanism to control assessment complexity in intricate domains. We benchmark our approach on popular general and clinical datasets and release our code to support fact-aware model training in future research.",
+    "publicationDate": "2025-12-03T10:14:31.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2503.17229",
+    "title": "FactSelfCheck: Fact-Level Black-Box Hallucination Detection for LLMs",
+    "abstract": "Large Language Models (LLMs) frequently generate hallucinated content, posing significant challenges for applications where factuality is crucial. While existing hallucination detection methods typically operate at the sentence level or passage level, we propose FactSelfCheck, a novel zero-resource black-box sampling-based method that enables fine-grained fact-level detection. Our approach represents text as interpretable knowledge graphs consisting of facts in the form of triples, providing clearer insights into content factuality than traditional approaches. Through analyzing factual consistency across multiple LLM responses, we compute fine-grained hallucination scores without requiring external resources or training data. Our evaluation demonstrates that FactSelfCheck performs competitively with leading sentence-level sampling-based methods while providing more detailed and interpretable insights. Most notably, our fact-level approach significantly improves hallucination correction, achieving a 35.5% increase in factual content compared to the baseline, while sentence-level SelfCheckGPT yields only a 10.6% improvement. The granular nature of our detection enables more precise identification and correction of hallucinated content. Additionally, we contribute FavaMultiSamples, a novel dataset that addresses a gap in the field by providing the research community with a second dataset for evaluating sampling-based methods.",
+    "publicationDate": "2025-03-21T15:32:24.000Z",
+    "votes": 66
+  }
+]
