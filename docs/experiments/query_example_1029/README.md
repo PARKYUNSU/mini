@@ -46,3 +46,21 @@
 
 - 쉼표 · 순서는 효과 0. **단어가 결정한다**: `rag search` 두 단어가 강하게 끌고, 그걸 빼도 `duplicate content detection` 은 3. 분야 용어 `near-duplicate detection` · `deduplication` · `duplicate document detection` 이 들어가야 4~5.
 - 그래서 '쉼표 구로 나누기' 안은 사전 등록하지 않는다. 남은 지렛대는 **검색어 단어 선택(일상어 → 분야 용어)** — external_term_1029(9B 는 직역)과 같은 벽.
+
+## 6. 진단 3 — 10-30 08:32 실사용 실패 재현 (`diag3.py`, 2026-10-30)
+
+같은 질문(예시 "예를들어" 뺀 꼴)을 사용자가 08시대에 3번 보냈고 3번 다 "찾을 수 없음". 운영 로그 검색어는 `cross-database retrieval similarity duplicate document detection large-scale database comparison research rag search` — 이번엔 분야 용어 `duplicate document detection` 이 **들어 있었다**. 그 검색어 그대로 재현:
+
+| 단계 | 결과 |
+|---|---|
+| 청크 300 원순위 | 중복 탐지 논문 6 · 10 · 23 · 35 · 48위 (Deduplicating Training Data · H3D · FOLD · Levenshtein 유사도 · ER 서베이) |
+| 논문 단위 + light rerank 15편 (운영) | 수집 논문 1/15 — H3D 5위뿐. 나머지 일반 RAG 논문 (Multi-Meta-RAG 1위 · Progressive Searching 2위) |
+| (참고) light rerank 끔 15편 | 수집 논문 2/15 — Billion-scale similarity search 1위 · 중복 이상사례 탐지 2위 · H3D 4위 |
+| 관련 문서 거르기 (15편, 2번) | 둘 다 `없음` → 아무것도 안 빼고 상위 5 (H3D 5위 포함) |
+| 정답 유무 판정 | 없음 → 답은 "찾을 수 없음" + Multi-Meta-RAG · Progressive Searching |
+
+**읽은 것 — 실패 지점 둘**
+1. **논문 단위 재순위(light rerank, 제목 + 초록 + 청크 임베딩 코사인)** 가 `rag search` 쪽으로 끌어 중복 탐지 논문을 15편 밖으로 민다. 청크 원순위에선 6 · 10 · 23위였다. 끄면 관련 논문이 1 · 2 · 4위.
+2. **거르기 · 판정 LLM 이 H3D(문서 중복 제거)를 관련으로 안 본다.** 상위 5 안에 있었는데도 거르기 `없음`, 판정 `없음`. 질문 앞 "RAG검색을 했을시에" 때문에 'RAG 논문이어야 한다'로 읽는 것으로 보인다(추정, 확인 안 함).
+- §5 의 "분야 용어가 들어가면 4~5" 는 이번엔 맞지 않았다 — 검색어에 `duplicate document detection` 이 있어도 뒤 단계 둘에서 졌다. 검색어만의 문제가 아니다.
+- 빈도: 실사용 고유 질문은 여전히 이 하나(134 · 135 · 10-30 3회 = 같은 사용자 같은 질문). light rerank 는 운영 전체에 걸린 단계라 이 한 질문으로 바꾸면 안 된다.
