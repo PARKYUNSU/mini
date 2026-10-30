@@ -57,12 +57,18 @@ def active_prompt() -> str:
 _GATE_NUM = re.compile(r"몇\s*(%|퍼센트|배|개|점|명|위)|몇\s*%|얼마나|정확도가|성공률|수치|\d+\s*%")
 _GATE_CMP = re.compile(r"차이|비교|어떻게 달라|뭐가 달라|다른 거야|vs\.?|\S+(랑|이랑|와|과)\s+\S+.*(차이|비교|달라|다른)")
 _GATE_LIST = re.compile(r"논문들|연구들|동향|정리해|트렌드|\d+\s*개\s*(찾|알려)|목록|방향으로 가")
+# 조사형("…연구 찾아줘 · 조사해줘")도 목록으로 (RAG_SURVEY_GATE, docs/experiments/survey_gate_1030).
+# "서베이"는 넣지 않는다 — 162 C1 은 서베이 논문 한 편을 찾는 질문이다.
+_GATE_SURVEY = re.compile(r"조사\s*해|연구\S*\s*(좀\s*)?(찾아|알아봐)")
 
 
 def gate_types(question: str) -> list[str]:
     """질문이 걸리는 유형 이름들(num·cmp·list). 비어 있으면 판정 대상."""
     q = question or ""
-    return [n for n, r in (("num", _GATE_NUM), ("cmp", _GATE_CMP), ("list", _GATE_LIST)) if r.search(q)]
+    out = [n for n, r in (("num", _GATE_NUM), ("cmp", _GATE_CMP), ("list", _GATE_LIST)) if r.search(q)]
+    if "list" not in out and os.getenv("RAG_SURVEY_GATE", "0").strip() == "1" and _GATE_SURVEY.search(q):
+        out.append("list")
+    return out
 
 
 def should_judge(question: str) -> bool:
