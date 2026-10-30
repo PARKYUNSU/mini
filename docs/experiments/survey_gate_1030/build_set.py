@@ -31,7 +31,7 @@ for tag, qf, gf in SETS:
         gold.append({"id": f"{tag}_{r[0]}", "stratum": tag, "relevant_papers": g.get(r[0], {}).get("relevant_papers", [])})
 d = E + "survey_gate_1030/"
 with open(d + "old_questions.tsv", "w") as f:
-    f.write("id\tquestion\n" + "".join(f"{i}\t{q}\n" for i, q in qs))
+    f.write("".join(f"{i}\t{q}\n" for i, q in qs))
 with open(d + "old_gold.jsonl", "w") as f:
     f.write("".join(json.dumps(x, ensure_ascii=False) + "\n" for x in gold))
 print(len(qs), "문항 ·", sum(bool(x["relevant_papers"]) for x in gold), "정답 있음")
