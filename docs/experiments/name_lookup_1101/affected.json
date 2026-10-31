@@ -1,0 +1,406 @@
+[
+ {
+  "set": "162",
+  "id": "A035",
+  "names": {
+   "NeurIPS": "2602.20735"
+  },
+  "gold": [
+   "2512.22442"
+  ],
+  "dup": false,
+  "q": "NeurIPS RAG 대회에서 우승한 계층적 필터링 + 두 번 생성하는 방식 알려줘"
+ },
+ {
+  "set": "162",
+  "id": "A089",
+  "names": {
+   "QLoRA": "2305.14314"
+  },
+  "gold": [
+   "2412.17548"
+  ],
+  "dup": false,
+  "q": "4GB GPU에서 QLoRA로 1.5B 모델을 아랍어용으로 파인튜닝한 연구 설명해줘"
+ },
+ {
+  "set": "162",
+  "id": "C1_14",
+  "names": {
+   "LoRA": "2106.09685"
+  },
+  "gold": [
+   "2501.00365"
+  ],
+  "dup": false,
+  "q": "파운데이션 모델용 LoRA 기법들을 정리한 리뷰 알려줘"
+ },
+ {
+  "set": "real40",
+  "id": "N05",
+  "names": {
+   "MXNorm": "2603.13180"
+  },
+  "gold": [
+   "2603.13180"
+  ],
+  "dup": false,
+  "q": "MXNorm이 RMSNorm보다 커널 속도가 최대 몇 배 빨라?"
+ },
+ {
+  "set": "real40",
+  "id": "N07",
+  "names": {
+   "PBI-Attack": "2412.05892"
+  },
+  "gold": [
+   "2412.05892"
+  ],
+  "dup": false,
+  "q": "PBI-Attack 탈옥 공격이 오픈소스 LVLM에서 평균 공격 성공률 몇 %였어?"
+ },
+ {
+  "set": "real40",
+  "id": "N15",
+  "names": {
+   "HippoCamp": "2604.01221"
+  },
+  "gold": [
+   "2604.01221"
+  ],
+  "dup": false,
+  "q": "개인 PC 파일 관리 에이전트 벤치마크 HippoCamp에서 최고 상용 모델의 사용자 프로파일링 정확도가 몇 %야?"
+ },
+ {
+  "set": "real40",
+  "id": "C01",
+  "names": {
+   "JetSpec": "2606.18394",
+   "DSpark": "2607.05147"
+  },
+  "gold": [
+   "2606.18394",
+   "2607.05147"
+  ],
+  "dup": false,
+  "q": "speculative decoding에서 JetSpec이랑 DSpark는 드래프트 만드는 방식이 어떻게 달라?"
+ },
+ {
+  "set": "real40",
+  "id": "C02",
+  "names": {
+   "CommVQ": "2506.18879"
+  },
+  "gold": [
+   "2605.00789",
+   "2506.18879"
+  ],
+  "dup": false,
+  "q": "KV 캐시 줄이는 방법 중에 LightKV랑 CommVQ 차이가 뭐야?"
+ },
+ {
+  "set": "real40",
+  "id": "C04",
+  "names": {
+   "HyperGraphRAG": "2503.21322"
+  },
+  "gold": [
+   "2503.21322",
+   "2604.06279"
+  ],
+  "dup": false,
+  "q": "HyperGraphRAG랑 Plasma GraphRAG는 그래프 RAG를 각각 어떻게 쓰는 거야? 비교해줘"
+ },
+ {
+  "set": "real40",
+  "id": "C07",
+  "names": {
+   "Reasoning-SQL": "2503.23157",
+   "Solid-SQL": "2412.12522"
+  },
+  "gold": [
+   "2503.23157",
+   "2412.12522"
+  ],
+  "dup": false,
+  "q": "Text-to-SQL에서 Reasoning-SQL이랑 Solid-SQL 접근 방식 차이 알려줘"
+ },
+ {
+  "set": "real40",
+  "id": "C08",
+  "names": {
+   "DeRAG": "2507.15042"
+  },
+  "gold": [
+   "2507.15042",
+   "2603.23791"
+  ],
+  "dup": false,
+  "q": "RAG에 프롬프트 인젝션 공격하는 DeRAG랑, 브라우저 에이전트를 인젝션에서 막는 Cognitive Firewall 비교해줘"
+ },
+ {
+  "set": "real40",
+  "id": "C09",
+  "names": {
+   "MoE-Mamba": "2401.04081",
+   "BlackMamba": "2402.01771"
+  },
+  "gold": [
+   "2401.04081",
+   "2402.01771"
+  ],
+  "dup": false,
+  "q": "MoE-Mamba랑 BlackMamba는 둘 다 Mamba에 MoE 붙인 건데 뭐가 달라?"
+ },
+ {
+  "set": "real40",
+  "id": "C10",
+  "names": {
+   "DynamicRAG": "2505.07233",
+   "DeepEra": "2601.16478"
+  },
+  "gold": [
+   "2505.07233",
+   "2601.16478"
+  ],
+  "dup": false,
+  "q": "RAG 리랭킹에서 DynamicRAG랑 DeepEra는 어떻게 달라?"
+ },
+ {
+  "set": "real2",
+  "id": "N01",
+  "names": {
+   "RepAct": "2407.00131"
+  },
+  "gold": [
+   "2407.00131"
+  ],
+  "dup": false,
+  "q": "엣지 기기용 재매개변수화 활성화 함수 RepAct가 MobileNetV3-Small ImageNet100에서 정확도를 최대 몇 % 올렸어?"
+ },
+ {
+  "set": "real2",
+  "id": "N02",
+  "names": {
+   "NeuroQA": "2605.20525"
+  },
+  "gold": [
+   "2605.20525"
+  ],
+  "dup": false,
+  "q": "3D 뇌 MRI 질의응답 벤치마크 NeuroQA는 QA 쌍이 몇 개야?"
+ },
+ {
+  "set": "real2",
+  "id": "N07",
+  "names": {
+   "Long-WAM": "2610.10528"
+  },
+  "gold": [
+   "2610.10528"
+  ],
+  "dup": false,
+  "q": "Long-WAM에서 컨텍스트를 19.2초로 늘리면 RoboCasa GR-1 성공률이 몇에서 몇으로 올랐어?"
+ },
+ {
+  "set": "real2",
+  "id": "C01",
+  "names": {
+   "SLMQuant": "2511.13023",
+   "Block-Sphere": "2605.19972"
+  },
+  "gold": [
+   "2511.13023",
+   "2605.19972"
+  ],
+  "dup": false,
+  "q": "SLMQuant랑 Block-Sphere Vector Quantization은 양자화를 각각 어떤 목적으로 다뤄? 차이 알려줘"
+ },
+ {
+  "set": "real2",
+  "id": "C03",
+  "names": {
+   "DeepFusion": "2602.14301"
+  },
+  "gold": [
+   "2607.00275",
+   "2602.14301"
+  ],
+  "dup": false,
+  "q": "연합학습에서 희소 모델 찾는 엔트로피 정규화 확률 게이트 방법이랑 DeepFusion 차이가 뭐야?"
+ },
+ {
+  "set": "real2",
+  "id": "C04",
+  "names": {
+   "LeForecast": "2503.22747"
+  },
+  "gold": [
+   "2412.12219",
+   "2503.22747"
+  ],
+  "dup": false,
+  "q": "LLM이 시계열 분석에 쓸모 있는지 본 연구랑 LeForecast 비교해줘"
+ },
+ {
+  "set": "real2",
+  "id": "C07",
+  "names": {
+   "MKEvolve": "2607.20501"
+  },
+  "gold": [
+   "2607.20501",
+   "2412.14841"
+  ],
+  "dup": false,
+  "q": "MKEvolve랑 테스트·정적분석 피드백으로 LLM 코드 생성 개선하는 연구 비교해줘"
+ },
+ {
+  "set": "real2",
+  "id": "C09",
+  "names": {
+   "World4RL": "2509.19080"
+  },
+  "gold": [
+   "2509.19080",
+   "2606.21775"
+  ],
+  "dup": false,
+  "q": "World4RL이랑 가변 길이 잠재 월드모델 연구는 어떻게 달라?"
+ },
+ {
+  "set": "real2",
+  "id": "C10",
+  "names": {
+   "LazyDiT": "2412.12444"
+  },
+  "gold": [
+   "2605.16147",
+   "2412.12444"
+  ],
+  "dup": false,
+  "q": "Diffusion Transformer에서 레지스터 토큰 연구랑 LazyDiT 차이가 뭐야?"
+ },
+ {
+  "set": "real2",
+  "id": "C13",
+  "names": {
+   "OmniJARVIS": "2407.00114",
+   "Xiaomi-Robotics-1": "2607.15330"
+  },
+  "gold": [
+   "2407.00114",
+   "2607.15330"
+  ],
+  "dup": false,
+  "q": "OmniJARVIS랑 Xiaomi-Robotics-1 VLA 모델 비교해줘"
+ },
+ {
+  "set": "llm",
+  "id": "R_138",
+  "names": {
+   "FActScore": "2305.14251"
+  },
+  "gold": [],
+  "dup": false,
+  "q": "생성 뒤에 같은 모델이 unsupported sentence를 지우는 faithfulness filter가 있고, 남은 초안을 그 계열 모델이 atomic claim 단위로 S/U 판정한다. FActScore 계열이다. 이 프로토콜에서 hallucination 0%는 무엇을 의미하는가. filter와 judge를 분리하라는 논문의 절차는 무엇인가."
+ },
+ {
+  "set": "llm",
+  "id": "R_139",
+  "names": {
+   "G-Eval": "2303.16634"
+  },
+  "gold": [],
+  "dup": false,
+  "q": "G-Eval처럼 생성 모델과 판정 모델이 같을 때 자기편향을 어떻게 측정하고, 인간 소표본은 몇 건이면 자동 판정을 보정할 수 있는가. 한국어 장문이면 그 수가 달라지는 논문이 있는가."
+ },
+ {
+  "set": "sv_old",
+  "id": "us_U6-2",
+  "names": {
+   "LLM-as-a-judge": "2610.18108"
+  },
+  "gold": [],
+  "dup": false,
+  "q": "LLM-as-a-judge의 편향(위치 편향, 길이 편향)을 분석한 연구 찾아줘"
+ },
+ {
+  "set": "heldout",
+  "id": "H_B01",
+  "names": {
+   "Self-RAG": "2310.11511"
+  },
+  "gold": [
+   "2310.11511"
+  ],
+  "dup": false,
+  "q": "Self-RAG 논문 요약해줘"
+ },
+ {
+  "set": "heldout",
+  "id": "H_B02",
+  "names": {
+   "ColBERT": "2004.12832"
+  },
+  "gold": [
+   "2004.12832"
+  ],
+  "dup": false,
+  "q": "ColBERT 논문 자세히 설명해줘"
+ },
+ {
+  "set": "heldout",
+  "id": "H_B05",
+  "names": {
+   "ReAct": "2210.03629"
+  },
+  "gold": [
+   "2210.03629"
+  ],
+  "dup": false,
+  "q": "ReAct 논문 자세히 설명해줘"
+ },
+ {
+  "set": "heldout",
+  "id": "H_B10",
+  "names": {
+   "LLMLingua-2": "2403.12968"
+  },
+  "gold": [
+   "2403.12968"
+  ],
+  "dup": false,
+  "q": "LLMLingua-2 논문 요약해줘"
+ },
+ {
+  "set": "heldout",
+  "id": "H_D02",
+  "names": {
+   "LoRA": "2106.09685"
+  },
+  "gold": [],
+  "dup": false,
+  "q": "LoRA랑 전체 파인튜닝은 성능이랑 비용이 어떻게 달라?"
+ },
+ {
+  "set": "heldout",
+  "id": "H_D06",
+  "names": {
+   "Self-RAG": "2310.11511"
+  },
+  "gold": [],
+  "dup": false,
+  "q": "Self-RAG랑 CRAG는 검색 결과를 다루는 방식이 뭐가 달라?"
+ },
+ {
+  "set": "heldout",
+  "id": "H_F08",
+  "names": {
+   "LLM-as-a-judge": "2610.18108"
+  },
+  "gold": [],
+  "dup": false,
+  "q": "LLM-as-a-judge로 0~5점 채점할 때 같은 답을 여러 번 채점하면 점수 분산이 얼마나 되고, 몇 번 평균내야 안정되는지 다룬 논문이 있는가."
+ }
+]

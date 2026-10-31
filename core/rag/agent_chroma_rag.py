@@ -67,6 +67,7 @@ from core.config.agent_config import (
 )
 from core.config.chroma_lock import is_chroma_write_locked
 from core.llm.agent_llm import get_rag_query_rewrite_llm
+from core.llm.relevance_filter import names as _question_names
 from core.rag.bm25_index import HYBRID_BM25_WEIGHT, HYBRID_VECTOR_WEIGHT, _normalize_pid, get_bm25_searcher
 from core.rag.query_expansion import build_multi_query_retrieval_queries, expand_query_for_bm25
 
@@ -2246,6 +2247,17 @@ def _with_abstract(body: str, abstract: str) -> str:
     return f"[초록] {abstract[:n]}\n\n{body}" if body else f"[초록] {abstract[:n]}"
 
 
+def _front_named(
+    docs: list[str], metas: list[dict[str, str]], dists: list[float | None] | None, named: list[str],
+) -> tuple[list[str], list[dict[str, str]], list[float | None] | None]:
+    """``named``(정규화 ID) 논문의 청크를 그 순서대로 맨 앞에 — 나머지 순서는 그대로 (name_lookup_1101)."""
+    rank = {p: i for i, p in enumerate(named)}
+    order = sorted(range(len(docs)), key=lambda i: rank.get(_normalize_pid(metas[i].get("paper_id") or ""), len(named)))
+    if dists is not None and len(dists) != len(docs):
+        dists = None
+    return [docs[i] for i in order], [metas[i] for i in order], None if dists is None else [dists[i] for i in order]
+
+
 def _format_chroma_hits(
     docs: list[str],
     metas: list[dict[str, str]],
@@ -2298,14 +2310,15 @@ class ChromaRAGPublic:
 
     def search(
         self, query: str, top_k: int = RAG_TOP_K, session_context: str = "", wants_depth: bool = False,
-        light_rerank: bool = True,
+        light_rerank: bool = True, name_query: str = "",
     ) -> str:
         if _vector_search_effective_disabled():
             print("[ChromaRAG TRACE] vector search skipped (disabled), jsonl only", flush=True)
             fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
             return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
         return _get_chroma_singleton().search(
-            query, top_k=top_k, session_context=session_context, wants_depth=wants_depth, light_rerank=light_rerank
+            query, top_k=top_k, session_context=session_context, wants_depth=wants_depth, light_rerank=light_rerank,
+            name_query=name_query,
         )
 
     def list_papers(self) -> str:
@@ -2460,8 +2473,9 @@ class ChromaRAGTool:
 
     def search(
         self, query: str, top_k: int = RAG_TOP_K, session_context: str = "", wants_depth: bool = False,
-        light_rerank: bool = True,
+        light_rerank: bool = True, name_query: str = "",
     ) -> str:
+        """``name_query``: 사용자 질문 원문 — 이름 붙은 논문 찾기용(RAG_NAME_LOOKUP), 검색어로는 안 쓴다."""
         if _vector_search_effective_disabled():
             fb = _fallback_rag_from_jsonl_tail(query=query, max_papers=max(1, top_k))
             return fb if fb.strip() else "관련 문서 없음 (JSONL 큐 비어 있음)"
@@ -2628,6 +2642,19 @@ class ChromaRAGTool:
                     if dists_clean is not None:
                         dists_clean.append(None)
 
+            # 질문 원문에 이름이 나온 논문(FActScore 등)은 후보에 넣고 맨 앞에 둔다 — 9B 검색어는 이름을 소문자로
+            # 바꿔(factscore) 하이브리드 순위에서 밀린다 (RAG_NAME_LOOKUP, docs/experiments/name_lookup_1101)
+            _named: list[str] = []
+            if name_query and os.getenv("RAG_NAME_LOOKUP", "0").strip() == "1":
+                _bm = get_bm25_searcher()
+                _named = [p for p in dict.fromkeys(_bm.named_paper(n) for n in _question_names(name_query)) if p][:3]
+                if _named:
+                    docs_clean, metas_clean, dists_clean, _n_named = _merge_bm25_union_chunks(
+                        self._collection, [{"paper_id": p} for p in _named], docs_clean, metas_clean, dists_clean,
+                        top_m=len(_named), chunks_per_paper=BM25_UNION_CHUNKS_PER_PAPER, query_text=search_query,
+                    )
+                    print(f"[ChromaRAG TRACE] name lookup: {_named} (새로 넣음 {_n_named})", flush=True)
+
             if not CHROMA_CROSS_ENCODER_RERANK and docs_clean:
                 _tbq = (original_query.strip() or search_query.strip())
                 if pre_cs is not None and len(docs_clean) == _retrieval_pool_len:
@@ -2652,6 +2679,11 @@ class ChromaRAGTool:
                         bm25_pid_scores,
                         title_boost_query=_tbq,
                     )
+                _protect = _fusion_protect_pids(
+                    metas_clean, dists_clean, bm25_pid_scores, int(os.getenv("RAG_FUSION_PROTECT_K", "3"))
+                ) if os.getenv("RAG_FUSION_PROTECT", "0").strip() == "1" else set()
+                _protect |= {(m.get("paper_id") or "").strip() for m in metas_clean
+                             if _normalize_pid(m.get("paper_id") or "") in _named}
                 docs_clean, metas_clean, dists_clean = _paper_max_one_chunk_per_paper(
                     docs_clean,
                     metas_clean,
@@ -2661,10 +2693,10 @@ class ChromaRAGTool:
                     title_query=_tbq,
                     chunks_per_paper_out=HYBRID_CHUNKS_PER_PAPER,
                     light_rerank_query=_tbq if light_rerank else "",  # light_rerank_gated_1015
-                    protect_pids=_fusion_protect_pids(
-                        metas_clean, dists_clean, bm25_pid_scores, int(os.getenv("RAG_FUSION_PROTECT_K", "3"))
-                    ) if os.getenv("RAG_FUSION_PROTECT", "0").strip() == "1" else None,
+                    protect_pids=_protect or None,
                 )
+            if _named:
+                docs_clean, metas_clean, dists_clean = _front_named(docs_clean, metas_clean, dists_clean, _named)
 
             hits = _format_chroma_hits(
                 docs_clean, metas_clean, dists_clean,

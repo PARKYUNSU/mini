@@ -32,9 +32,14 @@ _ABS = 600
 _NAME = re.compile(r"(?<![A-Za-z0-9])[A-Za-z][A-Za-z0-9\-]*(?![A-Za-z0-9])")  # "World4RL이랑" — 한글 조사가 붙어도
 
 
+def names(question: str) -> list[str]:
+    """질문 속 고유 이름 — 원래 대소문자 · 나온 순서 그대로 (검색의 이름 찾기 RAG_NAME_LOOKUP 도 쓴다)."""
+    return list(dict.fromkeys(t for t in _NAME.findall(question)
+                              if len(t) >= 4 and re.search(r"[a-z]", t) and re.search(r"[A-Z0-9]", t[1:])))
+
+
 def _names(question: str) -> set[str]:
-    return {t.lower() for t in _NAME.findall(question)
-            if len(t) >= 4 and re.search(r"[a-z]", t) and re.search(r"[A-Z0-9]", t[1:])}
+    return {t.lower() for t in names(question)}
 
 
 def _title(block: str) -> str:

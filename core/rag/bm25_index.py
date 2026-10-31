@@ -231,6 +231,18 @@ class BM25Searcher:
                 out[npid] = max(0.0, float(scores[idx]))
         return out
 
+    def named_paper(self, name: str) -> str | None:
+        """제목에 고유 이름(대소문자 그대로)이 든 논문 하나 — ``이름:`` 으로 시작하는 제목이 하나뿐이면 그것,
+        아니면 이름이 든 제목이 하나뿐일 때만 (docs/experiments/name_lookup_1101)."""
+        with self._lock:
+            if not self._loaded:
+                self._load()
+        rx = re.compile(r"(?<![A-Za-z0-9])" + re.escape(name) + r"(?![A-Za-z0-9])")
+        hits = [p for p in self._papers if rx.search(p["title"])]
+        lead = [p for p in hits if p["title"].startswith(name + ":")]
+        one = lead if len(lead) == 1 else hits if len(hits) == 1 else []
+        return one[0]["paper_id"] if one else None
+
     @property
     def paper_count(self) -> int:
         with self._lock:

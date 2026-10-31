@@ -1102,6 +1102,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     # 목록 질문: 라우터 컨텍스트(3편)를 쓰지 않고 10편 다시 검색 (docs/experiments/list_mode_1016)
                     rag_context = rag.search(
                         rag_query, top_k=LIST_MODE_TOP_K, session_context=_recent_ctx, wants_depth=False,
+                        name_query=user_request,
                     )
                     _src = "list"
                     _da_trace("list mode search", f"len={len(rag_context)}")
@@ -1116,7 +1117,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     session_ctx = _recent_ctx
                     _da_trace("before rag.search()", f"top_k={top_k} wants_depth={wants_depth} (sync collection.query)")
                     rag_context = rag.search(
-                        rag_query, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth
+                        rag_query, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth,
+                        name_query=user_request,
                     )
                     _da_trace("after rag.search()", f"len={len(rag_context)}")
                 # 비교 질문: 두 대상을 각각 검색해 앞에 합친다 — 라우터가 넘긴 컨텍스트에도 적용
@@ -1126,7 +1128,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     _da_trace("compare split targets", repr(_targets))
                     if _targets:
                         def _search_target(t: str) -> str:
-                            return rag.search(t, top_k=top_k, session_context="", wants_depth=False, light_rerank=False)
+                            return rag.search(t, top_k=top_k, session_context="", wants_depth=False, light_rerank=False,
+                                              name_query=t)
 
                         _extras = [_search_target(t) for t in _targets]
                         rag_context = _merge_rag_blocks(rag_context, _extras)
