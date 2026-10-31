@@ -14,6 +14,7 @@ LLM 에 건네진 컨텍스트 안에 있었는지만 본다.
 from __future__ import annotations
 
 import argparse
+import atexit
 import hashlib
 import json
 import os
@@ -97,6 +98,7 @@ def main() -> int:
     print(f"측정 {len(items)}문항")
 
     import core.graph.agent_nodes as N
+    from core.graph import rag_trace
     from core.session.agent_session import clear_session, set_paper_mode
 
     real_extract = N._extract_english_rag_query
@@ -108,6 +110,21 @@ def main() -> int:
 
     out_path = EXP / "results" / f"{args.label}.jsonl"
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    # 같은 label 두 개가 한 파일에 같이 쓰면 결과가 깨진다 (survey_gate_1030 첫 측정, protocol.md §2.5)
+    lock = out_path.with_suffix(".lock")
+    try:
+        pid = int(lock.read_text())
+        os.kill(pid, 0)
+        alive = True
+    except PermissionError:
+        alive = True
+    except (OSError, ValueError):
+        alive = False
+    if alive:
+        print(f"[중단] {args.label} 측정이 이미 돌고 있다 (pid {pid})", file=sys.stderr)
+        return 2
+    lock.write_text(str(os.getpid()))
+    atexit.register(lock.unlink, missing_ok=True)
     with out_path.open("w", encoding="utf-8") as w:
         for k, it in enumerate(items, 1):
             chat_id = f"e2e_eval_{args.label}_seq" if args.keep_session else f"e2e_eval_{args.label}_{it['id']}"
@@ -150,6 +167,7 @@ def main() -> int:
             cfg = {"configurable": {"chat_id": chat_id, "thread_id": chat_id, "bot": None}}
             state = {"user_request": it["question"], "route_type": "", "rag_context": ""}
             t0 = time.time()
+            rag_trace.start(chat_id)
             err = ""
             answer = ""
             try:
@@ -170,6 +188,7 @@ def main() -> int:
                 N._invoke_llm_with_fallback = real_invoke
                 N.number_context_papers = real_number
                 N.fix_citations = real_fix
+                _tr = rag_trace.finish(chat_id, write=False)  # 단계별 초 (foundation_1031 §1)
                 if not args.keep_session:
                     clear_session(chat_id)
             if args.keep_session:
@@ -211,11 +230,12 @@ def main() -> int:
                 **({"answer_ok": any(m in gold for m in ANSWER_ID_RE.findall(answer)),
                     "answer_first_ok": bool(ANSWER_ID_RE.findall(answer)) and ANSWER_ID_RE.findall(answer)[0] in gold,
                     "answer_papers": sorted(set(ANSWER_ID_RE.findall(answer))),
-                    "answer_len": len(answer), "answer": answer[:2000]} if args.answer else {}),
+                    "answer_len": len(answer), "answer": answer[:4000]} if args.answer else {}),
                 **({"numbered_context": numbered[0] if numbered else "",
                     "doc_ids": [re.sub(r"v\d+$", "", (p or "").strip()) for p in doc_ids]} if args.save_context else {}),
                 **({"citation_fix": cit[-1]} if cit else {}),
                 "elapsed": round(elapsed, 1),
+                "stages": [[x["stage"], x["s"]] for x in _tr.get("stages", [])],
                 "error": err,
             }
             w.write(json.dumps(row, ensure_ascii=False) + "\n")

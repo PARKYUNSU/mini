@@ -52,7 +52,8 @@ from core.llm.relevance_filter import filter_relevant
 from core.llm.question_conditions import count_notice, filter_by_year
 from core.llm.body_numbers import check_body_numbers
 from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
-from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates, term_query
+from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
+from core.graph import rag_trace
 from core.llm.presence_judge import (
     NO_DOC_HINT,
     gate_types,
@@ -66,7 +67,6 @@ from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
     DIRECT_ANSWER_PYTHON_EXAMPLE_SYSTEM,
     DIRECT_ANSWER_RAG_SYSTEM_BASE,
-    RAG_DETAIL_HINT,
     RAG_OUTPUT_TEMPLATE_MULTI_STRICT,
     list_slots_template,
     EXECUTOR_INTENTIONAL_SYNTAX_BLOCK,
@@ -205,15 +205,10 @@ def _prefer_single_hit_rag_context(user_request: str, *, wants_depth: bool) -> b
         return False
     if wants_depth:
         return True
-    # 짧은 요약·설명 요청을 Top-1 로 묶던 규칙. 끝단 평가에서 RAG 경로 141문항 중 53문항이
-    # 이 규칙으로 1편만 받아 정답을 놓쳤다 (docs/experiments/single_hit_1009). 막연한 요청
-    # ("아무거나 하나") 과 심층 모드는 위에서 여전히 1편으로 묶는다. 비교용으로만 되살린다.
-    if _SINGLE_HIT_SHORT_QUERY and len(u) <= 44 and ("요약" in u or "알려줘" in u or "설명해" in u):
-        return True
+    # 짧은 요약·설명 요청을 Top-1 로 묶던 규칙은 지웠다 — 끝단 평가에서 RAG 경로 141문항 중 53문항이
+    # 그 규칙으로 1편만 받아 정답을 놓쳤다 (docs/experiments/single_hit_1009). 막연한 요청
+    # ("아무거나 하나") 과 심층 모드는 위에서 여전히 1편으로 묶는다.
     return False
-
-
-_SINGLE_HIT_SHORT_QUERY = (os.getenv("RAG_SINGLE_HIT_SHORT_QUERY") or "0").strip() in ("1", "true", "yes", "on")
 
 
 def _rag_context_first_hit_only(rag_context: str, *, max_chars: int = 5500) -> str:
@@ -431,38 +426,6 @@ User question:
     return []
 
 
-# 조건이 여러 개인 질문("순서나 개수")은 조건마다 따로 검색한다 (RAG_ASPECT_SPLIT, docs/experiments/aspect_split_1022).
-# 두 조건을 검색어 하나에 섞으면 둘 다 밀렸다. 예시 용어는 넣지 않는다 — query_extract_1021 에서 무관한 질문에 새어 들었다.
-_ASPECT_RE = re.compile(r"\S(?:이나|나|또는|혹은|및|이랑|랑|와|과)\s")
-
-
-def _extract_aspects(user_request: str) -> list[str]:
-    """조건마다 영어 검색어 한 줄(2~3개). 조건이 하나이거나 실패하면 빈 목록."""
-    prompt = f"""Does the user question ask about two or three DIFFERENT aspects joined by "or"/"and" (for example two different factors, a problem and its solution, attacks and defenses)?
-If yes, return one short English academic search query per aspect. Each query must include the shared topic of the question and the aspect.
-If researchers use a standard technical term for that aspect, use that term. Never add names that are not implied by the question.
-If the question has only one aspect, return exactly: NONE
-Otherwise return 2-3 lines and nothing else:
-1: <query>
-2: <query>
-
-User question:
-{user_request}
-"""
-    for llm_getter in (get_rag_query_rewrite_llm, get_executor_llm):
-        try:
-            raw = (normalize_ai_message_content(llm_getter().invoke([HumanMessage(content=prompt)])) or "").strip()
-        except Exception:
-            continue
-        if re.match(r"\s*NONE\b", raw):
-            return []
-        got = re.findall(r"^\s*\d\s*[:：.]\s*(.+?)\s*$", raw, re.M)
-        got = [re.sub(r"\s+", " ", re.sub(r"[^A-Za-z0-9 .,+\-_/()]", " ", g)).strip() for g in got][:3]
-        got = [g for g in got if len(g) >= 3]
-        return got if len(got) >= 2 else []
-    return []
-
-
 def _merge_rag_blocks(primary: str, extras: list[str], *, per_extra: int = 2) -> str:
     """각 대상 검색 상위 ``per_extra`` 블록을 앞에, 원래 검색 블록을 뒤에 — 같은 논문은 한 번만."""
     seen: set[str] = set()
@@ -509,51 +472,7 @@ def _llm_model_label(llm) -> str:
 
 
 def _extract_english_rag_query(user_request: str, session_context: str = "") -> str:
-    q = _extract_english_rag_query_inner(user_request, session_context)
-    if os.getenv("RAG_QUERY_GLOSSARY", "0").strip() == "1":  # docs/experiments/query_glossary_1029
-        from core.rag.query_glossary import add_field_terms
-
-        q = add_field_terms(user_request, q)
-    return q
-
-
-def _extract_english_rag_query_inner(user_request: str, session_context: str = "") -> str:
-    """검색어 추출. ``RAG_QUERY_CLEAN=1`` 이면 프롬프트는 그대로 두고 앞뒤 정리만 (docs/experiments/query_clean_1021)."""
-    if os.getenv("RAG_QUERY_NORAG", "0").strip() == "1":  # docs/experiments/query_norag_1027
-        return drop_unasked_rag(user_request, _extract_english_rag_query_base(user_request, session_context))
-    if os.getenv("RAG_QUERY_CLEAN", "0").strip() != "1":
-        return _extract_english_rag_query_base(user_request, session_context)
-    req = (user_request or "").strip()
-    q = _extract_english_rag_query_base(_LIST_NUMBER.sub("", req).strip() or req, session_context)
-    return _drop_generic_words(q)
-
-
-_ASKS_RAG = re.compile(r"rag|retrieval[- ]augmented|검색\s*증강|리트리벌", re.I)
-_RAG_TERMS = re.compile(r"\b(?:in|for|of)?\s*(?:retrieval[- ]augmented generation|rag)(?:\s+(?:retrieval|systems?|pipelines?))?\b", re.I)
-
-
-def drop_unasked_rag(question: str, query: str) -> str:
-    """질문에 RAG 가 없는데 검색어에 붙은 rag · retrieval-augmented generation 을 지운다 (query_norag_1027).
-    지우고 2단어 미만이면 원래 검색어."""
-    if _ASKS_RAG.search(question or "") or re.search(r"[가-힣]", query or ""):
-        return query
-    out = ", ".join(x for x in (re.sub(r"\s+", " ", _RAG_TERMS.sub(" ", ph)).strip() for ph in re.split(r"\s*,\s*", query or "")) if x)
-    return out if len(out.replace(",", " ").split()) >= 2 else query
-
-
-def _drop_generic_words(query: str) -> str:
-    """외부 검색 v3 와 같은 일반어를 뺀다. 쉼표 구 구분은 남기고, 3단어 미만이 되면 원래대로."""
-    from core.rag.external_search import _GENERIC
-
-    if re.search(r"[가-힣]", query or ""):
-        return query  # 한국어 원문 폴백은 건드리지 않는다
-    phrases = []
-    for ph in re.split(r"\s*,\s*", query or ""):
-        kept = [w for w in ph.split() if w.lower() not in _GENERIC]
-        if kept:
-            phrases.append(" ".join(kept))
-    out = ", ".join(phrases)
-    return out if len(out.replace(",", " ").split()) >= 3 else query
+    return _extract_english_rag_query_base(user_request, session_context)
 
 
 def _extract_english_rag_query_base(user_request: str, session_context: str = "") -> str:
@@ -564,11 +483,8 @@ def _extract_english_rag_query_base(user_request: str, session_context: str = ""
     req = (user_request or "").strip()
     if not req:
         return req
-    if os.getenv("RAG_QUERY_V2", "0").strip() == "1":
-        return _extract_english_rag_query_v2(req, session_context)
-    # "RAG" 가 프롬프트에 있으면 질문에 없어도 검색어에 rag retrieval 이 붙는다 (docs/experiments/query_norag_1027)
-    _target = "an academic paper search" if os.getenv("RAG_QUERY_NORAG", "0").strip() == "1" else "academic RAG retrieval"
-    prompt = f"""Extract 3-5 core English search keywords for {_target}.
+    # "RAG" 가 프롬프트에 있으면 질문에 없어도 검색어에 rag retrieval 이 붙는다 — 빼 봤지만 기각 (docs/experiments/query_norag_1027)
+    prompt = f"""Extract 3-5 core English search keywords for academic RAG retrieval.
 Return ONLY one comma-separated line in English.
 No Korean, no explanations, no numbering.
 
@@ -616,44 +532,6 @@ Recent context:
 
 
 _RAG_QUERY_MAX_WORDS = 12
-
-# 검색어 추출 v2 (RAG_QUERY_V2, docs/experiments/query_extract_1021): 실제 사용에서 질문 앞 "1." 만으로 다른
-# 논문이 나왔고, 일반어(research · academic · paper …)가 붙어 일반 논문을 끌어왔으며, "인용"을 참고문헌으로 읽었다.
-_LIST_NUMBER = re.compile(r"^\s*(?:\d{1,2}\s*[.)]|[①-⑳]|[-•*])\s*")
-_QUERY_V2_PROMPT = """Write ONE English search query for finding research papers that answer the user's question.
-Rules:
-- 4 to 10 words, separated by spaces, no commas, no quotes.
-- Keep the specific technique, task, data type, and conditions stated in the question.
-- Translate Korean technical terms into the standard English research terms, e.g. 근거/충실성 -> faithfulness grounding, 인용 -> citation attribution, 모른다고 답하기 -> abstention unanswerable, 환각 -> hallucination.
-- Do NOT add generic words: research, paper, papers, academic, study, survey, keywords, method, approach, trends.
-- Ignore list numbers and request words such as 찾아줘, 정리해줘, 알려줘, 있어.
-Return only the query line.
-
-User question:
-{req}
-
-Recent context:
-{ctx}
-"""
-
-
-def _extract_english_rag_query_v2(req: str, session_context: str = "") -> str:
-    from core.rag.external_search import clean_query
-
-    q = _LIST_NUMBER.sub("", req).strip() or req
-    prompt = _QUERY_V2_PROMPT.format(req=q, ctx=session_context[:500] if session_context else "(none)")
-    raw = ""
-    for llm_getter in (get_rag_query_rewrite_llm, get_executor_llm):
-        try:
-            raw = (normalize_ai_message_content(llm_getter().invoke([HumanMessage(content=prompt)])) or "").strip()
-            if raw:
-                break
-        except Exception:
-            continue
-    words = re.sub(r"[^A-Za-z0-9\-\s]", " ", raw.splitlines()[0] if raw else "").lower().split()
-    if len(words) < 3:
-        return q
-    return " ".join(clean_query(" ".join(words)).split()[:_RAG_QUERY_MAX_WORDS])
 
 
 def _paper_knowledge_heuristic(user_request: str, req_lower: str) -> bool:
@@ -917,6 +795,7 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
             rule_name = result.get("route_type", "")
             choice = result.get("router_choice", "")
             print(f"[DEBUG] Router: 1단계 하드룰 → {rule_name} ({choice})")
+            rag_trace.mark(chat_id, "router", step=1, route=f"{rule_name}/{choice}")
             if is_scheduled and rule_name in ("planner", "code_run"):
                 result = {"route_type": "direct_answer", "router_choice": "B"}
                 print("[DEBUG] Router: 스케줄 작업 → planner/code_run 차단, direct_answer로 우회")
@@ -932,10 +811,9 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
         rag = get_chroma_rag_tool()
         _rag_hist = session_context if rag_history_allowed(user_request) else ""
         rag_query = _extract_english_rag_query(user_request, session_context=_rag_hist)
-        _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
         # 답변 노드가 이 컨텍스트에서 5칸을 쓴다 — 논문 단위면 5편을 가져온다 (RAG_PAPER_BLOCKS, docs/experiments/paper_blocks_1022)
         _rtk = 5 if os.getenv("RAG_PAPER_BLOCKS", "0").strip() == "1" else RAG_TOP_K
-        rag_context = rag.search(rag_query, top_k=_rtk, session_context=_rag_hist, light_rerank=_lr)
+        rag_context = rag.search(rag_query, top_k=_rtk, session_context=_rag_hist)
         _trs = get_tool_rag_store()
         tools_context = _trs.format_topk_block(user_request, k=TOOL_RAG_TOP_K)
         tools_list_str = _trs.format_router_tools_tag(user_request, k=TOOL_RAG_TOP_K)
@@ -952,6 +830,8 @@ def router_node(state: AgentState, *, config: RunnableConfig) -> dict:
             print("[DEBUG] Router: 스케줄 작업 → planner/code_run 차단, direct_answer로 우회")
         result = _maybe_override_rag_route(chat_id, user_request, result)
         result["rag_context"] = rag_context
+        rag_trace.mark(chat_id, "router", step=3, route=f"{result.get('route_type')}/{result.get('router_choice')}",
+                       query=rag_query, ids=rag_trace.paper_ids(rag_context))
         return result
     except Exception as e:
         print(f"❌ Router 노드 오류: {e}\n{traceback.format_exc()}")
@@ -1180,6 +1060,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             _hist_ok = rag_history_allowed(user_request)
             _recent_ctx = session.get_recent_context(max_turns=2) if _hist_ok else ""
             rag_query = _extract_english_rag_query(user_request, session_context=_recent_ctx)
+            rag_trace.mark(chat_id, "query", query=rag_query, history=bool(_recent_ctx))
             if prefer_single_hit:
                 top_k = max(RAG_TOP_K * 4, 10) if wants_depth else RAG_TOP_K
             else:
@@ -1197,6 +1078,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 and os.getenv("RAG_FILTER_BEFORE_CUT", "0").strip() == "1"
             )
             _rf_pre = ""
+            _rf = ""
+            _src = "search"
 
             if (
                 prefer_single_hit
@@ -1206,34 +1089,34 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 _da_trace("before rag.list_papers()", "sync jsonl, no chroma query")
                 rag_context = rag.list_papers()
                 _da_trace("after rag.list_papers()", f"len={len(rag_context)}")
+                _src = "list_papers"
             else:
                 cached_rag = (state.get("rag_context") or "").strip()
                 _list_mode = list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
                 _reuse = followup_reuse_context(session, user_request)
                 if _reuse:
                     rag_context = _reuse
+                    _src = "followup_reuse"
                     _da_trace("rag_context reused from previous answer", f"len={len(rag_context)}")
                 elif _list_mode:
                     # 목록 질문: 라우터 컨텍스트(3편)를 쓰지 않고 10편 다시 검색 (docs/experiments/list_mode_1016)
-                    _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
                     rag_context = rag.search(
-                        rag_query, top_k=LIST_MODE_TOP_K, session_context=_recent_ctx,
-                        wants_depth=False, light_rerank=_lr,
+                        rag_query, top_k=LIST_MODE_TOP_K, session_context=_recent_ctx, wants_depth=False,
                     )
+                    _src = "list"
                     _da_trace("list mode search", f"len={len(rag_context)}")
                 # 라우터 5편 대신 15편 다시 검색해 거르기 (RAG_ROUTER_RESEARCH, docs/experiments/router_research_1028)
                 elif cached_rag and cached_rag != "관련 문서 없음" and not (
                     _filter_first and os.getenv("RAG_ROUTER_RESEARCH", "0").strip() == "1"
                 ):
                     rag_context = cached_rag
+                    _src = "router"
                     _da_trace("rag_context reused from router", f"len={len(rag_context)}")
                 else:
                     session_ctx = _recent_ctx
                     _da_trace("before rag.search()", f"top_k={top_k} wants_depth={wants_depth} (sync collection.query)")
-                    # 수치·비교·목록 질문은 논문 단위 light rerank 를 건너뛴다 (RAG_LIGHT_RERANK_GATED_OFF, docs/experiments/light_rerank_gated_1015)
-                    _lr = not (os.getenv("RAG_LIGHT_RERANK_GATED_OFF", "0").strip() == "1" and gate_types(user_request))
                     rag_context = rag.search(
-                        rag_query, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth, light_rerank=_lr
+                        rag_query, top_k=top_k, session_context=session_ctx, wants_depth=wants_depth
                     )
                     _da_trace("after rag.search()", f"len={len(rag_context)}")
                 # 비교 질문: 두 대상을 각각 검색해 앞에 합친다 — 라우터가 넘긴 컨텍스트에도 적용
@@ -1245,25 +1128,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                         def _search_target(t: str) -> str:
                             return rag.search(t, top_k=top_k, session_context="", wants_depth=False, light_rerank=False)
 
-                        # 두 대상 검색을 동시에 (RAG_COMPARE_SPLIT_PARALLEL) — 순서는 대상 순서 그대로
-                        if os.getenv("RAG_COMPARE_SPLIT_PARALLEL", "0").strip() == "1":
-                            with ThreadPoolExecutor(max_workers=len(_targets)) as _ex:
-                                _extras = list(_ex.map(_search_target, _targets))
-                        else:
-                            _extras = [_search_target(t) for t in _targets]
+                        _extras = [_search_target(t) for t in _targets]
                         rag_context = _merge_rag_blocks(rag_context, _extras)
-                if (
-                    not _reuse
-                    and os.getenv("RAG_ASPECT_SPLIT", "0").strip() == "1"
-                    and "cmp" not in gate_types(user_request)
-                    and _ASPECT_RE.search(user_request)
-                ):
-                    _aspects = _extract_aspects(user_request)
-                    _da_trace("aspect split", repr(_aspects))
-                    if _aspects:
-                        rag_context = _merge_rag_blocks(rag_context, [
-                            rag.search(a, top_k=top_k, session_context="", wants_depth=False, light_rerank=False) for a in _aspects
-                        ])
+                rag_trace.mark(chat_id, "search", src=_src, ids=rag_trace.paper_ids(rag_context))
                 if _reuse:
                     pass  # 직전 답에서 이미 걸러진 컨텍스트
                 elif prefer_single_hit and wants_depth:
@@ -1282,6 +1149,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     rag_context = _rag_context_top_n_hits(rag_context, n=5)
                     _da_trace("rag_context top-5 only", f"len={len(rag_context)}")
 
+            rag_trace.mark(chat_id, "select", filter=_rf_pre, ids=rag_trace.paper_ids(rag_context))
             _da_trace("before session.get_last_assistant_response()", "")
             # 새 질문이면 직전 답·대화 맥락을 답변 프롬프트에 넣지 않는다 (RAG_HISTORY_GATE, docs/experiments/history_gate_1019)
             last_ai = session.get_last_assistant_response() if _hist_ok else ""
@@ -1289,8 +1157,6 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             _da_trace("after session.get_last_assistant_response()", f"last_ai_len={len(last_ai)} history={'on' if _hist_ok else 'off'}")
 
             system_prompt = DIRECT_ANSWER_RAG_SYSTEM_BASE
-            if os.getenv("RAG_ANSWER_DETAIL", "0").strip() == "1":
-                system_prompt = system_prompt + RAG_DETAIL_HINT
             # 심층 모드에 **프롬프트 지시를 붙이지 않는다** (2026-10-07). 길이 지시는
             # 짝지은 36시행에서 효과가 없었다 — 컨텍스트가 1.8배(527→952)로 늘어도
             # 답변이 길어진 쌍은 3/6, p=1.000. 재료가 없어서가 아니라 모델이 길이
@@ -1327,6 +1193,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             ):
                 output_template = list_slots_template(len(_doc_ids))
             _da_trace("rag_context numbered", f"docs={len(_doc_ids)}")
+            rag_trace.mark(chat_id, "filter", filter=_rf, year=_yf, docs=[_doc_ids[k] for k in sorted(_doc_ids)])
             # 정답 유무를 따로 묻고, '없음'이면 v13 의 정답 없음 형식을 지시한다 (docs/experiments/presence_integration_1012).
             prompt = direct_answer_rag_user(
                 _answer_session_ctx,
@@ -1348,19 +1215,14 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 print(f"[DEBUG] DirectAnswer: 정답 유무 판정 = {_pick}")
                 if _pick == "없음":
                     system_prompt = system_prompt + NO_DOC_HINT
+            rag_trace.mark(chat_id, "judge", gates=gate_types(user_request), pick=_pick)
             # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다
-            # 관련 문서가 1편만 남은 답도 외부를 찾아본다 (RAG_EXTERNAL_ON_SINGLE, docs/experiments/external_single_1023)
-            _single = os.getenv("RAG_EXTERNAL_ON_SINGLE", "0").strip() == "1" and len({str(p) for p in _doc_ids.values()}) == 1
             if external_search_active() and (
-                _pick == "없음" or list_mode_active(user_request, prefer_single_hit=prefer_single_hit) or _single
+                _pick == "없음" or list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
             ):
                 # 학회판(arXiv ID 없음)은 제목으로 거른다 — job 129 · 130 에서 본론 2406.01549 의 ACL 판이 다시 실렸다
                 _titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context))
-                _ext_q = rag_query
-                if _pick == "없음" and os.getenv("RAG_EXTERNAL_TERM_QUERY", "0").strip() == "1":  # docs/experiments/external_term_1029
-                    _ext_q = term_query(user_request, RAG_ANSWER_MODEL) or rag_query
-                    print(f"[DEBUG] DirectAnswer: 외부 검색어(분야 용어) = {_ext_q}")
-                _ext = ExternalSearch(_ext_q, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles)  # _doc_ids 는 {번호: 논문 ID}
+                _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles)  # _doc_ids 는 {번호: 논문 ID}
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
             if _da_timeout is None:
@@ -1383,6 +1245,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 print(f"[DEBUG] DirectAnswer: 중국어 섞임 재생성 {hanzi_count(answer)} → {hanzi_count(retry)}")
                 if retry and hanzi_count(retry) < hanzi_count(answer):
                     answer = retry
+            rag_trace.mark(chat_id, "answer", raw=answer[:4000])
 
         _da_trace("before telegram / structure", f"answer_len={len(answer)}")
         print(f"[DEBUG] DirectAnswer: 답변 생성 완료 ({len(answer)}자), 텔레그램 전송 시도")
@@ -1422,9 +1285,12 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     print(f"[DEBUG] DirectAnswer: 본론 숫자 대조 = {_bn}문장 뺌")
             # '없음' 판정이면 "찾을 수 없습니다" 결론을 덮어쓰지 않는다 (RAG_NODOC_KEEP_CONCLUSION, docs/experiments/nodoc_conclusion_1029)
             _keep_nodoc = _pick == "없음" and os.getenv("RAG_NODOC_KEEP_CONCLUSION", "0").strip() == "1"
+            rag_trace.mark(chat_id, "post", cit={k: _cit.get(k) for k in ("fixed", "dropped", "bad_refs")})
             if os.getenv("RAG_CONCLUSION_REWRITE", "0").strip() == "1" and not _keep_nodoc:  # docs/experiments/conclusion_rewrite_1021
+                _before = answer
                 answer, _cr = rewrite_conclusion(answer, user_request, rag_context, _doc_ids, RAG_ANSWER_MODEL)
                 print(f"[DEBUG] DirectAnswer: 결론 다시 쓰기 = {_cr}")
+                rag_trace.mark(chat_id, "rewrite", result=_cr, before=_before[:4000])
             if os.getenv("RAG_CITE_CLEANUP", "0").strip() == "1":  # docs/experiments/cite_cleanup_1022
                 answer, _cc = clean_internal_refs(answer, _doc_ids)
                 if _cc:
@@ -1439,6 +1305,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 if _ext_items:
                     answer = answer.rstrip() + format_section(_ext_items)
                     record_candidates(user_request, _ext_items)
+                rag_trace.mark(chat_id, "external", n=len(_ext_items), wait=round(_ext_wait, 1))
+            rag_trace.mark(chat_id, "final", answer=answer[:4000])
             # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_MULTI_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):
             answer = f"[논문 모드]\n\n{answer}"

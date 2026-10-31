@@ -133,11 +133,8 @@ def test_prefer_single_no_depth_short(monkeypatch):
     from core.graph import agent_nodes
     from core.graph.agent_nodes import _prefer_single_hit_rag_context
 
-    # 짧은 요약 Top-1 규칙은 기본 꺼짐 (docs/experiments/single_hit_1009), RAG_SINGLE_HIT_SHORT_QUERY=1 일 때만
-    monkeypatch.setattr(agent_nodes, "_SINGLE_HIT_SHORT_QUERY", False)
+    # 짧은 요약 Top-1 규칙은 지웠다 (docs/experiments/single_hit_1009)
     assert _prefer_single_hit_rag_context("GPT 요약", wants_depth=False) is False
-    monkeypatch.setattr(agent_nodes, "_SINGLE_HIT_SHORT_QUERY", True)
-    assert _prefer_single_hit_rag_context("GPT 요약", wants_depth=False) is True
 
 
 def test_prefer_single_no_depth_long_no_keyword():

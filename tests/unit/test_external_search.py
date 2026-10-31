@@ -113,23 +113,3 @@ def test_excludes_context_titles(monkeypatch):
     out = X.search_openalex("q", set(), per_page=8, min_sim=None, dedupe=False, clean=False,
                             exclude_titles={"Journal Only", "Enabling LLMs to Generate Text with Citations and More"})
     assert [o["title"] for o in out] == ["In Context Already"]
-
-
-def test_term_query_keeps_only_english_line(monkeypatch):
-    import langchain_ollama
-
-    from core.rag import external_search as es
-
-    class _LLM:
-        def __init__(self, **kw): pass
-        def invoke(self, prompt):
-            return type("R", (), {"content": self.out})()
-
-    for out, want in [
-        ('"entity resolution near-duplicate detection"\n설명', "entity resolution near-duplicate detection"),
-        ("엔티티 해석", ""),
-        ("", ""),
-    ]:
-        _LLM.out = out
-        monkeypatch.setattr(langchain_ollama, "ChatOllama", _LLM)
-        assert es.term_query("q", "m") == want

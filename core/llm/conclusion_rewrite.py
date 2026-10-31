@@ -14,7 +14,7 @@ from core.llm.answer_fix import _CITED, _find
 from core.llm.citation_fix import RAG_HIT_SEP, fix_citations
 from core.llm.lang_guard import hanzi_count
 
-__all__ = ["brief_findings", "cited_blocks", "extract_findings", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion", "drop_bundled"]
+__all__ = ["brief_findings", "cited_blocks", "extract_findings", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
 
 SYSTEM = "너는 논문 검색 답변의 결론을 고쳐 쓰는 편집자다. 참고 문서에 적힌 내용만 쓴다."
 
@@ -50,34 +50,6 @@ PROMPT_V2 = """[질문]
 - 대상이 좁으면(특정 도메인·비공개 데이터·소규모·정성 평가) 그 점을 밝힌다.
 - 각 논문의 방법을 다시 설명하지 마라.
 - 한국어로. 머리말·제목·번호 없이 결론 문장만 출력한다."""
-
-# v3 (docs/experiments/conclusion_v3_1024): 논문마다 한 문장 · 여러 논문 묶기 금지. v2 결론의 사실 오류 다수가
-# 한 논문의 주장을 두 논문의 공통 주장으로 묶은 것이었다(answer_judge_1024).
-PROMPT_V3 = """[질문]
-{question}
-
-[논문별 핵심 — 초록에서 뽑은 원문 문장]
-{findings}
-
-[할 일]
-위 논문들로 질문에 대한 결론을 써라.
-- 논문마다 정확히 한 문장: 그 논문의 결과와 대상(데이터 · 도메인)을 쓰고, 그 논문 하나만 [문서 N] 으로 인용한다.
-- 한 문장에 두 논문 이상을 인용하지 마라. 한 논문의 내용을 다른 논문의 것처럼 쓰지 마라.
-- 마지막에 한 문장으로 논문들이 무엇이 다른지 쓴다 — 새 사실이나 수치를 넣지 말고, 인용하지 않는다.
-- "모든 연구", "공통", "모두" 같은 일반화를 쓰지 마라.
-- 수치는 원문 숫자를 그대로 옮기고 계산하지 마라.
-- 한국어로. 머리말·제목·번호 없이 결론 문장만 출력한다."""
-
-_OVERGEN = re.compile(r"모든\s*(연구|논문|문서|방법)|공통(된|으로|적|점)|모두[^.]{0,30}(공유|같|일치|보여)")
-
-
-def _v3_violation(text: str) -> str:
-    """v3 추가 검사: 한 문장에 서로 다른 문서 둘 이상 인용 · 과잉 일반화."""
-    for sent in re.split(r"(?<=[.!?。])\s+", text):
-        if len(set(_DOC_N.findall(sent))) >= 2:
-            return "여러 논문 묶음"
-    return "과잉 일반화" if _OVERGEN.search(text) else ""
-
 
 _RESULT_RE = re.compile(
     r"outperform|improv|reduc|increas|achiev|surpass|benefit|cost-effective|limit|degrad|drop|cliff|"
@@ -198,26 +170,6 @@ def replace_conclusion(answer: str, text: str) -> str:
     return answer[:c.end()] + "\n" + text.strip() + "\n" if c else answer
 
 
-def _dropped(answer: str, why: str) -> tuple[str, str]:
-    mode = os.getenv("RAG_CONCLUSION_DROP_BUNDLED", "0").strip()  # docs/experiments/conclusion_overgen_1025
-    if mode not in ("1", "overgen"):
-        return answer, why
-    answer, n = drop_bundled(answer, bundled=mode == "1")
-    return answer, f"{why} · 묶기 {n} 지움" if n else why
-
-
-def drop_bundled(answer: str, bundled: bool = True) -> tuple[str, int]:
-    """결론에서 과잉 일반화 문장(``bundled`` 면 서로 다른 논문 둘 이상을 인용한 문장도)을 지운다. 인용 문장이 안 남으면 그대로."""
-    c = _find("결론", answer)
-    if not c:
-        return answer, 0
-    sents = [x for x in re.split(r"(?<=[.!?。])\s+|\n+", answer[c.end():]) if x.strip()]
-    keep = [x for x in sents if not (bundled and len(set(_CITED.findall(x))) >= 2) and not _OVERGEN.search(x)]
-    if len(keep) == len(sents) or not any(_CITED.search(x) for x in keep):
-        return answer, 0
-    return replace_conclusion(answer, " ".join(x.strip() for x in keep)), len(sents) - len(keep)
-
-
 def rewrite_conclusion(
     answer: str, question: str, numbered_context: str, doc_ids: dict[int, str], model: str
 ) -> tuple[str, str]:
@@ -232,8 +184,8 @@ def rewrite_conclusion(
 
     b, c = _find("본론", answer), _find("결론", answer)
     mode = os.getenv("RAG_CONCLUSION_PROMPT", "v1").strip()
-    if mode in ("v2", "v3"):
-        prompt = (PROMPT_V3 if mode == "v3" else PROMPT_V2).format(question=question, findings=_findings_text(blocks))
+    if mode == "v2":
+        prompt = PROMPT_V2.format(question=question, findings=_findings_text(blocks))
     else:
         prompt = PROMPT.format(
             question=question, blocks=RAG_HIT_SEP.join(blocks.values()), body=answer[b.end():c.start()].strip()
@@ -243,10 +195,10 @@ def rewrite_conclusion(
         text = str(llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=prompt)]).content or "").strip()
     except Exception as exc:  # 결론을 못 바꿔도 답은 낸다
         print(f"[DEBUG] conclusion_rewrite 실패: {type(exc).__name__}: {str(exc)[:120]}")
-        return _dropped(answer, "호출 실패")
+        return answer, "호출 실패"
     text = ids_to_doc_refs(text, blocks)
-    why = check_conclusion(text, blocks) or (_v3_violation(text) if mode == "v3" else "")
+    why = check_conclusion(text, blocks)
     if why:
-        return _dropped(answer, why)
+        return answer, why
     text, _ = fix_citations(text, numbered_context, doc_ids=doc_ids)
-    return _dropped(replace_conclusion(answer, text), "바꿈")
+    return replace_conclusion(answer, text), "바꿈"

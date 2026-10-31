@@ -73,31 +73,3 @@ def test_brief_findings_long_result_truncated_not_dropped():
           "Extensive experiments demonstrate that TrustMem improves memory utility: " + "x " * 150 + "and reduces omission by 40.1\\%.")
     out = brief_findings(ab, 300)
     assert len(out) <= 300 and "we propose TrustMem" in out and out.endswith("…")
-
-
-def test_v3_violation():
-    from core.llm.conclusion_rewrite import _v3_violation
-
-    assert _v3_violation("A 는 72% 를 얻었다[문서 1]. B 는 PDF 에서 낫다[문서 2]. 두 논문은 대상이 다르다.") == ""
-    assert _v3_violation("A 와 B 는 정확도를 높였다[문서 1][문서 2].") == "여러 논문 묶음"
-    assert _v3_violation("A 는 72%[문서 1]. 모든 연구가 같은 방향을 보인다.") == "과잉 일반화"
-    assert _v3_violation("두 연구는 공통된 결론을 제시한다[문서 1].") == "과잉 일반화"
-
-
-def test_drop_bundled():
-    from core.llm.conclusion_rewrite import drop_bundled
-
-    head = "<b>본론</b>\n1. …\n<b>결론</b>\n"
-    a = head + "A 는 72% 를 얻었다[2603.25333v1]. A 와 B 는 정확도를 높였다[2601.14123v1][2603.25333v1]. 모든 연구가 같은 방향을 보인다."
-    out, n = drop_bundled(a)
-    assert n == 2 and out.endswith("A 는 72% 를 얻었다[2603.25333v1].\n")
-    assert drop_bundled(head + "같은 논문[2603.25333v1][2603.25333v2] 은 묶기 아님.") == (head + "같은 논문[2603.25333v1][2603.25333v2] 은 묶기 아님.", 0)
-    only = head + "A 와 B 는 높였다[2601.14123v1][2603.25333v1]. 이는 흥미롭다."
-    assert drop_bundled(only) == (only, 0)  # 인용 문장이 안 남으면 그대로
-
-
-def test_drop_overgen_only():
-    from core.llm.conclusion_rewrite import drop_bundled
-
-    a = "<b>결론</b>\nA 와 B 는 높였다[2601.14123v1][2603.25333v1]. 모든 연구가 같은 방향을 보인다."
-    assert drop_bundled(a, bundled=False) == ("<b>결론</b>\nA 와 B 는 높였다[2601.14123v1][2603.25333v1].\n", 1)

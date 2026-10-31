@@ -20,6 +20,7 @@ from core.bridge.agent_bridge_queue import (
     set_approval_pending,
     set_approval_session,
 )
+from core.graph import rag_trace
 from core.graph.agent_hitl_state import pending_approvals
 from core.graph.agent_nodes import _is_execution_failure
 from core.session.agent_session import (
@@ -83,6 +84,8 @@ def execute_graph_turn(
             cfg["configurable"]["bot"] = None
 
     stream_user_notified = False
+    if not is_resume:  # 단계 기록 (docs/experiments/foundation_1031 §1)
+        rag_trace.start(chat_id, job_id=bridge_job_id, question=user_text)
     try:
         for attempt in range(LLM_RETRY_MAX):
             try:
@@ -353,4 +356,6 @@ def execute_graph_turn(
             if not ok:
                 _notify2(bot, chat_id, headline=headline, detail=detail, status_message_id=None)
             raise
+    finally:
+        rag_trace.finish(chat_id)
 
