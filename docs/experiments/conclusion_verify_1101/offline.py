@@ -28,6 +28,7 @@ PROMPT = {
 }
 NUM_PREDICT = {"v1": 12, "v2": 200}
 _VERDICT = re.compile(r"판정\s*[:：]\s*\**\s*(같음|다름|없음)")
+_LEAD = re.compile(r"^\s*((?:\[\s*\d{4}\.\d{4,5}(?:v\d+)?\s*\]\s*)+)(?![은는이가의와과에도를을])")  # conclusion_misattr_1025 dev.py
 # 눈가림 판정 파일과 같은 문장 나누기(conclusion_v3_1024 offline.py)
 split = lambda t: [s.strip() for s in re.split(r"(?<=[.!?。])\s+|\n+", re.sub(r"<[^>]+>", "", t)) if len(s.strip()) > 10]
 norm = lambda s: re.sub(r"\s+|<[^>]+>|v\d+(?=\])", "", s)
@@ -76,6 +77,17 @@ def items():
         for j, x in enumerate(split(a[_find("결론", a).end():])):
             if any(k in x for k in keys):
                 out.append(("case", ("recheck_1031", qid), f"{qid}.{j}", x, v))
+    # 문장 앞에 붙은 인용은 앞 문장 것 — 라벨도 그렇게 읽었다(misattr dev.py sentences() 와 같게). 11-01 첫 실행 뒤 고침(README §5)
+    at = {(it[0], it[2]): i for i, it in enumerate(out)}
+    for i, it in enumerate(out):
+        m = _LEAD.match(it[3]); head, j = it[2].rsplit(".", 1)
+        if not m or not j.strip("0"):  # 결론 첫 문장은 sentences() 처럼 둔다
+            continue
+        p = at.get((it[0], f"{head}.{int(j) - 1:0{len(j)}d}"))
+        if p is not None:  # 앞 문장이 표본에 없으면(aj 본론) 인용만 뺀다
+            out[p] = out[p][:3] + (out[p][3] + " " + m.group(1).strip(),) + out[p][4:]
+        out[i] = it[:3] + (it[3][m.end():].strip(),) + it[4:]
+    out = [it for it in out if it[3]]
     grp = collections.defaultdict(list)  # 결론(답 · 조건) → 그 결론 문장들이 인용한 논문, 인용 없는 문장용
     for it in out:
         grp[(it[0], it[2].rsplit(".", 1)[0])] += _CITED.findall(it[3])
@@ -103,7 +115,6 @@ def blocks(r):
 def prepare(it, grp):
     """인용 있는 문장은 그 인용 블록, 없는 문장은 같은 결론이 인용한 블록 전부와 대조(보고용 범위)."""
     src, key, sid, s, lab = it
-    # shortcut: 문장 앞에 붙은 인용([id] 다음 문장)도 그 문장 것으로 본다 — 드묾, 운영에 넣을 때 misattr dev.py 의 sentences() 로
     refs = list(dict.fromkeys(_CITED.findall(s)))
     use = refs or grp[(src, sid.rsplit(".", 1)[0])]
     bl = blocks(row(*key))
@@ -135,7 +146,7 @@ if __name__ == "__main__":
 
     model = os.getenv("RAG_HELPER_MODEL", "").strip() or RAG_ANSWER_MODEL
     llm = ChatOllama(**ollama_kwargs(model=model, temperature=0.0, seed=0, reasoning=False, num_predict=NUM_PREDICT[arm]))
-    path = D / f"results_{arm}.jsonl"
+    path = D / f"results_{arm}_lead.jsonl"  # results_{arm}.jsonl 은 고치기 전(0343212) 첫 실행
     done = {(x["src"], x["sid"]) for x in map(json.loads, open(path))} if path.exists() else set()
     with open(path, "a") as w:
         for it in xs:

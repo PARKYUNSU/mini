@@ -11,7 +11,7 @@ def rate(xs, lbls):
     return sum(map(drop, z)), len(z)
 
 
-for arm in ("v1", "v2"):
+for arm in ("v1", "v2", "v1_lead", "v2_lead"):
     p = D / f"results_{arm}.jsonl"
     if not p.exists():
         continue
