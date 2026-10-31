@@ -11,6 +11,7 @@
   - ``BOARDROOM_SCHEDULE_AT`` / ``BOARDROOM_SCHEDULE_ENABLED`` / ``BOARDROOM_SCHEDULE_SKIP_IF_NO_YES`` (swarm_meeting 자식)
 - 주일 찬양 가사(apps.church_lyrics): 수 08:35 ``rename`` · 토 09:00 ``lyrics`` (종료 코드 2=콘티 없음이면 토 11:00 한 번 더) · 매시 10분 ``harvest``.
   ``NOTION_TOKEN`` 있고 ``CHURCH_LYRICS_SCHEDULE_ENABLED``≠0 일 때. 결과는 ``.cron/job_runs.jsonl`` (event=church_lyrics_run).
+- 주간 점검(docs/experiments/foundation_1031 §6): 일 **04:00** ``scripts/weekly_check.sh`` 백그라운드 → ``foundation_1031/weekly.md`` 에 한 줄.
 - cron_engine: 1분마다 due job 체크 → LangGraph 트리거 → 텔레그램 선톡 (agent_bot 단독 실행 시에도 동일 worker 가 뜸, 락으로 중복 방지)
 - 메인 루프: ``SCHEDULER_POLL_SEC``(기본 30초) 간격으로 ``run_pending`` — 예약 시각 부근 재김이 더 촘촘함.
 - 프로세스 기동 직후: 서울 당일·각 작업 시각+grace 이후면 ``morning_scraper`` / Phase35 / arXiv / Boardroom 보충 시도(LLM 토론 배치 제외).
@@ -644,6 +645,32 @@ def run_church_lyrics_retry() -> None:
     _spawn_church_lyrics("lyrics")
 
 
+def run_weekly_check() -> None:
+    """주간 점검 (docs/experiments/foundation_1031 §6) — real40 40문항을 답까지 재 ``weekly.md`` 에 한 줄.
+
+    ~1시간 걸려 Popen 으로 띄우기만 한다. crontab 은 T7 을 못 읽어(TCC) 여기서 돌린다.
+    스케줄러가 기동 때 읽어 둔 .env 값은 넘기지 않는다 — 자식이 지금의 .env 를 읽어야 운영 설정 그대로 잰다.
+    """
+    print("\n🧪 [스케줄] 주간 점검 (scripts/weekly_check.sh)", flush=True)
+    _CRON_DIR.mkdir(parents=True, exist_ok=True)
+    env = {k: os.environ[k] for k in ("HOME", "PATH", "USER", "LOGNAME", "LANG") if k in os.environ}
+    env["PYTHONPATH"] = str(PROJECT_ROOT)
+    log_path = _CRON_DIR / "weekly_check_stdout.log"
+    with open(log_path, "a", encoding="utf-8") as logf:
+        logf.write(f"\n[{time.strftime('%Y-%m-%d %H:%M:%S')}] run_scheduler → Popen: scripts/weekly_check.sh\n")
+        logf.flush()
+        proc = subprocess.Popen(
+            ["/bin/sh", "scripts/weekly_check.sh"],
+            cwd=PROJECT_ROOT,
+            env=env,
+            stdin=subprocess.DEVNULL,
+            stdout=logf,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+    print(f"   백그라운드 주간 점검 PID={proc.pid} (로그: .cron/{log_path.name})", flush=True)
+
+
 def main() -> None:
     # Gemini 없어도 cron_engine(봇 스케줄)은 돌아야 함. 예전에는 여기서 return 해 Ollama 전용일 때 job이 영원히 안 돌았음.
     has_gemini = bool(get_gemini_api_keys())
@@ -683,6 +710,8 @@ def main() -> None:
         schedule.every().saturday.at("09:00").do(run_church_lyrics)
         schedule.every().saturday.at("11:00").do(run_church_lyrics_retry)
         schedule.every().hour.at(":10").do(run_church_harvest)
+
+    schedule.every().sunday.at("04:00").do(run_weekly_check)
 
     # cron_engine: 1분마다 due job 체크 (agent_bot 과 중복 시 파일 락으로 1곳만 실행)
     start_cron_worker_daemon(respect_agent_disable_env=False)
@@ -729,6 +758,7 @@ def main() -> None:
         )
     else:
         print("   - 주일 찬양: NOTION_TOKEN 없음 또는 CHURCH_LYRICS_SCHEDULE_ENABLED=0 — 등록 생략")
+    print("   - 주간 점검: 일 04:00 real40 → docs/experiments/foundation_1031/weekly.md (백그라운드, 로그: .cron/weekly_check_stdout.log)")
     print("   - cron_engine: 1분마다 due job 체크 → 텔레그램 선톡")
     poll_sec = _scheduler_poll_sec()
     print(f"   - 메인 루프 폴링: {poll_sec}s · SCHEDULER_POLL_SEC")
