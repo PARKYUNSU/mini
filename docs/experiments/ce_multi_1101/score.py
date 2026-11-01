@@ -28,7 +28,9 @@ def order(x, key=None, comb_="ce", n=30):
 hit = lambda o, g, k: bool(set(o[:k]) & set(g))
 rr = lambda o, g: next((1 / (i + 1) for i, p in enumerate(o[:15]) if p in g), 0.0)
 sign_p = lambda b, c: 1.0 if b + c == 0 else min(1, 2 * sum(comb(b + c, i) for i in range(min(b, c) + 1)) / 2 ** (b + c))
-main = [x for x in rows if x["set"] != "sv_old"]
+S18 = {r["id"] for r in map(json.loads, open(D.parent / "e2e_ko_1008/results/s18_162.jsonl")) if (r.get("rag_queries") or [""])[0]}
+EXTRA = [x for x in rows if x["set"] == "162" and x["id"] not in S18]  # paper_ce_1023 에 없던 문항 — 판정 밖, 보고만 (README §4.2)
+main = [x for x in rows if x["set"] != "sv_old" and x not in EXTRA]
 print(f"주 문항 {len(main)} · base≠운영 {sum(not x['same'] for x in main)} · 후보 없음 {sum(not x['pool'] for x in main)}")
 B = {x["id"] + x["set"]: order(x) for x in rows}
 print(f"base @1 {sum(hit(B[x['id'] + x['set']], x['gold'], 1) for x in main)} · @5 {sum(hit(B[x['id'] + x['set']], x['gold'], 5) for x in main)}"
@@ -70,6 +72,9 @@ for n in (15, 50):
 for s in ("162", "real40", "real2"):
     g_, l_, _ = compare([x for x in main if x["set"] == s], key, c)
     print(f"  {s}: @5 {g_}:{l_}")
+if EXTRA:
+    g_, l_, _ = compare(EXTRA, key, c)
+    print(f"  판정 밖 {' · '.join(x['id'] for x in EXTRA)}: @5 {g_}:{l_}")
 sv = [x for x in rows if x["set"] == "sv_old"]
 if sv:
     cov = lambda o, x: len(set(o[:5]) & set(x["gold"]))
