@@ -48,6 +48,7 @@ from core.llm.agent_llm import (
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.conclusion_rewrite import brief_findings, rewrite_conclusion
+from core.llm.conclusion_swap import swap_conclusion
 from core.llm.relevance_filter import filter_relevant
 from core.llm.question_conditions import count_notice, filter_by_year
 from core.llm.body_numbers import check_body_numbers
@@ -1302,6 +1303,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 answer, _cn = count_notice(user_request, answer, _yf)
                 if _cn:
                     print(f"[DEBUG] DirectAnswer: 조건 고지 = {_cn}")
+            # 결론의 인용 문장을 그 논문 원문 문장(번역)으로 (RAG_CONCLUSION_SWAP, docs/experiments/conclusion_struct_1102)
+            if os.getenv("RAG_CONCLUSION_SWAP", "0").strip() == "1" and not _keep_nodoc:
+                answer, _sw, _ = swap_conclusion(answer, rag_context, _doc_ids, RAG_ANSWER_MODEL)
+                print(f"[DEBUG] DirectAnswer: 결론 인용 문장 바꿔 끼우기 = {_sw}")
+                rag_trace.mark(chat_id, "swap", result=_sw)
             if _ext is not None:
                 _ext_items, _ext_wait = _ext.result()
                 print(f"[DEBUG] DirectAnswer: 외부 검색 {len(_ext_items)}편 (답변 뒤 대기 {_ext_wait:.1f}s)")
