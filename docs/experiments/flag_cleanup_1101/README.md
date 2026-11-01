@@ -38,4 +38,21 @@
 
 | 날짜 | 내용 |
 |---|---|
-| 2026-11-01 | 사전 등록 · `run.sh` · `compare.py`. |
+| 2026-11-01 | 사전 등록 · `run.sh` · `compare.py`(13fc51f — 정리 전 코드). |
+| 2026-11-01 21:15 ~ 21:54 | 정리 전 기준선 `cb_new` · `cb_old` 37행, 오류 0. Chroma 청크는 앞 · 중간 · 끝 모두 1,401,935. |
+| 2026-11-01 21:5x | 코드 정리(§4). 단위 테스트 701 통과(705 에서 지운 기능의 테스트 4개가 빠짐). |
+| 2026-11-01 21:57 ~ 22:38 | 정리 뒤 `ca_new` · `ca_old` 37행. `compare.py` 결과 **같음 37 · 다름 0**, 검색어 · 경로 다름 0, 오류 행 0 → 통과. Chroma 청크 1,401,935 그대로. |
+
+## 4. 결과 — 통과
+
+- 지운 것:
+  - `core/rag/agent_chroma_rag.py` 237줄
+  - `core/config/agent_config.py` 의 `CHROMA_CROSS_ENCODER_RERANK` 설정
+  - `tests/unit/test_paper_ce_rerank.py`
+  - `scripts/gen_hype_questions.py` · `scripts/index_hype_questions.py`
+- 남긴 것: `tests/unit/test_fusion_protect.py` 는 `tests/unit/test_protect_pids.py` 로 이름을 바꾸고, 이름 찾기가 쓰는 보호 테스트만 남겼다. 보호 로그 이름도 `fusion protect:` 에서 `protect:` 로 바꿨다.
+- 코드가 읽는 `RAG_` 플래그가 39개에서 35개로 줄었다(`RAG_HYPE` · `RAG_FUSION_PROTECT` · `RAG_FUSION_PROTECT_K` · `RAG_PAPER_CE_RERANK`).
+- 린트(ruff F)는 정리 전과 같은 경고 2개만 남았다. 쓰지 않는 `chromadb` import 이고, 이번 변경 밖이다.
+- 동작: 검색어와 경로가 같은 37문항 모두에서 컨텍스트 논문이 순서까지 같았다.
+- 봇은 재시작하지 않았다. 정리된 코드는 다음 재시작 때 운영에 들어간다.
+- 커밋에 안 들어간 로컬 도우미 `.cron/run_hype_gen.sh` 는 지운 스크립트를 부르므로 이제 돌지 않는다. HyPE 를 다시 잴 때는 13fc51f 에서 잰다.

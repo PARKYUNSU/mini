@@ -32,7 +32,6 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from core.config.agent_config import (
     BM25_UNION_CHUNKS_PER_PAPER,
     BM25_UNION_TOP_M,
-    CHROMA_CROSS_ENCODER_RERANK,
     CHROMA_DB_DIR,
     CHROMA_FETCH_MIN,
     CHROMA_FETCH_MULTIPLIER,
@@ -77,101 +76,6 @@ os.environ["CHROMA_SUBPROCESS"] = "0"
 _log = logging.getLogger(__name__)
 
 _SEARCH_TIMEOUT_SEC = 600.0
-
-# ── Cross-encoder reranker (lazy singleton, 기본 비활성 — CHROMA_CROSS_ENCODER_RERANK=1 일 때만) ──
-HYPE_COLLECTION = os.getenv("HYPE_COLLECTION", "paper_questions")
-HYPE_TOP_PAPERS = int(os.getenv("HYPE_TOP_PAPERS", "5"))
-
-
-def _hype_enabled() -> bool:
-    return os.getenv("RAG_HYPE", "0").strip() == "1"
-
-
-_CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
-_cross_encoder: object | None = None
-_cross_encoder_lock = threading.Lock()
-
-
-def _get_cross_encoder():
-    """Cross-encoder 모델을 lazy 로드 (첫 호출 시 1회만)."""
-    from sentence_transformers import CrossEncoder
-
-    global _cross_encoder
-    if _cross_encoder is not None:
-        return _cross_encoder
-    with _cross_encoder_lock:
-        if _cross_encoder is None:
-            print(f"[ChromaRAG TRACE] loading cross-encoder: {_CROSS_ENCODER_MODEL}", flush=True)
-            _cross_encoder = CrossEncoder(_CROSS_ENCODER_MODEL)
-            print("[ChromaRAG TRACE] cross-encoder loaded OK", flush=True)
-        return _cross_encoder
-
-
-def _cross_encoder_rerank(
-    query: str,
-    docs: list[str],
-    metas: list[dict[str, str]],
-    dists: list[float | None] | None,
-    *,
-    top_k: int,
-    max_unique_papers: int = 0,
-) -> tuple[list[str], list[dict[str, str]], list[float | None] | None]:
-    """Cross-encoder로 (query, doc) 쌍을 재정렬.
-
-    1. 모든 후보에 cross-encoder score 부여
-    2. paper_id 기반 다양성 보장: 각 논문에서 최고 점수 청크 1개만 우선 선택
-    3. top_k개까지 반환
-
-    .. note::
-        청크 단위 CE는 대규모 코퍼스에서 비용·역효과가 있어 기본 비활성이다.
-        재도입 시에는 **논문 단위**로 ``title + abstract + 대표 청크``를 한 덩어리로 묶어
-        (query, paper_text) 한 번만 스코어링하는 방식만 실험할 것.
-
-    Args:
-        max_unique_papers: 0이면 top_k 그대로, >0이면 최소 이 수만큼 고유 논문 확보 시도
-    """
-    if not docs or not query.strip():
-        return docs[:top_k], metas[:top_k], dists[:top_k] if dists else None
-
-    try:
-        ce = _get_cross_encoder()
-        pairs = [(query, doc[:512]) for doc in docs]
-        scores = ce.predict(pairs).tolist()
-    except Exception as exc:
-        print(f"[ChromaRAG TRACE] cross-encoder rerank failed: {exc}", flush=True)
-        return docs[:top_k], metas[:top_k], dists[:top_k] if dists else None
-
-    # (score, original_index) 쌍으로 정렬
-    indexed = sorted(enumerate(scores), key=lambda x: -x[1])
-
-    # paper_id 기반 다양성 보장: 논문별 최고 점수 청크 우선
-    first_per_paper: list[int] = []
-    extra: list[int] = []
-    seen_pids: set[str] = set()
-    for orig_idx, score in indexed:
-        pid = (metas[orig_idx].get("paper_id") or "").strip()
-        if not pid or pid not in seen_pids:
-            if pid:
-                seen_pids.add(pid)
-            first_per_paper.append(orig_idx)
-        else:
-            extra.append(orig_idx)
-
-    # 고유 논문 우선 + 나머지 추가 청크
-    final_order = first_per_paper + extra
-    final_order = final_order[:top_k]
-
-    out_docs = [docs[i] for i in final_order]
-    out_metas = [metas[i] for i in final_order]
-    out_dists = [dists[i] for i in final_order] if dists and len(dists) == len(docs) else None
-
-    # 로그
-    print(f"[ChromaRAG TRACE] cross-encoder rerank: {len(docs)} candidates → {len(out_docs)} results", flush=True)
-    for rank, idx in enumerate(final_order[:5]):
-        pid = (metas[idx].get("paper_id") or "?")[:20]
-        print(f"  #{rank+1} ce_score={scores[idx]:.4f} pid={pid}", flush=True)
-
-    return out_docs, out_metas, out_dists
 
 
 def _minmax_normalize_01(vals: list[float]) -> list[float]:
@@ -993,47 +897,6 @@ def _light_rerank_paper_pool_by_embedding(
     return reranked + rest
 
 
-# 논문 단위 cross-encoder 재순위 — 가벼운 재순위 상위 30편을 (검색어, 제목. 초록) 으로 다시 매겨 지금 순위와
-# RRF(k = 60)로 합친다 (RAG_PAPER_CE_RERANK, docs/experiments/ce_multi_1101 · ce_rerank_1101)
-_PAPER_CE_MODEL = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
-_PAPER_CE_TOP = 30
-_paper_ce: object | None = None
-
-
-def _get_paper_ce():
-    """다국어 cross-encoder 를 lazy 로드. CPU — 9B 가 쓰는 GPU 와 겹치지 않게 (MiniLM 임베더와 같다)."""
-    global _paper_ce
-    if _paper_ce is not None:
-        return _paper_ce
-    with _cross_encoder_lock:
-        if _paper_ce is None:
-            from sentence_transformers import CrossEncoder
-
-            print(f"[ChromaRAG TRACE] loading paper cross-encoder: {_PAPER_CE_MODEL}", flush=True)
-            _paper_ce = CrossEncoder(_PAPER_CE_MODEL, max_length=512, device="cpu")
-        return _paper_ce
-
-
-def _paper_ce_rerank(
-    query: str, paper_best: list[tuple[float, int, str]], metas: list[dict[str, str]]
-) -> list[tuple[float, int, str]]:
-    """상위 30편을 CE 순위와 지금 순위의 RRF 로 다시 줄 세운다. 31위 아래는 그대로, 실패하면 전부 그대로."""
-    head, rest = paper_best[:_PAPER_CE_TOP], paper_best[_PAPER_CE_TOP:]
-    texts = [
-        f"{(metas[bi].get('title') or '').strip()}. {re.sub(r'\s+', ' ', metas[bi].get('abstract') or '').strip()[:1500]}"
-        for _, bi, _ in head
-    ]
-    try:
-        scores = _get_paper_ce().predict([(query, t) for t in texts]).tolist()
-    except Exception as exc:
-        print(f"[ChromaRAG TRACE] paper CE rerank failed: {exc}", flush=True)
-        return paper_best
-    ce_rank = {i: r for r, i in enumerate(sorted(range(len(head)), key=lambda i: -scores[i]))}
-    order = sorted(range(len(head)), key=lambda i: -(1 / (61 + i) + 1 / (61 + ce_rank[i])))
-    print(f"[ChromaRAG TRACE] paper CE rerank: top={len(head)}", flush=True)
-    return [head[i] for i in order] + rest
-
-
 def _apply_title_similarity_to_paper_score(base_sc: float, sim: float) -> float:
     """논문 집계 점수에 제목–쿼리 유사도 반영: 가산 + (고유사도 시) 약한 곱 + (옵션) 레거시 threshold 곱."""
     ns = float(base_sc)
@@ -1069,22 +932,6 @@ def _paper_score_from_sorted_chunk_scores(
     if score_top_n >= 5 and len(sorted_desc) >= 5 and epsilon > 0:
         paper_sc += epsilon * sorted_desc[4]
     return paper_sc
-
-
-def _fusion_protect_pids(
-    metas: list[dict[str, str]], dists: list[float | None] | None, bm25_pid_scores: dict[str, float], k: int
-) -> set[str]:
-    """벡터(논문별 최소 거리) · BM25 논문 순위가 둘 다 k 안인 paper_id (fusion_protect_1027)."""
-    if k < 1 or not dists or len(dists) != len(metas) or not bm25_pid_scores:
-        return set()
-    best: dict[str, float] = {}
-    for m, d in zip(metas, dists):
-        pid = (m.get("paper_id") or "").strip()
-        if pid and d is not None and (pid not in best or d < best[pid]):
-            best[pid] = float(d)
-    vec = {_normalize_pid(p): p for p in sorted(best, key=best.get)[:k]}
-    bm = sorted(bm25_pid_scores, key=lambda p: -bm25_pid_scores[p])[:k]
-    return {vec[p] for p in bm if p in vec}
 
 
 def _paper_max_one_chunk_per_paper(
@@ -1208,13 +1055,11 @@ def _paper_max_one_chunk_per_paper(
                 pk,
                 max_combined_text_chars=light_rerank_max_input_chars,
             )
-            if os.getenv("RAG_PAPER_CE_RERANK", "0").strip() == "1":
-                paper_best = _paper_ce_rerank(light_rerank_query.strip(), paper_best, metas)
     cap = max(top_k_papers, 1)
-    if protect_pids:  # 벡터·BM25 둘 다 상위인데 잘린 논문은 상위 cap 끝자리에 넣는다
+    if protect_pids:  # 보호할 논문(이름 찾기)이 잘렸으면 상위 cap 끝자리에 넣는다
         miss = [r for r in paper_best[cap:] if r[2] in protect_pids][:cap]
         if miss:
-            print(f"[ChromaRAG TRACE] fusion protect: {[r[2] for r in miss]}", flush=True)
+            print(f"[ChromaRAG TRACE] protect: {[r[2] for r in miss]}", flush=True)
             paper_best = paper_best[: cap - len(miss)] + miss
     paper_best = paper_best[:cap]
 
@@ -2451,29 +2296,6 @@ class ChromaRAGTool:
     def _rewrite_query(self, query: str, session_context: str) -> str:
         return _rewrite_rag_query(query, session_context)
 
-    def _hype_paper_hits(self, query: str, top_papers: int) -> dict[str, float]:
-        """HyPE 갈래 (docs/experiments/hype_1014): 가상 질문 컬렉션에서 논문별 최소 거리."""
-        try:
-            if getattr(self, "_hype_col", None) is None:
-                self._hype_col = self._client.get_collection(
-                    name=HYPE_COLLECTION, embedding_function=self._embedding_fn
-                )
-            with self._db_lock:
-                r = self._hype_col.query(
-                    query_texts=[query], n_results=max(top_papers * 8, 20), include=["metadatas", "distances"]
-                )
-        except Exception as exc:  # 컬렉션이 없거나 서버 오류 → 갈래만 건너뜀
-            print(f"[ChromaRAG TRACE] hype skipped: {exc}", flush=True)
-            return {}
-        best: dict[str, float] = {}
-        for m, d in zip((r.get("metadatas") or [[]])[0], (r.get("distances") or [[]])[0]):
-            pid = (m or {}).get("paper_id") or ""
-            if pid and d is not None and (pid not in best or d < best[pid]):
-                best[pid] = float(d)
-        top = dict(sorted(best.items(), key=lambda kv: kv[1])[:top_papers])
-        print(f"[ChromaRAG TRACE] hype hits: {[(k, round(v, 3)) for k, v in top.items()]}", flush=True)
-        return top
-
     def _fetch_depth_chunks(
         self, paper_id: str, *, max_chunks: int = 15, max_chars: int = 6000
     ) -> tuple[list[str], list[dict[str, str]]]:
@@ -2551,13 +2373,11 @@ class ChromaRAGTool:
                 top_k,
                 search_query[:160],
             )
-            # CE 켜짐: 넓게 가져와 재정렬. CE 끔: 논문 집계 전 청크 후보 풀 (CHROMA_FETCH_MULTIPLIER / MIN).
+            # 논문 집계 전 청크 후보 풀 (CHROMA_FETCH_MULTIPLIER / MIN)
             _fetch_n = int(max(float(top_k) * CHROMA_FETCH_MULTIPLIER, float(CHROMA_FETCH_MIN)))
-            if CHROMA_CROSS_ENCODER_RERANK:
-                _fetch_n = max(_fetch_n, int(max(float(top_k) * 6.0, 30.0)))
             print(
                 f"[ChromaRAG TRACE] search BEFORE multi-query pool top_k={top_k} fetch_n={_fetch_n} "
-                f"ce_rerank={'on' if CHROMA_CROSS_ENCODER_RERANK else 'off'} qlen={len(search_query)}",
+                f"qlen={len(search_query)}",
                 flush=True,
             )
             docs_clean, metas_clean, dists_clean, bm25_pid_scores, first_chroma_raw, pre_cs = (
@@ -2577,46 +2397,6 @@ class ChromaRAGTool:
                     results=first_chroma_raw,
                 )
             print("[ChromaRAG TRACE] search AFTER multi-query pool", flush=True)
-
-            # ── Cross-encoder rerank (기본 끔): 대형 코퍼스에서는 하이브리드만 최종 순서로 사용 ──
-            _post_hybrid_cap = max(top_k * 2, 10)
-            if CHROMA_CROSS_ENCODER_RERANK:
-                docs_clean, metas_clean, dists_clean = _cross_encoder_rerank(
-                    search_query,
-                    docs_clean,
-                    metas_clean,
-                    dists_clean,
-                    top_k=_post_hybrid_cap,
-                )
-            else:
-                # CE 끔: 청크 단위 조기 cap 하지 않음 → 논문별 MAX 집계에 벡터 후보 전부 반영
-                print(
-                    "[ChromaRAG TRACE] cross-encoder rerank skipped; "
-                    "paper-level MAX aggregation will apply",
-                    flush=True,
-                )
-
-            # HyPE 갈래 (RAG_HYPE=1, 기본 꺼짐): 가상 질문과 가까운 논문을 후보에 넣거나 거리를 당긴다.
-            if _hype_enabled() and metas_clean is not None:
-                _hh = self._hype_paper_hits(search_query, HYPE_TOP_PAPERS)
-                if _hh:
-                    if dists_clean is None or len(dists_clean) != len(docs_clean):
-                        dists_clean = [None] * len(docs_clean)
-                    _pool = {}
-                    for _i, _m in enumerate(metas_clean):
-                        _pool.setdefault((_m.get("paper_id") or "").strip(), []).append(_i)
-                    for _pid, _dq in _hh.items():
-                        if _pid in _pool:
-                            for _i in _pool[_pid]:
-                                _d0 = dists_clean[_i]
-                                dists_clean[_i] = _dq if _d0 is None else min(_d0, _dq)
-                        else:
-                            _idocs, _imetas = self._fetch_depth_chunks(_pid, max_chunks=3, max_chars=3000)
-                            docs_clean = docs_clean + _idocs
-                            metas_clean = metas_clean + _imetas
-                            dists_clean = dists_clean + [_dq] * len(_idocs)
-                    pre_cs = None  # 거리가 바뀌었으니 하이브리드 점수를 다시 계산
-                    _retrieval_pool_len = -1
 
             # Title-first inject: 원본 쿼리와 search_query 모두로 제목 매칭 시도
             title_pid = _find_paper_by_title(original_query) or _find_paper_by_title(search_query)
@@ -2698,7 +2478,7 @@ class ChromaRAGTool:
                     )
                     print(f"[ChromaRAG TRACE] name lookup: {_named} (새로 넣음 {_n_named})", flush=True)
 
-            if not CHROMA_CROSS_ENCODER_RERANK and docs_clean:
+            if docs_clean:
                 _tbq = (original_query.strip() or search_query.strip())
                 if pre_cs is not None and len(docs_clean) == _retrieval_pool_len:
                     _cs = pre_cs
@@ -2722,11 +2502,8 @@ class ChromaRAGTool:
                         bm25_pid_scores,
                         title_boost_query=_tbq,
                     )
-                _protect = _fusion_protect_pids(
-                    metas_clean, dists_clean, bm25_pid_scores, int(os.getenv("RAG_FUSION_PROTECT_K", "3"))
-                ) if os.getenv("RAG_FUSION_PROTECT", "0").strip() == "1" else set()
-                _protect |= {(m.get("paper_id") or "").strip() for m in metas_clean
-                             if _normalize_pid(m.get("paper_id") or "") in _named}
+                _protect = {(m.get("paper_id") or "").strip() for m in metas_clean
+                            if _normalize_pid(m.get("paper_id") or "") in _named}
                 docs_clean, metas_clean, dists_clean = _paper_max_one_chunk_per_paper(
                     docs_clean,
                     metas_clean,

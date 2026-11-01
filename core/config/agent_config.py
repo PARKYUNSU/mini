@@ -112,12 +112,7 @@ else:
 CHAT_MEMORY_DB_PATH = "./chat_memory.db"
 CHROMA_WRITE_LOCK_PATH = PROJECT_ROOT / ".chroma_write.lock"
 
-# Chroma RAG: cross-encoder 재정렬. 대규모 청크 코퍼스에서는 지연·역효과 보고가 있어 기본 비활성.
-# 켜려면 환경변수 CHROMA_CROSS_ENCODER_RERANK=1
-_CHROMA_CE_RERANK_RAW = (os.getenv("CHROMA_CROSS_ENCODER_RERANK") or "0").strip().lower()
-CHROMA_CROSS_ENCODER_RERANK = _CHROMA_CE_RERANK_RAW in ("1", "true", "yes", "on")
-
-# Chroma 벡터 검색 후보 수: max(top_k * CHROMA_FETCH_MULTIPLIER, CHROMA_FETCH_MIN) (CE 끔일 때).
+# Chroma 벡터 검색 후보 수: max(top_k * CHROMA_FETCH_MULTIPLIER, CHROMA_FETCH_MIN).
 # 대규모 코퍼스에서 retrieval_missing 줄이기 위해 기본 fetch 확장 (env로 조정 가능).
 try:
     CHROMA_FETCH_MULTIPLIER = float(os.getenv("CHROMA_FETCH_MULTIPLIER", "20"))
