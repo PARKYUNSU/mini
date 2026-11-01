@@ -993,6 +993,47 @@ def _light_rerank_paper_pool_by_embedding(
     return reranked + rest
 
 
+# 논문 단위 cross-encoder 재순위 — 가벼운 재순위 상위 30편을 (검색어, 제목. 초록) 으로 다시 매겨 지금 순위와
+# RRF(k = 60)로 합친다 (RAG_PAPER_CE_RERANK, docs/experiments/ce_multi_1101 · ce_rerank_1101)
+_PAPER_CE_MODEL = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
+_PAPER_CE_TOP = 30
+_paper_ce: object | None = None
+
+
+def _get_paper_ce():
+    """다국어 cross-encoder 를 lazy 로드. CPU — 9B 가 쓰는 GPU 와 겹치지 않게 (MiniLM 임베더와 같다)."""
+    global _paper_ce
+    if _paper_ce is not None:
+        return _paper_ce
+    with _cross_encoder_lock:
+        if _paper_ce is None:
+            from sentence_transformers import CrossEncoder
+
+            print(f"[ChromaRAG TRACE] loading paper cross-encoder: {_PAPER_CE_MODEL}", flush=True)
+            _paper_ce = CrossEncoder(_PAPER_CE_MODEL, max_length=512, device="cpu")
+        return _paper_ce
+
+
+def _paper_ce_rerank(
+    query: str, paper_best: list[tuple[float, int, str]], metas: list[dict[str, str]]
+) -> list[tuple[float, int, str]]:
+    """상위 30편을 CE 순위와 지금 순위의 RRF 로 다시 줄 세운다. 31위 아래는 그대로, 실패하면 전부 그대로."""
+    head, rest = paper_best[:_PAPER_CE_TOP], paper_best[_PAPER_CE_TOP:]
+    texts = [
+        f"{(metas[bi].get('title') or '').strip()}. {re.sub(r'\s+', ' ', metas[bi].get('abstract') or '').strip()[:1500]}"
+        for _, bi, _ in head
+    ]
+    try:
+        scores = _get_paper_ce().predict([(query, t) for t in texts]).tolist()
+    except Exception as exc:
+        print(f"[ChromaRAG TRACE] paper CE rerank failed: {exc}", flush=True)
+        return paper_best
+    ce_rank = {i: r for r, i in enumerate(sorted(range(len(head)), key=lambda i: -scores[i]))}
+    order = sorted(range(len(head)), key=lambda i: -(1 / (61 + i) + 1 / (61 + ce_rank[i])))
+    print(f"[ChromaRAG TRACE] paper CE rerank: top={len(head)}", flush=True)
+    return [head[i] for i in order] + rest
+
+
 def _apply_title_similarity_to_paper_score(base_sc: float, sim: float) -> float:
     """논문 집계 점수에 제목–쿼리 유사도 반영: 가산 + (고유사도 시) 약한 곱 + (옵션) 레거시 threshold 곱."""
     ns = float(base_sc)
@@ -1167,6 +1208,8 @@ def _paper_max_one_chunk_per_paper(
                 pk,
                 max_combined_text_chars=light_rerank_max_input_chars,
             )
+            if os.getenv("RAG_PAPER_CE_RERANK", "0").strip() == "1":
+                paper_best = _paper_ce_rerank(light_rerank_query.strip(), paper_best, metas)
     cap = max(top_k_papers, 1)
     if protect_pids:  # 벡터·BM25 둘 다 상위인데 잘린 논문은 상위 cap 끝자리에 넣는다
         miss = [r for r in paper_best[cap:] if r[2] in protect_pids][:cap]
