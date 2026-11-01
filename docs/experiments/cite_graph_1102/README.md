@@ -92,7 +92,25 @@ N = 200 인 이유:
 
 | 날짜 | 내용 |
 |---|---|
-| 2026-11-02 | 사전 조사 · 사전 등록 · `orig.jsonl` · `candidates.py` · `run.sh` · `wait_run0.sh` · `ingest.sh` · `score.py`. |
+| 2026-11-02 | 사전 조사 · 사전 등록 · `orig.jsonl` · `candidates.py` · `run.sh` · `wait_run0.sh` · `ingest.sh` · `score.py` (f54abff). |
+| 2026-11-02 00:19 | 수집 전 측정 대기 `wait_run0.sh` 시작(01:00 수집 · 캐시 재생성 뒤 `run.sh 0`, 읽기만). |
+| 2026-11-02 00:20 ~ 00:23 | 후보 200편(`candidates.py`, 2분 24초). DB 7,797편 중 7,236편에서 arXiv 인용이 잡혔다. 외부 논문 41,426편 · 인용 수 1위 732 · 200위 42 · arXiv 에 없는 ID 0 · external_candidates 겹침 12. → §6: 주 지표가 통과할 수 없다. |
+
+## 6. 후보 결과 — 주 지표가 통과할 수 없다 (측정 전, 2026-11-02)
+
+- 원논문이 DB 에 없는 17문항 중 원논문이 후보 200편에 든 것은 **5문항**이다: A02 FLARE(100위) · A04 RAPTOR(198위) · A09 Reflexion(87위) · B06 Toolformer(110위) · B11 BGE M3(68위).
+- 다섯 편이 모두 컨텍스트에 들고 줄어듦이 0 이어도 5 : 0, p 0.0625 다. §4 관문(6 : 0)에 못 미친다.
+  - 통과하려면 원논문이 이미 DB 에 있는 13문항에서 우연한 늘어남이 하나 더 생기고, 줄어듦이 하나도 없어야 한다.
+- 나머지 12편의 순위(괄호는 DB 안 인용 수):
+  - 1000위 안: speculative sampling 2302.01318 207(41) · SelfCheckGPT 214(40) · HyDE 302(31) · RECOMP 305(31) · Adaptive-RAG 380(27) · PagedAttention 410(25) · Medusa 413(25) · FlashAttention 563(20) · RankGPT 603(19) · AWQ 771(16).
+  - 1000위 밖: speculative decoding 2211.17192 · 워터마크 2301.10226 · RepoCoder · Repository-Level Prompt Generation.
+  - FlashAttention · speculative decoding · 워터마크는 학회판(NeurIPS · ICML)으로 인용되는 일이 많다. arXiv ID 만 세는 규칙은 그런 인용을 못 센다(§0 한계).
+- 상위는 '써서 인용하는' 논문이 차지한다.
+  - 상위 20편 중 11편이 모델 기술 보고서 · 시스템 카드다(Llama 3 · Qwen3 · Gemini · Qwen2.5 · GPT-4o · Qwen3-VL · Qwen2.5-VL · Gemini 1.5 · Gemini 2.5 · Qwen2 · Qwen). 나머지도 벤치마크(GSM8K · HumanEval) · 최적화기(Adam · AdamW) 등이다.
+  - 검색 · 임베딩 · RAG 논문은 제목으로 세면 200편 중 약 23편이다(Contriever · E5 · REPLUG · BEIR · IRCoT · Atlas · REALM · DSPy · RAPTOR · FLARE · BGE M3 등).
+  - DB 안 인용 수는 '사용자가 묻는 원논문'을 잘 대신하지 못한다.
+- N 을 늘려 원논문을 더 넣지는 않는다. held-out 원논문의 순위를 이미 봤으므로, 그 순위에 맞춰 N 을 정하면 판정 세트에 맞춘 셈이 된다.
+- 수집 · 운영 쓰기는 하지 않았다. 다음은 사용자가 정한다.
 
 ## 파일
 
