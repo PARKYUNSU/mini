@@ -52,10 +52,13 @@ for m, lang, c in ARMS:
     print(f"{key:7} {c:3} | @5 얻음 {g} : 잃음 {l} (순 {g - l:+d}, p {sign_p(g, l):.3f}) | @15 {g15}:{l15} | @1 {g1}:{l1}"
           f" | MRR@15 {st.mean(rr(o[x['id'] + x['set']], x['gold']) for x in main):.3f} | CE 30편 중앙 {sec:.2f}s")
 
-best = max(res)
+best = max(r for r in res if -r[2] <= 3.0)  # 조건 3 은 고르기 전 자격 (README §4.1)
 net, _, nsec, key, c, g, l = best
-ok = {"1 순 ≥ +5": net >= 5, "2 얻음 ≥ 2×잃음": g >= 2 * l, "3 CE 30편 시간 ≤ 3s": -nsec <= 3.0}
-print(f"\n고른 갈래: {key} {c} (얻음 {g} : 잃음 {l})")
+ok = {"1 순 ≥ +5": net >= 5, "2 얻음 ≥ 2×잃음": g >= 2 * l}
+print(f"\n고른 갈래(30편 ≤ 3s 중): {key} {c} (얻음 {g} : 잃음 {l})")
+for r in res:
+    if -r[2] > 3.0 and r[0] >= net + 3:
+        print(f"  bge 갈래 {r[3]} {r[4]} 순 {r[0]:+d} — 고른 갈래보다 +3 이상 · 시간 {-r[2]:.1f}s → 사용자 결정")
 for k_, v in ok.items():
     print(("통과 " if v else "미달 ") + k_)
 print("→ 다음 단계(따로 사전 등록)" if all(ok.values()) else "→ R1 접음")

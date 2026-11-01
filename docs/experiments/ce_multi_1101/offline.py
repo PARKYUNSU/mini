@@ -66,16 +66,23 @@ def queries(first: str, suffix: str) -> dict:
 
 tool = acr._get_chroma_singleton(); bm = acr.get_bm25_searcher()
 LIMIT = int(os.getenv("CEM_LIMIT", "0"))
+OUT = D / ("results.jsonl" if not LIMIT else "smoke.jsonl")
+done = {(r["set"], r["id"]) for r in map(json.loads, open(OUT))} if OUT.exists() and not LIMIT else set()  # 끊기면 이어서
 out = []
+w = open(OUT, "a" if done else "w")
 for s, qf, gf, first, suffix in SETS:
     qs = queries(first, suffix)
     for x in [x for x in load_items(qf, gf) if x["gold"] and x["id"] in qs][:LIMIT or None]:
+        if (s, x["id"]) in done:
+            continue
         if acr.is_chroma_write_locked() or acr._vector_search_effective_disabled():
-            sys.exit("Chroma 쓰기 잠금 또는 벡터 검색 꺼짐 — 측정 중단")
+            sys.exit("Chroma 쓰기 잠금 또는 벡터 검색 꺼짐 — 측정 중단 (다시 돌리면 이어서)")
         q, src = qs[x["id"]]
         CAP.clear()
         base = paper_ids(tool.search(q, top_k=15, name_query=x["question"]))[:15]
         pool = CAP.get("pool") or []
+        if not pool:
+            sys.exit(f"{s} {x['id']}: 가벼운 재순위를 안 탔다(잠금 · 대체 경로) — 측정 중단 (다시 돌리면 이어서)")
         named = [p for p in dict.fromkeys(bm.named_paper(n) for n in names(x["question"])) if p][:3]
         front = [p for p in named if p in base]
         texts = [f"{t}. {(AB.get(p) or a)[:1500]}" for p, t, a in pool]
@@ -91,8 +98,7 @@ for s, qf, gf, first, suffix in SETS:
                     "gold": sorted({bare(g) for g in x["gold"]}), "base": base, "front": front,
                     "pool": [p for p, _, _ in pool], "scores": scores, "sec": sec,
                     "same": base == front + rest[:15 - len(front)], "light_q": CAP.get("query", "").strip() == q.strip()})
+        w.write(json.dumps(out[-1], ensure_ascii=False) + "\n"); w.flush()
         print(s, x["id"], f"CE {sum(sec.values()):.1f}s", "" if out[-1]["same"] else "base≠pool", flush=True)
-with open(D / ("results.jsonl" if not LIMIT else "smoke.jsonl"), "w") as w:
-    w.writelines(json.dumps(x, ensure_ascii=False) + "\n" for x in out)
 print(f"행 {len(out)} · base≠pool {sum(not x['same'] for x in out)} · 가로챈 검색어 다름 {sum(not x['light_q'] for x in out)}"
       f" · 최대 RSS {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**30:.1f}GB")
