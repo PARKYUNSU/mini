@@ -2,7 +2,7 @@
 
 from core.llm.answer_fix import _CITED
 from core.llm.citation_fix import RAG_HIT_SEP
-from core.llm.conclusion_swap import check_translation, sentences, snap, swap_conclusion
+from core.llm.conclusion_swap import check_translation, first_person, sentences, snap, swap_conclusion
 
 CTX = RAG_HIT_SEP.join([
     "[문서 1]\n[2410.21819v2] Self-Preference Bias\n[초록] Judges are widely used today. GPT-4 exhibits a significant degree of "
@@ -38,6 +38,12 @@ def test_check_translation():
     assert check_translation(src, "인간 주석은 신뢰할 수 있는 금표준이 될 수 있다.") == "부정어 빠짐"
     assert check_translation(src, "인간 주석은 신뢰할 수 있는 금표준이 아닐 수 있다.") == ""
     assert check_translation("Results improve.", "결과가\n좋아진다.") == "꼴"
+
+
+def test_first_person():
+    assert first_person("우리의 실험 결과는 우리가 가정한 대로였고, 우리는 이를 공개한다.") == \
+        "이 논문의 실험 결과는 이 논문이 가정한 대로였고, 이 논문은 이를 공개한다."
+    assert first_person("우리나라 데이터") == "우리나라 데이터"
 
 
 def test_swap_replaces_cited_keeps_uncited_and_tail():

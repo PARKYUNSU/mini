@@ -15,7 +15,7 @@ from core.llm.answer_fix import _CITED, _find
 from core.llm.conclusion_rewrite import _RESULT_NUM, _RESULT_RE, _bare, _sentences, cited_blocks
 from core.llm.lang_guard import hanzi_count
 
-__all__ = ["best_result", "check_translation", "sentences", "snap", "swap_conclusion"]
+__all__ = ["best_result", "check_translation", "first_person", "sentences", "snap", "swap_conclusion"]
 
 SYSTEM = "너는 논문 문장 번역가다. 주어진 영어 문장 하나만 한국어로 옮긴다."
 
@@ -38,6 +38,9 @@ _LEAD = re.compile(r"^\s*((?:\[\s*\d{4}\.\d{4,5}(?:v\d+)?\s*\]\s*)+)(?![은는�
 _NEG_EN = re.compile(r"\b(?:not|no|never|without|cannot|neither|nor|unable|fails?|failed|lacks?)\b|n't", re.I)
 _NEG_KO = re.compile(r"않|없|못|아[니닌닐님]|불가|실패|부족|결여")  # '아닐' 은 '아니' 를 글자로 안 품는다
 _END = re.compile(r"\n\s*(?:<b>|📎)")  # 결론 단락 끝: 다음 머리 · 외부 검색 줄
+# 1인칭 지시를 9B 가 안 따랐다(dev 점검: "우리는 …") → 번역 뒤 글자로 바꾼다
+_WE = re.compile(r"우리(는|의|가|를)")
+_WE_TO = {"는": "은", "의": "의", "가": "이", "를": "을"}
 
 
 def best_result(abstract: str) -> str:
@@ -76,6 +79,11 @@ def snap(claim: str, blk: str) -> str:
         return best
     a = _ABS.search(blk)
     return best_result(a.group(1) if a else text)
+
+
+def first_person(text: str) -> str:
+    """'우리는 · 우리의 · 우리가 · 우리를' → '이 논문은 · 이 논문의 · 이 논문이 · 이 논문을'."""
+    return _WE.sub(lambda m: "이 논문" + _WE_TO[m.group(1)], text)
 
 
 def check_translation(src: str, text: str) -> str:
@@ -147,7 +155,7 @@ def swap_conclusion(
             seen.add((i, src))
             t0 = time.monotonic()
             try:
-                ko = tr(src)
+                ko = first_person(tr(src))
                 why = check_translation(src, ko)
             except Exception as exc:  # 번역을 못 해도 원문 문장은 넣는다
                 ko, why = "", f"호출 실패 {type(exc).__name__}"

@@ -18,10 +18,10 @@ RES = D.parent / "e2e_ko_1008" / "results"
 ERR = {"E", "X", "U"}
 
 
-def sign_p(w: int, l: int) -> float:
+def sign_p(win: int, lose: int) -> float:
     """양쪽 정확 부호 검정."""
-    n = w + l
-    return min(1.0, 2 * sum(math.comb(n, i) for i in range(min(w, l) + 1)) / 2 ** n) if n else 1.0
+    n = win + lose
+    return min(1.0, 2 * sum(math.comb(n, i) for i in range(min(win, lose) + 1)) / 2 ** n) if n else 1.0
 
 
 def main() -> None:
