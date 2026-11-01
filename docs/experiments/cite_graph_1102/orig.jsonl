@@ -1,0 +1,30 @@
+{"id": "H_A01", "orig": ["2212.10496"], "note": "HyDE — Precise Zero-Shot Dense Retrieval without Relevance Labels"}
+{"id": "H_A02", "orig": ["2305.06983"], "note": "FLARE — Active Retrieval Augmented Generation"}
+{"id": "H_A03", "orig": ["2401.15884"], "note": "CRAG — Corrective Retrieval Augmented Generation"}
+{"id": "H_A04", "orig": ["2401.18059"], "note": "RAPTOR"}
+{"id": "H_A07", "orig": ["2309.11495"], "note": "Chain-of-Verification"}
+{"id": "H_A08", "orig": ["2303.08896"], "note": "SelfCheckGPT"}
+{"id": "H_A09", "orig": ["2303.11366"], "note": "Reflexion"}
+{"id": "H_A10", "orig": ["2309.06180"], "note": "PagedAttention (vLLM)"}
+{"id": "H_A11", "orig": ["2211.17192", "2302.01318"], "note": "speculative decoding — 동시 제안 두 편"}
+{"id": "H_A12", "orig": ["2403.14403"], "note": "Adaptive-RAG"}
+{"id": "H_A13", "orig": ["2310.04408"], "note": "RECOMP"}
+{"id": "H_A14", "orig": ["2301.10226"], "note": "A Watermark for Large Language Models"}
+{"id": "H_A18", "orig": ["2305.18290"], "note": "DPO"}
+{"id": "H_A19", "orig": ["2306.00978"], "note": "AWQ"}
+{"id": "H_A21", "orig": ["2303.12570", "2206.12839"], "note": "RepoCoder · Repository-Level Prompt Generation"}
+{"id": "H_A22", "orig": ["2407.01449", "2406.11251"], "note": "ColPali · Document Screenshot Embedding — 같은 달 두 편"}
+{"id": "H_B01", "orig": ["2310.11511"], "note": "heldout_gold 그대로"}
+{"id": "H_B02", "orig": ["2004.12832"], "note": "heldout_gold 그대로"}
+{"id": "H_B03", "orig": ["2307.03172"], "note": "heldout_gold 그대로"}
+{"id": "H_B04", "orig": ["2309.15217"], "note": "heldout_gold 그대로"}
+{"id": "H_B05", "orig": ["2210.03629"], "note": "heldout_gold 그대로"}
+{"id": "H_B06", "orig": ["2302.04761"], "note": "heldout_gold 그대로"}
+{"id": "H_B07", "orig": ["2404.16130"], "note": "heldout_gold 그대로"}
+{"id": "H_B08", "orig": ["2004.04906"], "note": "heldout_gold 그대로"}
+{"id": "H_B09", "orig": ["2304.09542"], "note": "heldout_gold 그대로"}
+{"id": "H_B10", "orig": ["2403.12968"], "note": "heldout_gold 그대로"}
+{"id": "H_B11", "orig": ["2402.03216"], "note": "heldout_gold 그대로"}
+{"id": "H_B12", "orig": ["2401.10774"], "note": "heldout_gold 그대로"}
+{"id": "H_B13", "orig": ["2205.14135"], "note": "heldout_gold 그대로"}
+{"id": "H_B14", "orig": ["2311.09476"], "note": "heldout_gold 그대로"}
