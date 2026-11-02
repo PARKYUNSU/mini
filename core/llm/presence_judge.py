@@ -34,6 +34,11 @@ PROMPT = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문
 _GATE_NUM = re.compile(r"몇\s*(%|퍼센트|배|개|점|명|위)|몇\s*%|얼마나|정확도가|성공률|수치|\d+\s*%")
 _GATE_CMP = re.compile(r"차이|비교|어떻게 달라|뭐가 달라|다른 거야|vs\.?|\S+(랑|이랑|와|과)\s+\S+.*(차이|비교|달라|다른)")
 _GATE_LIST = re.compile(r"논문들|연구들|동향|정리해|트렌드|\d+\s*개\s*(찾|알려)|목록|방향으로 가")
+# 열린 요청(추천 · 아무거나 · N편)도 "특정 연구 하나"가 아니라 판정이 거짓 '없음'을 낸다(judge_none_1103 — 5/5).
+# 목록 모드는 켜지 않고 판정만 건너뛴다(`RAG_OPEN_GATE`, docs/experiments/open_gate_1103). "추천 시스템" 같은 주제어는 안 잡게 동사꼴만.
+_GATE_OPEN = re.compile(r"추천\s*(해|좀|부탁)|아무\s*(거나|논문|연구)|볼\s*만한|읽어야\s*할|읽을\s*만한|재밌는|재미있는"
+                        r"|괜찮은\s*(논문|연구)|좋은\s*(논문|연구)|\d+\s*편|몇\s*편|(두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*편"
+                        r"|뽑아\s*(줘|주)|골라\s*(줘|주)|최신\s*(논문|연구)")
 
 
 def gate_types(question: str) -> list[str]:
@@ -52,6 +57,8 @@ def gate_types(question: str) -> list[str]:
 def should_judge(question: str) -> bool:
     if os.getenv("RAG_PRESENCE_GATE", "0").strip() != "1":
         return True
+    if os.getenv("RAG_OPEN_GATE", "0").strip() == "1" and _GATE_OPEN.search(question or ""):
+        return False
     return not gate_types(question)
 
 
