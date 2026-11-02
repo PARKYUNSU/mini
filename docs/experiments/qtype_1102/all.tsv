@@ -1,0 +1,948 @@
+uid	split	srcs	question
+d0001	dev	R_1 R_2 R_3 R_4 R_5	네 지식 베이스(ChromaDB)에서 최근 AI 논문 아무거나 하나 찾아서 요약해 봐
+d0002	dev	R_6	'환각(Hallucination)' 현상을 어떻게 해결하는지 나온 논문 있어?
+d0003	dev	R_7	거절
+d0004	dev	R_8	네 지식 베이스에서 '환각(Hallucination)' 현상을 다룬 논문 찾아봐
+d0005	dev	R_9	"""윤수르, 네 지식 베이스에서 환각(Hallucination) 현상을 다룬 논문 여러 개 찾아서 목록으로 알려줘."
+d0006	dev	R_10 R_11	네 지식 베이스에서 환각(Hallucination) 현상을 다룬 논문 여러 개 찾아서 목록으로 알려줘.
+d0007	dev	R_12	GPT-4o 논문 요약해줘
+d0008	dev	R_13	Dialectical Alignment 논문 요약해줘)
+d0009	dev	R_14	그거 더 자세히 알려줘
+d0010	dev	R_15 R_16 R_17 R_19 R_21 R_23	Dialectical Alignment 논문 요약해줘
+d0011	dev	R_18 R_20 R_22 R_24	그거 더 자세하게 알려줘
+d0012	dev	R_25 R_26 R_27 R_28 R_29	환각(Hallucination) 관련 논문 여러 개 찾아서 목록으로 알려줘
+d0013	dev	R_30 R_31	Transformer 논문 자세히 설명해줘
+d0014	dev	R_32 R_33 R_34 R_36 R_37	Attention Is All You Need 논문 자세히 설명해줘
+d0015	dev	R_35	ttention Is All You Need 논문 자세히 설명해줘
+d0016	dev	R_38 R_40 R_41	28087ms 는 몇 초야?
+d0017	dev	R_39 R_94 R_95 R_97 R_99	승인
+d0018	dev	R_42	너는 누구야?
+d0019	dev	R_43	궁금한게 있는데, 답변 가능해?
+d0020	dev	R_44 R_45 R_46 R_47 R_48 R_54 history_gate_1019:r1_R06 real_eval_1013:R06	RAG의 검색 정확도를 높이는 논문들을 분석해 보고, 아직 사람들이 시도하지 않은 '연구의 빈틈(Research Gap)'을 3가지 제안해 봐
+d0021	dev	R_49 R_52 R_66 R_69	서울 날씨 알려줘
+d0022	dev	R_50 R_51	파주 날씨 알려줘
+d0023	dev	R_53 R_82	부산 날씨 알려줘
+d0024	dev	R_55 R_56 R_57 R_58 R_59 R_60 R_61 R_62 R_63 R_64 R_65 R_72 R_73	RAG 검색 정확도 향상 관련 논문 5개 찾아줘. 그리고 그 논문들을 바탕으로 아직 시도되지 않은 연구 빈틈 3가지를 심층 분석 섹션에 상세히 제안해 줘
+d0025	dev	R_67	지금 현재 서울 날씨 알려줘
+d0026	dev	R_68	부천시 날씨 알려줘
+d0027	dev	R_70	안ㄴㅇ
+d0028	dev	R_71 R_84 R_85 R_91	안녕
+d0029	dev	R_74	다음 영어 키워드를 기반으로 논문 5개를 찾아줘: 'Improving RAG retrieval accuracy', 'Reranking', 'Chunking optimization', 'Hallucination mitigation in RAG'. (단, Survey나 Review 논문은 절대 제외하고 구체적인 방법론을 제시한 논문만 찾아줘.) 찾은 논문들을 요약하고, 이를 바탕으로 아직 시도되지 않은 구체적이고 기술적인 연구 빈틈 3가지를 한글로 상세히 제안해 줘.
+d0030	dev	R_75 R_78	RAG retrieval accuracy enhancement, Reranking, Chunking optimization, Hallucination mitigation [지시사항] 1. 위 영어 키워드들만 사용하여 가장 관련성 높은 논문 5개를 찾아주세요. 2. (매우 중요) 5개 논문의 '핵심 요약'은 절대로 복사 붙여넣기 하지 마세요. 반드시 각 논문의 실제 본문을 읽고, 서로 다른 독립적인 요약을 3줄 이내로 작성해야 합니다. 3. 요약이 끝난 후, 위 논문들을 종합하여 구체적인 기술적 연구 빈틈 3가지를 한글로 제안해 주세요.
+d0031	dev	R_76	"각 논문을 반드시 아래 4개 축 중 하나로 명확히 분류해서 요약해줘: (1) Retrieval 개선 (2) Reranking (3) Chunking (4) Hallucination mitigation 그리고 5개 논문이 이 4개 축을 균형 있게 커버하도록 선택해줘. (특히 reranking 논문이 반드시 1개 이상 포함되도록 해줘) 각 논문 요약은 ""이 논문이 실제로 무엇을 개선했는지""를 정확하게 반영해야 하며, retrieval 논문을 generation 논문처럼 설명하지 않도록 주의해줘."
+d0032	dev	R_77	"""RAG 검색 정확도 향상(retrieval accuracy), Reranking, Chunking, Hallucination mitigation 관련 최신 논문 찾아줘."""
+d0033	dev	R_79 R_83 R_92	지금 서울 날씨 알려줘
+d0034	dev	R_80	강원도 속초 날씨 알려줘
+d0035	dev	R_81	속초 날씨 알려줘
+d0036	dev	R_86	너 누구야
+d0037	dev	R_87	너 버전 알아?
+d0038	dev	R_88	논문 재밌는것좀 요약해줘
+d0039	dev	R_89	아래 텍스트를 읽고 핵심 내용을 3가지로 요약해. 애플이 최근 공개한 M4 칩은 TSMC의 2세대 3나노 공정으로 제작되었으며, AI 연산을 위한 뉴럴 엔진(NPU) 성능이 초당 38조 번의 연산을 수행할 수 있을 정도로 대폭 향상되었다. 특히 전력 효율이 극대화되어 얇은 아이패드 프로에서도 발열 없이 데스크톱급 성능을 낸다.
+d0040	dev	R_90	아래 텍스트를 읽고, 네가 가장 자신 있는 마크다운 보고서 형식(서론/본론/결론)으로 상세하게 분석해 줘. 최근 AI 업계에서는 단일 LLM에 의존하는 것을 넘어, 여러 개의 특화된 AI 에이전트가 협업하는 '멀티 에이전트(Multi-Agent)' 시스템과 '에이전틱 RAG(Agentic RAG)'가 핵심 트렌드로 떠오르고 있습니다. 기존 RAG가 단순히 문서를 검색해 답변하는 수준이었다면, 에이전틱 RAG는 AI가 스스로 검색 시점과 도구를 결정하고, 검색된 정보를 바탕으로 다단계 추론을 수행합니다. 이를 통해 환각(Hallucination) 현상을 대폭 줄이고 기업용 데이터의 보안과 신뢰성을 높일 수 있어 많은 빅테크 기업들이 도입을 서두르고 있습니다.
+d0041	dev	R_93 R_96 R_98	arXiv에서 오늘 올라온 cs.AI 논문 제목 5개를 크롤링해서 알려주는 도구 만들어줘
+d0042	dev	R_100	아까 만든 arXiv 도구를 2026-09-16 날짜로 실행해줘
+d0043	dev	R_101	아까 만든 arXiv 도구 실행해줘
+d0044	dev	R_102 R_105 R_107	LLM 에이전트가 쓰는 도구가 오류를 내도 티가 안 나는 경우, 모델이 그걸 알아채는지 다룬 논문 있어? 핵심 내용 설명해줘.
+d0045	dev	R_103	대기업처럼 사전학습부터 RL까지 다 하지 않고, 어렵고 정보량 많은 탐색 궤적 데이터만으로 검색 에이전트 성능을 끌어올린 연구 알려줘.
+d0046	dev	R_104 R_106	멀티에이전트 강화학습에서 비정상성이나 부분 관측 같은 문제를 게임 이론(내시 균형, 진화 동역학) 관점에서 정리한 논문 요약해줘.
+d0047	dev	R_108 history_gate_1019:r1_R04 query_glossary_1029:R04 real_eval_1013:R04	디코더 전용 LLM을 비지도 대조학습만으로 긴 문서 검색기로 바꾸는 연구 알려줘
+d0048	dev	R_109	Rag용 논문 추천좀 해줘 최신 논문중에서 재밌는걸로
+t0001	test	R_110 foundation_1031:H_I04b history_gate_1019:F02	다른 논문도 추천해줘
+d0049	dev	R_111 corpus_seed_1020:D01	RAG 답변이 검색된 문서에 근거하는지(faithfulness) 자동으로 검증하는 연구 있어?
+d0050	dev	R_112 corpus_seed_1020:D02 user_suite_1027:U1-2	LLM 답변에 문장 단위 인용(citation)을 정확하게 붙이게 하는 방법 찾아줘
+d0051	dev	R_113 corpus_seed_1020:D03 user_suite_1027:U1-3	검색 문서에 답이 없을 때 모른다고 답하게(abstention) 만드는 연구들 정리해줘
+d0052	dev	R_114	1. RAG 답변이 검색된 문서에 근거하는지 자동으로 검증하는 연구 있어?
+d0053	dev	R_115 user_suite_1027:U1-1	RAG 답변이 검색된 문서에 근거하는지 자동으로 검증하는 연구 있어?
+d0054	dev	R_116 R_117 R_125 corpus_seed_1020:D19 user_suite_1027:U4-1	RAG 문서 청킹 전략(고정 길이, 의미 단위 등)을 비교한 연구 있어?
+d0055	dev	R_118 R_122 corpus_seed_1020:D07 corpus_seed_1023:R01 user_suite_1027:U2-1	긴 컨텍스트 중간에 있는 정보를 LLM이 놓치는 문제를 다룬 연구 있어?
+d0056	dev	R_119 R_127 aspect_split_1022:M01 corpus_seed_1020:D08 corpus_seed_1023:R02 survey_gate_1030:as_M01 user_suite_1027:U2-2	RAG에서 검색된 문서의 순서나 개수가 답변 품질에 주는 영향을 분석한 연구 찾아줘
+d0057	dev	R_120 list_findings_1023:L01	RAG에서 검색된 문서를 다시 순위 매기는 리랭커 연구 정리해줘
+d0058	dev	R_121	그 중 두 번째 논문 자세히 설명해줘
+d0059	dev	R_123	peculative decoding에서 JetSpec이랑 DSpark는 드래프트 만드는 방식이 어떻게 달라?
+d0060	dev	R_124 history_gate_1019:r1_N12 real_eval_1013:N12	성공한 궤적만으로 학습해서 에이전트 실패 단계를 찾는 OAT가 프롬프팅 기반 방법보다 얼마나 빨라?
+d0061	dev	R_126 list_findings_1023:L02	LLM 에이전트 메모리 관리 연구들 정리해줘
+d0062	dev	R_128	요즘 날씨 어때?
+d0063	dev	R_129 R_130 R_131 corpus_seed_1020:D12 user_suite_1027:U2-6	관련 없는 문서가 섞였을 때 RAG가 흔들리지 않게 하는 연구들 정리해줘
+d0064	dev	R_132 R_133 corpus_seed_1020:D21 survey_gate_1030:us_U4-3 user_suite_1027:U4-3	하이브리드 검색에서 희소·밀집 검색 결과를 합치는 방법 연구 찾아줘
+d0065	dev	R_134 corpus_er_1029:R_134 nodoc_conclusion_1029:R_134 survey_gate_1030:er_R_134	예를들어 RAG검색을 했을시에, 두개의 DB에서(각 DB는 엄청난 양의 문서를 가지고 있음) 서로 비슷하거나 같은 내용을 찾는 연구에 대해서 조사해줘
+d0066	dev	R_135 R_136 survey_gate_1030:S13	RAG검색을 했을시에, 두개의 DB에서(각 DB는 엄청난 양의 문서를 가지고 있음) 서로 비슷하거나 같은 내용을 찾는 연구에 대해서 조사해줘
+d0067	dev	R_137 corpus_llmeval_1030:R_137	LLM-as-judge self-preference bias를 다룬 논문을 찾아라. 초안 생성 모델과 사실성 판정 모델이 같은 GPT-4 계열일 때, faithfulness나 hallucination rate가 얼마나 낙관적으로 나오는가. 판정자를 다른 모델군으로 두거나, 인간 표본으로 보정하는 절차는 무엇인가.
+d0068	dev	R_138 corpus_llmeval_1030:R_138	생성 뒤에 같은 모델이 unsupported sentence를 지우는 faithfulness filter가 있고, 남은 초안을 그 계열 모델이 atomic claim 단위로 S/U 판정한다. FActScore 계열이다. 이 프로토콜에서 hallucination 0%는 무엇을 의미하는가. filter와 judge를 분리하라는 논문의 절차는 무엇인가.
+d0069	dev	R_139 corpus_llmeval_1030:R_139	G-Eval처럼 생성 모델과 판정 모델이 같을 때 자기편향을 어떻게 측정하고, 인간 소표본은 몇 건이면 자동 판정을 보정할 수 있는가. 한국어 장문이면 그 수가 달라지는 논문이 있는가.
+d0070	dev	R_140	"현재 RAG 기반 생성형 AI 시스템의 환각(Hallucination) 탐지 및 평가를 위해 LLM을 평가자로 사용하는 'LLM-as-a-Judge' 방식을 도입했습니다. 그런데 동일한 프롬프트와 생성 결과물에 대해 두 가지 다른 평가 모델(GPT-4o와 Grok)의 환각 비율 판정 결과가 극명하게 갈리는 문제(1.0% vs 11.4%)가 발생했습니다. 특히 한 모델은 코퍼스 외부의 '도메인 일반 지식(표준 요구사항 등)'을 환각으로 오인하는 과적합(False Positive) 경향을 보였습니다. 이러한 상황에서 ""단일 LLM의 평가 결과를 확정치로 신뢰할 수 없으므로, 최종적으로 인간 검증(Human-in-the-loop)을 거치기 전까지는 판정 결과를 점(Point)이 아닌 범위(Range, 1.0~11.4%) 혹은 불확실성 구간으로 보고해야 한다""는 실무적 방어 논리를 세웠습니다. 이 주장을 학술적으로 뒷받침할 수 있는 논문을 찾아주세요. 특히 다음 3가지 주제에 해당하는 최신 연구(2023~2026년)를 중점적으로 찾아주세요. 1. LLM-as-a-Judge의 한계와 모델 간 판정 불일치 (Inter-annotator agreement / Model discrepancy / False positives in hallucination detection) 2. AI 환각 평가에서 인간 검증(Human-in-the-loop)의 필수성 및 AI-Human 혼합 평가 방법론의 효과 3. AI 평가 지표 측정 시 불확실성을 반영한 범위 보고(Range reporting) 또는 신뢰 구간(Confidence interval) 적용의 타당성"
+d0071	dev	aspect_split_1022:M02	LLM 양자화에서 가중치 양자화랑 KV 캐시 양자화 연구 알려줘
+d0072	dev	aspect_split_1022:M03	LLM 환각을 탐지하는 연구나 완화하는 연구 알려줘
+d0073	dev	aspect_split_1022:M04	RAG 청킹에서 청크 크기나 의미 단위 분할을 다룬 연구 있어?
+d0074	dev	aspect_split_1022:M05	speculative decoding에서 드래프트 모델 학습이나 검증 단계를 개선한 연구 알려줘
+d0075	dev	aspect_split_1022:M06 list_findings_1023:L03	LLM 탈옥 공격이랑 방어 연구 정리해줘
+d0076	dev	aspect_split_1022:M07	프롬프트 인젝션 공격 기법이나 방어 기법 연구 알려줘
+d0077	dev	aspect_split_1022:M08	연합학습에서 통신 효율이나 차등 프라이버시를 다룬 연구 있어?
+d0078	dev	aspect_split_1022:M09	비전-언어 모델 환각을 줄이는 방법이나 탐지하는 방법 연구 있어?
+d0079	dev	aspect_split_1022:M10 survey_gate_1030:as_M10	RAG에서 노이즈 문서나 방해 문서에 대한 강건성을 다룬 연구 찾아줘
+d0080	dev	aspect_split_1022:M11	LLM 에이전트의 도구 호출 판단이나 도구 사용 벤치마크 연구 알려줘
+d0081	dev	aspect_split_1022:M12	생성 모델 워터마크에서 이미지·영상 워터마크나 텍스트·에이전트 워터마크 연구 있어?
+d0082	dev	compare_split_1015:A054 e2e_ko_1008:A054 presence_gate_1014:A054 real_eval2_1015:A054	5W3H 구조화 의도 프롬프트가 Claude, GPT-4o, Gemini에서도 잘 통하는지 비교한 연구 알려줘
+d0083	dev	compare_split_1015:A090 e2e_ko_1008:A090 presence_gate_1014:A090 real_eval2_1015:A090	LLM이 코드 에너지 소비를 사람이 최적화한 것만큼 줄이는지 비교한 연구 알려줘
+d0084	dev	compare_split_1015:C01 history_gate_1019:r1_C01 real_eval_1013:C01	speculative decoding에서 JetSpec이랑 DSpark는 드래프트 만드는 방식이 어떻게 달라?
+d0085	dev	compare_split_1015:C02 history_gate_1019:r1_C02 real_eval_1013:C02	KV 캐시 줄이는 방법 중에 LightKV랑 CommVQ 차이가 뭐야?
+d0086	dev	compare_split_1015:C03 history_gate_1019:r1_C03 real_eval_1013:C03	LLM 탈옥에서 논리식으로 바꿔서 뚫는 방법이랑, 텍스트 탈옥을 오디오로 옮기는 연구는 뭐가 다른 거야?
+d0087	dev	compare_split_1015:C04 history_gate_1019:r1_C04 real_eval_1013:C04	HyperGraphRAG랑 Plasma GraphRAG는 그래프 RAG를 각각 어떻게 쓰는 거야? 비교해줘
+d0088	dev	compare_split_1015:C05 history_gate_1019:r1_C05 real_eval_1013:C05	환각 탐지에서 Semantic Entropy Probes랑 ChainPoll 비교해줘
+d0089	dev	compare_split_1015:C06 history_gate_1019:r1_C06 real_eval_1013:C06	프로세스 보상 모델 EDU-PRM이랑 DPRM은 각각 뭘 해결하려는 거고 어떻게 달라?
+d0090	dev	compare_split_1015:C07 history_gate_1019:r1_C07 real_eval_1013:C07	Text-to-SQL에서 Reasoning-SQL이랑 Solid-SQL 접근 방식 차이 알려줘
+d0091	dev	compare_split_1015:C08 history_gate_1019:r1_C08 real_eval_1013:C08	RAG에 프롬프트 인젝션 공격하는 DeRAG랑, 브라우저 에이전트를 인젝션에서 막는 Cognitive Firewall 비교해줘
+d0092	dev	compare_split_1015:C09 history_gate_1019:r1_C09 real_eval_1013:C09	MoE-Mamba랑 BlackMamba는 둘 다 Mamba에 MoE 붙인 건데 뭐가 달라?
+d0093	dev	compare_split_1015:C10 history_gate_1019:r1_C10 real_eval_1013:C10	RAG 리랭킹에서 DynamicRAG랑 DeepEra는 어떻게 달라?
+d0094	dev	compare_split_1015:C11 history_gate_1019:r1_C11 real_eval_1013:C11	멀티에이전트 토론을 번역 평가에 쓴 M-MAD랑 주장 검증에 쓴 PROClaim 비교해줘
+d0095	dev	compare_split_1015:C01 history_gate_1019:r2_C01 real_eval2_1015:C01	SLMQuant랑 Block-Sphere Vector Quantization은 양자화를 각각 어떤 목적으로 다뤄? 차이 알려줘
+d0096	dev	compare_split_1015:C02 history_gate_1019:r2_C02 real_eval2_1015:C02	온폴리시 증류에서 Prefix Replay 방식이랑 BranchOPD는 뭐가 달라?
+d0097	dev	compare_split_1015:C03 history_gate_1019:r2_C03 real_eval2_1015:C03	연합학습에서 희소 모델 찾는 엔트로피 정규화 확률 게이트 방법이랑 DeepFusion 차이가 뭐야?
+d0098	dev	compare_split_1015:C04 history_gate_1019:r2_C04 real_eval2_1015:C04	LLM이 시계열 분석에 쓸모 있는지 본 연구랑 LeForecast 비교해줘
+d0099	dev	compare_split_1015:C05 history_gate_1019:r2_C05 real_eval2_1015:C05	GNN 링크 예측에 컨포멀 예측 붙인 연구랑 Gegenbauer GNN은 각각 뭘 하는 거야?
+d0100	dev	compare_split_1015:C06 history_gate_1019:r2_C06 real_eval2_1015:C06	에이전트 메모리에서 LRE 축출 방식이랑 decoupling·aggregation 검색 방식 차이 알려줘
+d0101	dev	compare_split_1015:C07 history_gate_1019:r2_C07 real_eval2_1015:C07	MKEvolve랑 테스트·정적분석 피드백으로 LLM 코드 생성 개선하는 연구 비교해줘
+d0102	dev	compare_split_1015:C08 history_gate_1019:r2_C08 real_eval2_1015:C08	UNITE랑 Context-Aware Tokenization 월드모델은 토크나이저를 각각 어떻게 다뤄?
+d0103	dev	compare_split_1015:C09 history_gate_1019:r2_C09 real_eval2_1015:C09	World4RL이랑 가변 길이 잠재 월드모델 연구는 어떻게 달라?
+d0104	dev	compare_split_1015:C10 history_gate_1019:r2_C10 real_eval2_1015:C10	Diffusion Transformer에서 레지스터 토큰 연구랑 LazyDiT 차이가 뭐야?
+d0105	dev	compare_split_1015:C11 history_gate_1019:r2_C11 real_eval2_1015:C11	Factored Agents랑 긴 컨텍스트 LLM이 긴 인컨텍스트 학습에 약하다는 연구 비교해줘
+d0106	dev	compare_split_1015:C12 history_gate_1019:r2_C12 real_eval2_1015:C12	CoT를 내재화하는 Masked Self-Distillation이랑 반지도 CoT 학습은 뭐가 달라?
+d0107	dev	compare_split_1015:C13 history_gate_1019:r2_C13 real_eval2_1015:C13	OmniJARVIS랑 Xiaomi-Robotics-1 VLA 모델 비교해줘
+d0108	dev	compare_split_1015:C14 history_gate_1019:r2_C14 real_eval2_1015:C14	flow matching 모델 동역학 워터마크랑 LLM 에이전트 행동 워터마크 차이 알려줘
+d0109	dev	conclusion_drop2_1025:D01	LLM 추론 속도 높이는 연구들 정리해줘
+d0110	dev	conclusion_drop2_1025:D02	RAG 청킹 방법 연구들 정리해줘
+d0111	dev	conclusion_drop2_1025:D03	그래프 RAG 연구들 어떤 방향으로 가고 있어?
+d0112	dev	conclusion_drop2_1025:D04	LLM 에이전트 도구 사용 연구 동향 알려줘
+d0113	dev	conclusion_drop2_1025:D05	멀티모달 LLM 환각 줄이는 연구들 정리해줘
+d0114	dev	conclusion_drop2_1025:D06	MoE 모델 연구들 정리해줘
+d0115	dev	conclusion_drop2_1025:D07	긴 컨텍스트 처리 연구들 정리해줘
+d0116	dev	conclusion_drop2_1025:D08	LLM 정렬(alignment) 선호도 학습 연구들 정리해줘
+d0117	dev	conclusion_drop2_1025:D09	텍스트 임베딩 모델 연구 동향 알려줘
+d0118	dev	conclusion_drop2_1025:D10	LLM 평가 벤치마크 연구들 정리해줘
+d0119	dev	conclusion_drop2_1025:D11	확산 모델 가속 연구들 정리해줘
+d0120	dev	conclusion_drop2_1025:D12	로봇 조작 학습 연구들 정리해줘
+d0121	dev	conclusion_drop2_1025:D13	LLM 프라이버시·개인정보 유출 연구들 정리해줘
+d0122	dev	conclusion_drop2_1025:D14	코딩 에이전트 연구들 어떤 방향으로 가고 있어?
+d0123	dev	conclusion_drop2_1025:D15	LLM 수학 추론 개선 연구들 정리해줘
+d0124	dev	conclusion_drop2_1025:D16	멀티에이전트 LLM 협업 연구들 정리해줘
+d0125	dev	conclusion_drop2_1025:D17	모델 압축(가지치기) 연구들 정리해줘
+d0126	dev	conclusion_drop2_1025:D18	검색 에이전트(deep research) 연구 동향 알려줘
+d0127	dev	conclusion_drop2_1025:D19	LLM 지속 학습·망각 연구들 정리해줘
+d0128	dev	conclusion_drop2_1025:D20	비전 언어 모델 효율화 연구들 정리해줘
+d0129	dev	conclusion_drop2_1025:D21	KV 캐시 양자화랑 KV 캐시 축출 방식 비교해줘
+d0130	dev	conclusion_drop2_1025:D22	RAG에서 밀집 검색이랑 희소 검색 비교한 연구들 정리해줘
+d0131	dev	conclusion_drop2_1025:D23	DPO 같은 오프라인 선호 학습이랑 PPO 같은 온라인 RL 비교한 연구 알려줘
+d0132	dev	conclusion_drop2_1025:D24	LLM 환각 탐지에서 내부 상태 기반 방법이랑 외부 검증 기반 방법 비교해줘
+d0133	dev	conclusion_drop2_1025:D25	프롬프트 인젝션 방어에서 탐지 모델 방식이랑 구조적 분리 방식 비교해줘
+d0134	dev	conclusion_drop2_1025:D26	speculative decoding에서 별도 드래프트 모델 방식이랑 자기 드래프트 방식 비교해줘
+d0135	dev	conclusion_drop2_1025:D27	연합학습에서 개인화 방법이랑 통신 효율화 방법 연구 비교해줘
+d0136	dev	conclusion_drop2_1025:D28	월드 모델에서 픽셀 예측 방식이랑 잠재 공간 예측 방식 비교해줘
+d0137	dev	conclusion_drop2_1025:D29	지식 증류에서 로짓 증류랑 특징 증류 비교한 연구들 알려줘
+d0138	dev	conclusion_drop2_1025:D30	LLM 워터마크에서 토큰 분포 변경 방식이랑 사후 삽입 방식 비교해줘
+d0139	dev	conclusion_overgen_1025:E01	LLM 추론 비용 줄이는 연구들 정리해줘
+d0140	dev	conclusion_overgen_1025:E02	RAG 평가 방법 연구들 정리해줘
+d0141	dev	conclusion_overgen_1025:E03	LLM 에이전트 계획(planning) 연구 동향 알려줘
+d0142	dev	conclusion_overgen_1025:E04	비전 트랜스포머 연구들 정리해줘
+d0143	dev	conclusion_overgen_1025:E05	LLM 사실성(factuality) 개선 연구들 정리해줘
+d0144	dev	conclusion_overgen_1025:E06	스테이트 스페이스 모델(Mamba) 연구들 정리해줘
+d0145	dev	conclusion_overgen_1025:E07	LLM 안전성 레드팀 연구들 정리해줘
+d0146	dev	conclusion_overgen_1025:E08	음성 언어 모델 연구 동향 알려줘
+d0147	dev	conclusion_overgen_1025:E09	추천 시스템에 LLM 쓰는 연구들 정리해줘
+d0148	dev	conclusion_overgen_1025:E10	LLM 파인튜닝 효율화(LoRA 등) 연구들 정리해줘
+d0149	dev	conclusion_overgen_1025:E11	이미지 생성 모델 제어 연구들 정리해줘
+d0150	dev	conclusion_overgen_1025:E12	자율주행 학습 연구들 정리해줘
+d0151	dev	conclusion_overgen_1025:E13	의료 분야 LLM 연구들 정리해줘
+d0152	dev	conclusion_overgen_1025:E14	LLM 테스트 시간 연산 확장 연구들 정리해줘
+d0153	dev	conclusion_overgen_1025:E15	그래프 신경망 연구 동향 알려줘
+d0154	dev	conclusion_overgen_1025:E16	LLM 다국어 처리 연구들 정리해줘
+d0155	dev	conclusion_overgen_1025:E17	문서 이해(OCR·레이아웃) 모델 연구들 정리해줘
+d0156	dev	conclusion_overgen_1025:E18	강화학습으로 LLM 추론 학습시키는 연구들 정리해줘
+d0157	dev	conclusion_overgen_1025:E19	LLM 기반 과학 연구 자동화 연구들 정리해줘
+d0158	dev	conclusion_overgen_1025:E20	동영상 이해 모델 연구들 정리해줘
+d0159	dev	conclusion_overgen_1025:E21	LLM 편향·공정성 연구들 정리해줘
+d0160	dev	conclusion_overgen_1025:E22	지식 그래프랑 LLM 결합 연구 동향 알려줘
+d0161	dev	conclusion_overgen_1025:E23	LLM 서빙 시스템 연구들 정리해줘
+d0162	dev	conclusion_overgen_1025:E24	시계열 이상 탐지 연구들 정리해줘
+d0163	dev	conclusion_overgen_1025:E25	LLM 메모리·장기 기억 연구들 정리해줘
+d0164	dev	conclusion_overgen_1025:E26	RAG 쿼리 재작성 연구들 정리해줘
+d0165	dev	conclusion_overgen_1025:E27	합성 데이터로 LLM 학습시키는 연구들 정리해줘
+d0166	dev	conclusion_overgen_1025:E28	LLM 탈옥 방어 연구 동향 알려줘
+d0167	dev	conclusion_overgen_1025:E29	멀티모달 검색 연구들 정리해줘
+d0168	dev	conclusion_overgen_1025:E30	LLM 코드 보안 취약점 연구들 정리해줘
+d0169	dev	conclusion_overgen_1025:E31	양자화랑 가지치기 중 LLM 압축에 뭐가 나은지 비교한 연구 알려줘
+d0170	dev	conclusion_overgen_1025:E32	RAG에서 긴 컨텍스트 모델이랑 검색 방식 비교한 연구들 알려줘
+d0171	dev	conclusion_overgen_1025:E33	LLM 평가에서 사람 평가랑 LLM 판정자 비교한 연구 정리해줘
+d0172	dev	conclusion_overgen_1025:E34	에이전트 메모리에서 요약 방식이랑 검색 방식 비교해줘
+d0173	dev	conclusion_overgen_1025:E35	파인튜닝이랑 프롬프트 엔지니어링 성능 비교한 연구 알려줘
+d0174	dev	conclusion_overgen_1025:E36	확산 모델이랑 자기회귀 모델 이미지 생성 비교해줘
+d0175	dev	conclusion_overgen_1025:E37	모델 병합이랑 멀티태스크 학습 비교한 연구 알려줘
+d0176	dev	conclusion_overgen_1025:E38	작은 모델 증류랑 큰 모델 직접 사용 비교한 연구 정리해줘
+d0177	dev	conclusion_overgen_1025:E39	단일 에이전트랑 멀티에이전트 성능 비교한 연구 알려줘
+d0178	dev	conclusion_overgen_1025:E40	임베딩 검색이랑 리랭커 조합 효과 비교한 연구들 정리해줘
+d0179	dev	corpus_er_1029:E01	두 회사 고객 DB를 합칠 때 이름이나 주소 표기가 조금씩 달라도 같은 사람을 찾아내는 연구 있어?
+d0180	dev	corpus_er_1029:E02	LLM으로 두 데이터의 레코드가 같은 대상인지 판단하게 하면 기존 방법보다 나은지 다룬 논문 찾아줘
+d0181	dev	corpus_er_1029:E03	웹에서 긁어온 엄청 많은 문서 중에 거의 똑같은 문서를 빠르게 걸러내는 방법 알려줘
+d0182	dev	corpus_er_1029:E04	학습 데이터에서 중복 문서를 지우면 언어모델 성능이 어떻게 달라지는지 연구한 거 있어?
+d0183	dev	corpus_er_1029:E05	쇼핑몰 두 곳의 상품 목록에서 같은 상품끼리 짝지어 주는 연구 정리해줘
+d0184	dev	corpus_er_1029:E06	벡터가 수억 개인 두 집합 사이에서 서로 비슷한 쌍을 전부 찾는 방법 있어?
+d0185	dev	corpus_er_1029:E07 survey_gate_1030:er_E07	서로 다른 두 표의 열 이름이 같은 뜻인지 자동으로 맞춰 주는 연구 찾아줘
+d0186	dev	corpus_er_1029:E08	논문 데이터베이스 두 개를 합칠 때 같은 논문이 중복으로 들어간 걸 찾는 방법 있어?
+d0187	dev	corpus_er_1029:E09	문장을 임베딩으로 바꿔서 의미가 같은 중복 데이터를 지우는 연구 알려줘
+d0188	dev	corpus_er_1029:E10 survey_gate_1030:er_E10	레이블 데이터가 거의 없을 때 두 데이터셋의 같은 항목을 맞추는 방법 조사해줘
+d0189	dev	corpus_er_1029:E11	서로 다른 지식 그래프에 있는 같은 개체를 연결하는 연구 정리해줘
+d0190	dev	corpus_llmeval_1030:L01	GPT로 다른 모델 답변 점수 매기게 하면 사람 평가랑 얼마나 맞는지 연구한 거 있어?
+d0191	dev	corpus_llmeval_1030:L02	LLM 심사위원이 자기가 만든 답을 더 좋게 쳐주는 경향 다룬 논문 찾아줘
+d0192	dev	corpus_llmeval_1030:L03	두 답변을 비교시킬 때 먼저 나온 걸 더 좋게 보는 문제 연구 정리해줘
+d0193	dev	corpus_llmeval_1030:L04	긴 답변이 내용보다 좋은 점수를 받는 문제를 해결하려는 연구 있어?
+d0194	dev	corpus_llmeval_1030:L05	긴 글 생성 결과를 사실 하나하나로 쪼개서 맞는지 확인하는 평가 방법 알려줘
+d0195	dev	corpus_llmeval_1030:L06	정답 요약 없이 LLM으로 요약 품질을 채점하는 방법 연구 있어?
+d0196	dev	corpus_llmeval_1030:L07	챗봇 벤치마크에서 사람 대신 모델이 판정하는 거 믿을 만한지 다룬 논문 있어?
+d0197	dev	corpus_llmeval_1030:L08	모델 답에서 환각을 문장 단위로 찾아내는 연구 찾아줘
+d0198	dev	corpus_llmeval_1030:L09	프롬프트를 조금 바꾸면 LLM 평가 점수가 흔들리는 문제 다룬 논문 있어?
+d0199	dev	corpus_llmeval_1030:L10	작은 모델을 평가자로 학습시켜서 GPT-4 심사위원 대신 쓰는 연구 있어?
+d0200	dev	corpus_llmeval_1030:L11	LLM이 채점할 때 점수가 한쪽으로 쏠리는 걸 보정하는 방법 알려줘
+d0201	dev	corpus_llmeval_1030:L12	여러 LLM 심사위원 의견을 모아서 평가 신뢰도를 높이는 연구 정리해줘
+d0202	dev	corpus_seed_1020:D04 user_suite_1027:U1-4	외부 지식 없이 샘플링 일관성으로 환각을 탐지하는 방법 알려줘
+d0203	dev	corpus_seed_1020:D05 user_suite_1027:U1-5	모델이 답을 만든 뒤 검증 질문을 스스로 만들어 사실을 확인하는 연구 있어?
+d0204	dev	corpus_seed_1020:D06 user_suite_1027:U1-6	LLM 환각 탐지 연구 동향 정리해줘
+d0205	dev	corpus_seed_1020:D09 user_suite_1027:U2-3	프롬프트를 압축해서 컨텍스트 길이를 줄이면서 성능을 유지하는 방법 알려줘
+d0206	dev	corpus_seed_1020:D10 user_suite_1027:U2-4	롱 컨텍스트 LLM이랑 RAG 중 어느 쪽이 나은지 비교한 연구 있어?
+d0207	dev	corpus_seed_1020:D11 nodoc_conclusion_1029:U_U2-5 user_suite_1027:U2-5	검색 전에 질문을 재작성하거나 가상 답변을 만들어 검색 품질을 높이는 방법 찾아줘
+d0208	dev	corpus_seed_1020:D13 user_suite_1027:U3-1	표가 포함된 문서에서 질의응답 성능을 높이는 RAG 연구 있어?
+d0209	dev	corpus_seed_1020:D14 user_suite_1027:U3-2	표를 LLM에 넣을 때 어떤 형식으로 직렬화하는 게 좋은지 비교한 연구 찾아줘
+d0210	dev	corpus_seed_1020:D15 user_suite_1027:U3-3	PDF 문서에서 표와 레이아웃을 보존하며 파싱하는 방법 알려줘
+d0211	dev	corpus_seed_1020:D16 user_suite_1027:U3-4	표와 텍스트를 함께 보고 수치 추론하는 QA 연구 동향 정리해줘
+d0212	dev	corpus_seed_1020:D17 user_suite_1027:U3-5	차트나 도표가 있는 문서를 검색하는 멀티모달 RAG 논문 5개 찾아줘
+d0213	dev	corpus_seed_1020:D18 user_suite_1027:U3-6	재무 보고서처럼 수치가 많은 문서에서 LLM이 계산을 틀리지 않게 하는 연구 있어?
+d0214	dev	corpus_seed_1020:D20 user_suite_1027:U4-2	BM25랑 dense retrieval 차이가 뭐야?
+d0215	dev	corpus_seed_1020:D22 user_suite_1027:U4-4	cross-encoder 재순위랑 ColBERT 차이가 뭐야?
+d0216	dev	corpus_seed_1020:D23 user_suite_1027:U4-5	도메인 특화 문서용으로 임베딩 모델을 파인튜닝하는 연구들 정리해줘
+d0217	dev	corpus_seed_1020:D24 user_suite_1027:U4-6	여러 문서를 거쳐야 답이 나오는 multi-hop RAG 연구 동향 정리해줘
+d0218	dev	corpus_seed_1020:D25 nodoc_conclusion_1029:D_D25 nodoc_conclusion_1029:U_U5-1 user_suite_1027:U5-1	HNSW 인덱스 파라미터가 검색 정확도와 속도에 주는 영향을 분석한 연구 있어?
+d0219	dev	corpus_seed_1020:D26 user_suite_1027:U5-2	임베딩 벡터를 양자화해서 메모리를 줄이면서 검색 성능을 유지하는 방법 찾아줘
+d0220	dev	corpus_seed_1020:D27 nodoc_conclusion_1029:U_U5-3 user_suite_1027:U5-3	메타데이터 필터링과 근사 최근접 검색을 같이 할 때 성능 문제를 다룬 연구 있어?
+d0221	dev	corpus_seed_1020:D28 user_suite_1027:U5-4	벡터 검색 인덱스 최적화 연구들 정리해줘
+d0222	dev	corpus_seed_1020:D29 user_suite_1027:U6-1	RAG 시스템을 검색과 생성 단계로 나눠 평가하는 프레임워크 연구 있어?
+d0223	dev	corpus_seed_1020:D30 survey_gate_1030:us_U6-2 user_suite_1027:U6-2	LLM-as-a-judge의 편향(위치 편향, 길이 편향)을 분석한 연구 찾아줘
+d0224	dev	corpus_seed_1020:D31 user_suite_1027:U6-3	RAG 평가용 질문-정답 데이터를 LLM으로 합성하는 방법 알려줘
+d0225	dev	corpus_seed_1020:D32 user_suite_1027:U6-4	검색 평가 지표 nDCG랑 recall@k 차이가 뭐야?
+d0226	dev	corpus_seed_1020:D33 user_suite_1027:U6-5	LLM 애플리케이션 회귀 테스트나 지속 평가 방법 연구들 정리해줘
+d0227	dev	corpus_seed_1020:D34 user_suite_1027:U6-6	벤치마크 데이터 오염 때문에 평가가 부풀려지는 문제를 다룬 연구 있어?
+d0228	dev	corpus_seed_1020:D01	automatic verification of faithfulness and groundedness of RAG answers to retrieved documents
+d0229	dev	corpus_seed_1020:D02	sentence-level citation and attribution generation for LLM answers with citation precision and recall
+d0230	dev	corpus_seed_1020:D03	RAG abstention and negative rejection when retrieved context is insufficient or the question is unanswerable
+d0231	dev	corpus_seed_1020:D04	zero-resource hallucination detection via sampling consistency of LLM outputs
+d0232	dev	corpus_seed_1020:D05	LLM self-verification by generating verification questions after answering (chain of verification)
+d0233	dev	corpus_seed_1020:D06	survey of hallucination detection and mitigation in large language models
+d0234	dev	corpus_seed_1020:D07 query_glossary_1029:D07	lost in the middle: position bias of information in long context LLMs
+d0235	dev	corpus_seed_1020:D08	effect of number and order of retrieved passages on RAG answer quality
+d0236	dev	corpus_seed_1020:D09	prompt compression for long context LLMs preserving performance
+d0237	dev	corpus_seed_1020:D10	long-context LLMs versus retrieval-augmented generation comparison
+d0238	dev	corpus_seed_1020:D11	query rewriting and hypothetical document embeddings to improve retrieval for RAG
+d0239	dev	corpus_seed_1020:D12 query_glossary_1029:D12	robustness of RAG to irrelevant or noisy retrieved documents
+d0240	dev	corpus_seed_1020:D13	retrieval-augmented question answering over tables and semi-structured documents
+d0241	dev	corpus_seed_1020:D14	table serialization formats for large language models comparison
+d0242	dev	corpus_seed_1020:D15	PDF document parsing preserving tables and layout for RAG
+d0243	dev	corpus_seed_1020:D16	hybrid table-text question answering with numerical reasoning
+d0244	dev	corpus_seed_1020:D17	multimodal RAG over visually rich documents with charts and figures
+d0245	dev	corpus_seed_1020:D18	numerical reasoning over financial reports with LLMs
+d0246	dev	corpus_seed_1020:D19	document chunking strategies for retrieval-augmented generation comparison
+d0247	dev	corpus_seed_1020:D20	BM25 sparse retrieval versus dense passage retrieval
+d0248	dev	corpus_seed_1020:D21	hybrid sparse dense retrieval fusion methods
+d0249	dev	corpus_seed_1020:D22	cross-encoder reranking versus late interaction ColBERT retrieval
+d0250	dev	corpus_seed_1020:D23	domain adaptation fine-tuning of text embedding models for retrieval
+d0251	dev	corpus_seed_1020:D24	multi-hop retrieval-augmented generation
+d0252	dev	corpus_seed_1020:D25	HNSW approximate nearest neighbor index parameters recall latency tradeoff
+d0253	dev	corpus_seed_1020:D26	embedding quantization for vector search memory reduction product quantization binary embeddings
+d0254	dev	corpus_seed_1020:D27	filtered approximate nearest neighbor search with metadata constraints
+d0255	dev	corpus_seed_1020:D28	vector database indexing optimization survey
+d0256	dev	corpus_seed_1020:D29	evaluation framework for RAG separating retrieval and generation quality
+d0257	dev	corpus_seed_1020:D30	biases of LLM-as-a-judge position bias verbosity bias
+d0258	dev	corpus_seed_1020:D31	synthetic question answer generation for RAG evaluation datasets
+d0259	dev	corpus_seed_1020:D32	information retrieval evaluation metrics nDCG recall at k
+d0260	dev	corpus_seed_1020:D33	regression testing and continuous evaluation of LLM applications
+d0261	dev	corpus_seed_1020:D34	benchmark data contamination in LLM evaluation
+d0262	dev	corpus_seed_1020:H01 corpus_seed_1020:H01	RAG 답변 중 검색 문서가 뒷받침하지 않는 문장을 찾아내는 NLI 기반 방법 있어?
+d0263	dev	corpus_seed_1020:H02 corpus_seed_1020:H02 survey_gate_1030:ho_H02	LLM이 생성한 긴 글의 사실 정확도를 원자적 주장 단위로 평가하는 연구 찾아줘
+d0264	dev	corpus_seed_1020:H03 corpus_seed_1020:H03	RAG에서 검색 결과와 모델 내부 지식이 충돌할 때 어떻게 처리하는지 다룬 연구 있어?
+d0265	dev	corpus_seed_1020:H04 corpus_seed_1020:H04	LLM이 자기 답의 확신도를 말로 표현하게 하고 그게 정확한지 본 연구 알려줘
+d0266	dev	corpus_seed_1020:H05 corpus_seed_1020:H05 corpus_seed_1023:R03	검색이 필요할 때만 검색하도록 판단하는 적응형 RAG 연구들 정리해줘
+d0267	dev	corpus_seed_1020:H06 corpus_seed_1020:H06	LLM이 스스로 검색 결과를 비평하고 다시 검색하는 self-reflective RAG 방법 찾아줘
+d0268	dev	corpus_seed_1020:H07 corpus_seed_1020:H07 nodoc_conclusion_1029:H_H07	검색된 문서를 요약하거나 걸러서 LLM에 넣는 컨텍스트 압축 방법 있어?
+d0269	dev	corpus_seed_1020:H08 corpus_seed_1020:H08 survey_gate_1030:ho_H08	RAG에서 검색기와 생성기를 함께 학습시키는 연구 찾아줘
+d0270	dev	corpus_seed_1020:H09 corpus_seed_1020:H09	스캔된 문서 이미지에서 바로 검색하는 비전 기반 문서 검색 연구 있어?
+d0271	dev	corpus_seed_1020:H10 corpus_seed_1020:H10	엑셀 같은 스프레드시트를 LLM이 이해하게 하는 방법 연구 알려줘
+d0272	dev	corpus_seed_1020:H11 corpus_seed_1020:H11	텍스트를 SQL로 바꿔서 표 데이터에 질의하는 LLM 연구 동향 정리해줘
+d0273	dev	corpus_seed_1020:H12 corpus_seed_1020:H12 nodoc_conclusion_1029:H_H12	긴 표에서 필요한 행과 열만 골라 LLM에 넣는 방법 있어?
+d0274	dev	corpus_seed_1020:H13 corpus_seed_1020:H13	과학 논문 PDF에서 수식과 표를 정확하게 추출하는 OCR 모델 찾아줘
+d0275	dev	corpus_seed_1020:H14 corpus_seed_1020:H14	문서의 제목과 섹션 구조를 이용해 계층적으로 검색하는 RAG 방법 있어?
+d0276	dev	corpus_seed_1020:H15 corpus_seed_1020:H15	지식 그래프를 만들어서 RAG 검색에 쓰는 GraphRAG 연구들 정리해줘
+d0277	dev	corpus_seed_1020:H16 corpus_seed_1020:H16 survey_gate_1030:ho_H16	검색 쿼리를 여러 개로 나눠 검색하고 결과를 합치는 방법 연구 찾아줘
+d0278	dev	corpus_seed_1020:H17 corpus_seed_1020:H17	학습 없이 LLM으로 검색 결과를 재순위하는 listwise reranking 연구 있어?
+d0279	dev	corpus_seed_1020:H18 corpus_seed_1020:H18	다국어나 한국어 검색을 위한 임베딩 모델 연구 알려줘
+d0280	dev	corpus_seed_1020:H19 corpus_seed_1020:H19 query_glossary_1029:H19	긴 문서를 한 번에 임베딩해서 문맥을 살리는 late chunking 같은 방법 있어?
+d0281	dev	corpus_seed_1020:H20 corpus_seed_1020:H20 nodoc_conclusion_1029:H_H20 survey_gate_1030:ho_H20	검색 인덱스를 GPU로 빠르게 만드는 근사 최근접 검색 라이브러리 연구 찾아줘
+d0282	dev	corpus_seed_1020:H21 corpus_seed_1020:H21 nodoc_conclusion_1029:H_H21	문서가 계속 추가·삭제될 때 벡터 인덱스를 갱신하는 방법 연구 있어?
+d0283	dev	corpus_seed_1020:H22 corpus_seed_1020:H22 corpus_seed_1023:R04	RAG 답변 품질을 사람 평가 없이 자동으로 채점하는 지표 연구들 정리해줘
+d0284	dev	corpus_seed_1020:H23 corpus_seed_1020:H23	LLM 평가에서 판정 모델을 여러 개 써서 편향을 줄이는 방법 있어?
+d0285	dev	corpus_seed_1020:H24 corpus_seed_1020:H24 survey_gate_1030:ho_H24	RAG 시스템에 대한 적대적 공격이나 문서 오염(poisoning) 연구 찾아줘
+d0286	dev	corpus_seed_1020:H25 corpus_seed_1020:H25	검색 평가 데이터셋을 만들 때 정답 문서 라벨이 불완전한 문제를 다룬 연구 있어?
+d0287	dev	corpus_seed_1020:H26 corpus_seed_1020:H26	LLM 답변의 일관성을 여러 번 샘플링해 측정하는 평가 방법 알려줘
+d0288	dev	corpus_seed_1020:H27 corpus_seed_1020:H27	기업 내부 문서용 RAG를 실제로 구축하며 겪은 문제를 정리한 사례 연구 있어?
+d0289	dev	corpus_seed_1020:H28 corpus_seed_1020:H28	법률이나 의료처럼 전문 분야 RAG에서 정확도를 높이는 방법 연구 동향 정리해줘
+d0290	dev	corpus_seed_1020:H29 corpus_seed_1020:H29 nodoc_conclusion_1029:H_H29	RAG 응답 지연을 줄이기 위한 캐싱이나 추측 검색 같은 시스템 최적화 연구 있어?
+d0291	dev	corpus_seed_1020:H30 corpus_seed_1020:H30	LLM이 인용한 출처가 실제로 그 주장을 뒷받침하는지 검사하는 벤치마크 찾아줘
+d0292	dev	e2e_ko_1008:A001	최적수송 맵의 연속성을 보장하는 곡률 텐서가 음수가 아닌지 다항식 최적화로 검증하는 연구 있어?
+d0293	dev	e2e_ko_1008:A002	주택담보대출 부도 예측에서 학습 기간을 늘리고 변수를 더 넣었더니 오히려 성능이 떨어졌다는 논문 설명해줘
+d0294	dev	e2e_ko_1008:A003 nodoc_conclusion_1029:162_A003	언어 에이전트가 역전파처럼 자연어로 자기 프롬프트랑 파이프라인을 스스로 최적화하는 방법 알려줘
+d0295	dev	e2e_ko_1008:A004	스크린샷이나 이미지가 들어있는 깃허브 이슈를 LLM으로 해결하는 연구 요약해줘
+d0296	dev	e2e_ko_1008:A005	RAG에서 엔트로피 기반 불확실성 추정이 induction head 때문에 실패한다는 논문 있어?
+d0297	dev	e2e_ko_1008:A006	멀티모달 모델의 MoE 연속 학습에서 라우팅이 표류해서 망각이 생기는 문제를 다룬 연구 설명해줘
+d0298	dev	e2e_ko_1008:A007	RoPE 주파수를 잘라서 컨텍스트 길이를 늘리는 방법 알려줘
+d0299	dev	e2e_ko_1008:A008	LLM 애플리케이션 전체 워크플로를 세밀한 작업 단위로 쪼개서 스케줄링하는 연구 있어?
+d0300	dev	e2e_ko_1008:A009	LLM 에이전트가 간접 프롬프트 인젝션을 당하지 않게 사용자 목표와 맞는지 확인해서 막는 방법 설명해줘
+d0301	dev	e2e_ko_1008:A010	LLM이 생성한 코드에서 생기는 환각을 분류하고 벤치마크로 만든 논문 알려줘
+d0302	dev	e2e_ko_1008:A011	농업 연구소의 과학 데이터를 지식 그래프 기반 에이전틱 RAG로 탐색하는 시스템 요약해줘
+d0303	dev	e2e_ko_1008:A012	수백 개 문서에 증거가 흩어져 있어서 코퍼스 전체를 봐야 하는 천만 토큰짜리 추론 벤치마크 있어?
+d0304	dev	e2e_ko_1008:A013	치아 우식 이미지 학습 데이터를 젠슨-섀넌 발산으로 골라내는 방법 알려줘
+d0305	dev	e2e_ko_1008:A014	합리적인 파트너 에이전트 집단과 협력하는 걸 배우는 데 필요한 샘플 복잡도를 분석한 논문 설명해줘
+d0306	dev	e2e_ko_1008:A015 presence_gate_1014:A015 real_eval2_1015:A015	비전 언어 모델을 오픈 보캐뷸러리 객체 탐지랑 분할에 여러 시나리오로 평가한 연구 정리해줘
+d0307	dev	e2e_ko_1008:A016	다층 영역 분할 PDE 솔버의 파라미터를 그래프 신경망으로 학습하는 방법 알려줘
+d0308	dev	e2e_ko_1008:A017	LLM 증류에서 reverse KL 쓰면 학생 모델이 과신하게 되는 문제를 다양성 항으로 고친 논문 있어?
+d0309	dev	e2e_ko_1008:A018	타깃 발굴부터 시작하는 계산 신약개발 방법들을 입문자용으로 정리한 자료 알려줘
+d0310	dev	e2e_ko_1008:A019	중국 초중고 수학 문제로 멀티모달 파운데이션 모델을 평가하는 벤치마크 있어?
+d0311	dev	e2e_ko_1008:A020	진화 강화학습으로 학습한 소크라테스식 STEM 융합 교육 튜터 연구 설명해줘
+d0312	dev	e2e_ko_1008:A021	병원 퇴원 기록에서 주진단 코드를 자동으로 고르는 시스템 사례 알려줘
+d0313	dev	e2e_ko_1008:A022	로봇 상태-행동 궤적을 그림으로 그려서 VLA 정책에 프롬프트로 주는 방법 설명해줘
+d0314	dev	e2e_ko_1008:A023 nodoc_conclusion_1029:162_A023	4천 개 넘는 언어를 다루는 자기지도 음성 인코더 논문 요약해줘
+d0315	dev	e2e_ko_1008:A024	차량 센싱과 통신을 위해 OFDM 프레임 구성을 강화학습으로 조절하는 연구 있어?
+d0316	dev	e2e_ko_1008:A025	evidential deep learning을 단순한 손실 함수로 바꿔서 한 번의 추론으로 불확실성을 내는 방법 알려줘
+d0317	dev	e2e_ko_1008:A026	의료 멀티모달 모델의 답변을 ROUGE나 BLEU 대신 LLM으로 자동 평가하는 방법 있어?
+d0318	dev	e2e_ko_1008:A027	아무 코퍼스에서나 다양한 RAG 지시 데이터를 합성하는 방법 설명해줘
+d0319	dev	e2e_ko_1008:A028	협상하는 LLM 에이전트가 신뢰 실행 환경인지 아닌지 구별하는 능력을 다룬 논문 알려줘
+d0320	dev	e2e_ko_1008:A029	온라인 강의 수강생이 개념을 이해하도록 그래프 RAG로 돕는 연구 요약해줘
+d0321	dev	e2e_ko_1008:A030	모방학습으로 만든 로봇 정책을 온라인 상호작용으로 잔차 정책을 붙여 다듬는 방법 알려줘
+d0322	dev	e2e_ko_1008:A031	CLIP 프롬프트 벡터를 입력 이미지마다 조건부로 만들어서 처음 보는 클래스에 일반화하는 방법 설명해줘
+d0323	dev	e2e_ko_1008:A032	티베트 전통 의학 질문에 여러 지식베이스를 쓰면서 근거를 추적할 수 있는 RAG 연구 있어?
+d0324	dev	e2e_ko_1008:A033	요약문을 ROUGE 말고 LLM으로 세밀하게 평가하는 방법 알려줘
+d0325	dev	e2e_ko_1008:A034	독일 법학 교육에서 오픈소스 LLM으로 감정서 문체를 분석할 수 있는지 본 연구 설명해줘
+d0326	dev	e2e_ko_1008:A035	NeurIPS RAG 대회에서 우승한 계층적 필터링 + 두 번 생성하는 방식 알려줘
+d0327	dev	e2e_ko_1008:A036	비전 언어 모델 안에 이상 탐지 지식을 가진 희소한 뉴런이 이미 있다는 연구 요약해줘
+d0328	dev	e2e_ko_1008:A037	계속 늘어나는 확률적 데이터에서 가중치 있는 빈발 순차 패턴을 찾는 방법 있어?
+d0329	dev	e2e_ko_1008:A038	협력형 언어 게임에서 언어모델 사전분포와 인지 위계를 베이즈 추론으로 합친 연구 설명해줘
+d0330	dev	e2e_ko_1008:A039	참과 거짓 주장이 섞인 LLM 답변의 확신도를 추정해서 환각을 잡는 방법 알려줘
+d0331	dev	e2e_ko_1008:A040	레딧 글로 신종 향정신성 물질에 대한 의사 질문에 답하는 RAG 연구 있어?
+d0332	dev	e2e_ko_1008:A041	천만 개 사실이 있는 지식 그래프에서 문제를 뽑아 LLM 사실성을 평가하는 방법 설명해줘
+d0333	dev	e2e_ko_1008:A042	RAG 검색 DB에 속이는 문서를 넣어서 모델 행동을 바꾸는 공격 논문 알려줘
+d0334	dev	e2e_ko_1008:A043	산업 공정 제어에 심층 강화학습을 쓰기 위해 전이학습을 활용하는 방향을 정리한 글 요약해줘
+d0335	dev	e2e_ko_1008:A044	강화학습으로 고른 지식 그래프 정보를 프롬프트에 넣어서 LLM 환각을 줄이는 방법 있어?
+d0336	dev	e2e_ko_1008:A045	데이터센터에서 LLM 추론을 서빙할 때 에너지 효율과 성능의 트레이드오프를 분석한 연구 알려줘
+d0337	dev	e2e_ko_1008:A046	파인튜닝한 Mistral과 RAG로 암호화폐 뉴스를 계층적으로 요약하는 연구 설명해줘
+d0338	dev	e2e_ko_1008:A047	구현형 에이전트를 위한 일상 집안일 천 가지 시뮬레이션 벤치마크 있어?
+d0339	dev	e2e_ko_1008:A048	깊이 정보 없이 여러 시점 RGB 영상만으로 입자 물리 시뮬레이터를 학습하는 방법 알려줘
+d0340	dev	e2e_ko_1008:A049	영화 이해를 위해 장면이 바뀌어도 등장인물을 알아보는 비전 언어 모델 요약해줘
+d0341	dev	e2e_ko_1008:A050	검증 가능한 보상 강화학습에서 시각 의존도에 따라 토큰별 advantage를 다르게 주는 방법 설명해줘
+d0342	dev	e2e_ko_1008:A051	포트폴리오 인덱스 추종에서 종목 수 제약을 미분 가능하게 바꾼 연구 있어?
+d0343	dev	e2e_ko_1008:A052	잠재 확산 모델로 실제 같은 라이다 점구름 장면을 생성하는 방법 알려줘
+d0344	dev	e2e_ko_1008:A053	백도어 트리거로 텍스트 분류기에 편향을 심는 공격 연구 설명해줘
+d0345	dev	e2e_ko_1008:A055	점구름 분류에서 로컬 특징을 강화한 상태 공간 모델 있어?
+d0346	dev	e2e_ko_1008:A056	사전학습 코퍼스 없이 LLM 자체 토큰 임베딩으로 검색할지 말지 정하는 적응형 RAG 설명해줘
+d0347	dev	e2e_ko_1008:A057	LLM이 작가의 창작물을 흉내 내는지 보이지 않는 워터마크로 잡아내는 방법 알려줘
+d0348	dev	e2e_ko_1008:A058	레이어를 점진적으로 빼서 작고 빠른 도메인 특화 LLM을 만드는 방법 요약해줘
+d0349	dev	e2e_ko_1008:A059	여러 RAG 시스템을 앙상블하는 걸 이론적으로 분석한 연구 있어?
+d0350	dev	e2e_ko_1008:A060	노이즈나 충돌 정보 주입 같은 RAG 보안 공격을 평가하는 벤치마크 알려줘
+d0351	dev	e2e_ko_1008:A061 query_glossary_1029:A061	질의 난이도에 따라 RAG 컨텍스트 압축률을 동적으로 바꾸는 방법 설명해줘
+d0352	dev	e2e_ko_1008:A062	지역 정보와 전역 정보를 잇기 위해 계층적 지식 층을 만드는 그래프 RAG 알려줘
+d0353	dev	e2e_ko_1008:A063	답할 수 없거나 반사실적인 컨텍스트에서도 문맥에 충실하도록 학습한 작은 RAG 모델 있어?
+d0354	dev	e2e_ko_1008:A064	학습 없이 야코비안으로 확산 모델 잠재 공간에서 의미 있는 편집 방향을 찾는 방법 설명해줘
+d0355	dev	e2e_ko_1008:A065	LLM으로 텍스트에서 위키데이터 타입과 관계에 맞춘 지식 그래프를 만드는 방법 알려줘
+d0356	dev	e2e_ko_1008:A066	성숙도 단계와 불확실성 측정으로 구현형 AI의 신뢰성을 인증하는 틀 요약해줘
+d0357	dev	e2e_ko_1008:A067	후보 해법을 많이 탐색한 다음 가장 좋은 걸 다듬어서 지연을 줄이는 코드 생성 방법 있어?
+d0358	dev	e2e_ko_1008:A068	분산 시스템을 위한 필드 기반 집합 프로그래밍 파이썬 라이브러리 알려줘
+d0359	dev	e2e_ko_1008:A069	RAG에서 검색 문서를 더 많이 넣으면 hard negative 때문에 긴 컨텍스트 LLM 성능이 떨어진다는 연구 설명해줘
+d0360	dev	e2e_ko_1008:A070	LLM이 만든 근거 설명으로 대화 속 사회적 의미 탐지를 보강하는 방법 알려줘
+d0361	dev	e2e_ko_1008:A071	LLM 환각이 이론적으로 피할 수 없다는 주장과 환각 유형 분류를 정리한 글 요약해줘
+d0362	dev	e2e_ko_1008:A072	재현성을 위해 재료과학 시뮬레이션 워크플로를 온톨로지로 기계가 읽을 수 있게 만든 연구 있어?
+d0363	dev	e2e_ko_1008:A073	밴딧에서 분산이 가장 작은 팔을 고르는 소프트맥스 정책 경사 방법 설명해줘
+d0364	dev	e2e_ko_1008:A074	RAG 지식베이스를 블랙박스 워터마크로 지켜서 지식재산 도용을 잡는 방법 알려줘
+d0365	dev	e2e_ko_1008:A075	오프라인 강화학습으로 반응하고 조종 가능한 자율주행 시뮬레이션 에이전트 만드는 연구 있어?
+d0366	dev	e2e_ko_1008:A076	난임 클리닉에서 LLM이 환자 병력 청취를 할 수 있는지 평가한 연구 요약해줘
+d0367	dev	e2e_ko_1008:A077 query_glossary_1029:A077	계층적 강화학습에서 자유 에너지와 상태 집계로 하위 목표를 찾는 방법 설명해줘
+d0368	dev	e2e_ko_1008:A078	히르슈슈프룽병 진단을 위해 대장 조직 이미지에서 근육층을 트랜스포머로 분할한 연구 알려줘
+d0369	dev	e2e_ko_1008:A079	SHAP 절댓값 평균이 작은 특징을 빼도 안전한지 따져본 논문 있어?
+d0370	dev	e2e_ko_1008:A080	벵골어 지역 방언에 대한 LLM 질의응답 편향을 측정한 연구 설명해줘
+d0371	dev	e2e_ko_1008:A081	기업에서 RAG를 도입할 때 보안이나 확장성 같은 문제를 정리한 글 요약해줘
+d0372	dev	e2e_ko_1008:A082	웹캠으로 표정 감정을 인식해서 맞는 음악을 틀어주는 시스템 알려줘
+d0373	dev	e2e_ko_1008:A083	실제로 코드 수정을 이끌어내는 코드 리뷰 코멘트를 LLM이 쓰도록 학습하는 방법 있어?
+d0374	dev	e2e_ko_1008:A084	확률적 ICP 점구름 정합의 불확실성을 kernel SHAP으로 설명하는 연구 알려줘
+d0375	dev	e2e_ko_1008:A085	텍스트 질의를 받아서 소리와 영상으로 강의 영상의 단계를 찾아 캡션 다는 모델 설명해줘
+d0376	dev	e2e_ko_1008:A086	LLM이 만든 콘텐츠의 법적 소유권과 출처 표기 문제를 다룬 연구 요약해줘
+d0377	dev	e2e_ko_1008:A087	연구 작업을 돕기 위해 LLM으로 웹 문서 사이에 의미 링크를 만드는 방법 알려줘
+d0378	dev	e2e_ko_1008:A088	RAG 답변 구간마다 근거 문서를 붙이려고 어텐션과 의존 구문 분석을 같이 쓰는 방법 있어?
+d0379	dev	e2e_ko_1008:A089	4GB GPU에서 QLoRA로 1.5B 모델을 아랍어용으로 파인튜닝한 연구 설명해줘
+d0380	dev	e2e_ko_1008:A091	교통 시스템에서 대형 언어모델이 할 수 있는 역할과 로드맵을 정리한 글 요약해줘
+d0381	dev	e2e_ko_1008:A092	파라미터 지식과 문맥 지식이 충돌할 때 문맥 민감 뉴런에 가중치를 줘서 해결하는 방법 있어?
+d0382	dev	e2e_ko_1008:A093	긴 컨텍스트 추론에서 어텐션 표류를 고려해 KV 캐시를 동적으로 검색·압축하는 방법 설명해줘
+d0383	dev	e2e_ko_1008:A094	GPT-4로 소프트웨어 테스트용 메타모픽 관계를 생성해본 연구 알려줘
+d0384	dev	e2e_ko_1008:A095	가소성 상실과 망각을 동시에 막는 효용 기반 섭동 경사하강법 설명해줘
+d0385	dev	e2e_ko_1008:A096	가중치 공유로 계산량을 줄인 가벼운 LSTM 구조 알려줘
+d0386	dev	e2e_ko_1008:A097	딥러닝 실험을 24시간 자율로 돌리는 LLM 에이전트 연구 있어?
+d0387	dev	e2e_ko_1008:A098	초기 레이어에서 중요한 토큰을 골라 긴 입력을 천 배 줄이는 방법 요약해줘
+d0388	dev	e2e_ko_1008:A099	GUI 에이전트 학습 궤적을 먼저 화면을 탐색하고 나중에 과제를 거꾸로 추론해서 만드는 방법 설명해줘
+d0389	dev	e2e_ko_1008:A100	아주 긴 하드웨어 스펙 문서를 다중 홉 추론으로 읽어서 칩 설계를 돕는 LLM 연구 있어?
+d0390	dev	e2e_ko_1008:A101	여러 채널 센서 시계열의 정상 패턴을 시간과 공간 양쪽으로 학습해서 이상치를 찾는 방법 알려줘
+d0391	dev	e2e_ko_1008:A102	RAG의 검색기와 생성기를 동시에 노리는 경사 기반 오염 공격 설명해줘
+d0392	dev	e2e_ko_1008:A103	로봇 작업 중 실패를 온라인으로 감지하고 복구하는 뉴로심볼릭 프레임워크 알려줘
+d0393	dev	e2e_ko_1008:A104	프로그래밍 학습 시스템에서 지식 그래프 RAG로 피드백을 주고 문제를 추천한 연구 요약해줘
+d0394	dev	e2e_ko_1008:A105	봄버맨 같은 팀 게임 에이전트를 커리큘럼 학습과 집단 셀프플레이로 훈련한 연구 있어?
+d0395	dev	e2e_ko_1008:A106	위험한 주행 상황 추론을 돕기 위해 비슷한 희귀 교통 시나리오를 검색해 VLM에 주는 방법 설명해줘
+d0396	dev	e2e_ko_1008:A107	무인 수상정에서 LSTM으로 파도 방향을 추정하는 연구 알려줘
+d0397	dev	e2e_ko_1008:A108	앞에서 찾은 근거를 거꾸로 다시 보고 고치는 다중 홉 RAG 방법 있어?
+d0398	dev	e2e_ko_1008:A109	점구름 동영상 행동 인식에 선택적 상태 공간 모델을 쓴 연구 요약해줘
+d0399	dev	e2e_ko_1008:A110	하드 라벨만 보이는 상황에서 적은 질의로 데이터 없이 모델을 훔치는 방법 설명해줘
+d0400	dev	e2e_ko_1008:A111	지역 인용 추천을 위해 인용 전용 사전학습을 한 BART 모델 알려줘
+d0401	dev	e2e_ko_1008:A112 nodoc_conclusion_1029:162_A112	유사도만이 아니라 유용성과 간결성까지 고려해서 RAG 검색하는 방법 있어?
+d0402	dev	e2e_ko_1008:A113	자동차 표준 규정 준수 챗봇과 설계 코파일럿에 RAG를 쓴 사례 알려줘
+d0403	dev	e2e_ko_1008:A114 nodoc_conclusion_1029:162_A114	컨텍스트 관련성과 활용도를 라벨링한 설명 가능한 RAG 벤치마크 설명해줘
+d0404	dev	e2e_ko_1008:A115	GNN을 개수 한정자가 있는 논리 분류기로 증류해서 해석 가능하게 만드는 방법 알려줘
+d0405	dev	e2e_ko_1008:A116	벡터 저장소, 지식 그래프, 텐서 분해를 합친 도메인 특화 RAG 연구 요약해줘
+d0406	dev	e2e_ko_1008:A117 query_glossary_1029:A117	RAG 컨텍스트에 다양하면서도 관련 있는 청크를 고르려고 DPP를 쓰는 방법 있어?
+d0407	dev	e2e_ko_1008:A118	토큰화와 분포 가설이 LLM이 의미를 갖는 근거라는 주장을 다룬 글 설명해줘
+d0408	dev	e2e_ko_1008:A119	단안 깊이 추정을 위해 어댑터 혼합으로 CLIP을 가볍게 적응시킨 방법 알려줘
+d0409	dev	e2e_ko_1008:A120	전력망 규정 준수 여부를 검색과 LLM 추론으로 판단하는 시스템 알려줘
+d0410	dev	e2e_ko_1008:C1_01	LLM용 RAG 전반을 정리한 서베이 논문 있어?
+d0411	dev	e2e_ko_1008:C1_02 presence_gate_1014:C1_02 real_eval2_1015:C1_02	그래프 기반 RAG 서베이 정리해줘
+d0412	dev	e2e_ko_1008:C1_03	멀티모달 RAG를 다룬 서베이 알려줘
+d0413	dev	e2e_ko_1008:C1_04	추론을 결합한 에이전틱 RAG 서베이 요약해줘
+d0414	dev	e2e_ko_1008:C1_05	RAG 시스템을 어떻게 평가하는지 정리한 서베이 있어?
+d0415	dev	e2e_ko_1008:C1_06	RAG의 신뢰성, 프라이버시, 보안 문제를 정리한 서베이 알려줘
+d0416	dev	e2e_ko_1008:C1_07	대형 언어모델 환각에 대한 서베이 논문 요약해줘
+d0417	dev	e2e_ko_1008:C1_08	LLM 기반 자율 에이전트 서베이 알려줘
+d0418	dev	e2e_ko_1008:C1_09	컴퓨터를 조작하는 GUI 에이전트나 웹 에이전트 서베이 있어?
+d0419	dev	e2e_ko_1008:C1_10	트랜스포머 대안으로서 상태 공간 모델을 정리한 서베이 설명해줘
+d0420	dev	e2e_ko_1008:C1_11	대형 비전 언어 모델 서베이 알려줘
+d0421	dev	e2e_ko_1008:C1_12	파운데이션 모델을 쓴 구현형 AI와 로보틱스 서베이 요약해줘
+d0422	dev	e2e_ko_1008:C1_13	LLM 추론 가속을 위한 KV 캐시 관리 서베이 있어?
+d0423	dev	e2e_ko_1008:C1_14	파운데이션 모델용 LoRA 기법들을 정리한 리뷰 알려줘
+d0424	dev	e2e_ko_1008:C1_15	LLM 테스트 타임 계산 스케일링 서베이 설명해줘
+d0425	dev	e2e_ko_1008:C1_16	대형 언어모델 안전성 서베이 알려줘
+d0426	dev	e2e_ko_1008:C1_17	LLM 시대의 텍스트 임베딩을 정리한 서베이 있어?
+d0427	dev	e2e_ko_1008:C1_18	MoE 모델 추론 최적화 서베이 요약해줘
+d0428	dev	e2e_ko_1008:C1_19	소형 언어모델 서베이 알려줘
+d0429	dev	e2e_ko_1008:C1_20	추천 시스템에 LLM이나 생성 모델을 쓰는 연구를 정리한 서베이 있어?
+d0430	dev	e2e_ko_1008:C1_21	확산 모델 기반 비디오 편집 서베이 알려줘
+d0431	dev	e2e_ko_1008:C1_22 nodoc_conclusion_1029:162_C1_22	의료 분야 RAG를 정리한 리뷰 논문 요약해줘
+d0432	dev	e2e_ko_1008:C1_23	딥러닝 데이터 오염 공격 서베이 알려줘
+d0433	dev	e2e_ko_1008:C1_24	LLM 기반 Text-to-SQL 리뷰 있어?
+d0434	dev	e2e_ko_1008:C2_01	순환 구조 없이 셀프 어텐션만으로 기계번역을 한 원조 논문 설명해줘
+d0435	dev	e2e_ko_1008:C2_02	양방향 마스크 언어모델로 사전학습해서 언어 이해 성능을 올린 논문 알려줘
+d0436	dev	e2e_ko_1008:C2_03	1750억 파라미터 모델로 퓨샷 인컨텍스트 학습을 보여준 논문 요약해줘
+d0437	dev	e2e_ko_1008:C2_04	사람 피드백 강화학습으로 언어모델이 지시를 따르게 학습시킨 논문 설명해줘
+d0438	dev	e2e_ko_1008:C2_05	별도 보상 모델 없이 선호도를 직접 최적화하는 방법 알려줘
+d0439	dev	e2e_ko_1008:C2_06 nodoc_conclusion_1029:162_C2_06	큰 모델을 저랭크 업데이트 행렬로 효율적으로 파인튜닝하는 원조 방법 설명해줘
+d0440	dev	e2e_ko_1008:C2_07	4비트로 양자화한 모델에 저랭크 어댑터를 붙여 GPU 한 장으로 파인튜닝하는 방법 알려줘
+d0441	dev	e2e_ko_1008:C2_08	중간 추론 단계를 보여주는 프롬프팅이 산술 추론을 높인다는 논문 요약해줘
+d0442	dev	e2e_ko_1008:C2_09	언어모델이 추론 과정과 도구 행동을 번갈아 하게 만드는 방법 설명해줘
+d0443	dev	e2e_ko_1008:C2_10	중간 추론 단계들을 트리로 탐색하면서 스스로 평가하는 방법 알려줘
+d0444	dev	e2e_ko_1008:C2_11	위키백과 밀집 검색과 seq2seq 생성기를 결합해서 지식 집약 과제를 푼 원조 RAG 논문 설명해줘
+d0445	dev	e2e_ko_1008:C2_12	언어모델 손실이 파라미터, 데이터, 계산량과 거듭제곱 법칙을 따른다는 논문 요약해줘
+d0446	dev	e2e_ko_1008:C2_13	계산 최적 학습을 하려면 모델 크기만큼 학습 토큰도 늘려야 한다는 논문 알려줘
+d0447	dev	e2e_ko_1008:C2_14	이미지 패치 시퀀스에 순수 트랜스포머를 적용해 분류한 논문 설명해줘
+d0448	dev	e2e_ko_1008:C2_15	점진적으로 노이즈를 넣는 과정을 거꾸로 학습해서 이미지를 생성하는 논문 알려줘
+d0449	dev	e2e_ko_1008:C2_16	사전학습된 오토인코더의 잠재 공간에서 확산을 돌려 고해상도 이미지를 만드는 방법 설명해줘
+d0450	dev	e2e_ko_1008:C2_17	비전 인코더를 LLM에 연결하고 GPT-4로 만든 멀티모달 데이터로 지시 튜닝한 논문 요약해줘
+d0451	dev	e2e_ko_1008:C2_18	LLM이 작업을 계획하고 허깅페이스 모델들에 나눠 맡기는 시스템 알려줘
+d0452	dev	e2e_ko_1008:C2_19	토큰마다 8개 전문가 중 2개로 보내는 희소 MoE 언어모델 설명해줘
+d0453	dev	e2e_ko_1008:C2_20	공개 데이터만으로 학습한 7B~65B 오픈 파운데이션 언어모델 알려줘
+d0454	dev	external_search_v2_1020:N01	RAG에서 검색 결과 순위를 매길 때 LLM 생성 확률을 쓰는 방법 있어?
+d0455	dev	external_search_v2_1020:N02 survey_gate_1030:x2_N02	LLM이 거짓 정보를 그럴듯하게 만들어낼 때 내부 활성값으로 잡아내는 연구 찾아줘
+d0456	dev	external_search_v2_1020:N03	여러 LLM 답을 비교해서 사실 오류를 찾는 교차 검증 방법 있어?
+d0457	dev	external_search_v2_1020:N04	검색 증강 생성에서 출처 문서를 사용자에게 보여주는 인터페이스 연구 있어?
+d0458	dev	external_search_v2_1020:N05	긴 문서 요약에서 원문에 없는 내용이 생기는 문제를 다룬 연구 정리해줘
+d0459	dev	external_search_v2_1020:N06	RAG 시스템의 답변 정확도를 운영 중에 모니터링하는 방법 연구 있어?
+d0460	dev	external_search_v2_1020:N07	문서 검색에서 쿼리 확장을 LLM으로 하는 방법 찾아줘
+d0461	dev	external_search_v2_1020:N08	전문 용어가 많은 문서에서 검색 성능을 높이는 어휘 확장 방법 있어?
+d0462	dev	external_search_v2_1020:N09	표 이미지에서 셀 구조를 인식하는 테이블 구조 인식 모델 찾아줘
+d0463	dev	external_search_v2_1020:N10	재무제표 같은 표에서 LLM이 숫자를 정확히 계산하게 하는 프로그램 생성 방법 있어?
+d0464	dev	external_search_v2_1020:N11	PDF에서 차트를 읽고 수치를 뽑아내는 차트 이해 모델 연구 정리해줘
+d0465	dev	external_search_v2_1020:N12	슬라이드나 보고서처럼 레이아웃이 복잡한 문서에서 질의응답하는 연구 있어?
+d0466	dev	external_search_v2_1020:N13 survey_gate_1030:x2_N13	질문과 문서의 언어가 다를 때(교차 언어) 검색하는 방법 연구 찾아줘
+d0467	dev	external_search_v2_1020:N14	희소 학습 표현(SPLADE 같은)으로 검색하는 방법 연구 있어?
+d0468	dev	external_search_v2_1020:N15	검색기를 LLM 피드백으로 학습시키는 방법 찾아줘
+d0469	dev	external_search_v2_1020:N16	임베딩 모델을 작게 증류해서 검색 속도를 높이는 연구 있어?
+d0470	dev	external_search_v2_1020:N17	벡터 검색에서 차원 수를 줄여 속도와 메모리를 아끼는 방법 연구 정리해줘
+d0471	dev	external_search_v2_1020:N18 survey_gate_1030:x2_N18	디스크 기반 대규모 벡터 인덱스 연구 찾아줘
+d0472	dev	external_search_v2_1020:N19	RAG 평가에서 정답 문서 없이 검색 품질을 추정하는 방법 있어?
+d0473	dev	external_search_v2_1020:N20	LLM 답변을 사람 선호와 맞추는 자동 평가 모델(리워드 모델) 연구 정리해줘
+d0474	dev	external_search_v2_1020:N21	생성 답변의 사실성을 위키피디아 근거로 자동 채점하는 방법 있어?
+d0475	dev	external_search_v2_1020:N22 survey_gate_1030:x2_N22	질의응답 벤치마크에서 질문 난이도를 자동으로 조절해 만드는 방법 연구 찾아줘
+d0476	dev	external_search_v2_1020:N23	LLM 평가 결과의 통계적 유의성을 검정하는 방법 다룬 연구 있어?
+d0477	dev	external_search_v2_1020:N24	프롬프트를 조금 바꿔도 LLM 성능이 크게 달라지는 민감도 문제 연구 정리해줘
+d0478	dev	external_search_v2_1020:N25	RAG 파이프라인 구성 요소를 자동으로 고르는 AutoML 같은 방법 있어?
+d0479	dev	external_search_v2_1020:N26 survey_gate_1030:x2_N26	검색 결과에서 개인정보가 새어나가는 RAG 프라이버시 문제 연구 찾아줘
+d0480	dev	external_search_v2_1020:N27	오래된 문서와 최신 문서가 섞였을 때 최신 정보를 우선하는 시간 인식 검색 연구 있어?
+d0481	dev	external_search_v2_1020:N28	대화형 검색에서 앞 질문 맥락을 반영해 질의를 다시 쓰는 방법 연구 정리해줘
+d0482	dev	external_search_v2_1020:N29	LLM이 표를 보고 그래프나 차트를 생성하는 연구 있어?
+d0483	dev	external_search_v2_1020:N30	RAG 답변 생성 시 여러 문서의 정보를 합쳐 요약하는 다중 문서 요약 방법 찾아줘
+d0484	dev	external_search_v3_1020:M01	LLM 답변에서 숫자나 날짜를 잘못 말하는 수치 환각을 줄이는 방법 있어?
+d0485	dev	external_search_v3_1020:M02	RAG에서 검색 문서를 몇 개 넣을지 질문마다 자동으로 정하는 방법 찾아줘
+d0486	dev	external_search_v3_1020:M03	문서 검색에서 질문을 여러 하위 질문으로 쪼개서 검색하는 연구 정리해줘
+d0487	dev	external_search_v3_1020:M04	LLM이 표를 SQL 없이 직접 읽고 답할 때 틀리는 유형을 분석한 연구 있어?
+d0488	dev	external_search_v3_1020:M05	PDF 문서의 각주나 참고문헌을 본문과 구분해서 파싱하는 방법 있어?
+d0489	dev	external_search_v3_1020:M06 survey_gate_1030:x3_M06	도메인 문서로 LLM을 계속 사전학습시켜 전문 지식을 넣는 방법 연구 찾아줘
+d0490	dev	external_search_v3_1020:M07	RAG와 파인튜닝 중 어느 쪽이 도메인 지식 주입에 나은지 비교한 연구 있어?
+d0491	dev	external_search_v3_1020:M08	임베딩 검색 결과를 키워드 일치로 다시 걸러내는 하이브리드 재순위 방법 있어?
+d0492	dev	external_search_v3_1020:M09	긴 회의록이나 보고서를 계층적으로 요약하는 LLM 방법 연구 정리해줘
+d0493	dev	external_search_v3_1020:M10	검색 증강 생성에서 이미지와 텍스트를 같이 임베딩하는 멀티모달 검색 방법 찾아줘
+d0494	dev	external_search_v3_1020:M11	RAG 시스템의 응답을 사람이 평가할 때 평가자 간 일치도를 다룬 연구 있어?
+d0495	dev	external_search_v3_1020:M12 survey_gate_1030:x3_M12	LLM 출력이 JSON 같은 정해진 형식을 지키게 하는 구조화 생성 방법 연구 찾아줘
+d0496	dev	external_search_v3_1020:M13	지식 그래프와 벡터 검색을 함께 써서 질의응답하는 하이브리드 RAG 연구 정리해줘
+d0497	dev	external_search_v3_1020:M14	검색 시스템에서 사용자 클릭 로그로 랭킹을 개선하는 방법 있어?
+d0498	dev	external_search_v3_1020:M15 survey_gate_1030:x3_M15	LLM이 모르는 최신 사건 질문에 답할 때 웹 검색을 붙이는 방법 연구 찾아줘
+d0499	dev	external_search_v3_1020:M16	문서 임베딩에서 긴 문서를 여러 벡터로 나눠 표현하는 multi-vector 방법 있어?
+d0500	dev	external_search_v3_1020:M17	특허나 법률 문서처럼 긴 전문 문서를 검색하는 방법 연구 정리해줘
+d0501	dev	external_search_v3_1020:M18	RAG 답변에서 근거 문장을 하이라이트해서 보여주는 방법 있어?
+d0502	dev	external_search_v3_1020:M19 survey_gate_1030:x3_M19	LLM 기반 평가에서 같은 답을 여러 번 채점하면 점수가 흔들리는 문제 다룬 연구 찾아줘
+d0503	dev	external_search_v3_1020:M20	검색용 벤치마크에서 BEIR 같은 제로샷 평가 결과를 정리한 연구 있어?
+d0504	dev	external_search_v3_1020:M21	작은 언어모델로도 RAG 성능을 내는 방법 연구 정리해줘
+d0505	dev	external_search_v3_1020:M22	질문에 답이 여러 개일 때 모호성을 처리하는 질의응답 연구 있어?
+d0506	dev	external_search_v3_1020:M23 survey_gate_1030:x3_M23	코드 저장소를 검색해서 코드 생성에 쓰는 retrieval-augmented code generation 연구 찾아줘
+d0507	dev	external_search_v3_1020:M24	RAG 파이프라인에서 문서 중복을 제거해 컨텍스트를 아끼는 방법 있어?
+d0508	dev	external_search_v3_1020:M25	LLM 답변의 불확실성을 수치로 추정하는 방법 연구 동향 정리해줘
+d0509	dev	external_search_v3_1020:M26	OCR 오류가 많은 스캔 문서에서 검색 성능을 높이는 방법 있어?
+d0510	dev	external_search_v3_1020:M27 survey_gate_1030:x3_M27	학술 논문 추천 시스템에서 LLM을 쓰는 방법 연구 찾아줘
+d0511	dev	external_search_v3_1020:M28	표와 그림이 섞인 과학 논문에서 질의응답하는 벤치마크 있어?
+d0512	dev	external_search_v3_1020:M29	검색 결과의 다양성을 높이는 재순위 방법 연구 정리해줘
+d0513	dev	external_search_v3_1020:M30	LLM 에이전트가 여러 번 검색하며 답을 찾는 deep research 시스템 연구 있어?
+d0514	dev	foundation_1031:H_A04	문서를 계층적으로 요약해서 트리로 만든 뒤 그 트리에서 검색하는 연구 알려줘
+d0515	dev	foundation_1031:H_A05	표와 텍스트가 섞인 질문에 답할 때 표 부분을 SQL로 바꿔서 푸는 연구 있어?
+d0516	dev	foundation_1031:H_A06	긴 문서를 넣을 때 프롬프트를 압축해서 토큰을 줄이는 연구 핵심 내용 설명해줘
+d0517	dev	foundation_1031:H_A07	LLM이 스스로 검증용 질문을 만들어 답을 확인하면서 환각을 줄이는 방법 다룬 논문 있어?
+d0518	dev	foundation_1031:H_A08	여러 번 샘플링한 답들이 서로 얼마나 일치하는지로 환각을 잡아내는 연구 알려줘
+d0519	dev	foundation_1031:H_A09	에이전트가 실패한 시도를 말로 돌아보고 다음 시도에 반영하는 방법 다룬 논문 있어?
+d0520	dev	foundation_1031:H_A11	작은 모델이 초안을 만들고 큰 모델이 한 번에 검증하는 방식으로 생성 속도를 높인 연구 알려줘
+d0521	dev	foundation_1031:H_A12	질문 난이도에 따라 검색을 안 하거나 한 번 하거나 여러 번 하도록 고르는 RAG 연구 있어?
+d0522	dev	foundation_1031:H_A13	검색된 문서를 요약하거나 압축해서 LLM에 넣는 방식으로 RAG 비용을 줄인 연구 알려줘
+d0523	dev	foundation_1031:H_A15	평가 문제가 학습 데이터에 섞였는지(데이터 오염) 확인하는 방법 다룬 논문 알려줘
+d0524	dev	foundation_1031:H_A16	에이전트가 웹 브라우저를 직접 조작해서 과제를 푸는 벤치마크 연구 있어?
+d0525	dev	foundation_1031:H_A17	사용자와 나눈 예전 대화를 장기 기억으로 저장했다가 꺼내 쓰는 LLM 구조 연구 핵심 내용 알려줘
+d0526	dev	foundation_1031:H_A18	보상 모델 없이 선호 데이터만으로 바로 정책을 학습하는 방법 다룬 논문 설명해줘
+d0527	dev	foundation_1031:H_A20	질문을 여러 개의 하위 질문으로 쪼개서 차례로 검색하며 답하는 멀티홉 RAG 연구 알려줘
+d0528	dev	foundation_1031:H_A23	단백질 구조 예측에 언어 모델을 쓰는 연구 있어?
+d0529	dev	foundation_1031:H_A24	자율주행 차량의 경로 계획을 강화학습으로 푸는 연구 핵심 내용 알려줘
+d0530	dev	foundation_1031:H_B02	ColBERT 논문 자세히 설명해줘
+d0531	dev	foundation_1031:H_B03	Lost in the Middle 논문 핵심 내용 알려줘
+d0532	dev	foundation_1031:H_B05	ReAct 논문 자세히 설명해줘
+d0533	dev	foundation_1031:H_B14	RAG 자동 평가 프레임워크 ARES 논문 요약해줘
+d0534	dev	foundation_1031:H_C01	LLM이 외부 API를 호출하는 도구 사용 능력을 평가하는 벤치마크 연구들 정리해줘
+d0535	dev	foundation_1031:H_C02	긴 컨텍스트 모델을 평가하는 벤치마크 연구들 알려줘
+d0536	dev	foundation_1031:H_C03	Text-to-SQL 최신 연구 5개 찾아줘
+d0537	dev	foundation_1031:H_C04	LLM 탈옥(jailbreak) 공격과 방어 연구 동향 정리해줘
+d0538	dev	foundation_1031:H_C05	지식 그래프와 LLM을 결합한 질의응답 연구들 조사해줘
+d0539	dev	foundation_1031:H_C08	한국어 LLM이나 한국어 벤치마크 관련 연구 찾아줘
+d0540	dev	foundation_1031:H_C10	여러 LLM 에이전트가 협업해서 문제를 푸는 연구들 조사해줘
+d0541	dev	foundation_1031:H_C11	텍스트 임베딩 모델 학습 방법 연구 3개만 알려줘
+d0542	dev	foundation_1031:H_C12	과학 논문을 자동으로 읽고 요약하거나 리뷰하는 연구들 정리해줘
+d0543	dev	foundation_1031:H_C13	의료 분야에 RAG를 적용한 연구 찾아줘
+d0544	dev	foundation_1031:H_C15	수학 문제 풀이 능력을 높이는 LLM 학습 방법 연구 트렌드 알려줘
+d0545	dev	foundation_1031:H_C17	LLM 출력의 불확실성을 추정하는 연구들 조사해줘
+d0546	dev	foundation_1031:H_C18	음성 비서에 LLM을 붙인 연구 동향 정리해줘
+d0547	dev	foundation_1031:H_D01	BM25랑 밀집 검색은 어떤 질문에서 성능이 갈려? 비교한 연구 알려줘
+d0548	dev	foundation_1031:H_D02	LoRA랑 전체 파인튜닝은 성능이랑 비용이 어떻게 달라?
+d0549	dev	foundation_1031:H_D03	RAG로 검색해서 넣는 방식이랑 긴 컨텍스트에 문서를 다 넣는 방식 중 뭐가 나은지 비교한 연구 있어?
+d0550	dev	foundation_1031:H_D04	DPO랑 PPO 기반 RLHF는 결과가 어떻게 달라?
+d0551	dev	foundation_1031:H_D05	cross-encoder 리랭커랑 LLM 리랭커는 정확도랑 속도가 어떻게 달라?
+d0552	dev	foundation_1031:H_D06	Self-RAG랑 CRAG는 검색 결과를 다루는 방식이 뭐가 달라?
+d0553	dev	foundation_1031:H_D07	문장 단위로 임베딩하는 거랑 문서 단위로 임베딩하는 거는 검색 정확도가 어떻게 달라?
+d0554	dev	foundation_1031:H_D08	GPT-4 판정이랑 사람 판정은 얼마나 일치해? 비교한 연구 알려줘
+d0555	dev	foundation_1031:H_E01	speculative decoding을 쓰면 생성 속도가 보통 몇 배 빨라져?
+d0556	dev	foundation_1031:H_E02	RAG를 붙이면 환각이 몇 % 정도 줄어든다는 연구 있어?
+d0557	dev	foundation_1031:H_E03	LLM을 4비트로 양자화하면 정확도가 얼마나 떨어져?
+d0558	dev	foundation_1031:H_E04	리랭커를 붙이면 검색 정확도(Recall@10)가 얼마나 올라가?
+d0559	dev	foundation_1031:H_E05	LLM 판정자가 자기 모델 답을 얼마나 더 높게 평가하는지 수치로 보여준 연구 있어?
+d0560	dev	foundation_1031:H_E06	프롬프트 압축으로 토큰을 몇 배까지 줄여도 성능이 유지돼?
+d0561	dev	foundation_1031:H_E07	긴 컨텍스트에서 필요한 정보가 중간에 있으면 정확도가 얼마나 떨어져?
+d0562	dev	foundation_1031:H_E08	웹 에이전트 벤치마크에서 제일 좋은 모델 성공률이 몇 %야?
+d0563	dev	foundation_1031:H_F02	RAG 평가에서 같은 LLM이 답 생성과 근거성 판정을 둘 다 하면 점수가 부풀려지는가. 판정 모델을 분리했을 때 차이를 측정한 연구를 찾아라.
+d0564	dev	foundation_1031:H_F03	하이브리드 검색에서 RRF로 합칠 때 k 값을 바꾸면 결과가 얼마나 흔들리는지, 그리고 학습된 가중치 융합이 RRF보다 나은 조건을 다룬 논문이 있는가.
+d0565	dev	foundation_1031:H_F05	citation precision이 높아도 답 문장이 인용 문서 내용과 다를 수 있다. 인용 정확도와 근거성을 따로 재야 한다고 주장한 연구와 그 측정 방법을 알려줘.
+d0566	dev	foundation_1031:H_F06	한국어 질문을 영어 검색어로 번역해 영어 코퍼스를 검색할 때 번역 오류가 검색 성능에 얼마나 영향을 주는지, 다국어 임베딩으로 바로 검색하는 것과 비교한 연구가 있는가.
+d0567	dev	foundation_1031:H_F08	LLM-as-a-judge로 0~5점 채점할 때 같은 답을 여러 번 채점하면 점수 분산이 얼마나 되고, 몇 번 평균내야 안정되는지 다룬 논문이 있는가.
+d0568	dev	foundation_1031:H_G01	RAG 리랭킹 관련 논문들을 바탕으로 아직 덜 연구된 빈틈 3가지 제안해줘
+d0569	dev	foundation_1031:H_G02	LLM 에이전트 메모리 연구들을 읽고 실제 서비스에 적용할 때 문제점을 정리해줘
+d0570	dev	foundation_1031:H_G03	환각 탐지 연구들을 방법별(내부 상태 · 샘플링 일관성 · 외부 검증)로 나눠서 정리해줘
+d0571	dev	foundation_1031:H_G04	RAG 평가 방법들을 비교표처럼 정리하고 어떤 상황에 뭘 쓰면 좋은지 추천해줘
+d0572	dev	foundation_1031:H_H01	retreival augmented generaton 최신 논문 요약해줘
+d0573	dev	foundation_1031:H_H02	랭체인 말고 다른 rag 프레임워크 논문 있어?
+d0574	dev	foundation_1031:H_H04	트랜스포머 대체할만한 구조 연구 있나
+t0002	test	foundation_1031:H_A01	검색할 때 질문을 가상의 답변 문서로 먼저 바꾼 뒤 그걸로 검색하는 방법을 다룬 논문 있어?
+t0003	test	foundation_1031:H_A02	LLM이 답을 생성하는 도중에 확신이 낮아지면 그때 검색을 다시 하는 연구 알려줘
+t0004	test	foundation_1031:H_A03	RAG에서 검색 결과가 별로면 웹 검색으로 보충하고 문서를 걸러내는 방법 다룬 논문 있어?
+t0005	test	foundation_1031:H_A10	KV 캐시를 페이지 단위로 관리해서 LLM 서빙 처리량을 올린 연구 설명해줘
+t0006	test	foundation_1031:H_A14	LLM이 만든 글인지 사람이 쓴 글인지 구분할 수 있게 워터마크를 넣는 연구 있어?
+t0007	test	foundation_1031:H_A19	양자화할 때 중요한 가중치만 지켜서 성능 손실을 줄이는 연구 있어?
+t0008	test	foundation_1031:H_A21	코드 생성 모델이 저장소 전체 파일을 참고하도록 검색을 붙인 연구 있어?
+t0009	test	foundation_1031:H_A22	문서 페이지 이미지를 OCR 없이 그대로 임베딩해서 검색하는 멀티모달 RAG 연구 알려줘
+t0010	test	foundation_1031:H_A25	LLM이 긴 대화에서 앞에서 한 말과 모순되는 답을 하는지 검사하는 연구 있어?
+t0011	test	foundation_1031:H_A26	긴 동영상에서 필요한 장면을 찾아서 질문에 답하는 연구 알려줘
+t0012	test	foundation_1031:H_A27	LLM이 만든 코드를 실행해 보고 오류 메시지를 보고 스스로 고치는 방법 다룬 논문 있어?
+t0013	test	foundation_1031:H_A28	에이전트가 작업 계획을 먼저 세운 뒤 단계별로 실행하는 방식을 다룬 연구 핵심 내용 알려줘
+t0014	test	foundation_1031:H_A29	여러 추론 경로를 트리처럼 펼쳐서 탐색하면서 답을 찾는 방법 다룬 논문 설명해줘
+t0015	test	foundation_1031:H_A30	LLM 안에 있는 잘못된 사실 하나만 골라서 고치는 지식 편집 연구 알려줘
+t0016	test	foundation_1031:H_A31	학습할 때보다 긴 입력을 처리하도록 위치 인코딩(RoPE)을 늘리는 방법 연구 있어?
+t0017	test	foundation_1031:H_A32	전문가 혼합(MoE) 모델에서 토큰을 어느 전문가에게 보낼지 정하는 라우팅을 개선한 연구 알려줘
+t0018	test	foundation_1031:H_A33	LLM이 학습 데이터에 있던 개인정보를 그대로 외워서 내뱉는 문제를 다룬 연구 있어?
+t0019	test	foundation_1031:H_A34	LLM 답변에 성별이나 인종 편향이 있는지 측정하는 벤치마크 연구 알려줘
+t0020	test	foundation_1031:H_A35	차트나 그래프 이미지를 보고 질문에 답하는 모델 연구 핵심 내용 설명해줘
+t0021	test	foundation_1031:H_A36	LLM을 추천 시스템에 붙여서 추천 품질을 높인 연구 있어?
+t0022	test	foundation_1031:H_A37	학생이 쓴 서술형 답안을 LLM으로 자동 채점하는 연구 알려줘
+t0023	test	foundation_1031:H_A38	LLM이 숫자 계산이나 단위 변환을 틀리지 않도록 외부 계산기를 쓰게 한 연구 있어?
+t0024	test	foundation_1031:H_A39	날씨 예보에 트랜스포머를 쓴 연구 있어?
+t0025	test	foundation_1031:H_A40	로봇 팔이 물건을 집는 동작을 강화학습으로 배우는 연구 핵심 내용 알려줘
+t0026	test	foundation_1031:H_B01	Self-RAG 논문 요약해줘
+t0027	test	foundation_1031:H_B04	RAGAS 논문 요약해줘
+t0028	test	foundation_1031:H_B06	Toolformer 논문 요약해줘
+t0029	test	foundation_1031:H_B07	GraphRAG(From Local to Global) 논문 핵심 내용 설명해줘
+t0030	test	foundation_1031:H_B08	DPR(Dense Passage Retrieval) 논문 요약해줘
+t0031	test	foundation_1031:H_B09	RankGPT 논문에서 LLM으로 재순위하는 방법 설명해줘
+t0032	test	foundation_1031:H_B10	LLMLingua-2 논문 요약해줘
+t0033	test	foundation_1031:H_B11	BGE M3 임베딩 논문 핵심 내용 알려줘
+t0034	test	foundation_1031:H_B12	Medusa 논문 요약해줘
+t0035	test	foundation_1031:H_B13	FlashAttention 논문 자세히 설명해줘
+t0036	test	foundation_1031:H_B15	RETRO 논문 핵심 내용 알려줘
+t0037	test	foundation_1031:H_B16	QLoRA 논문 핵심 내용이랑 실험 결과 알려줘
+t0038	test	foundation_1031:H_B17	Chain-of-Thought 프롬프팅 논문 자세히 설명해줘
+t0039	test	foundation_1031:H_B18	REPLUG 논문 요약해줘
+t0040	test	foundation_1031:H_C06	RAG 시스템 평가 지표를 제안한 연구들 정리해줘
+t0041	test	foundation_1031:H_C07	작은 언어 모델로 추론 능력을 끌어올린 연구 추천해줘
+t0042	test	foundation_1031:H_C09	모바일이나 엣지 기기에서 LLM을 돌리기 위한 경량화 연구들 정리해줘
+t0043	test	foundation_1031:H_C14	2025년에 나온 딥 리서치(검색 에이전트) 연구들 정리해줘
+t0044	test	foundation_1031:H_C16	요즘 재밌는 RAG 논문 추천해줘
+t0045	test	foundation_1031:H_C19	LLM 에이전트가 위험한 행동을 하지 않게 막는 안전성 연구들 정리해줘
+t0046	test	foundation_1031:H_C20	LLM으로 소프트웨어 버그를 찾는 연구들 정리해줘
+t0047	test	foundation_1031:H_C21	검색 시스템에서 사용자 클릭 기록을 활용한 연구 4개만 찾아줘
+t0048	test	foundation_1031:H_C22	멀티모달 LLM이 이미지 속 글자를 읽는 능력을 평가한 연구들 조사해줘
+t0049	test	foundation_1031:H_C23	2025년 이후에 나온 LLM 기반 기계 번역 연구들 정리해줘
+t0050	test	foundation_1031:H_C24	긴 문서 요약에 LLM을 쓴 연구 추천해줘
+t0051	test	foundation_1031:H_C25	법률 분야에 LLM을 적용한 연구 찾아줘
+t0052	test	foundation_1031:H_C26	교육 분야에서 LLM을 튜터로 쓴 연구들 정리해줘
+t0053	test	foundation_1031:H_C27	언어별로 LLM 성능이 얼마나 차이 나는지 다룬 다국어 연구들 조사해줘
+t0054	test	foundation_1031:H_C28	LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘
+t0055	test	foundation_1031:H_C29	임베딩 모델 벤치마크(MTEB 같은) 관련 연구들 알려줘
+t0056	test	foundation_1031:H_C30	LLM 사전학습 데이터를 고르거나 정제하는 연구들 정리해줘
+t0057	test	foundation_1031:H_C31	요즘 나온 LLM 에이전트 논문 중에 볼만한 거 추천해줘
+t0058	test	foundation_1031:H_D09	Self-Consistency랑 한 번만 생성하는 CoT는 정확도랑 비용이 어떻게 달라?
+t0059	test	foundation_1031:H_D10	Mamba 같은 상태공간 모델이랑 트랜스포머는 긴 시퀀스에서 성능이 어떻게 달라?
+t0060	test	foundation_1031:H_D11	GraphRAG랑 일반 벡터 검색 RAG는 어떤 질문에서 성능이 갈려?
+t0061	test	foundation_1031:H_D12	파인튜닝으로 지식을 넣는 거랑 RAG로 넣는 거는 결과가 어떻게 달라?
+t0062	test	foundation_1031:H_D13	고정 길이로 자르는 청킹이랑 의미 단위 청킹은 RAG 성능이 어떻게 달라?
+t0063	test	foundation_1031:H_D14	few-shot 프롬프팅이랑 파인튜닝은 데이터가 적을 때 성능이 어떻게 달라?
+t0064	test	foundation_1031:H_D15	BERT 같은 인코더 임베딩이랑 디코더 LLM 임베딩은 검색 성능이 어떻게 달라?
+t0065	test	foundation_1031:H_D16	오픈소스 LLM이랑 상용 LLM은 RAG 답변 품질이 얼마나 차이 나? 비교한 연구 알려줘
+t0066	test	foundation_1031:H_E09	LLM 판정자 여러 개를 모아 다수결하면 사람 평가와 일치도가 얼마나 올라가?
+t0067	test	foundation_1031:H_E10	KV 캐시를 양자화하면 메모리를 몇 배 줄일 수 있어?
+t0068	test	foundation_1031:H_E11	임베딩 벡터를 양자화하면 검색 성능이 얼마나 떨어져?
+t0069	test	foundation_1031:H_E12	코딩 에이전트가 실제 깃허브 이슈를 몇 % 정도 해결해? 최신 결과 알려줘
+t0070	test	foundation_1031:H_E13	합성 데이터로만 학습한 검색기는 사람 라벨로 학습한 것과 성능 차이가 몇 % 나?
+t0071	test	foundation_1031:H_E14	지식 증류로 만든 작은 모델은 원래 큰 모델 성능의 몇 %까지 따라가?
+t0072	test	foundation_1031:H_E15	음성 인식 모델에 LLM을 붙이면 단어 오류율이 몇 % 줄어?
+t0073	test	foundation_1031:H_E16	LLM이 답에 다는 인용이 실제로 근거가 되는 비율은 보통 몇 % 정도야?
+t0074	test	foundation_1031:H_F01	리랭커를 cross-encoder로 바꿨더니 top-5 정밀도는 올랐지만 지연이 3배가 됐다. 이 트레이드오프를 정량적으로 다룬 논문이 있는가, 있다면 어떤 조건에서 리랭킹을 생략해도 되는가.
+t0075	test	foundation_1031:H_F04	9B급 로컬 모델로 RAG를 돌릴 때 컨텍스트 문서를 5편에서 10편으로 늘리면 오히려 답 품질이 떨어지는가. 모델 크기별로 이 현상을 비교한 연구가 있는가.
+t0076	test	foundation_1031:H_F07	답이 없는 질문에 모른다고 답하게 파인튜닝하면 답이 있는 질문에서도 거절이 늘어나는 부작용이 있는가. 이 균형을 다룬 연구를 찾아라.
+t0077	test	foundation_1031:H_F09	KV 캐시를 압축하면 긴 문서 질의응답에서 앞부분 정보부터 잃는가, 중간 정보부터 잃는가. 위치별 손실을 측정한 연구가 있는가.
+t0078	test	foundation_1031:H_F10	결론 문장이 여러 논문의 결과를 한 문장에 섞으면 출처가 잘못 붙는다. 여러 문서를 요약할 때 출처 혼동을 측정하거나 줄인 연구가 있는가.
+t0079	test	foundation_1031:H_F11	임베딩 검색에서 질문은 짧고 문서는 길어서 유사도가 낮게 나온다. 문서 확장이나 질문 확장으로 이 길이 차이를 보정하는 방법을 비교한 연구가 있는가.
+t0080	test	foundation_1031:H_F12	로컬 9B 모델로 답을 만들고 큰 모델로 검증만 할 때, 검증 모델이 틀린 답을 통과시키는 비율을 잰 연구가 있는가. 검증 프롬프트 형식에 따른 차이도 알려줘.
+t0081	test	foundation_1031:H_F13	BM25와 밀집 검색을 합친 뒤 cross-encoder로 재순위할 때 첫 단계 후보 수를 늘리면 재순위 성능이 계속 오르는지 포화되는지 다룬 논문이 있는가.
+t0082	test	foundation_1031:H_F14	LLM이 영어 초록을 한국어로 요약할 때 숫자나 부정 표현이 바뀌는 오류가 얼마나 생기는지, 번역·요약 충실도를 잰 연구가 있는가.
+t0083	test	foundation_1031:H_G05	작은 모델로 RAG 답변 품질을 높이는 방법들을 논문 근거로 우선순위 매겨줘
+t0084	test	foundation_1031:H_G06	LLM 에이전트 평가 연구들을 바탕으로 앞으로 필요한 벤치마크 3가지를 제안해줘
+t0085	test	foundation_1031:H_G07	RAG 환각을 줄이는 방법들을 논문 근거로 비용이 싼 순서대로 정리해줘
+t0086	test	foundation_1031:H_G08	긴 컨텍스트 연구들을 근거로 문서 QA 서비스에서 컨텍스트 길이를 얼마나 쓰는 게 좋을지 정리해줘
+t0087	test	foundation_1031:H_G09	임베딩 모델 연구들을 비교해서 한국어 검색 서비스에 어떤 걸 쓰면 좋을지 추천해줘
+t0088	test	foundation_1031:H_H03	논문 아무거나 재밌는거 하나 알려줘
+t0089	test	foundation_1031:H_H05	llm 할루시네이숀 줄이는 법 논문
+t0090	test	foundation_1031:H_H06	요즘 핫한 에이전트 논문 머있어
+t0091	test	foundation_1031:H_H07	벡터 db 검색 빠르게 하는 연구 잇나
+t0092	test	foundation_1031:H_I01a	LLM이 표 데이터를 이해하는 능력을 다룬 연구들 정리해줘
+t0093	test	foundation_1031:H_I01b	그 중 첫 번째 논문 실험 결과 자세히 알려줘
+t0094	test	foundation_1031:H_I02a	긴 대화를 기억하는 LLM 메모리 연구 알려줘
+t0095	test	foundation_1031:H_I02b	그거 한계는 뭐야?
+t0096	test	foundation_1031:H_I03a	모델 병합(model merging) 연구들 정리해줘
+t0097	test	foundation_1031:H_I03b	두 번째 거랑 세 번째 거 차이가 뭐야?
+t0098	test	foundation_1031:H_I04a	RAG 답변의 근거성을 자동으로 평가하는 연구 있어?
+t0099	test	foundation_1031:H_I05a	LLM 판정자의 위치 편향을 다룬 논문 알려줘
+t0100	test	foundation_1031:H_I05b	그 논문에서 편향을 줄이는 방법도 제안했어? 그리고 실험에 쓴 모델은 뭐였어?
+d0575	dev	hf_coverage_1012:H001	외부 지식과 행동을 연결해 긴 에이전트 시퀀스를 생성하고, 다단계 과정으로 전문가 모델을 학습시켜 소규모 모델로 1 조 파라미터급 성능을 달성하는 방법을 다룬 논문 설명해줘
+d0576	dev	hf_coverage_1012:H002	코드가 복잡하게 연결된 작업에서 가장 좋은 성능을 보이는 xLSTM 이 왜 우월한지 게이트 메커니즘과 메모리 동적 과정을 분석한 연구 요약해줘
+d0577	dev	hf_coverage_1012:H003	현재 관찰과 지시어만으로는 새로운 카메라 각도나 로봇 형태에 일반화되지 않는 비전 - 언어 - 동작 모델을 위해, 짧은 자체 생성 상호작용 기록에서 시스템 변수를 추론하고 파라미터 업데이트 없이 세계 역학을 학습하는 적응 프레임워크 연구 있어?
+d0578	dev	hf_coverage_1012:H004	3D 공간 추론 에이전트가 기존 툴 호출 방식의 유연성 한계를 극복하기 위해 코드 인터페이스를 활용한 상태 유지형 파이썬 커널을 통해 시공간 정보를 역동적으로 분석하는 방법 논문을 소개해줘
+d0579	dev	hf_coverage_1012:H005	병렬 방식으로 전체 블록의 초안 분포를 만들고 경량 헤드로 인과적 정보를 보완하며 안정성을 높이는 추론 가속화 연구 있어?
+d0580	dev	hf_coverage_1012:H006	1인칭 시점의 비전 센서로만 제한된 에이전트가 보조적인 외부 관점을 통해 완전한 신체 위치를 파악하고 텍스트 설명으로 세계를 커스터마이징하는 연구 있어?
+d0581	dev	hf_coverage_1012:H007	로봇 조작과 자율 주행 등 다양한 물리적 환경에서 자연어 명령만으로 미래 영상을 예측하고, 이를 통해 합성 데이터 생성 및 정책 평가, 로봇 제어 신호 제공에 활용되는 연구 있어?
+d0582	dev	hf_coverage_1012:H008	MDLMs 의 신뢰할 수 있는 디코딩 궤적을 추적하고 이를 모델 간에 선택적으로 이전하여 추론 성능을 높이는 연구 있어?
+d0583	dev	hf_coverage_1012:H009	초대규모 토큰 수를 효율적으로 처리하기 위해 그룹 쿼리 어텐션 기반의 블록 단위 희소 구조와 GPU 커널을 공동 설계하여 속도를 극대화한 연구 있어?
+d0584	dev	hf_coverage_1012:H010	강화학습 에이전트의 희소 보상 문제를 해결하기 위해 완료된 정책 궤적에서 직접 계층적 기술을 추출하고, 이를 상황별 중요도에 따라 선택하여 상호작용 기록에 주입하는 자기지도 학습 연구 설명해줘
+d0585	dev	hf_coverage_1012:H011	장기적인 연구를 수행하는 에이전트가 복잡한 작업을 분해하고 하위 에이전트에 위임하며 결과를 통합하는 능력을 스스로 학습할 수 있도록 가이드된 훈련 경로를 통해 대리 부여 지능을 향상시킨 연구 설명해줘?
+d0586	dev	hf_coverage_1012:H012	스크린샷이나 차트 등 시각적 입력을 받아 가시화된 코드와 실행 가능한 프로그램을 연결하는 멀티모달 코드 지능 분야를 분류하고 평가 기준을 제시한 연구 있어?
+d0587	dev	hf_coverage_1012:H013	여러 모델 훈련 및 데이터 합성 과제를 수행하며 가설과 실험 결과를 연결하는 나무 구조를 활용해 인간 감독 없이 연구 성과를 누적적으로 개선하는 연구가 있어?
+d0588	dev	hf_coverage_1012:H014	언어 지시를 통해 3D 점의 미래 궤적을 예측하고 다양한 동작 패턴을 학습한 연구 요약해줘
+d0589	dev	hf_coverage_1012:H015	LLM 에이전트의 추론 과정에서 발견된 증거에 따라 메모리 접근을 동적으로 재구성하고 조합적 폭발을 방지하는 연구 있어?
+d0590	dev	hf_coverage_1012:H016	자신의 생성된 콘텐츠 역사를 기억하고 카메라 조종을 유지하며 스타일 왜곡을 줄이는 세계 모델을 다룬 논문 설명해줘
+d0591	dev	hf_coverage_1012:H017	지속적인 시점 기반의 시공간 정보 스트림에서 공간 추론 능력을 평가하기 위해 시간戳과 증거 구간을 포함한 계층적 벤치마크를 구성하고, 이를 통해 거대 다중 모달 언어모델들의 현재 한계를 규명한 연구 있어?
+d0592	dev	hf_coverage_1012:H018	비율 기반 평가 분포를 추론하는 대형 시각언어모델이 효율적인 학생 모델로 지식을 전수하는 방식을 다룬 연구 있어?
+d0593	dev	hf_coverage_1012:H019	단어 임베딩 벡터의 크기를 줄이면서도 인과적 언어모델에서 다대일 충돌 문제를 해결하기 위해 여러 해시 함수로 생성된 고유한 해시 서명을 통해 다음 토큰을 예측하는 연구 있어?
+d0594	dev	hf_coverage_1012:H020	사진 촬영 시 카메라 구성과 피사체 자세를 실시간으로 안내하는 멀티모달 언어모델 연구 있어?
+d0595	dev	hf_coverage_1012:H021	실패한 에이전트 궤적을 단계별로 분석하여 책임 있는 기술만 업데이트하고 백본 모델을 동결하는 연구 있어?
+d0596	dev	hf_coverage_1012:H022	로봇 에이전트가 명시적 지시 없이 놀이를 통해 다양한 탐험 작업을 스스로 계획하고 실행하며 실패를 수정한 뒤 성공 경험을 코드 라이브러리로 축적해 새로운 과제에 재사용하는 방식의 연구가 있나?
+d0597	dev	hf_coverage_1012:H023	음성, 음악 등 다양한 오디오 모달리티를 포괄하는 편집 작업을 위해 인간과 에이전트의 협력을 통해 대규모 데이터셋을 구축하고 평가 기준을 정립한 연구 있어?
+d0598	dev	hf_coverage_1012:H024	강화학습 에이전트가 실패 사례와 환경 통계를 분석하여 다음 단계의 학습 환경을 자동으로 설계하는 연구가 있어?
+d0599	dev	hf_coverage_1012:H025	이미지 생성 모델의 픽셀 생성과 의미적 결정 단계를 분리하여 텍스트 수준에서 구조화된 다양성을 유도하고 시맨틱 브라우징을 가능하게 하는 방법을 다룬 논문 설명해줘
+d0600	dev	hf_coverage_1012:H026	매우 큰 규모의 이미지 복원 모델을 뛰어넘는 성능을 내면서 파라미터 수만 2% 수준으로 줄인 경량화 프레임워크를 구축하기 위해 구조 압축과 잠재 공간 기반 지식 증류 기법을 어떻게 결합했는지 설명해줘
+d0601	dev	hf_coverage_1012:H027	대규모 언어모델이 단기 기억을 장기 매개변수로 통합하고 인공 데이터를 통해 자체적으로 지식을 재구성하는 방법을 다룬 논문 설명해줘
+d0602	dev	hf_coverage_1012:H028	분산된 잠재 공간에 직접 장면 정보를 캐시하는 방법으로 비디오 세계 모델의 속도와 메모리 사용량을 획기적으로 개선한 연구가 있어?
+d0603	dev	hf_coverage_1012:H029	검색, 도구 사용, 증거 검토 등 긴 추이로 과제를 해결하는 에이전트에서 지원되지 않거나 충돌하는 주장을 식별해 신뢰성을 높이는 방법을 다룬 연구 있어?
+d0604	dev	hf_coverage_1012:H030	대규모 언어 모델 에이전트의 메모리 시스템을 데이터 관리 관점에서 네 가지 핵심 모듈로 분해하여 평가한 연구 있어?
+d0605	dev	hf_coverage_1012:H031	소프트웨어 엔지니어링에 특화된 대규모 모델이 전문 웹 데이터에서 수학 및 코드 위주로 학습되며, 추론 효율성을 고려한 아키텍처와 다단계 후학습 과정을 통해 직접 답변과 명시적 추론 과정을 모두 제공하는 두 가지 버전을 출시한 연구 있어?
+d0606	dev	hf_coverage_1012:H032	백엔드 문서 인덱싱은 미리 수행하되 검색 쿼리 의도와 시스템 지시를 실시간으로 결합하여 정밀한 재순위를 처리하는 효율적인 모델 연구 있어?
+d0607	dev	hf_coverage_1012:H033	단일 대형 언어모델을 에이전트와 환경으로 동시 활용하여 예측 오차로 보상 신호를 생성하고 실패 패턴 분석을 통해 학습 데이터를 재분포하는 자기 진화 방식 연구 있어?
+d0608	dev	hf_coverage_1012:H034	다방 대화의 복잡한 분류 작업을 위해 verbose 예시를 구조화된 기준과 정확한 태스크 설명으로 압축하는 방법론을 다룬 논문 설명해줘
+d0609	dev	hf_coverage_1012:H035	학생 모델의 롤아웃이 실패하는 어려운 질문에서 교사의 응답을 프롬프트 안에 직접 포함시켜 학습 안정성을 높이는 연구가 있어?
+d0610	dev	hf_coverage_1012:H036	단일 이미지에서 3D 장면을 생성하기 위해 비디오 확산 잠재력을 삼각형 스픳래트로 직접 매핑하고, 렌더링 시의 기울기 흐름 문제를 해결하는 기법을 다루는 논문 설명해줘
+d0611	dev	hf_coverage_1012:H037	자신의 추론이 제한된 관점에서도 가능하도록 먼저 가설을 세운 뒤 합성된 새로운 시점 영상으로 재검토하고 검증하는 방법을 다룬 논문 설명해줘
+d0612	dev	hf_coverage_1012:H038	코드 에이전트의 리포지토리 탐색 과제를 별도의 전용 서브에이전트로 분리하여 토큰 소비를 줄이고 해결률을 높이는 연구 있어?
+d0613	dev	hf_coverage_1012:H039	위성 이미지를 기반으로 도시 환경을 빠르게 재구성하고 시뮬레이션 샌드박스를 만들어 드론 항법 등 실제 응용에 활용하는 연구 있어?
+d0614	dev	hf_coverage_1012:H040	장시간 영상 이해에서 프레임 처리 비용을 줄이면서도 성능을 높이기 위해 관찰 - 사고 - 행동 사이클과 에이전트 강화학습을 활용한 능동적 지각 연구 있어?
+d0615	dev	history_gate_1019:r2_N08 real_eval2_1015:N08	LLM 에이전트 스킬 자격증명 유출 연구에서 유출의 몇 %가 디버그 로깅 때문이었어?
+d0616	dev	history_gate_1019:r2_T01 real_eval2_1015:T01	요즘 LLM 양자화 연구들 정리해줘
+d0617	dev	history_gate_1019:r2_T08 real_eval2_1015:T08	생성 모델 워터마크 연구들 정리해줘
+d0618	dev	history_gate_1019:r2_N04 real_eval2_1015:N04	채용 알고리즘 단일화(monoculture) 연구에서 흑인 지원자 지원의 몇 %가 불리한 포지션에 들어갔어?
+d0619	dev	history_gate_1019:F01	그 중 첫 번째 논문 자세히 설명해줘
+d0620	dev	history_gate_1019:r1_N01 real_eval_1013:N01	추론 시점 스케일링에서 샘플링 폭이랑 깊이를 같이 조절하는 DDC라는 방법 있던데, 토큰을 얼마나 줄였대?
+d0621	dev	history_gate_1019:r1_N02 real_eval_1013:N02	지식 그래프로 이종 멀티로봇 계획 세우는 LLM 방법이 MAT-THOR에서 성능 몇 % 올렸어?
+d0622	dev	history_gate_1019:r1_N09 real_eval_1013:N09	우주 로봇팔로 회전하는 물체 잡는 궤적 최적화에서 트랜스포머 warm-start가 반복 횟수를 몇 % 줄였어?
+d0623	dev	history_gate_1019:r2_N07 real_eval2_1015:N07	Long-WAM에서 컨텍스트를 19.2초로 늘리면 RoboCasa GR-1 성공률이 몇에서 몇으로 올랐어?
+d0624	dev	history_gate_1019:r2_T02 real_eval2_1015:T02	지식 증류 관련 논문들 동향 알려줘
+d0625	dev	history_gate_1019:r1_T07 real_eval_1013:T07	LLM 환각 탐지 방법 논문들 비교해서 정리해줘
+d0626	dev	history_gate_1019:F03	그 논문의 한계는 뭐야?
+d0627	dev	history_gate_1019:r1_N14 real_eval_1013:N14	재귀적 하네스 자기개선(RHI)이 추론 비용을 최대 몇 % 줄였어?
+d0628	dev	history_gate_1019:r1_N06 real_eval_1013:N06	의미는 같은데 표현만 바꾼 입력에 LLM 에이전트가 얼마나 일관되게 답하는지 본 연구에서 제일 안정적인 모델이랑 그 비율 알려줘
+d0629	dev	history_gate_1019:r1_N10 real_eval_1013:N10	LightKV는 비전 토큰을 몇 %만 쓰고 연산을 얼마나 줄였어?
+d0630	dev	history_gate_1019:r1_R02 real_eval_1013:R02	RAG 검색 정확도 향상 관련 논문 5개 찾아줘. 그리고 그 논문들을 바탕으로 아직 시도되지 않은 연구 빈틈 3가지를 심층 분석 섹션에 상세히 써줘
+d0631	dev	history_gate_1019:F04	방금 답한 거 더 쉽게 설명해줘
+d0632	dev	history_gate_1019:r2_N01 real_eval2_1015:N01	엣지 기기용 재매개변수화 활성화 함수 RepAct가 MobileNetV3-Small ImageNet100에서 정확도를 최대 몇 % 올렸어?
+d0633	dev	history_gate_1019:r2_T07 real_eval2_1015:T07	VLA 모델 연구들 정리해줘
+d0634	dev	history_gate_1019:r1_R01 real_eval_1013:R01	LLM 에이전트가 쓰는 도구가 오류를 내도 티가 안 나는 경우, 모델이 그걸 알아채는지 다룬 논문 있어? 핵심 내용 설명해줘
+d0635	dev	history_gate_1019:F05	두 번째 항목은 어떤 실험을 했어?
+d0636	dev	history_gate_1019:r2_N12 real_eval2_1015:N12	LLM 지식 그래프 구성 평가 연구에서 그래프 매칭 임계값을 몇 %로 잡았어?
+d0637	dev	history_gate_1019:r2_T06 real_eval2_1015:T06	LLM 코드 생성 연구들 어떤 방향으로 가고 있어?
+d0638	dev	history_gate_1019:r2_N05 real_eval2_1015:N05	올림피아드 수준 다중 이미지 추론 벤치마크에서 제일 센 모델도 정답률이 몇 % 정도야?
+d0639	dev	history_gate_1019:r2_N06 real_eval2_1015:N06	해수면 온도 잠재공간 자료동화 DeepDA는 관측이 10%만 있을 때 오차 증가가 몇 %를 넘지 않았어?
+d0640	dev	history_gate_1019:F06	그 방법이랑 비슷한 연구 더 있어?
+d0641	dev	history_gate_1019:r1_T08 real_eval_1013:T08	RAG에서 리랭킹 개선하는 연구들 정리해줘
+d0642	dev	history_gate_1019:r2_T05 real_eval2_1015:T05	시계열 예측 관련 논문 5개 찾아줘
+d0643	dev	history_gate_1019:r1_R05 real_eval_1013:R05	멀티에이전트 강화학습에서 비정상성이나 부분 관측 같은 문제를 게임 이론(내시 균형, 진화 동역학) 관점에서 정리한 논문 요약해줘
+d0644	dev	history_gate_1019:r1_N11 real_eval_1013:N11	AI가 사람 스킬 수요를 늘리는지 채용공고로 분석한 연구에서, 회복탄력성 같은 스킬 있는 데이터 과학자는 연봉을 몇 % 더 받는대?
+d0645	dev	history_gate_1019:r1_T06 real_eval_1013:T06	LLM 보상 모델(reward model) 관련 논문들 알려줘
+d0646	dev	history_gate_1019:r1_N08 real_eval_1013:N08	VLM에 이미지 올릴 때 프롬프트 보고 덜 중요한 영역을 뭉개서 압축하는 방법이 비트레이트를 얼마나 줄였어?
+d0647	dev	history_gate_1019:F07	위에서 말한 방법의 핵심 아이디어만 요약해줘
+d0648	dev	history_gate_1019:r1_N03 real_eval_1013:N03	건강 질문으로 LLM 문화 역량을 평가한 벤치마크에서 제일 좋은 모델도 문화적으로 적절한 답을 몇 % 정도밖에 못 했어?
+d0649	dev	history_gate_1019:r2_N11 real_eval2_1015:N11	학습 없이 불확실성 기반 재주의로 VLM 환각을 줄인 방법이 환각률을 몇 %p 줄였어?
+d0650	dev	history_gate_1019:r2_T03 real_eval2_1015:T03	연합학습 연구들 정리해줘
+d0651	dev	history_gate_1019:r2_T04 real_eval2_1015:T04	월드 모델 최근 연구 동향 정리해줘
+d0652	dev	history_gate_1019:r1_T03 real_eval_1013:T03	LLM 탈옥 공격 논문들 정리해줘
+d0653	dev	history_gate_1019:F08	그 연구는 어떤 데이터셋을 썼어?
+d0654	dev	history_gate_1019:r1_N04 real_eval_1013:N04	코드가 깔끔하면 코딩 에이전트가 토큰을 덜 쓴다는 연구 있던데 얼마나 줄었어?
+d0655	dev	history_gate_1019:r1_T01 real_eval_1013:T01	요즘 speculative decoding 연구 동향 정리해줘
+d0656	dev	history_gate_1019:r2_N02 real_eval2_1015:N02	3D 뇌 MRI 질의응답 벤치마크 NeuroQA는 QA 쌍이 몇 개야?
+d0657	dev	history_gate_1019:r1_N07 real_eval_1013:N07	PBI-Attack 탈옥 공격이 오픈소스 LVLM에서 평균 공격 성공률 몇 %였어?
+d0658	dev	history_gate_1019:F09	이어서 그 분야 최신 동향도 알려줘
+d0659	dev	history_gate_1019:r1_N15 real_eval_1013:N15	개인 PC 파일 관리 에이전트 벤치마크 HippoCamp에서 최고 상용 모델의 사용자 프로파일링 정확도가 몇 %야?
+d0660	dev	history_gate_1019:r1_R03 real_eval_1013:R03	대기업처럼 사전학습부터 RL까지 다 하지 않고, 어렵고 정보량 많은 탐색 궤적 데이터만으로 검색 에이전트 성능을 끌어올린 연구 알려줘
+d0661	dev	history_gate_1019:r2_N10 real_eval2_1015:N10	드론으로 풍력발전기 결함 검사하는 분산 시스템이 탐지 정확도를 최대 몇 %까지 올렸어?
+d0662	dev	history_gate_1019:r2_N09 real_eval2_1015:N09	한국 유아 발음 자동 평가 연구에서 NeMo SortFormer의 화자 수 정확도가 몇 %였어?
+d0663	dev	history_gate_1019:r1_T04 real_eval_1013:T04	Text-to-SQL 최근 연구들 어떤 방향으로 가고 있어?
+d0664	dev	history_gate_1019:F10	그거 실제로 써먹으려면 뭐가 필요해?
+d0665	dev	history_gate_1019:r1_T05 real_eval_1013:T05	프롬프트 인젝션 공격이랑 방어 연구 정리해줘
+d0666	dev	history_gate_1019:r1_N13 real_eval_1013:N13	재료과학 분야 LLM 환각을 여러 단계로 검증해서 잡는 방법이 환각을 몇 % 줄였어?
+d0667	dev	history_gate_1019:r1_T02 real_eval_1013:T02	KV 캐시 압축 관련 논문 5개 찾아서 설명해줘
+d0668	dev	history_gate_1019:r2_N03 real_eval2_1015:N03	VLM에서 프롬프트 때문에 생기는 환각을 어텐션 헤드 제거로 줄인 연구가 환각을 몇 % 줄였어?
+d0669	dev	history_gate_1019:r1_N05 real_eval_1013:N05	MXNorm이 RMSNorm보다 커널 속도가 최대 몇 배 빨라?
+d0670	dev	list_findings_v2_1026:F01	RAG에서 검색 결과 노이즈에 강하게 만드는 연구들 정리해줘
+d0671	dev	list_findings_v2_1026:F02	LLM 긴 문맥 압축 연구들 정리해줘
+d0672	dev	list_findings_v2_1026:F03	LLM 에이전트 자기 개선 연구들 정리해줘
+d0673	dev	list_findings_v2_1026:F04	검색 증강 생성 평가 벤치마크 연구들 정리해줘
+d0674	dev	list_findings_v2_1026:F05	LLM 환각 완화 방법 연구들 정리해줘
+d0675	dev	list_findings_v2_1026:F06	KV 캐시 축출 방법 연구들 정리해줘
+d0676	dev	list_findings_v2_1026:F07	LLM 정렬에서 보상 해킹 다룬 연구들 정리해줘
+d0677	dev	list_findings_v2_1026:F08	LLM 추론 효율화(조기 종료·토큰 절약) 연구들 정리해줘
+d0678	dev	list_findings_v2_1026:F09	멀티모달 RAG 연구들 정리해줘
+d0679	dev	list_findings_v2_1026:F10	LLM 기반 코드 수정·버그 고치기 연구들 정리해줘
+d0680	dev	list_findings_v2_1026:F11	텍스트-이미지 생성 안전성 연구들 정리해줘
+d0681	dev	list_findings_v2_1026:F12	연합학습 개인화 연구들 정리해줘
+d0682	dev	list_findings_v2_1026:F13	LLM 사실 검증 연구들 정리해줘
+d0683	dev	list_findings_v2_1026:F14	온폴리시 증류 연구들 정리해줘
+d0684	dev	list_findings_v2_1026:F15	비전 언어 모델 토큰 줄이기 연구들 정리해줘
+d0685	dev	list_findings_v2_1026:F16	LLM 테이블 이해 연구들 정리해줘
+d0686	dev	list_findings_v2_1026:F17	에이전트 웹 탐색 벤치마크 연구들 정리해줘
+d0687	dev	list_findings_v2_1026:F18	LLM 수학 증명 연구들 정리해줘
+d0688	dev	list_findings_v2_1026:F19	그래프 신경망과 LLM 결합 연구들 정리해줘
+d0689	dev	list_findings_v2_1026:F20	LLM 안전 정렬 연구들 정리해줘
+d0690	dev	list_findings_v2_1026:F21	시계열 기초 모델 연구들 정리해줘
+d0691	dev	list_findings_v2_1026:F22	로봇 정책 학습에 월드 모델 쓰는 연구들 정리해줘
+d0692	dev	list_findings_v2_1026:F23	LLM 다국어 성능 격차 연구들 정리해줘
+d0693	dev	list_findings_v2_1026:F24	문서 파싱·PDF 처리 RAG 연구들 정리해줘
+d0694	dev	list_findings_v2_1026:F25	LLM 개인화 응답 연구들 정리해줘
+d0695	dev	list_findings_v2_1026:F26	혼합 전문가(MoE) 라우팅 연구들 정리해줘
+d0696	dev	list_findings_v2_1026:F27	확산 언어 모델 연구들 정리해줘
+d0697	dev	list_findings_v2_1026:F28	LLM 평가에서 판정자 편향 연구들 정리해줘
+d0698	dev	list_findings_v2_1026:F29	프롬프트 인젝션 탐지 연구들 정리해줘
+d0699	dev	list_findings_v2_1026:F30	임베딩 모델 미세조정 연구들 정리해줘
+d0700	dev	list_findings_v2_1026:F31	LLM 양자화 정확도 손실 연구들 정리해줘
+d0701	dev	list_findings_v2_1026:F32	스펙큘러티브 디코딩 드래프트 모델 학습 연구들 정리해줘
+d0702	dev	list_findings_v2_1026:F33	에이전트 도구 호출 오류 복구 연구들 정리해줘
+d0703	dev	list_findings_v2_1026:F34	지식 그래프 구축에 LLM 쓰는 연구들 정리해줘
+d0704	dev	list_findings_v2_1026:F35	음성 인식 모델 연구들 정리해줘
+d0705	dev	list_findings_v2_1026:F36	의료 영상 AI 연구들 정리해줘
+d0706	dev	list_findings_v2_1026:F37	과학 문헌 검색 에이전트 연구들 정리해줘
+d0707	dev	list_findings_v2_1026:F38	LLM 저작권·데이터 출처 연구들 정리해줘
+d0708	dev	list_findings_v2_1026:F39	강화학습 보상 설계에 LLM 쓰는 연구들 정리해줘
+d0709	dev	list_findings_v2_1026:F40	LLM 서빙 스케줄링 연구들 정리해줘
+d0710	dev	premise_leak_1102:P01	Lost in the Middle 논문에서 정답 문서가 중간에 있으면 정확도가 20% 넘게 떨어진다던데, 정확히 몇 %였고 어떤 모델에서 그랬어?
+d0711	dev	premise_leak_1102:P02	Self-RAG는 검색을 아예 안 하고 반성 토큰만으로 답을 고친다던데 맞아? 그래도 성능이 오른 이유가 뭐야?
+d0712	dev	premise_leak_1102:P03	RAG를 붙이면 환각이 절반 이하로 줄어든다던데, 그 결과를 보인 논문과 측정 방법 알려줘
+d0713	dev	premise_leak_1102:P04	LoRA는 풀 파인튜닝보다 항상 성능이 낮다던데 실제로 얼마나 차이 나는지 비교한 연구 있어?
+d0714	dev	premise_leak_1102:P05	LLM 판정자를 다른 모델 계열로 바꾸면 자기 선호 편향이 거의 사라진다던데, 얼마나 줄어드는지 잰 연구 찾아줘
+d0715	dev	premise_leak_1102:P06	Chain-of-Thought는 작은 모델에서는 오히려 성능을 떨어뜨린다던데, 몇 B 이하에서 그런지 보인 논문 있어?
+d0716	dev	premise_leak_1102:P07	양자화를 4비트까지 하면 정확도가 거의 안 떨어지지만 3비트부터 급격히 무너진다던데, 그 경계를 실험한 연구 알려줘
+d0717	dev	premise_leak_1102:P08	Speculative decoding은 답 품질을 조금 희생해서 속도를 얻는 방법이라던데, 품질이 얼마나 떨어지는지 정리해줘
+d0718	dev	premise_leak_1102:P09	GraphRAG는 일반 RAG보다 비용이 10배 이상 든다던데, 비용 대비 정확도 향상을 잰 연구 있어?
+d0719	dev	premise_leak_1102:P10	리랭커를 쓰면 검색 지연이 두 배가 되는데 정확도는 5%도 안 오른다던데 맞아? 근거 논문 알려줘
+d0720	dev	premise_leak_1102:P11	MoE 모델은 같은 크기 dense 모델보다 학습이 불안정하다던데, 그 원인과 해결책을 다룬 연구 정리해줘
+d0721	dev	premise_leak_1102:P12	DPO는 PPO보다 항상 정렬 성능이 좋다던데, 둘을 직접 비교한 결과에서 차이가 얼마나 났어?
+d0722	dev	premise_leak_1102:P13	긴 컨텍스트 모델은 128K를 넣어도 실제로는 앞쪽 8K 정도만 쓴다던데, 이걸 측정한 연구 있어?
+d0723	dev	premise_leak_1102:P14	프롬프트 인젝션은 시스템 프롬프트에 경고 문구만 넣어도 대부분 막힌다던데, 방어율이 몇 %인지 잰 논문 알려줘
+d0724	dev	premise_leak_1102:P15	에이전트에게 도구 설명을 길게 주면 오히려 도구 선택 정확도가 떨어진다던데, 그걸 실험한 연구 있어?
+d0725	dev	premise_leak_1102:P16	LLMLingua 같은 프롬프트 압축은 20배 압축해도 성능이 거의 그대로라던데 정말 그래? 얼마나 떨어지는지 알려줘
+d0726	dev	premise_leak_1102:P17	다회차 대화 검색에서 LLM으로 질문을 다시 쓰면 검색이 크게 좋아진다던데, 얼마나 좋아지는지 잰 연구 알려줘
+d0727	dev	premise_leak_1102:P18	RLHF를 하면 모델이 아첨(sycophancy)을 배운다던데, 아첨이 얼마나 늘어나는지 측정한 연구랑 줄이는 방법 정리해줘
+d0728	dev	premise_leak_1102:P19	멀티에이전트 토론을 하면 환각이 확실히 줄어든다던데, 단일 모델 자기 검증이랑 비교하면 얼마나 차이 나?
+d0729	dev	premise_leak_1102:P20	코드 생성에서 테스트를 먼저 만들게 하면 pass@1이 크게 오른다던데, 그 효과를 잰 논문 알려줘
+d0730	dev	premise_leak_1102:P21	BM25가 dense 검색보다 도메인 밖 데이터에서 더 낫다던데, BEIR 같은 벤치마크에서 실제 결과가 어땠어?
+d0731	dev	premise_leak_1102:P22	LLM은 9.11이랑 9.9 같은 숫자 비교를 토크나이저 때문에 틀린다던데, 이 원인을 분석한 연구 있어?
+d0732	dev	premise_leak_1102:P23	합성 데이터로만 계속 학습하면 모델이 붕괴한다던데, 몇 세대 만에 무너지는지 보인 논문 찾아줘
+d0733	dev	premise_leak_1102:P24	검색 문서를 많이 넣을수록 RAG 정확도가 계속 오른다던데, 문서 수를 늘렸을 때 결과를 정리한 연구 알려줘
+d0734	dev	premise_leak_1102:P25	비전-언어 모델은 이미지보다 텍스트 프롬프트에 훨씬 더 의존한다던데, 그걸 정량화한 연구 있어?
+d0735	dev	premise_leak_1102:P26	LLM 워터마크는 문장을 바꿔 쓰기만 하면 거의 다 지워진다던데, 패러프레이즈 공격 뒤 탐지율이 얼마나 되는지 알려줘
+d0736	dev	premise_leak_1102:P27	생성 뒤에 같은 모델이 근거 없는 문장을 지우는 필터를 쓰면 사실성 점수가 부풀려진다던데, 이걸 다룬 연구와 보정 방법 정리해줘
+d0737	dev	premise_leak_1102:P28	사람 평가자끼리도 일치도가 70% 정도밖에 안 된다던데, LLM 판정자와 사람 간 일치도를 사람끼리 일치도와 비교한 연구 알려줘
+d0738	dev	premise_leak_1102:P29	RAG에서 청크를 작게 자를수록 인용 정확도가 오른다던데, 청크 크기별로 비교한 결과 있어?
+d0739	dev	premise_leak_1102:P30	강화학습으로 추론을 학습한 모델은 답이 길어질수록 정확도가 떨어진다던데, 길이와 정확도 관계를 분석한 논문 찾아줘
+d0740	dev	qcond_1025:K01	KV 캐시 압축 논문 4개 찾아서 각각 메모리를 몇 % 줄였는지 알려줘
+d0741	dev	qcond_1025:K02	speculative decoding 논문 3개만 골라서 속도 향상 배수 비교해줘
+d0742	dev	qcond_1025:K03	RAG 리랭커 연구 5개 정리해줘
+d0743	dev	qcond_1025:K04	LLM 탈옥 방어 논문 6개 찾아줘
+d0744	dev	qcond_1025:K05	2026년에 나온 RAG 평가 논문들 정리해줘
+d0745	dev	qcond_1025:K06	2025년 이후 나온 LLM 양자화 논문만 알려줘
+d0746	dev	qcond_1025:K07	2024년 이전 연합학습 논문 중 통신 효율화 다룬 거 알려줘
+d0747	dev	qcond_1025:K08	의료 데이터로 실험한 환각 탐지 연구 알려줘
+d0748	dev	qcond_1025:K09	한국어 데이터셋으로 평가한 LLM 연구 있어?
+d0749	dev	qcond_1025:K10	금융 분야에 멀티에이전트 LLM 적용한 연구 정리해줘
+d0750	dev	qcond_1025:K11	코드 데이터로 실험한 모델 가지치기 연구 알려줘
+d0751	dev	qcond_1025:K12	추가 학습 없이 LLM 환각을 줄인 방법 알려줘
+d0752	dev	qcond_1025:K13	사람 라벨 없이 텍스트 임베딩 모델 학습한 연구 알려줘
+d0753	dev	qcond_1025:K14	강화학습 없이 LLM 추론 능력을 올린 연구 알려줘
+d0754	dev	qcond_1025:K15	GPU 없이 CPU만으로 돌아가는 RAG 연구 있어?
+d0755	dev	qcond_1025:K16	재학습 없이 LLM 개인정보를 지우는 방법 연구 알려줘
+d0756	dev	qcond_1025:K17	ChainPoll이 환각 탐지에서 얼마나 좋은지 수치로 알려줘
+d0757	dev	qcond_1025:K18	LoRA 원 논문에서 학습 파라미터를 몇 배 줄였다고 했어?
+d0758	dev	qcond_1025:K19	MobileVLM V2 1.7B가 어느 크기 모델과 비슷한 성능을 냈어?
+d0759	dev	qcond_1025:K20	ReXTrust의 AUROC가 얼마야?
+d0760	dev	qcond_1025:K21	FlashRerank-XL 논문 핵심 내용 설명해줘
+d0761	dev	qcond_1025:K22	QuantumRAG 프레임워크가 검색 정확도를 얼마나 올렸어?
+d0762	dev	qcond_1025:K23	HyperKV 캐시 압축 방법이랑 SnapKV 비교해줘
+d0763	dev	qcond_1025:K24	MetaJailGuard 방어 기법이 공격 성공률을 몇 %로 낮췄어?
+d0764	dev	qcond_1025:K25	DMQR-RAG랑 Rewrite-Retrieve-Read 쿼리 재작성 방식 비교해줘
+d0765	dev	qcond_1025:K26	jina-reranker-v3랑 RAG Playground 비교해줘
+d0766	dev	qcond_1025:K27	World4RL이랑 Looped World Models 차이 알려줘
+d0767	dev	qcond_1025:K28	TradingAgents랑 BMW Agents 비교해줘
+d0768	dev	qcond_1025:K29	RAG 검색 정확도 연구 3개 찾고 각각 한계도 하나씩 알려줘
+d0769	dev	qcond_1025:K30	LLM 에이전트 메모리 연구 정리하고 아직 안 풀린 문제 2가지 제안해줘
+d0770	dev	qcond_1025:K31	프롬프트 인젝션 방어 연구를 공격 유형별로 나눠서 정리해줘
+d0771	dev	qcond_1025:K32	확산 모델 가속 연구를 학습 필요 여부로 나눠서 정리해줘
+d0772	dev	qcond_1025:K33	텍스트 임베딩 연구 중 다국어 지원하는 것만 골라줘
+d0773	dev	qcond_1025:K34	오픈소스 모델로만 실험한 Text-to-SQL 연구 알려줘
+d0774	dev	qcond_1025:K35	7B 이하 작은 모델로 실험한 수학 추론 연구 알려줘
+d0775	dev	qcond_1025:K36	이미지 말고 동영상으로 실험한 VLM 환각 연구 알려줘
+d0776	dev	qcond_1025:K37	실제 로봇으로 실험한 VLA 연구만 알려줘
+d0777	dev	qcond_1025:K38	벤치마크 말고 실제 서비스 로그로 평가한 RAG 연구 있어?
+d0778	dev	qcond_1025:K39	LLM 워터마크 연구 중 공격에 강건성을 수치로 보고한 것 알려줘
+d0779	dev	qcond_1025:K40	지식 증류 연구 중 학생 모델이 교사보다 나아진 사례 알려줘
+d0780	dev	qcond_rule_1025:P01	2026년에 나온 KV 캐시 압축 논문 정리해줘
+d0781	dev	qcond_rule_1025:P02	2025년 이후 나온 RAG 리랭커 연구 알려줘
+d0782	dev	qcond_rule_1025:P03	2024년 이전에 나온 speculative decoding 연구 있어?
+d0783	dev	qcond_rule_1025:P04	2026년 이후 나온 LLM 에이전트 메모리 논문 알려줘
+d0784	dev	qcond_rule_1025:P05	2024년에 나온 프롬프트 인젝션 연구 정리해줘
+d0785	dev	qcond_rule_1025:P06	2025년에 발표된 환각 탐지 논문 알려줘
+d0786	dev	qcond_rule_1025:P07	2023년 이전 텍스트 임베딩 연구 알려줘
+d0787	dev	qcond_rule_1025:P08	2026년에 나온 월드 모델 논문 정리해줘
+d0788	dev	qcond_rule_1025:P09	2025년부터 나온 Text-to-SQL 연구 정리해줘
+d0789	dev	qcond_rule_1025:P10	2024년까지 나온 연합학습 논문 알려줘
+d0790	dev	qcond_rule_1025:P11	2026년에 나온 코딩 에이전트 벤치마크 연구 알려줘
+d0791	dev	qcond_rule_1025:P12	2025년 이전 지식 증류 연구 정리해줘
+d0792	dev	qcond_rule_1025:P13	2024년 이후 나온 확산 모델 가속 연구 알려줘
+d0793	dev	qcond_rule_1025:P14	2026년에 나온 탈옥 공격 논문 정리해줘
+d0794	dev	qcond_rule_1025:P15	2025년에 나온 VLA 로봇 연구 알려줘
+d0795	dev	qcond_rule_1025:P16	2023년에 나온 LLM 평가 연구 있어?
+d0796	dev	qcond_rule_1025:P17	LLM 양자화 논문 5개 찾아줘
+d0797	dev	qcond_rule_1025:P18	그래프 RAG 논문 4편 정리해줘
+d0798	dev	qcond_rule_1025:P19	멀티모달 환각 연구 6개 알려줘
+d0799	dev	qcond_rule_1025:P20	LLM 워터마크 논문 3편만 골라줘
+d0800	dev	qcond_rule_1025:P21	RAG 청킹 연구 5개 정리해줘
+d0801	dev	qcond_rule_1025:P22	MoE 모델 논문 4개 찾아줘
+d0802	dev	qcond_rule_1025:P23	LLM 추론 강화학습 논문 6편 알려줘
+d0803	dev	qcond_rule_1025:P24	에이전트 도구 사용 연구 5편 정리해줘
+d0804	dev	qcond_rule_1025:P25	Mamba 연구 3개 알려줘
+d0805	dev	qcond_rule_1025:P26	LLM 서빙 시스템 논문 7개 찾아줘
+d0806	dev	qcond_rule_1025:P27	시계열 예측 논문 4개 골라서 정리해줘
+d0807	dev	qcond_rule_1025:P28	프롬프트 압축 연구 5개 알려줘
+d0808	dev	qcond_rule_1025:P29	LLM 개인정보 연구 4편 정리해줘
+d0809	dev	qcond_rule_1025:P30	의료 LLM 논문 6개 찾아줘
+d0810	dev	qcond_rule_1025:P31	로봇 조작 학습 논문 8개 알려줘
+d0811	dev	qcond_rule_1025:P32	코드 생성 벤치마크 논문 5개 정리해줘
+d0812	dev	qcond_rule_1025:P33	2025년 이후 나온 KV 캐시 논문 4개 알려줘
+d0813	dev	qcond_rule_1025:P34	2026년에 나온 RAG 논문 5편 정리해줘
+d0814	dev	qcond_rule_1025:P35	2024년 이전 LLM 탈옥 연구 3개 찾아줘
+d0815	dev	qcond_rule_1025:P36	2025년에 나온 텍스트 임베딩 논문 4개 알려줘
+d0816	dev	qcond_rule_1025:P37	2026년 이후 나온 speculative decoding 논문 3편 정리해줘
+d0817	dev	qcond_rule_1025:P38	2024년에 나온 멀티에이전트 논문 5개 알려줘
+d0818	dev	qcond_rule_1025:P39	2025년 이후 지식 그래프 RAG 논문 4개 찾아줘
+d0819	dev	qcond_rule_1025:P40	2023년 이전 강화학습 기반 LLM 정렬 논문 3개 알려줘
+d0820	dev	query_glossary_1029:G01	검색해 온 문서 중에 관련 없는 문서가 섞이면 답변이 얼마나 나빠지는지 본 연구 찾아줘
+d0821	dev	query_glossary_1029:G02	문서를 어느 크기로 잘라서 넣어야 RAG 성능이 좋은지 비교한 논문 있어?
+d0822	dev	query_glossary_1029:G03	처음 검색한 결과를 다시 정렬해서 정확도를 올리는 방법 정리해줘
+d0823	dev	query_glossary_1029:G04	사용자 질문을 검색하기 좋게 다시 써 주는 방법 알려줘
+d0824	dev	query_glossary_1029:G05	한 번 검색으로 안 되는 질문을 여러 번 검색해서 답 찾는 방법 있어?
+d0825	dev	query_glossary_1029:G06 survey_gate_1030:qg_G06	질문마다 검색이 필요한지 모델이 스스로 판단하게 하는 연구 찾아줘
+d0826	dev	query_glossary_1029:G07	엑셀 같은 표에서 답을 찾아 주는 LLM 연구 정리해줘
+d0827	dev	query_glossary_1029:G08	프롬프트에 넣는 문서가 너무 길 때 줄여서 넣는 방법 있어?
+d0828	dev	query_glossary_1029:G09	큰 모델이 아는 걸 작은 모델에 옮겨서 RAG에 쓰는 연구 알려줘
+d0829	dev	query_glossary_1029:G10	LLM이 자기 답에 얼마나 확실한지 숫자로 말하게 하는 연구 있어?
+d0830	dev	query_glossary_1029:G11	챗봇이 이전 대화 내용을 오래 기억하게 만드는 방법 찾아줘
+d0831	dev	query_glossary_1029:G12	LLM이 계산기나 검색 API를 직접 호출해서 쓰게 하는 연구 정리해줘
+d0832	dev	query_glossary_1029:G13	RAG 답변이 문서에 없는 내용을 지어내는지 잡아내는 방법 알려줘
+d0833	dev	query_glossary_1029:G14	검색 문서에 답이 없을 때 모른다고 말하게 하는 방법 있어?
+d0834	dev	query_glossary_1029:G15	긴 문서 중간에 있는 정보를 LLM이 잘 못 쓰는 문제 다룬 논문 찾아줘
+d0835	dev	query_glossary_1029:G16	RAG에 넣기 전에 문서 DB에서 거의 똑같은 문서를 지우면 검색이 좋아지는지 본 연구 있어?
+d0836	dev	survey_gate_1030:S01	RAG에서 검색할 문서를 작은 조각으로 나누는 방식이 성능에 어떤 영향을 주는지 조사해줘
+d0837	dev	survey_gate_1030:S02	LLM이 긴 대화를 기억하게 하는 메모리 구조에 대한 연구를 조사해줘
+d0838	dev	survey_gate_1030:S03	검색 결과를 LLM으로 다시 순위 매기는 방법에 대해 조사해줘
+d0839	dev	survey_gate_1030:S04	RAG 답변의 출처 표시가 맞는지 확인하는 연구 조사해줘
+d0840	dev	survey_gate_1030:S05	여러 단계 추론이 필요한 질문에서 검색을 반복하는 방법 조사해줘
+d0841	dev	survey_gate_1030:S06	LLM 에이전트가 도구를 고르고 쓰는 방법에 대한 연구 조사해줘
+d0842	dev	survey_gate_1030:S07	임베딩 모델을 특정 분야 문서에 맞게 조정하는 연구 조사해줘
+d0843	dev	survey_gate_1030:S08	표나 그래프가 들어 있는 PDF 문서를 RAG로 검색하는 방법 조사해줘
+d0844	dev	survey_gate_1030:S09	LLM이 모르는 질문에는 답하지 않게 하는 방법에 대한 연구 조사해줘
+d0845	dev	survey_gate_1030:S10	작은 모델로 큰 모델의 답변 품질을 따라가게 하는 증류 연구 조사해줘
+d0846	dev	survey_gate_1030:S11	검색 증강 생성에서 질문을 다시 써서 검색을 잘 되게 하는 연구 조사해줘
+d0847	dev	survey_gate_1030:S12	벡터 검색 인덱스를 적은 메모리로 운영하는 압축 방법 조사해줘

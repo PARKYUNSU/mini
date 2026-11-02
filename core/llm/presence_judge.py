@@ -39,7 +39,14 @@ _GATE_LIST = re.compile(r"논문들|연구들|동향|정리해|트렌드|\d+\s*�
 def gate_types(question: str) -> list[str]:
     """질문이 걸리는 유형 이름들(num·cmp·list). 비어 있으면 판정 대상."""
     q = question or ""
-    return [n for n, r in (("num", _GATE_NUM), ("cmp", _GATE_CMP), ("list", _GATE_LIST)) if r.search(q)]
+    got = [n for n, r in (("num", _GATE_NUM), ("cmp", _GATE_CMP), ("list", _GATE_LIST)) if r.search(q)]
+    if os.getenv("RAG_QTYPE_CLF", "0").strip() == "1":
+        # 분류기 (docs/experiments/qtype_1102) — 수치 · 비교는 분류기만, 목록은 정규식과 합친다(정규식 쪽이 정밀함)
+        from core.llm.qtype import predict
+
+        p = predict(q)
+        got = [n for n, t in (("num", "N"), ("cmp", "C"), ("list", "L")) if t in p or (n == "list" and n in got)]
+    return got
 
 
 def should_judge(question: str) -> bool:
