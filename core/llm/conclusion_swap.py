@@ -1,8 +1,10 @@
-"""결론의 인용 문장을 그 논문 원문 문장(번역)으로 바꿔 끼운다 (RAG_CONCLUSION_SWAP, docs/experiments/conclusion_struct_1102).
+"""결론의 인용 문장을 그 논문 원문 결과 문장(번역)으로 바꿔 끼운다 (RAG_CONCLUSION_SWAP, docs/experiments/conclusion_struct_1102).
 
 왜 따로 쓰나: 결론 오류(질문 전제 섞임 · 결과 뒤집기 · 남의 수치 붙이기)는 9B 가 논문 결과를 제 말로 옮길 때 생겼다
 (answer_review_1030 · conclusion_verify_1101). 무엇을 말할지는 9B 결론을 따르고, 말은 그 논문 블록에서 9B 문장과 가장
 많이 겹치는 원문 문장으로 바꾼다. 인용 없는 문장(직답 · 대비)은 둔다 — 논문별 한 줄만 쓰면 직답과 대비를 잃었다(미리보기).
+D2: D1 은 바꾼 문장 오류를 30/147 → 6/160 으로 줄였지만 배경 · 방법 소개 문장을 골라 답하는 정도가 나빠졌다(held-out 20:12).
+그래서 결과 문장만 후보로 두고, 9B 문장과 숫자가 하나라도 겹칠 때만 바꾼다.
 """
 
 from __future__ import annotations
@@ -12,10 +14,10 @@ import time
 from typing import Callable
 
 from core.llm.answer_fix import _CITED, _find
-from core.llm.conclusion_rewrite import _RESULT_NUM, _RESULT_RE, _bare, _sentences, cited_blocks
+from core.llm.conclusion_rewrite import _PROPOSE, _RESULT_NUM, _RESULT_RE, _bare, _sentences, cited_blocks
 from core.llm.lang_guard import hanzi_count
 
-__all__ = ["best_result", "check_translation", "first_person", "sentences", "snap", "swap_conclusion"]
+__all__ = ["check_translation", "first_person", "sentences", "snap", "swap_conclusion"]
 
 SYSTEM = "너는 논문 문장 번역가다. 주어진 영어 문장 하나만 한국어로 옮긴다."
 
@@ -34,21 +36,16 @@ _NUM = re.compile(r"\d+(?:[.,]\d+)?")
 _NUMTOK = re.compile(r"(?<![A-Za-z])(?<![A-Za-z]-)\d+(?:[.,]\d+)?")
 _LATIN = re.compile(r"[A-Za-z][A-Za-z0-9\-]{2,}")
 _LEAD = re.compile(r"^\s*((?:\[\s*\d{4}\.\d{4,5}(?:v\d+)?\s*\]\s*)+)(?![은는이가의와과에도를을])")  # conclusion_misattr_1025 dev.py
+# 표 · 링크 · 메일 · 참고문헌 · 소속 줄은 후보가 아니다(held-out D1: 제목 · 저자 줄을 골라 번역)
+_JUNK = re.compile(r"\||https?://|\S+@\S+\.\w|arXiv preprint|et al\.,? \(?\d{4}|\[\d+(?:\s*[,–-]\s*\d+)*\]|University|Institute", re.I)
 # "may not be a reliable gold standard" → "신뢰할 수 있는 금표준" 처럼 부정이 빠진 번역은 영어로 둔다('부재'는 inconsistency 번역이라 안 셈)
 _NEG_EN = re.compile(r"\b(?:not|no|never|without|cannot|neither|nor|unable|fails?|failed|lacks?)\b|n't", re.I)
 _NEG_KO = re.compile(r"않|없|못|아[니닌닐님]|불가|실패|부족|결여")  # '아닐' 은 '아니' 를 글자로 안 품는다
+_HANGUL = re.compile(r"[가-힣]")
 _END = re.compile(r"\n\s*(?:<b>|📎)")  # 결론 단락 끝: 다음 머리 · 외부 검색 줄
 # 1인칭 지시를 9B 가 안 따랐다(dev 점검: "우리는 …") → 번역 뒤 글자로 바꾼다
 _WE = re.compile(r"우리(는|의|가|를)")
 _WE_TO = {"는": "은", "의": "의", "가": "이", "를": "을"}
-
-
-def best_result(abstract: str) -> str:
-    """초록의 결과 문장 하나 — extract_findings 와 같은 점수(첫 문장 빼고 수치 2 + 결과 동사 1, 같으면 뒤쪽). 없으면 마지막 문장."""
-    sents = _sentences(abstract.replace("\\%", "%"))
-    score = {i: 2 * bool(_RESULT_NUM.search(x)) + bool(_RESULT_RE.search(x)) for i, x in enumerate(sents) if i}
-    top = sorted((i for i in score if score[i]), key=lambda i: (-score[i], -i))
-    return sents[top[0]] if top else (sents[-1] if sents else "")
 
 
 def sentences(text: str) -> list[str]:
@@ -64,21 +61,30 @@ def sentences(text: str) -> list[str]:
     return out
 
 
-def snap(claim: str, blk: str) -> str:
-    """9B 인용 문장과 숫자(3점) · 영어 낱말(1점)이 가장 많이 겹치는 블록 원문 문장. 같으면 앞(초록) · 0점이면 초록 결과 문장."""
-    claim = _CITED.sub("", claim)
-    nums, words = set(_NUMTOK.findall(claim)), {w.lower() for w in _LATIN.findall(claim)}
+def _candidates(blk: str) -> list[str]:
+    """블록의 결과 문장(결과 동사 · 수치). 초록 첫 문장(배경) · 제안 문장 · 표 · 참고문헌 · 소속 줄은 뺀다."""
     t = _TITLE.search(blk)
     text = blk[t.end():] if t else blk
-    best, top = "", 0
-    for s in _sentences(text.replace("\\%", "%")):
-        k = 3 * len(nums & set(_NUMTOK.findall(s))) + len(words & {w.lower() for w in _LATIN.findall(s)})
-        if k > top:
-            best, top = s, k
-    if best:
-        return best
     a = _ABS.search(blk)
-    return best_result(a.group(1) if a else text)
+    first = _sentences(a.group(1).replace("\\%", "%"))[:1] if a else []
+    return [s for s in _sentences(text.replace("\\%", "%"))
+            if s not in first and not _JUNK.search(s) and not _PROPOSE.search(s)
+            and (_RESULT_RE.search(s) or _RESULT_NUM.search(s))]
+
+
+def snap(claim: str, blk: str, nums: set[str] | None = None, skip: tuple[str, ...] = ()) -> tuple[str, set[str]]:
+    """``(결과 문장, 겹친 숫자)``. 9B 문장과 숫자(3점) · 영어 낱말(1점)이 가장 많이 겹치는 결과 문장 — 같으면 뒤 문장.
+    숫자가 하나도 안 겹치면 ``("", set())`` (그 문장은 바꾸지 않는다). ``nums`` 를 주면 그 숫자만 본다."""
+    claim = _CITED.sub("", claim)
+    nums = set(_NUMTOK.findall(claim)) if nums is None else nums
+    words = {w.lower() for w in _LATIN.findall(claim)}
+    best, top, hit = "", 0, set()
+    for s in _candidates(blk):
+        n = nums & set(_NUMTOK.findall(s))
+        k = 3 * len(n) + len(words & {w.lower() for w in _LATIN.findall(s)})
+        if n and s not in skip and k >= top:
+            best, top, hit = s, k, n
+    return best, hit
 
 
 def first_person(text: str) -> str:
@@ -95,6 +101,8 @@ def check_translation(src: str, text: str) -> str:
         return "한자"
     if not text or "\n" in text:
         return "꼴"
+    if len(_HANGUL.findall(text)) < 5:  # held-out D1: 번역 대신 영어로 바꿔 쓴 문장이 검사를 통과했다
+        return "한국어 아님"
     if _NEG_EN.search(src) and not _NEG_KO.search(text):
         return "부정어 빠짐"
     return ""
@@ -119,8 +127,8 @@ def swap_conclusion(
     answer: str, numbered_context: str, doc_ids: dict[int, str], model: str,
     translate: Callable[[str], str] | None = None,
 ) -> tuple[str, str, dict]:
-    """``(답, 상태, 기록)``. 상태: "바꿈 N"(바꾼 인용 문장 수) · "대상 아님" · "인용 문장 없음". 기록은 측정용."""
-    info: dict = {"pairs": [], "dropped": 0, "fallback": [], "tsec": 0.0}
+    """``(답, 상태, 기록)``. 상태: "바꿈 N"(바꾼 인용 문장 수) · "바꿀 문장 없음" · "대상 아님" · "인용 문장 없음". 기록은 측정용."""
+    info: dict = {"pairs": [], "kept": 0, "dropped": 0, "fallback": [], "tsec": 0.0}
     blocks = cited_blocks(answer, numbered_context, doc_ids)
     c = _find("결론", answer)
     if len(blocks) < 2 or not c:
@@ -139,30 +147,47 @@ def swap_conclusion(
     tr = translate or _translator(model)
     out, seen = [], set()
     for s in sents:
-        ids = _CITED.findall(s)
+        ids = list(dict.fromkeys(_CITED.findall(s)))
         if not ids:
             out.append(s)
             continue
-        after = []
+        # 인용한 논문마다 숫자가 겹치는 결과 문장이 있어야 바꾼다 — 하나라도 없으면(본론 밖 논문 포함) 9B 문장을 둔다
+        picks = {}
         for i in ids:
-            if i not in by_id:  # 본론 밖 논문 인용 — 다시 쓰기 검사가 막으므로 드물다
-                info["dropped"] += 1
-                continue
-            pid, blk = by_id[i]
-            src = snap(s, blk)
-            if (i, src) in seen:
-                continue
-            seen.add((i, src))
-            t0 = time.monotonic()
-            try:
-                ko = first_person(tr(src))
-                why = check_translation(src, ko)
-            except Exception as exc:  # 번역을 못 해도 원문 문장은 넣는다
-                ko, why = "", f"호출 실패 {type(exc).__name__}"
-            info["tsec"] += time.monotonic() - t0
-            if why:
-                info["fallback"].append(why)
-            after.append(f"{src if why else ko} [{pid}]")
-        info["pairs"].append({"before": s, "after": after, "ids": ids})
-        out += after
+            src, hit = snap(s, by_id[i][1]) if i in by_id else ("", set())
+            if not src:
+                break
+            srcs = [src]
+            left = set(_NUMTOK.findall(_CITED.sub("", s))) - hit
+            if left:  # 9B 문장이 두 원문 문장을 합쳤으면 남은 숫자를 덮는 문장 하나 더(원문 순서로)
+                src2, _ = snap(s, by_id[i][1], left, (src,))
+                if src2:
+                    order = _candidates(by_id[i][1])
+                    srcs = sorted([src, src2], key=order.index)
+            picks[i] = srcs
+        else:
+            after = []
+            for i, srcs in picks.items():
+                pid = by_id[i][0]
+                for src in srcs:
+                    if (i, src) in seen:
+                        continue
+                    seen.add((i, src))
+                    t0 = time.monotonic()
+                    try:
+                        ko = first_person(tr(src))
+                        why = check_translation(src, ko)
+                    except Exception as exc:  # 번역을 못 해도 원문 문장은 넣는다
+                        ko, why = "", f"호출 실패 {type(exc).__name__}"
+                    info["tsec"] += time.monotonic() - t0
+                    if why:
+                        info["fallback"].append(why)
+                    after.append(f"{src if why else ko} [{pid}]")
+            info["pairs"].append({"before": s, "after": after, "ids": ids})
+            out += after
+            continue
+        info["kept"] += 1
+        out.append(s)
+    if not info["pairs"]:
+        return answer, "바꿀 문장 없음", info
     return answer[:c.end()] + "\n" + " ".join(out) + (tail or "\n"), f"바꿈 {len(info['pairs'])}", info

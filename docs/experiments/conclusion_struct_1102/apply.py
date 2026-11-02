@@ -50,7 +50,8 @@ def main() -> int:
     ch = [x for x in rows if x["changed"]]
     print(f"답 {len(rows)} · 바뀐 답 {len(ch)} · 상태 {dict(Counter(x['status'].split()[0] for x in rows))}")
     print(f"바꾼 인용 문장 {sum(len(x['pairs']) for x in ch)} · 넣은 문장 {sum(len(p['after']) for x in ch for p in x['pairs'])}"
-          f" · 영어로 둠 {dict(Counter(w.split()[0] for x in ch for w in x['fallback']))} · 본론 밖 뺌 {sum(x['dropped'] for x in ch)}")
+          f" · 영어로 둠 {dict(Counter(w.split()[0] for x in ch for w in x['fallback']))} · 본론 밖 뺌 {sum(x['dropped'] for x in ch)}"
+          f" · 숫자 안 겹쳐 둔 인용 문장 {sum(x.get('kept', 0) for x in rows)}")
     if ch:
         print(f"번역 초 중앙 {statistics.median(x['tsec'] for x in ch):.1f} · 최대 {max(x['tsec'] for x in ch):.1f}"
               f" · 인용 집합 다른 답 {sum(not x['cited_same'] for x in ch)}")
