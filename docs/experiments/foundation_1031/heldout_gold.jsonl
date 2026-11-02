@@ -71,7 +71,6 @@
 {"id": "H_E15", "stratum": "E", "relevant_papers": []}
 {"id": "H_E16", "stratum": "E", "relevant_papers": []}
 {"id": "H_F01", "stratum": "F", "relevant_papers": []}
-{"id": "H_F04", "stratum": "F", "relevant_papers": []}
 {"id": "H_F07", "stratum": "F", "relevant_papers": []}
 {"id": "H_F09", "stratum": "F", "relevant_papers": []}
 {"id": "H_F10", "stratum": "F", "relevant_papers": []}
@@ -79,6 +78,7 @@
 {"id": "H_F12", "stratum": "F", "relevant_papers": []}
 {"id": "H_F13", "stratum": "F", "relevant_papers": []}
 {"id": "H_F14", "stratum": "F", "relevant_papers": []}
+{"id": "H_F15", "stratum": "F", "relevant_papers": []}
 {"id": "H_G05", "stratum": "G", "relevant_papers": []}
 {"id": "H_G06", "stratum": "G", "relevant_papers": []}
 {"id": "H_G07", "stratum": "G", "relevant_papers": []}

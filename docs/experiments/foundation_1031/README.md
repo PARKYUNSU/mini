@@ -47,6 +47,7 @@
   - DB 를 안 보고 썼다. 기존 질문 913개와 SequenceMatcher 0.75 이상 겹치는 문항은 없다.
   - B 정답 ID: RETRO 2112.04426 · QLoRA 2305.14314 · CoT 2201.11903 · REPLUG 2301.12652.
   - 그대로 둔 29문항은 D1 에서 결론이 안 바뀌어 판정 묶음에 안 들어간 문항이다.
+- 11-02 교체(qtype_1102 뒤): R6 판정에서 본 H_F04 의 편수 고지 오작동("5편에서 10편으로"를 요청 편수로 읽음)을 보고 `question_conditions` 를 고쳤다. 그래서 H_F04 를 `dev_from_heldout_1102.tsv`(+ `_gold.jsonl`)로 옮기고, 같은 F 꼴 새 문항 H_F15 를 넣었다(DB 안 보고 씀 · 기존 질문 1,162개와 SequenceMatcher 최대 0.42).
 
 ## 3 · 4. 사전 등록 규칙 · 지표 — protocol.md §2.5
 

@@ -8,30 +8,49 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 
 from core.llm.answer_fix import _find
 from core.llm.citation_fix import RAG_HIT_SEP
 
 __all__ = ["year_condition", "filter_by_year", "requested_count", "count_notice"]
 
+_RANGE = re.compile(r"(20\d\d)\s*년?\s*(?:~|-|–|부터)\s*(20\d\d)\s*년")
 _YEAR = re.compile(r"(20\d\d)\s*년\s*(이후|부터|이전|전에|전|까지)?")
+_REL = re.compile(r"(재작년|작년|지난해|올해|금년)\s*(이후|부터|이전|전에|전|까지)?")
+_REL_YEARS = {"재작년": -2, "작년": -1, "지난해": -1, "올해": 0, "금년": 0}
 _DATE = re.compile(r"\[발행일:\s*(\d{4})-")
-_COUNT = re.compile(r"(?<![\d.])(\d{1,2})\s*(?:개|편)")
+# 요청 동사가 바로 따를 때만 편수다 — "예시를 3개 넣을 때" · "5편에서 10편으로" · "상위 10개 중"은 아니다(qtype_1102 §6.2)
+_COUNT = re.compile(r"(?<![\d.])(\d{1,2})\s*(?:개|편)\s*(?:의\s*)?(?:논문|연구)?\s*(?:만|정도|쯤)?\s*(?:을|를)?\s*"
+                    r"(?:찾|알려|골라|고르|뽑|추천|정리|보여|소개|요약|비교|설명|나열|줘|주세요)")
 _ITEM = re.compile(r"^\s*(?:<b>)?\d+\.\s", re.M)
 
 
-def year_condition(question: str) -> tuple[str, int] | None:
-    """``("eq"|"ge"|"lt"|"le", 연도)`` 또는 None. "2024년 이전"은 2023 까지(lt), "2024년까지"는 2024 까지(le)."""
-    m = _YEAR.search(question)
-    if not m:
+def year_condition(question: str, this_year: int | None = None) -> tuple[int | None, int | None] | None:
+    """발행 연도 범위 ``(처음, 끝)``(포함, 열린 쪽은 None) 또는 None.
+
+    "2024년 이전"은 (None, 2023), "2024년까지"는 (None, 2024), "2023~2026년"은 (2023, 2026), "작년"은 올해 − 1.
+    """
+    if m := _RANGE.search(question):
+        lo, hi = sorted(int(g) for g in m.groups())
+        return lo, hi
+    if m := _YEAR.search(question):
+        y = int(m.group(1))
+    elif m := _REL.search(question):
+        y = (this_year or date.today().year) + _REL_YEARS[m.group(1)]
+    else:
         return None
-    op = {"이후": "ge", "부터": "ge", "이전": "lt", "전에": "lt", "전": "lt", "까지": "le"}.get(m.group(2) or "", "eq")
-    return op, int(m.group(1))
+    word = m.group(2) or ""
+    if word in ("이후", "부터"):
+        return y, None
+    if word in ("이전", "전에", "전"):
+        return None, y - 1
+    return (None, y) if word == "까지" else (y, y)
 
 
-def _ok(year: int, cond: tuple[str, int]) -> bool:
-    op, y = cond
-    return {"eq": year == y, "ge": year >= y, "lt": year < y, "le": year <= y}[op]
+def _ok(year: int, cond: tuple[int | None, int | None]) -> bool:
+    lo, hi = cond
+    return (lo is None or year >= lo) and (hi is None or year <= hi)
 
 
 def filter_by_year(question: str, context: str) -> tuple[str, str]:
@@ -52,9 +71,13 @@ def requested_count(question: str) -> int | None:
     return int(m.group(1)) if m and 2 <= int(m.group(1)) <= 10 else None
 
 
-def _period(cond: tuple[str, int]) -> str:
-    op, y = cond
-    return {"eq": f"{y}년", "ge": f"{y}년 이후", "lt": f"{y}년 이전", "le": f"{y}년까지"}[op]
+def _period(cond: tuple[int | None, int | None]) -> str:
+    lo, hi = cond
+    if lo == hi:
+        return f"{lo}년"
+    if hi is None:
+        return f"{lo}년 이후"
+    return f"{hi}년까지" if lo is None else f"{lo}~{hi}년"
 
 
 def count_notice(question: str, answer: str, year_status: str = "") -> tuple[str, str]:
