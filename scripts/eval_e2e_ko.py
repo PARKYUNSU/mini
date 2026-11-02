@@ -88,7 +88,7 @@ def main() -> int:
     ap.add_argument("--keep-session", action="store_true",
                     help="문항 사이 대화 기록을 지우지 않고 한 대화로 이어 묻는다 (docs/experiments/history_gate_1019)")
     ap.add_argument("--save-context", action="store_true",
-                    help="답변 LLM 에 건네진 번호 붙은 컨텍스트를 행에 저장 (presence_judge_1011)")
+                    help="답변 LLM 에 건네진 번호 붙은 컨텍스트 · 답 단계 원문 · 다시 쓰기 전 답을 행에 저장 (presence_judge_1011)")
     args = ap.parse_args()
 
     items = load_items(Path(args.questions), Path(args.gold))
@@ -232,7 +232,11 @@ def main() -> int:
                     "answer_papers": sorted(set(ANSWER_ID_RE.findall(answer))),
                     "answer_len": len(answer), "answer": answer[:4000]} if args.answer else {}),
                 **({"numbered_context": numbered[0] if numbered else "",
-                    "doc_ids": [re.sub(r"v\d+$", "", (p or "").strip()) for p in doc_ids]} if args.save_context else {}),
+                    "doc_ids": [re.sub(r"v\d+$", "", (p or "").strip()) for p in doc_ids],
+                    # 답 단계 원문 · 결론 다시 쓰기 전 답 — 전제가 어느 단계에서 들어오는지 본다(premise_leak_1102)
+                    "stage_text": {x["stage"]: {k: x[k] for k in ("raw", "result", "before") if k in x}
+                                   for x in _tr.get("stages", []) if x["stage"] in ("answer", "rewrite")}}
+                   if args.save_context else {}),
                 **({"citation_fix": cit[-1]} if cit else {}),
                 "elapsed": round(elapsed, 1),
                 "stages": [[x["stage"], x["s"]] for x in _tr.get("stages", [])],
