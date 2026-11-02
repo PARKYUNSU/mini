@@ -240,6 +240,10 @@ def main() -> int:
                 **({"citation_fix": cit[-1]} if cit else {}),
                 "elapsed": round(elapsed, 1),
                 "stages": [[x["stage"], x["s"]] for x in _tr.get("stages", [])],
+                # 답 LLM 입력 지문 · 단계 결정(판정 결과 · 게이트 · 거르기 등). 두 조건에서 지문이 같으면 답 차이는
+                # 표본 흔들림뿐이다 — R6 에서 입력이 같은 9쌍 중 8 이 승패가 갈렸다 (docs/experiments/judge_off_1102 §2)
+                "answer_input": hashlib.sha1(captured[0].encode()).hexdigest()[:12] if captured else "",
+                "trace": [{k: v for k, v in x.items() if k not in ("raw", "before", "answer")} for x in _tr.get("stages", [])],
                 "error": err,
             }
             w.write(json.dumps(row, ensure_ascii=False) + "\n")
