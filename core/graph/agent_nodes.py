@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+import itertools
 import logging
 import os
 import re
@@ -449,6 +450,69 @@ def _merge_rag_blocks(primary: str, extras: list[str], *, per_extra: int = 2) ->
     for b in [x.strip() for x in (primary or "").split(_RAG_HIT_SEP) if x.strip()]:
         add(b)
     return _RAG_HIT_SEP.join(out) if out else primary
+
+
+# 여러 주제를 한 번에 묻는 질문은 주제마다 검색해 번갈아 앞에 놓는다 (RAG_TOPIC_SPLIT, docs/experiments/topic_split_1103).
+# 한 줄 검색어(12단어)가 셋째 주제를 빠뜨렸다(실사용 job 140). 번호 항목은 지시문일 수도 있어 주제인지는 LLM 이 가린다.
+_ENUM_ITEM_RE = re.compile(r"(?:^|[\s:：])\(?([1-9])[.)](?!\d)|([①-⑨])")
+TOPIC_SPLIT_MAX = 4
+TOPIC_SPLIT_PER_TOPIC = 3
+
+
+def topic_split_candidate(user_request: str) -> bool:
+    """번호 항목이 1 · 2 순서로 있거나(1. · (1) · 1) · ①) 한 줄에 쉼표가 둘 이상이면 하위 주제 뽑기를 해 본다."""
+    q = user_request or ""
+    nums = [a or str(ord(b) - ord("①") + 1) for a, b in _ENUM_ITEM_RE.findall(q)]
+    if "1" in nums and "2" in nums[nums.index("1") + 1:]:
+        return True
+    return any(line.count(",") + line.count("、") >= 2 for line in q.split("\n"))
+
+
+def _extract_subtopics(user_request: str) -> list[str]:
+    """하위 주제마다 영어 검색어 한 줄. 주제가 하나뿐이거나 실패하면 빈 목록 — 호출 쪽은 기존 검색만 쓴다."""
+    prompt = f"""The user asks for research papers. Does the question list several separate research sub-topics to find papers for (for example a numbered list of topics, or "A, B, C" listed as separate techniques)?
+- Instructions about the answer (number of papers, summary style, format, excluding surveys, research gaps) are not topics.
+- A method that combines several parts, or a survey of one subject, is one topic.
+Write one line per sub-topic with 3-6 English keywords (translate Korean into English). Keep a shared context such as RAG in every line.
+If there is only one topic, write one line.
+At most {TOPIC_SPLIT_MAX} lines, nothing else:
+1: <English keywords>
+2: <English keywords>
+
+User question:
+{user_request}
+"""
+    try:
+        raw = (normalize_ai_message_content(get_rag_query_rewrite_llm(num_predict=320).invoke([HumanMessage(content=prompt)])) or "").strip()
+    except Exception:
+        return []
+    got = []
+    for line in re.findall(r"^\s*\d\s*[:：.)]\s*(.+?)\s*$", raw, re.M)[:TOPIC_SPLIT_MAX]:
+        # 9B 가 긴 한국어 질문에서 한국어로 적는다(job 140) — 그 줄만 기존 영어 검색어 추출로 바꾼다
+        if re.search(r"[가-힣]", line):
+            line = _extract_english_rag_query_base(line)
+        # 9B 가 질문에 없는 세부 기법을 덧붙여 길게 쓴다(dev v1) — 앞 10단어만
+        q = " ".join(re.sub(r"[^A-Za-z0-9 .,+\-_/()]", " ", line).split()[:10])
+        if len(re.findall(r"[A-Za-z]{2,}", q)) >= 2:
+            got.append(q)
+    # 질문의 RAG 맥락을 줄마다 지키라 해도 9B 가 빼 RAG 와 무관한 청크 논문이 걸렸다(dev D_77) — 없으면 붙인다
+    if re.search(r"RAG|검색\s*증강|retrieval[- ]augmented", user_request, re.I):
+        got = [g if re.search(r"\bRAG\b|retrieval[- ]augmented", g, re.I) else f"{g} RAG" for g in got]
+    got = list(dict.fromkeys(got))
+    return got if len(got) >= 2 else []
+
+
+def _interleave_topic_blocks(primary: str, per_topic: list[str]) -> str:
+    """주제별 검색 상위 블록을 번갈아(1주제 1위, 2주제 1위, …, 1주제 2위 …) 앞에, 원래 검색 블록을 뒤에 —
+    같은 논문은 한 번만. 이후 목록 모드 상위 10 자르기가 주제를 고루 남긴다."""
+    bad = ("관련 문서 없음", "검색 오류")
+    rows = [[b.strip() for b in r.split(_RAG_HIT_SEP) if b.strip()][:TOPIC_SPLIT_PER_TOPIC]
+            for r in per_topic if (r or "").strip() and not r.strip().startswith(bad)]
+    order = [b for rank in itertools.zip_longest(*rows) for b in rank if b]
+    if not order:
+        return primary
+    base = "" if (primary or "").strip().startswith(bad) else primary
+    return _merge_rag_blocks(base, [_RAG_HIT_SEP.join(order)], per_extra=len(order))
 
 
 def _da_trace(step: str, detail: str = "") -> None:
@@ -1081,6 +1145,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             _rf_pre = ""
             _rf = ""
             _src = "search"
+            _topics: list[str] = []
+            _list_on = list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
 
             if (
                 prefer_single_hit
@@ -1093,13 +1159,24 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 _src = "list_papers"
             else:
                 cached_rag = (state.get("rag_context") or "").strip()
-                _list_mode = list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
                 _reuse = followup_reuse_context(session, user_request)
+                # 여러 주제 질문: 주제마다 검색해 번갈아 앞에 놓고 목록 모드(10편)로 답한다 — 나뉘면 비교 분리 검색 ·
+                # 정답 유무 판정은 하지 않는다 (RAG_TOPIC_SPLIT, docs/experiments/topic_split_1103). 상위 5 경로에서는
+                # 자르기 앞 거르기가 하위 주제 문서를 빼 2편까지 줄었다(dev D_140 19→2).
+                if (
+                    not _reuse
+                    and not prefer_single_hit
+                    and os.getenv("RAG_TOPIC_SPLIT", "0").strip() == "1"
+                    and topic_split_candidate(user_request)
+                ):
+                    _topics = _extract_subtopics(user_request)
+                    _da_trace("topic split", repr(_topics))
+                    _list_on = _list_on or bool(_topics)
                 if _reuse:
                     rag_context = _reuse
                     _src = "followup_reuse"
                     _da_trace("rag_context reused from previous answer", f"len={len(rag_context)}")
-                elif _list_mode:
+                elif _list_on:
                     # 목록 질문: 라우터 컨텍스트(3편)를 쓰지 않고 10편 다시 검색 (docs/experiments/list_mode_1016)
                     rag_context = rag.search(
                         rag_query, top_k=LIST_MODE_TOP_K, session_context=_recent_ctx, wants_depth=False,
@@ -1122,9 +1199,15 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                         name_query=user_request,
                     )
                     _da_trace("after rag.search()", f"len={len(rag_context)}")
+                if _topics:  # 위 RAG_TOPIC_SPLIT
+                    _per_topic = [
+                        rag.search(t, top_k=top_k, session_context="", wants_depth=False, name_query=t)
+                        for t in _topics
+                    ]
+                    rag_context = _interleave_topic_blocks(rag_context, _per_topic)
                 # 비교 질문: 두 대상을 각각 검색해 앞에 합친다 — 라우터가 넘긴 컨텍스트에도 적용
                 # (RAG_COMPARE_SPLIT, docs/experiments/compare_split_1015)
-                if not _reuse and os.getenv("RAG_COMPARE_SPLIT", "0").strip() == "1" and "cmp" in gate_types(user_request):
+                if not _topics and not _reuse and os.getenv("RAG_COMPARE_SPLIT", "0").strip() == "1" and "cmp" in gate_types(user_request):
                     _targets = _extract_comparison_targets(user_request)
                     _da_trace("compare split targets", repr(_targets))
                     if _targets:
@@ -1134,7 +1217,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
                         _extras = [_search_target(t) for t in _targets]
                         rag_context = _merge_rag_blocks(rag_context, _extras)
-                rag_trace.mark(chat_id, "search", src=_src, ids=rag_trace.paper_ids(rag_context))
+                rag_trace.mark(chat_id, "search", src=_src, ids=rag_trace.paper_ids(rag_context),
+                               **({"topics": _topics} if _topics else {}))
                 if _reuse:
                     pass  # 직전 답에서 이미 걸러진 컨텍스트
                 elif prefer_single_hit and wants_depth:
@@ -1143,7 +1227,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 elif prefer_single_hit:
                     rag_context = _rag_context_first_hit_only(rag_context)
                     _da_trace("rag_context top-1 only", f"len={len(rag_context)}")
-                elif _list_mode:
+                elif _list_on:
                     rag_context = _compact_list_blocks(_rag_context_top_n_hits(rag_context, n=LIST_MODE_TOP_K))
                     _da_trace("rag_context list mode (compact top-10)", f"len={len(rag_context)}")
                 else:
@@ -1193,7 +1277,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             if (
                 os.getenv("RAG_LIST_SLOTS", "0").strip() == "1"
                 and len(_doc_ids) > 1
-                and list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
+                and _list_on
             ):
                 output_template = list_slots_template(len(_doc_ids))
             _da_trace("rag_context numbered", f"docs={len(_doc_ids)}")
@@ -1207,10 +1291,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 output_template_strict=output_template,
                 rag_max_chars=rag_max_chars,
                 doc_count=len(_doc_ids),
-                list_mode=list_mode_active(user_request, prefer_single_hit=prefer_single_hit),
+                list_mode=_list_on,
             )
             _pick = None
-            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request):
+            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request) and not _topics:
                 # 답변과 같은 앞부분으로 판정하면 답변 호출이 컨텍스트를 다시 읽지 않는다 (docs/experiments/judge_cache_1017)
                 if shared_prefix_active() and not image_base64:
                     _pick = judge_presence_shared(system_prompt, prompt, user_request, RAG_ANSWER_MODEL)
@@ -1222,7 +1306,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             rag_trace.mark(chat_id, "judge", gates=gate_types(user_request), pick=_pick)
             # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다
             if external_search_active() and (
-                _pick == "없음" or list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
+                _pick == "없음" or _list_on
             ):
                 # 학회판(arXiv ID 없음)은 제목으로 거른다 — job 129 · 130 에서 본론 2406.01549 의 ACL 판이 다시 실렸다
                 _titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context))

@@ -1,0 +1,30 @@
+{"id": "HT01", "stratum": "T", "relevant_papers": [], "topics": ["질의 재작성으로 검색 개선", "cross-encoder reranking", "RAG 답의 근거성(faithfulness) 평가"]}
+{"id": "HT02", "stratum": "T", "relevant_papers": [], "topics": ["KV 캐시 압축 · 양자화", "speculative decoding", "LLM 서빙 batching · 스케줄링"]}
+{"id": "HT03", "stratum": "T", "relevant_papers": [], "topics": ["도구 호출 정확도", "에이전트 장기 기억", "multi-agent 협업 프레임워크", "에이전트 작업 벤치마크"]}
+{"id": "HT04", "stratum": "T", "relevant_papers": [], "topics": ["환각을 줄이는 디코딩", "생성 뒤 사실 검증 · 수정"]}
+{"id": "HT05", "stratum": "T", "relevant_papers": [], "topics": ["생성 평가의 평가자 간 일치도", "사람 평가를 LLM 평가로 대체할 때의 신뢰성", "요약 자동 평가 지표의 한계"]}
+{"id": "HT06", "stratum": "T", "relevant_papers": [], "topics": ["LoRA 계열 PEFT", "instruction 데이터 품질 필터링", "특정 언어 continual pretraining"]}
+{"id": "HT07", "stratum": "T", "relevant_papers": [], "topics": ["이미지-텍스트 공동 임베딩", "표 · 차트 문서 이해", "멀티모달 RAG"]}
+{"id": "HT08", "stratum": "T", "relevant_papers": [], "topics": ["프롬프트 인젝션 공격 · 방어", "자동 red teaming(탈옥 탐색)"]}
+{"id": "HT09", "stratum": "T", "relevant_papers": [], "topics": ["코드 벤치마크 오염", "실행 피드백 self-repair", "repository-level 코드 생성", "코드 LLM 의 보안 취약 코드"]}
+{"id": "HT10", "stratum": "T", "relevant_papers": [], "topics": ["lost in the middle", "긴 컨텍스트 모델 vs RAG", "context compression"]}
+{"id": "HT11", "stratum": "T", "relevant_papers": [], "topics": ["지식 증류", "pruning", "quantization", "low-rank factorization"]}
+{"id": "HT12", "stratum": "T", "relevant_papers": [], "topics": ["RAG 검색 품질 평가", "RAG 답 정확성 평가", "인용 정확도 평가"]}
+{"id": "HT13", "stratum": "T", "relevant_papers": [], "topics": ["RLHF 보상 모델", "DPO 계열 직접 선호 학습", "reward hacking"]}
+{"id": "HT14", "stratum": "T", "relevant_papers": [], "topics": ["수학 추론 chain-of-thought", "process reward model"]}
+{"id": "HT15", "stratum": "T", "relevant_papers": [], "topics": ["하이브리드 검색(BM25+dense)", "쿼리 확장", "청크 크기 최적화"]}
+{"id": "HT16", "stratum": "T", "relevant_papers": [], "topics": ["벤치마크 오염", "평가 프롬프트 민감도", "LLM 판정 위치 편향", "LLM 판정 장황함 편향"]}
+{"id": "HT17", "stratum": "T", "relevant_papers": [], "topics": ["에이전트 planning", "self-reflection", "에이전트 오류 복구"]}
+{"id": "HT18", "stratum": "T", "relevant_papers": [], "topics": ["지식 그래프 RAG", "테이블 QA", "text-to-SQL"]}
+{"id": "HT19", "stratum": "T", "relevant_papers": [], "topics": ["early exit", "MoE 라우팅", "모델 캐스케이드"]}
+{"id": "HT20", "stratum": "T", "relevant_papers": [], "topics": ["RAG 개인정보 유출", "RAG 지식 베이스 poisoning", "membership inference", "간접 프롬프트 인젝션"]}
+{"id": "HT21", "stratum": "T", "relevant_papers": [], "topics": ["음성 인식", "화자 분리", "음성 합성"]}
+{"id": "HT22", "stratum": "T", "relevant_papers": [], "topics": ["VLM 객체 환각", "VQA 벤치마크", "비디오 이해"]}
+{"id": "HT23", "stratum": "T", "relevant_papers": [], "topics": ["self-consistency", "tree of thoughts", "least-to-most prompting", "program-aided reasoning"]}
+{"id": "HT24", "stratum": "T", "relevant_papers": [], "topics": ["검색 증강 코드 생성", "API 문서 검색", "코드 검색 임베딩"]}
+{"id": "HT25", "stratum": "T", "relevant_papers": [], "topics": ["LLM routing", "model merging", "mixture of agents"]}
+{"id": "HT26", "stratum": "T", "relevant_papers": [], "topics": ["환각 탐지", "불확실성 추정", "selective prediction"]}
+{"id": "HT27", "stratum": "T", "relevant_papers": [], "topics": ["prompt compression", "KV cache eviction", "sparse attention", "context window extension"]}
+{"id": "HT28", "stratum": "T", "relevant_papers": [], "topics": ["instruction tuning 데이터 선택", "합성 데이터 생성", "데이터 중복 제거"]}
+{"id": "HT29", "stratum": "T", "relevant_papers": [], "topics": ["PDF 파싱", "표 추출", "레이아웃 분석"]}
+{"id": "HT30", "stratum": "T", "relevant_papers": [], "topics": ["LLM 자기 평가", "외부 verifier"]}

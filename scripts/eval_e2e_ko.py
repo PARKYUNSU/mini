@@ -71,6 +71,7 @@ def load_items(questions: Path = QUESTIONS, gold_path: Path = GOLD) -> list[dict
         if not line.strip():
             continue
         qid, q = line.split("\t", 1)
+        q = q.replace("\\n", "\n")  # 여러 줄 질문(번호 항목)은 TSV 에 \n 으로 적는다 (topic_split_1103)
         if qid in EXCLUDED:
             continue
         items.append({"id": qid, "stratum": gold[qid]["stratum"], "question": q, "gold": gold[qid]["relevant_papers"]})

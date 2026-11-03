@@ -159,7 +159,7 @@ def get_llm_debate_scheduler_llm():
     )
 
 
-def get_rag_query_rewrite_llm():
+def get_rag_query_rewrite_llm(num_predict: int = 160):
     """Chroma standalone 검색어 재작성: 짧은 출력, 비-thinking.
 
     결정적(temperature 0, seed 고정)이다. 0.2 였을 때 같은 질문이 실행마다 다른 영어 키워드를 내서
@@ -173,7 +173,7 @@ def get_rag_query_rewrite_llm():
             top_p=0.8,
             repeat_penalty=1.18,
             reasoning=False,
-            num_predict=160,
+            num_predict=num_predict,
         )
     )
 

@@ -1,0 +1,30 @@
+HT01	사내 문서 QA용 RAG를 운영하고 있는데 답변 품질이 들쭉날쭉합니다. 단계별로 원인을 점검하려고 하니 아래 주제별로 논문을 찾아 주세요.\n1. 질의 재작성(query rewriting)으로 검색 성능을 높이는 방법\n2. 검색 결과를 cross-encoder로 다시 정렬하는 reranking\n3. 생성된 답이 검색 문서에 근거했는지 확인하는 faithfulness 평가
+HT02	LLM 서빙 비용을 줄이려고 합니다. 2023년 이후 연구 중에서 다음 세 방향의 논문을 각각 알려 주세요.\n1. KV 캐시 압축이나 양자화\n2. speculative decoding으로 생성 속도 높이기\n3. 여러 요청을 묶어 처리하는 batching · 스케줄링
+HT03	에이전트 시스템 설계 리뷰를 준비 중입니다. 2024년 이후 논문 위주로 아래 주제를 찾아 주세요.\n1. 도구 호출(tool calling) 정확도를 높이는 방법\n2. 에이전트의 장기 기억(long-term memory) 관리\n3. 여러 에이전트가 역할을 나눠 협업하는 multi-agent 프레임워크\n4. 에이전트의 작업 성공률을 재는 벤치마크
+HT04	우리 팀 목표는 LLM 답변의 환각을 줄이는 것입니다. 두 갈래로 근거 논문이 필요합니다.\n1. 생성 단계에서 환각을 줄이는 디코딩 기법(contrastive decoding 등)\n2. 생성한 뒤에 사실 여부를 검증하고 고치는 post-hoc correction
+HT05	사내 요약 평가에서 같은 요약문을 두고 평가자 두 명의 점수가 자주 엇갈립니다. 평가 설계를 다시 하려는데 다음 주제의 논문을 찾아 주세요.\n1. 텍스트 생성 평가에서 평가자 간 일치도(inter-annotator agreement)\n2. 사람 평가를 LLM 평가로 바꿀 때의 신뢰성\n3. 요약 품질 자동 평가 지표의 한계
+HT06	한국어 특화 LLM을 파인튜닝할 계획입니다. 아래 순서대로 관련 연구를 정리해 주세요.\n1. 적은 GPU로 가능한 parameter-efficient fine-tuning(LoRA 계열)\n2. instruction tuning 데이터의 품질 필터링\n3. 다국어 모델의 특정 언어 성능을 올리는 continual pretraining
+HT07	멀티모달 검색 시스템을 검토하고 있습니다. 최신 논문을 주제별로 찾아 주세요.\n1. 이미지와 텍스트를 같은 공간에 임베딩하는 방법\n2. 표나 차트가 들어간 문서를 이해하는 document understanding\n3. 멀티모달 RAG에서 이미지를 근거로 답하는 방법
+HT08	LLM 보안 점검 보고서를 써야 합니다. 아래 두 주제의 논문을 찾아 주세요.\n1. 프롬프트 인젝션(prompt injection) 공격과 방어\n2. 탈옥(jailbreak) 프롬프트를 자동으로 찾는 red teaming
+HT09	코드 생성 모델 도입을 검토하는 중입니다. 다음 네 가지에 대한 연구가 필요합니다.\n1. 코드 생성 벤치마크의 데이터 오염(contamination)\n2. 실행 결과를 피드백으로 써서 코드를 고치는 self-repair\n3. 저장소 전체 맥락을 쓰는 repository-level 코드 생성\n4. 코드 LLM이 보안 취약 코드를 만드는 위험
+HT10	'긴 컨텍스트 모델이 있으면 RAG는 필요 없다'는 주장에 반박하는 자료를 만들려고 합니다. 다음 주제의 논문을 찾아 주세요.\n1. 긴 입력 중간에 있는 정보를 놓치는 현상(lost in the middle)\n2. 긴 컨텍스트 모델과 RAG의 성능 · 비용 비교\n3. 긴 문서를 줄여 넣는 context compression
+HT11	모델 경량화 보고서에 쓸 거야. 아래 네 범주로 나눠서 범주마다 대표 논문을 골라 줘:\n(1) 지식 증류(knowledge distillation)\n(2) 가지치기(pruning)\n(3) 양자화(quantization)\n(4) 저랭크 분해(low-rank factorization)
+HT12	RAG 평가 방법을 정리하려고 해. ① 검색 품질 평가 ② 답변 정확성 평가 ③ 인용 정확도(citation accuracy) 평가 — 각각 대표 논문을 찾아줘.
+HT13	강화학습 기반 LLM 정렬을 공부하고 있어. (1) RLHF 보상 모델 학습 (2) DPO처럼 보상 모델 없이 선호 데이터로 바로 학습하는 방법 (3) 보상 해킹(reward hacking) 문제 — 이 세 가지 논문을 알려줘.
+HT14	다음 두 축으로 나눠서 논문 추천해줘: (1) 수학 추론을 위한 chain-of-thought 개선 (2) 추론 단계를 검증하는 process reward model
+HT15	검색 증강 생성에서 하이브리드 검색(BM25+dense), 쿼리 확장, 문서 청크 크기 최적화 관련 논문 찾아줘
+HT16	LLM 평가에서 벤치마크 오염, 평가 프롬프트 민감도, 위치 편향(position bias), 장황함 편향(verbosity bias)을 다룬 최신 논문 알려줘
+HT17	에이전트의 계획 수립(planning), 자기 성찰(self-reflection), 오류 복구를 각각 다룬 연구를 찾아줘
+HT18	지식 그래프 기반 RAG, 테이블 질의응답, 자연어를 SQL로 바꾸는 text-to-SQL 쪽 논문을 찾아줘
+HT19	LLM 추론 비용을 줄이는 early exit, mixture-of-experts 라우팅, 모델 캐스케이드(cascade) 관련 연구 알려줘
+HT20	RAG 시스템의 개인정보 유출, 지식 베이스 오염(poisoning) 공격, 멤버십 추론 공격, 검색 문서를 통한 간접 프롬프트 인젝션에 대한 논문 찾아줘
+HT21	음성 인식, 화자 분리(speaker diarization), 음성 합성(TTS) 분야의 최신 논문을 하나씩 알려줘
+HT22	비전-언어 모델의 객체 환각(object hallucination), 시각 질의응답 벤치마크, 비디오 이해 쪽 논문 찾아줘
+HT23	다음 키워드로 논문 찾아줘: 'self-consistency', 'tree of thoughts', 'least-to-most prompting', 'program-aided reasoning'. 논문마다 무엇을 개선했는지 한 줄씩 정리해줘.
+HT24	키워드 'retrieval-augmented code generation', 'API documentation retrieval', 'code search embedding' 로 관련 논문 3편 찾아서 비교해줘.
+HT25	'LLM routing', 'model merging', 'mixture of agents' 세 주제마다 대표 논문을 하나씩 소개해줘.
+HT26	Hallucination detection, Uncertainty estimation, Selective prediction\n\n[요청]\n1. 위 세 키워드에 맞는 논문을 하나 이상씩 찾아 주세요.\n2. 논문마다 핵심 방법을 2줄로 요약해 주세요.\n3. 마지막에 세 연구를 잇는 아이디어를 하나 제안해 주세요.
+HT27	Prompt compression, KV cache eviction, Sparse attention, Context window extension\n\n지시:\n1. 위 키워드별로 관련 논문을 찾아라.\n2. 서베이 논문은 빼라.\n3. 결과는 표로 정리하라.
+HT28	Data selection for instruction tuning, Synthetic data generation, Data deduplication\n위 세 주제로 논문을 찾고 1. 논문별 데이터 규모 2. 성능 향상 폭을 정리해줘.
+HT29	문서 파싱(PDF parsing), 표 추출, 레이아웃 분석 각각에 대해 RAG 전처리에 쓸 만한 연구가 있는지 찾아줘
+HT30	LLM의 자기 평가(self-evaluation)와 외부 검증기(verifier)를 쓰는 방법을 각각 다룬 논문 찾아줘. 둘 중 어느 쪽이 환각 탐지에 나은지 판단하고 싶어.
