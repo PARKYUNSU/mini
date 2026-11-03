@@ -4,6 +4,7 @@
   .venv/bin/python docs/experiments/open_judge_1103/oj.py run      # 옛 · 새 꼬리 판정 → oj_dev.jsonl
   .venv/bin/python docs/experiments/open_judge_1103/oj.py extra    # 새로 '없음'이 된 문항 라벨 묶음(어느 꼬리인지 안 보임)
   .venv/bin/python docs/experiments/open_judge_1103/oj.py score
+  (뒤에 v2 를 붙이면 v2 꼬리 · oj_dev_v2.jsonl — README §8.2)
 
 판정 입력은 저장 행에서 운영과 같은 글자로 다시 만들고 answer_input sha1 로 확인한다.
 판정 호출은 운영 함수 judge_presence_shared 그대로이고 꼬리(SHARED_TAIL)만 바꾼다.
@@ -36,6 +37,23 @@ OPEN_TAIL = """
 
 [질문]
 {question}"""
+# README §8.2 — v1 이 G2 미달이라 한 번만 고친 꼬리(측정 전 고정). 부분만 맞는 문서는 고르지 않고, 주제 없는 요청은 첫 문서.
+OPEN_TAIL_V2 = """
+[판정 요청 — 답변을 쓰지 말고 판정 한 줄만]
+위 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 특정한 연구 하나가 아니라 **질문의 주제를 다룬 논문**을 추천받으려 한다.
+
+질문의 주제를 주된 내용으로 다루는 문서가 있으면 그 문서 번호를, 하나도 없으면 `없음`을 답하라.
+- 방법·대상·결과가 질문의 표현과 똑같지 않아도 주제가 같으면 고른다.
+- 질문이 말한 기법·과제가 문서의 중심이어야 한다. 그 기법을 다른 목적의 한 단계로만 쓰는 문서, 질문 주제보다 넓은 분야를 두루 다루는 개관·입장 논문은 고르지 않는다.
+- 낱말이나 분야만 겹치고 주된 내용이 다른 주제인 문서도 고르지 않는다.
+- 질문에 주제가 없으면(아무 논문 · 재밌는 논문) 첫 문서를 고른다.
+- 여러 문서가 맞으면 가장 앞 번호 하나만 적는다.
+
+출력은 정확히 한 줄: `답: 문서 N` 또는 `답: 없음`
+
+[질문]
+{question}"""
+TAILS = {"v1": (OPEN_TAIL, ""), "v2": (OPEN_TAIL_V2, "_v2")}
 
 
 def tsv(p):
@@ -93,12 +111,13 @@ def is_none(x):
 
 def main():
     cmd = sys.argv[1]
+    open_tail, sfx = TAILS[sys.argv[2] if len(sys.argv) > 2 else "v1"]
     items = pool()
     print("문항", len(items), "· 저장 '없음'", sum(is_none(i["stored"]) for i in items), flush=True)
     if cmd == "packet":
         packet([i for i in items if is_none(i["stored"])], D + "label_packet.md")
     elif cmd == "run":
-        out = D + "oj_dev.jsonl"
+        out = D + f"oj_dev{sfx}.jsonl"
         done = {json.loads(l)["id"] for l in open(out, encoding="utf-8")} if os.path.exists(out) else set()
         old_tail = pj.SHARED_TAIL
         with open(out, "a", encoding="utf-8") as w:
@@ -107,7 +126,7 @@ def main():
                     continue
                 row = {"id": it["id"], "src": it["src"], "stored": it["stored"]}
                 try:
-                    for name, tail in (("old", old_tail), ("new", OPEN_TAIL)):
+                    for name, tail in (("old", old_tail), ("new", open_tail)):
                         pj.SHARED_TAIL = tail
                         t0 = time.time()
                         row[name] = pj.judge_presence_shared(DIRECT_ANSWER_RAG_SYSTEM_BASE, it["prompt"], it["q"], cfg.RAG_ANSWER_MODEL)
@@ -118,13 +137,13 @@ def main():
                 w.flush()
                 print(f"[{k}/{len(items)}] {it['id']} 저장 {it['stored']} · 옛 {row['old']} · 새 {row['new']} ({row['old_s']}s+{row['new_s']}s)", flush=True)
     elif cmd == "extra":
-        res = {r["id"]: r for r in map(json.loads, open(D + "oj_dev.jsonl", encoding="utf-8"))}
+        res = {r["id"]: r for r in map(json.loads, open(D + f"oj_dev{sfx}.jsonl", encoding="utf-8"))}
         ids = sorted(i for i, r in res.items() if not is_none(r["stored"]) and (is_none(r["old"]) or is_none(r["new"])))
-        packet([i for i in items if i["id"] in ids], D + "label_packet_extra.md")
+        packet([i for i in items if i["id"] in ids], D + f"label_packet_extra{sfx}.md")
     elif cmd == "score":
-        res = {r["id"]: r for r in map(json.loads, open(D + "oj_dev.jsonl", encoding="utf-8"))}
+        res = {r["id"]: r for r in map(json.loads, open(D + f"oj_dev{sfx}.jsonl", encoding="utf-8"))}
         lab = {}
-        for f in ("labels.tsv", "labels_extra.tsv"):
+        for f in ("labels.tsv", "labels_extra.tsv", f"labels_extra{sfx}.tsv"):
             if os.path.exists(D + f):
                 lab.update({l.split("\t")[0]: l.split("\t")[1] for l in open(D + f, encoding="utf-8") if l.strip() and not l.startswith("#")})
         rs = list(res.values())
