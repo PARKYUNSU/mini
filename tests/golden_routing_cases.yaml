@@ -47,3 +47,27 @@
 - input: "edit JOB-A1B2 prompt 오늘 IT 뉴스 요약"
   expected_search_intent: tool
   expected_tool: schedule_edit_job
+
+# === 학술 질문은 날씨 · 웹 검색 · DB 목록 도구로 가지 않는다 (docs/experiments/router_open_1103) ===
+- input: "날씨 예측 AI 모델 논문 읽을 만한 거 하나 알려줘"
+  expected_search_intent: rag
+  expected_tool: null
+
+- input: "날씨 데이터로 전력 수요를 예측하는 연구 알려줘"
+  expected_search_intent: rag
+  expected_tool: null
+
+- input: "LLM이 모르는 최신 사건 질문에 답할 때 웹 검색을 붙이는 방법 연구 찾아줘"
+  expected_search_intent: rag
+  expected_tool: null
+
+- input: "뉴스 기사를 요약하는 LLM 연구 알려줘"
+  expected_search_intent: rag
+  expected_tool: null
+
+- input: "비디오 이해 모델 최신 논문 세 편 알려줘"
+  expected_search_intent: rag
+  expected_tool: null
+
+- input: "서울 날씨 알려줘"
+  expected_tool: 서울_지금_현재_날씨_알려줘

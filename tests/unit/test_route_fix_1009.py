@@ -15,6 +15,13 @@ from core.graph.agent_router_rules import _names_paper_topic, is_factual_lookup
     "LLM이 생성한 코드에서 생기는 환각을 분류하고 벤치마크로 만든 논문 알려줘",
     "양방향 마스크 언어모델로 사전학습해서 언어 이해 성능을 올린 논문 알려줘",
     "점진적으로 노이즈를 넣는 과정을 거꾸로 학습해서 이미지를 생성하는 논문 알려줘",
+    # 짧은 주제의 열린 요청 (docs/experiments/router_open_1103)
+    "비디오 이해 모델 최신 논문 세 편 알려줘",
+    "텍스트 음성 변환 최신 논문 하나 알려줘",
+    "자율주행 계획 모델 최신 논문 알려줘",
+    "투기적 디코딩 논문 중 재미있는 거 알려줘",
+    "연합학습 관련 괜찮은 논문 있으면 알려줘",
+    "음성 인식 논문 중 재밌는 거 알려줘",
 ])
 def test_topic_paper_question_is_not_inventory(q):
     assert _names_paper_topic(q)
@@ -25,6 +32,11 @@ def test_topic_paper_question_is_not_inventory(q):
     "chromadb에 저장된 논문 뭐 있어?",
     "저장된 논문 알려줘",
     "최근 논문 알려줘",
+    "DB에 무슨 논문 있어?",
+    "어떤 논문이 저장되어 있어?",
+    "크로마DB에 저장된 논문 개수 알려줘",
+    "요즘 들어온 논문 뭐 있어",
+    "논문 몇 편 있어?",
 ])
 def test_inventory_request_stays_inventory(q):
     assert not _names_paper_topic(q)

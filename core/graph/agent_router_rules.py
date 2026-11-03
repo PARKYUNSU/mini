@@ -468,7 +468,8 @@ def is_smalltalk_or_memory_request(user_request: str, req_lower: str) -> bool:
 
 def get_search_intent(user_request: str, req_lower: str) -> Literal["web", "rag", "tool", "none"]:
     """검색 의도 분류."""
-    rag_blockers = ("논문", "chromadb", "chroma", "paper")
+    # "…요약하는 연구 설명해줘" · "웹 검색을 붙이는 방법 연구 찾아줘"가 웹 검색으로 샜다 (docs/experiments/router_open_1103)
+    rag_blockers = ("논문", "연구", "chromadb", "chroma", "paper")
     if any(b in req_lower for b in rag_blockers):
         return "rag"
     if "저장된" in req_lower and any(b in req_lower for b in ("논문", "paper")):
@@ -520,6 +521,9 @@ def is_weather_tool_request(user_request: str) -> bool:
     """
     if "날씨" not in user_request:
         return False
+    # "날씨 예측 AI 모델 논문" 같은 학술 질문은 날씨 조회가 아니다 (docs/experiments/router_open_1103)
+    if "논문" in user_request or "연구" in user_request:
+        return False
     # 날씨 관련 뉴스·기사·속보는 웹 검색 영역
     if any(x in user_request for x in ("뉴스", "기사", "속보", "보도", "언론")):
         return False
@@ -568,15 +572,18 @@ def _names_paper_topic(user_request: str) -> bool:
         return True
     # 게이트 어휘가 못 잡는 주제 질문(예: "노이즈를 거꾸로 학습해 이미지를 생성하는 논문")도 있다.
     # 목록 요청은 짧고 막연하다 — 요청어·조사를 빼고도 내용이 길게 남으면 주제 질문이다.
-    content = _INVENTORY_FILLER_RE.sub(" ", stripped.lower())
+    content = _INVENTORY_FILLER_RE.sub(" ", _PARTICLE_END_RE.sub(" ", stripped.lower()))
     return len(re.sub(r"[^가-힣a-z0-9]", "", content)) >= _TOPIC_MIN_CONTENT_CHARS
 
 
+# 조사는 낱말 끝에서만 지운다 — 낱말 안 글자까지 지우면 "비디오 이해 모델"이 "비디오해모델"로 줄어
+# 짧은 주제의 열린 요청이 저장 논문 목록 도구로 갔다 (docs/experiments/router_open_1103)
+_PARTICLE_END_RE = re.compile(r"(에서|에|의|은|는|이|가|을|를|들)(?=\s|$|[?.!])")
 _INVENTORY_FILLER_RE = re.compile(
-    r"(db|저장된|저장돼\s*있는|최근|최신|요즘|목록|리스트|알려\s*줘|보여\s*줘|뭐\s*있어|있어|조회|좀|해줘|"
-    r"에서|에|의|은|는|이|가|을|를|들|어떤|무슨)"
+    r"(db|저장된|저장돼\s*있는|저장되어|최근|최신|요즘|목록|리스트|알려\s*줘|보여\s*줘|뭐\s*있어|있어|조회|좀|해줘|"
+    r"어떤|무슨|몇\s*(?:개|편)|개수|하나)"
 )
-_TOPIC_MIN_CONTENT_CHARS = 12
+_TOPIC_MIN_CONTENT_CHARS = 5
 
 
 def match_whitelisted_tool(
