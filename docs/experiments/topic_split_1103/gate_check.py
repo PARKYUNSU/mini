@@ -55,7 +55,8 @@ def main():
             print(f"[{k}/{len(cand)}] {s} 나뉨 {len(topics)} ({row['s']}s) · {q[:60]!r} → {topics}", flush=True)
     rows = [json.loads(l) for l in open(out, encoding="utf-8")]
     split = [r for r in rows if r["topics"]]
-    print(f"2단계 나뉨 {len(split)}/{len(rows)} · 시간 중앙 {sorted(r['s'] for r in rows)[len(rows) // 2]}s")
+    if rows:  # 후보 0 이면 뽑기도 없다 (held-out 90)
+        print(f"2단계 나뉨 {len(split)}/{len(rows)} · 시간 중앙 {sorted(r['s'] for r in rows)[len(rows) // 2]}s")
 
 
 if __name__ == "__main__":
