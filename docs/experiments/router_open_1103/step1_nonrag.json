@@ -1,0 +1,308 @@
+[
+{
+"q": "28087ms 는 몇 초야?",
+"src": "실사용",
+"route": "direct_answer",
+"choice": "A",
+"tool": "",
+"acad": false,
+"topic": false
+},
+{
+"q": "너는 누구야?",
+"src": "실사용",
+"route": "direct_answer",
+"choice": "A",
+"tool": "",
+"acad": false,
+"topic": false
+},
+{
+"q": "궁금한게 있는데, 답변 가능해?",
+"src": "실사용",
+"route": "direct_answer",
+"choice": "A",
+"tool": "",
+"acad": false,
+"topic": false
+},
+{
+"q": "서울 날씨 알려줘",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": false,
+"topic": false
+},
+{
+"q": "파주 날씨 알려줘",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": false,
+"topic": false
+},
+{
+"q": "부산 날씨 알려줘",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": false,
+"topic": false
+},
+{
+"q": "지금 현재 서울 날씨 알려줘",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": false,
+"topic": false
+},
+{
+"q": "부천시 날씨 알려줘",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": false,
+"topic": false
+},
+{
+"q": "안녕",
+"src": "실사용",
+"route": "direct_answer",
+"choice": "A",
+"tool": "",
+"acad": false,
+"topic": false
+},
+{
+"q": "지금 서울 날씨 알려줘",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": false,
+"topic": false
+},
+{
+"q": "강원도 속초 날씨 알려줘",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": false,
+"topic": false
+},
+{
+"q": "속초 날씨 알려줘",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": false,
+"topic": false
+},
+{
+"q": "너 누구야",
+"src": "실사용",
+"route": "direct_answer",
+"choice": "A",
+"tool": "",
+"acad": false,
+"topic": false
+},
+{
+"q": "너 버전 알아?",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "tavily_search_tool",
+"acad": false,
+"topic": false
+},
+{
+"q": "요즘 날씨 어때?",
+"src": "실사용",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": false,
+"topic": false
+},
+{
+"q": "파인튜닝한 Mistral과 RAG로 암호화폐 뉴스를 계층적으로 요약하는 연구 설명해줘",
+"src": "e2e_ko_1008",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "tavily_search_tool",
+"acad": true,
+"topic": true
+},
+{
+"q": "LLM이 모르는 최신 사건 질문에 답할 때 웹 검색을 붙이는 방법 연구 찾아줘",
+"src": "external_search_v3_1020",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "tavily_search_tool",
+"acad": true,
+"topic": true
+},
+{
+"q": "방금 답한 거 더 쉽게 설명해줘",
+"src": "history_gate_1019",
+"route": "direct_answer",
+"choice": "A",
+"tool": "",
+"acad": false,
+"topic": false
+},
+{
+"q": "이어서 그 분야 최신 동향도 알려줘",
+"src": "history_gate_1019",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "tavily_search_tool",
+"acad": false,
+"topic": false
+},
+{
+"q": "에이전트가 웹을 검색하며 보고서를 쓰는 시스템을 만들고 있다. 이런 deep research 에이전트의 평가 벤치마크, 출처 검증 방법, 긴 보고서의 사실성 평가를 다룬 최신 연구를 찾아주세요.",
+"src": "judge_none_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "tavily_search_tool",
+"acad": true,
+"topic": true
+},
+{
+"q": "비디오 이해 모델 최신 논문 세 편 알려줘",
+"src": "open_gate2_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "chromadb_db_inventory",
+"acad": true,
+"topic": false
+},
+{
+"q": "텍스트 음성 변환 최신 논문 하나 알려줘",
+"src": "open_gate2_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "chromadb_db_inventory",
+"acad": true,
+"topic": false
+},
+{
+"q": "자율주행 계획 모델 최신 논문 알려줘",
+"src": "open_gate2_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "chromadb_db_inventory",
+"acad": true,
+"topic": false
+},
+{
+"q": "날씨 예측 AI 모델 논문 읽을 만한 거 하나 알려줘",
+"src": "open_gate2_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "서울_지금_현재_날씨_알려줘",
+"acad": true,
+"topic": true
+},
+{
+"q": "투기적 디코딩 논문 중 재미있는 거 알려줘",
+"src": "open_gate_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "chromadb_db_inventory",
+"acad": true,
+"topic": false
+},
+{
+"q": "표나 PDF 같은 문서 이해 연구 최신 논문 알려줘",
+"src": "open_gate_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "chromadb_db_inventory",
+"acad": true,
+"topic": false
+},
+{
+"q": "연합학습 관련 괜찮은 논문 있으면 알려줘",
+"src": "open_gate_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "chromadb_db_inventory",
+"acad": true,
+"topic": false
+},
+{
+"q": "해석 가능성 연구 중에 재밌는 논문 하나 알려줘",
+"src": "open_gate_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "chromadb_db_inventory",
+"acad": true,
+"topic": false
+},
+{
+"q": "논문 아무거나 재밌는거 하나 알려줘",
+"src": "open_gate_1103",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "chromadb_db_inventory",
+"acad": true,
+"topic": false
+},
+{
+"q": "사용자 질문을 검색하기 좋게 다시 써 주는 방법 알려줘",
+"src": "query_glossary_1029",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "tavily_search_tool",
+"acad": false,
+"topic": true
+},
+{
+"q": "매일 아침 RAG 논문 요약 보내줘",
+"src": "합성",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "schedule_add_job",
+"acad": true,
+"topic": true
+},
+{
+"q": "파이썬으로 arXiv 크롤링 코드 짜줘",
+"src": "합성",
+"route": "planner",
+"choice": "C",
+"tool": "",
+"acad": true,
+"topic": true
+},
+{
+"q": "안녕 윤수르",
+"src": "합성",
+"route": "direct_answer",
+"choice": "A",
+"tool": "",
+"acad": false,
+"topic": false
+},
+{
+"q": "기존 도구 목록 보여줘",
+"src": "합성",
+"route": "use_existing_tool",
+"choice": "B",
+"tool": "agent_tools_list",
+"acad": false,
+"topic": false
+}
+]
