@@ -1,0 +1,40 @@
+{"id": "HU01", "stratum": "T", "relevant_papers": [], "topics": ["반복 검색(iterative · 다중 홉)", "요약 트리 계층 인덱싱", "재검색 판단(corrective RAG)"]}
+{"id": "HU02", "stratum": "T", "relevant_papers": [], "topics": ["KV 캐시 eviction(헤드별)", "KV 캐시 오프로딩", "prefix 캐싱"]}
+{"id": "HU03", "stratum": "T", "relevant_papers": [], "topics": ["대화 요약 기억 압축", "지식 그래프 장기 기억", "기억 망각 · 갱신"]}
+{"id": "HU04", "stratum": "T", "relevant_papers": [], "topics": ["학습 데이터 추출 공격", "출력 워터마크", "백도어 공격 · 탐지"]}
+{"id": "HU05", "stratum": "T", "relevant_papers": [], "topics": ["activation steering", "제약 디코딩 · 출력 형식 강제", "프롬프트 자동 최적화"]}
+{"id": "HU06", "stratum": "T", "relevant_papers": [], "topics": ["강화학습 추론 모델 학습", "MCTS 결합 추론", "형식 증명(Lean) 자동화", "합성 수학 데이터"]}
+{"id": "HU07", "stratum": "T", "relevant_papers": [], "topics": ["근사 최근접 탐색 인덱스", "임베딩 미세 조정", "희소 + 밀집 임베딩 결합"]}
+{"id": "HU08", "stratum": "T", "relevant_papers": [], "topics": ["conformal prediction", "확신도 보정(calibration)"]}
+{"id": "HU09", "stratum": "T", "relevant_papers": [], "topics": ["언어별 성능 격차", "문화 지식 벤치마크", "기계 번역 평가 데이터 문제"]}
+{"id": "HU10", "stratum": "T", "relevant_papers": [], "topics": ["가중치 병합", "앙상블 디코딩", "작은 모델 초안 + 큰 모델 다듬기"]}
+{"id": "HU11", "stratum": "T", "relevant_papers": [], "topics": ["참조 없는 평가", "평가 LLM 자기 선호 편향", "쌍대 비교 순위"]}
+{"id": "HU12", "stratum": "T", "relevant_papers": [], "topics": ["어텐션 헤드 가지치기", "가중치 공유", "신경망 구조 탐색"]}
+{"id": "HU13", "stratum": "T", "relevant_papers": [], "topics": ["전문가 로딩 스케줄링", "라우터 학습 안정화", "희소 활성화 효율"]}
+{"id": "HU14", "stratum": "T", "relevant_papers": [], "topics": ["긴 문서 요약", "회의록 요약", "요약 사실성 평가"]}
+{"id": "HU15", "stratum": "T", "relevant_papers": [], "topics": ["few-shot 예시 선택", "역할 부여 프롬프트", "프롬프트 민감도"]}
+{"id": "HU16", "stratum": "T", "relevant_papers": [], "topics": ["쿼리 성능 예측", "클릭 기반 평가", "합성 쿼리 생성"]}
+{"id": "HU17", "stratum": "T", "relevant_papers": [], "topics": ["서브워드 분할", "다국어 토크나이저", "토큰 줄이는 문맥 압축"]}
+{"id": "HU18", "stratum": "T", "relevant_papers": [], "topics": ["링크 예측", "그래프 트랜스포머", "GNN + LLM"]}
+{"id": "HU19", "stratum": "T", "relevant_papers": [], "topics": ["FActScore", "주장 분해", "근거 검색 기반 검증"]}
+{"id": "HU20", "stratum": "T", "relevant_papers": [], "topics": ["RAG 컨텍스트 압축", "문서 순서 재배치", "중복 문서 제거"]}
+{"id": "HU21", "stratum": "T", "relevant_papers": [], "topics": ["어텐션 희소화", "저정밀도 부동소수점", "모델 샤딩"]}
+{"id": "HU22", "stratum": "T", "relevant_papers": [], "topics": ["도구 선택", "웹 브라우징", "코드 실행"]}
+{"id": "HU23", "stratum": "T", "relevant_papers": [], "topics": ["지식 편집", "지식 충돌", "시간 민감 질문"]}
+{"id": "HU24", "stratum": "T", "relevant_papers": [], "topics": ["생성형 검색 엔진 최적화(GEO)", "검색 광고", "인용 편향"]}
+{"id": "HU25", "stratum": "T", "relevant_papers": [], "topics": ["연합 학습 기반 LLM 학습", "차등 프라이버시", "기계 언러닝"]}
+{"id": "HU26", "stratum": "T", "relevant_papers": [], "topics": ["코드 리뷰 자동화", "테스트 코드 생성", "프로그램 번역"]}
+{"id": "HU27", "stratum": "T", "relevant_papers": [], "topics": ["constitutional AI", "레드팀 데이터셋", "over-refusal"]}
+{"id": "HU28", "stratum": "T", "relevant_papers": [], "topics": ["긴 컨텍스트 벤치마크", "위치 편향 완화", "슬라이딩 윈도우 어텐션"]}
+{"id": "HU29", "stratum": "T", "relevant_papers": [], "topics": ["late chunking", "contextual retrieval", "proposition indexing"]}
+{"id": "HU30", "stratum": "T", "relevant_papers": [], "topics": ["constitutional AI", "debate", "scalable oversight"]}
+{"id": "HU31", "stratum": "T", "relevant_papers": [], "topics": ["contrastive search", "nucleus sampling", "typical decoding"]}
+{"id": "HU32", "stratum": "T", "relevant_papers": [], "topics": ["multi-query retrieval", "HyDE", "step-back query"]}
+{"id": "HU33", "stratum": "T", "relevant_papers": [], "topics": ["code interpreter agents", "SQL agents", "spreadsheet agents"]}
+{"id": "HU34", "stratum": "T", "relevant_papers": [], "topics": ["faithfulness metrics", "answer relevancy", "context precision", "context recall"]}
+{"id": "HU35", "stratum": "T", "relevant_papers": [], "topics": ["평가 모델 간 점수 불일치", "장황함 편향", "앙상블 평가"]}
+{"id": "HU36", "stratum": "T", "relevant_papers": [], "topics": ["모델 라우팅(작은 모델에 위임)", "모델 로딩 · 콜드 스타트 지연", "로컬 양자화 정확도 손실"]}
+{"id": "HU37", "stratum": "T", "relevant_papers": [], "topics": ["법률 환각 측정", "인용 생성", "긴 판결문 검색 · 요약", "도메인 특화 임베딩"]}
+{"id": "HU38", "stratum": "T", "relevant_papers": [], "topics": ["자기 지도 학습", "대조 학습", "메타 학습"]}
+{"id": "HU39", "stratum": "T", "relevant_papers": [], "topics": ["문장 임베딩 평가", "다국어 임베딩", "임베딩 압축"]}
+{"id": "HU40", "stratum": "T", "relevant_papers": [], "topics": ["학습 데이터 저작권", "모델 출력 저작권"]}

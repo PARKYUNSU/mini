@@ -455,29 +455,81 @@ def _merge_rag_blocks(primary: str, extras: list[str], *, per_extra: int = 2) ->
 # 여러 주제를 한 번에 묻는 질문은 주제마다 검색해 번갈아 앞에 놓는다 (RAG_TOPIC_SPLIT, docs/experiments/topic_split_1103).
 # 한 줄 검색어(12단어)가 셋째 주제를 빠뜨렸다(실사용 job 140). 번호 항목은 지시문일 수도 있어 주제인지는 LLM 이 가린다.
 _ENUM_ITEM_RE = re.compile(r"(?:^|[\s:：])\(?([1-9])[.)](?!\d)|([①-⑨])")
+_QUOTED_ITEM_RE = re.compile(r"['‘\"“]([^'’\"”\n]{2,80})['’\"”]")
+# 쉼표 목록 뒤가 "… 관련 논문" · "…을 다룬 연구" 처럼 일반 꼬리일 때만 주제 목록이다 — "…를 합친 RAG 연구" · "…에서도 통하는지 비교한 연구" 는 한 주제
+_LIST_TAIL_RE = re.compile(r"^[^,]{0,40}?(?:관련|다룬|다루는|쪽|대한|관한|분야|각각)|^\s*\S+(?:\s\S+){0,2}\s*(?:논문|연구)")
+# 지시문("표로 정리해줘") · 조건("서베이 제외" · "2024년 이후" · "다섯 편")은 주제 항목이 아니다
+_ITEM_REQUEST_RE = re.compile(r"(?:주세요|줘|[아어여빼하]라|시오|세요|할 것|합니다)[.!?\s]*$|\?\s*$|논문(?:별|마다)|제외|이후|이전|\d+\s*편|[두세네]\s*편|다섯\s*편")
+_SUBTOPIC_NOTE_RE = re.compile(r"^\W*(?:note|no separate|shared context|there is only)\b|[:：]\s*$", re.I)
+# "RAG를" 처럼 조사가 붙고, 줄에는 소문자로 나온다 — \b 는 한글 앞에서 안 끊긴다. "storage" · "FRAGMENT" 는 아니다
+_RAG_WORD_RE = re.compile(r"(?<![A-Z])RAG(?![a-z])|(?<![A-Za-z])rag(?![A-Za-z])|검색\s*증강|[Rr]etrieval[- ][Aa]ugmented(?:\s[Gg]eneration)?")
 TOPIC_SPLIT_MAX = 4
 TOPIC_SPLIT_PER_TOPIC = 3
 
 
+def _enum_items(user_request: str) -> list[int]:
+    return [int(a) if a else ord(b) - ord("①") + 1 for a, b in _ENUM_ITEM_RE.findall(user_request or "")]
+
+
 def topic_split_candidate(user_request: str) -> bool:
-    """번호 항목이 1 · 2 순서로 있거나(1. · (1) · 1) · ①) 한 줄에 쉼표가 둘 이상이면 하위 주제 뽑기를 해 본다."""
+    """번호 항목이 1 · 2 순서로 있거나 한 줄에 항목 셋 이상을 쉼표로 적었으면(영어 키워드 · 따옴표 · 일반 꼬리) 하위 주제를 뽑아 본다."""
     q = user_request or ""
-    nums = [a or str(ord(b) - ord("①") + 1) for a, b in _ENUM_ITEM_RE.findall(q)]
-    if "1" in nums and "2" in nums[nums.index("1") + 1:]:
+    nums = _enum_items(q)
+    if 1 in nums and 2 in nums[nums.index(1) + 1:]:
         return True
-    return any(line.count(",") + line.count("、") >= 2 for line in q.split("\n"))
+    # 괄호 안 쉼표는 예시다 — "디코딩 전략(greedy, beam, sampling)"
+    q = re.sub(r"\([^()]*\)|（[^（）]*）", "", q)
+    for line in q.split("\n"):
+        if line.count(",") + line.count("、") < 2:
+            continue
+        if not re.search(r"[가-힣]", line) or len(_QUOTED_ITEM_RE.findall(line)) >= 3:
+            return True
+        if _LIST_TAIL_RE.search(re.split(r"[,、]", line)[-1]):
+            return True
+    return False
+
+
+def _explicit_subtopics(user_request: str) -> list[str]:
+    """질문이 직접 적은 항목 — 영어 키워드 줄 · 따옴표 키워드 · 번호 항목(지시문 아닌 것). 없으면 빈 목록(LLM 이 뽑는다)."""
+    q = user_request or ""
+    for line in q.split("\n"):
+        items = [x.strip() for x in line.split(",") if x.strip()]
+        if len(items) >= 3 and not re.search(r"[가-힣?]", line) and all(len(x.split()) <= 8 for x in items):
+            return items
+        quoted = _QUOTED_ITEM_RE.findall(line)
+        if len(quoted) >= 3:
+            return quoted
+    hits = list(_ENUM_ITEM_RE.finditer(q))
+    runs: list[list[str]] = []
+    for k, m in enumerate(hits):
+        num = int(m.group(1)) if m.group(1) else ord(m.group(2)) - ord("①") + 1
+        end = hits[k + 1].start() if k + 1 < len(hits) else len(q)
+        item = re.split(r"\s+[—–-]+\s+", q[m.end():end].split("\n")[0])[0].strip()
+        if num == 1:
+            runs.append([item])
+        elif runs and num == len(runs[-1]) + 1:
+            runs[-1].append(item)
+    for run in runs:
+        # 지시문이 하나라도 끼면 항목을 믿지 않는다 — "1) 배경 2) 방법 3) 결과 순으로 정리해줘"
+        if len(run) >= 2 and all(x and not _ITEM_REQUEST_RE.search(x) for x in run):
+            return run
+    return []
 
 
 def _extract_subtopics(user_request: str) -> list[str]:
     """하위 주제마다 영어 검색어 한 줄. 주제가 하나뿐이거나 실패하면 빈 목록 — 호출 쪽은 기존 검색만 쓴다."""
-    prompt = f"""The user asks for research papers. Does the question list several separate research sub-topics to find papers for (for example a numbered list of topics, or "A, B, C" listed as separate techniques)?
-- Instructions about the answer (number of papers, summary style, format, excluding surveys, research gaps) are not topics.
-- A method that combines several parts, or a survey of one subject, is one topic.
-Write one line per sub-topic with 3-6 English keywords (translate Korean into English). Keep a shared context such as RAG in every line.
-If there is only one topic, write one line.
+    explicit = _explicit_subtopics(user_request)
+    if explicit:
+        return _clean_subtopics(explicit, user_request, min_words=1)
+    prompt = f"""The user asks for research papers. List the separate research sub-topics the question asks papers for.
+- Numbered items, quoted keywords, or "A, B, C" that name different techniques or problems are separate sub-topics, one line each.
+- Instructions about the answer (number of papers, summary style, format, excluding surveys, research gaps) are not sub-topics.
+- One method that combines several parts, one comparison, or one survey of a subject is a single sub-topic: write one line.
+Each line has 3-6 English keywords naming only that sub-topic (translate Korean). No sentences, no extra techniques.
+If the sub-topics share a subject stated in the question, repeat it in each line.
 At most {TOPIC_SPLIT_MAX} lines, nothing else:
-1: <English keywords>
-2: <English keywords>
+1: <keywords>
+2: <keywords>
 
 User question:
 {user_request}
@@ -486,20 +538,56 @@ User question:
         raw = (normalize_ai_message_content(get_rag_query_rewrite_llm(num_predict=320).invoke([HumanMessage(content=prompt)])) or "").strip()
     except Exception:
         return []
-    got = []
-    for line in re.findall(r"^\s*\d\s*[:：.)]\s*(.+?)\s*$", raw, re.M)[:TOPIC_SPLIT_MAX]:
-        # 9B 가 긴 한국어 질문에서 한국어로 적는다(job 140) — 그 줄만 기존 영어 검색어 추출로 바꾼다
+    return _parse_subtopics(raw, user_request)
+
+
+def _parse_subtopics(raw: str, user_request: str) -> list[str]:
+    # 9B 가 번호 없이 줄만 쓰기도 한다 — 번호 줄만 읽어 맞게 나눈 질문을 '한 주제'로 버렸다(topic_split2_1104)
+    lines = [re.sub(r"^\s*(?:\d\s*[:：.)]|[-*•])\s*", "", l).strip() for l in raw.splitlines()]
+    lines = [l for l in lines if not _SUBTOPIC_NOTE_RE.search(l)]
+    # 빈 줄 뒤에 같은 목록을 번호 붙여 한 번 더 쓴다(HT17 · HT22) — 줄이 둘 이상인 첫 덩어리만
+    head = list(itertools.takewhile(bool, lines))
+    return _clean_subtopics(head if len(head) >= 2 else [l for l in lines if l], user_request, min_words=2)
+
+
+def _subtopic_keywords(item: str, user_request: str) -> str:
+    """한국어 항목 → 영어 키워드. 맥락이 없으면 '가지치기(pruning)' 가 정원 가지치기가 되고(HT11), 맥락에 다른 항목이 들어가면 그것까지 옮긴다(HT09)
+    — 번호 항목 앞 글만 준다. 쉼표 목록은 항목이 맥락에 섞이니 맥락 없이."""
+    first = _ENUM_ITEM_RE.search(user_request or "")
+    context = (user_request[:first.start()].strip()[:120] if first else "") or "(none)"
+    prompt = f"""Write 3-6 English search keywords for this research topic. Use the context only to interpret the topic. One line, no explanations.
+
+Context: {context}
+Topic: {item}
+Keywords:"""
+    try:
+        return (normalize_ai_message_content(get_rag_query_rewrite_llm().invoke([HumanMessage(content=prompt)])) or "").strip().split("\n")[0]
+    except Exception:
+        return ""
+
+
+def _clean_subtopics(lines: list[str], user_request: str, min_words: int) -> list[str]:
+    has_rag = bool(_RAG_WORD_RE.search(user_request or ""))
+    got: dict[str, str] = {}
+    for line in lines:
+        if len(got) >= TOPIC_SPLIT_MAX:
+            break
+        # 번호 항목 · 9B 가 한국어로 적은 줄(job 140) — 영어 키워드로 바꾼다
         if re.search(r"[가-힣]", line):
-            line = _extract_english_rag_query_base(line)
+            line = _subtopic_keywords(line, user_request)
+        # 질문에 없는 RAG 는 프롬프트에서 새어 든 것이다(HT11 · HT25 — 경량화 질문 검색어에 RAG)
+        if not has_rag:
+            line = _RAG_WORD_RE.sub(" ", line)
         # 9B 가 질문에 없는 세부 기법을 덧붙여 길게 쓴다(dev v1) — 앞 10단어만
         q = " ".join(re.sub(r"[^A-Za-z0-9 .,+\-_/()]", " ", line).split()[:10])
-        if len(re.findall(r"[A-Za-z]{2,}", q)) >= 2:
-            got.append(q)
-    # 질문의 RAG 맥락을 줄마다 지키라 해도 9B 가 빼 RAG 와 무관한 청크 논문이 걸렸다(dev D_77) — 없으면 붙인다
-    if re.search(r"RAG|검색\s*증강|retrieval[- ]augmented", user_request, re.I):
-        got = [g if re.search(r"\bRAG\b|retrieval[- ]augmented", g, re.I) else f"{g} RAG" for g in got]
-    got = list(dict.fromkeys(got))
-    return got if len(got) >= 2 else []
+        q = re.sub(r"(?:\s*,)+", ",", q).strip(" ,.-")
+        if len(re.findall(r"[A-Za-z]{2,}", q)) < min_words:
+            continue
+        # 질문의 RAG 맥락을 줄마다 지키라 해도 9B 가 빼 RAG 와 무관한 청크 논문이 걸렸다(dev D_77) — 없으면 붙인다
+        if has_rag and not _RAG_WORD_RE.search(q):
+            q = f"{q} RAG"
+        got.setdefault(re.sub(r"[^a-z0-9]", "", q.lower()), q)  # 9B 가 같은 목록을 번호 붙여 한 번 더 쓴다(HT17)
+    return list(got.values()) if len(got) >= 2 else []
 
 
 def _interleave_topic_blocks(primary: str, per_topic: list[str]) -> str:
