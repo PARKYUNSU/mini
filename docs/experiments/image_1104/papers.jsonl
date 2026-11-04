@@ -1,0 +1,20 @@
+{"paper_id": "2412.16145", "title": "Offline Reinforcement Learning for LLM Multi-Step Reasoning", "pdf_url": "https://arxiv.org/pdf/2412.16145v2", "figs_in_text": 2, "questions": ["HU06"]}
+{"paper_id": "2605.27361", "title": "Natural Language Query to Configuration for Retrieval Agents", "pdf_url": "https://arxiv.org/pdf/2605.27361v1", "figs_in_text": 7, "questions": ["HU16"]}
+{"paper_id": "2504.00241", "title": "Synthesizing Public Opinions with LLMs: Role Creation, Impacts, and the Future to eDemorcacy", "pdf_url": "https://arxiv.org/pdf/2504.00241v1", "figs_in_text": 1, "questions": ["HU15"]}
+{"paper_id": "2504.03846", "title": "Do LLM Evaluators Prefer Themselves for a Reason?", "pdf_url": "https://arxiv.org/pdf/2504.03846v3", "figs_in_text": 18, "questions": ["HU11"]}
+{"paper_id": "2412.20340", "title": "Distilling Desired Comments for Enhanced Code Review with Large Language Models", "pdf_url": "https://arxiv.org/pdf/2412.20340v2", "figs_in_text": 3, "questions": ["HU26"]}
+{"paper_id": "2411.13154", "title": "DMQR-RAG: Diverse Multi-Query Rewriting for RAG", "pdf_url": "https://arxiv.org/pdf/2411.13154v1", "figs_in_text": 2, "questions": ["HU32"]}
+{"paper_id": "2510.19310", "title": "JointCQ: Improving Factual Hallucination Detection with Joint Claim and Query Generation", "pdf_url": "https://arxiv.org/pdf/2510.19310v1", "figs_in_text": 1, "questions": ["HU19"]}
+{"paper_id": "2412.17018", "title": "GAS: Generative Auto-bidding with Post-training Search", "pdf_url": "https://arxiv.org/pdf/2412.17018v2", "figs_in_text": 2, "questions": ["HU24"]}
+{"paper_id": "2305.14314", "title": "QLoRA: Efficient Finetuning of Quantized LLMs", "pdf_url": "https://arxiv.org/pdf/2305.14314v1", "figs_in_text": 4, "questions": ["HU36"]}
+{"paper_id": "2412.17411", "title": "Pretraining with random noise for uncertainty calibration", "pdf_url": "https://arxiv.org/pdf/2412.17411v2", "figs_in_text": 11, "questions": ["HU08"]}
+{"paper_id": "2606.28356", "title": "SafeGEO: Understanding Generative Engine Optimization Risks in Recommendation Agents", "pdf_url": "https://arxiv.org/pdf/2606.28356v2", "figs_in_text": 18, "questions": ["HU24"]}
+{"paper_id": "2511.03217", "title": "Hybrid Fact-Checking that Integrates Knowledge Graphs, Large Language Models, and Search-Based Retrieval Agents Improves Interpretable Claim Verification", "pdf_url": "https://arxiv.org/pdf/2511.03217v1", "figs_in_text": 1, "questions": ["HU19"]}
+{"paper_id": "2605.22763", "title": "Advancing Mathematics Research with AI-Driven Formal Proof Search", "pdf_url": "https://arxiv.org/pdf/2605.22763v1", "figs_in_text": 9, "questions": ["HU06"]}
+{"paper_id": "2406.19223", "title": "T-FREE: Subword Tokenizer-Free Generative LLMs via Sparse Representations for Memory-Efficient Embeddings", "pdf_url": "https://arxiv.org/pdf/2406.19223v2", "figs_in_text": 14, "questions": ["HU17", "HU39"]}
+{"paper_id": "2412.18004", "title": "Correctness is not Faithfulness in RAG Attributions", "pdf_url": "https://arxiv.org/pdf/2412.18004v1", "figs_in_text": 2, "questions": ["HU34"]}
+{"paper_id": "2507.21989", "title": "Benchmarking Filtered Approximate Nearest Neighbor Search Algorithms on Transformer-based Embedding Vectors", "pdf_url": "https://arxiv.org/pdf/2507.21989v3", "figs_in_text": 17, "questions": ["HU07"]}
+{"paper_id": "1612.03651", "title": "FastText.zip: Compressing text classification models", "pdf_url": "https://arxiv.org/pdf/1612.03651v1", "figs_in_text": 2, "questions": ["HU39"]}
+{"paper_id": "2605.15081", "title": "ML-Embed: Inclusive and Efficient Embeddings for a Multilingual World", "pdf_url": "https://arxiv.org/pdf/2605.15081v1", "figs_in_text": 7, "questions": ["HU39"]}
+{"paper_id": "2606.04280", "title": "The Loss Is Not Enough: Sampling Conditions and Inductive Bias in Contrastive Representation Learning", "pdf_url": "https://arxiv.org/pdf/2606.04280v1", "figs_in_text": 1, "questions": ["HU38"]}
+{"paper_id": "2405.20139", "title": "GNN-RAG: Graph Neural Retrieval for Large Language Model Reasoning", "pdf_url": "https://arxiv.org/pdf/2405.20139v1", "figs_in_text": 3, "questions": ["HU18"]}
