@@ -1,0 +1,98 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2610.33768",
+    "title": "SkillQR: Agentic Skill Discovery for Reason-Intensive Query Rewriting",
+    "abstract": "Dense retrievers provide grounded evidence that mitigates hallucinations in outputs from Large Language Models (LLMs). Real-world queries are often verbose, ambiguously framed, or require multi-step reasoning, introducing irrelevant details that weaken semantic matching for dense retrievers. Query rewriting is a widely adopted pre-retrieval technique that leverages LLMs to reformulate queries and bridge the semantic gap between such queries and the retrieval target. Existing rewriting approaches either rely on expensive proprietary models, substantial training data, or iterative retrieval and rewriting, while largely applying a uniform rewriting strategy regardless of the retrieval corpus. We observe that effective query rewriting instructions are not universal: the optimal strategy depends on the retrieval target, rather than the model alone. We introduce SkillQR, a query rewriting framework that automatically discovers reasoning strategy sets from the retrieval target and dynamically routes a query to the appropriate rewriting strategy at inference time. Without relying on training data, SkillQR achieves competitive performance compared to fine-tuned rewriting models on the BRIGHT and R2MED benchmarks, while also providing lower inference latency than iterative rewriting approaches.",
+    "publicationDate": "2026-10-24T16:19:31.000Z",
+    "votes": 0
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.14875",
+    "title": "EviQE: Evidence Selection for LLM-Based Query Expansion",
+    "abstract": "LLM-based query expansion increasingly conditions reformulation on documents retrieved from the target corpus, yet most work focuses on how to generate expansions rather than which documents the model should read. We propose EviQE, which aggregates documents retrieved by multiple reformulators, selects a compact evidence set, and uses it for one grounded expansion step. This separates evidence selection from generation and treats reformulators as complementary retrieval perspectives. Across three TREC DL and five BEIR benchmarks, reformulators frequently retrieve distinct relevant documents, so pooled candidates provide higher relevant-document coverage than any individual source. The strongest gains come from relevance-based evidence selection: LLM-Score consistently outperforms direct reformulation, cold-start expansion, and single-source seeded expansion. Additional retrieval-generation rounds provide little benefit once strong conditioning evidence has been selected and can reduce effectiveness.",
+    "publicationDate": "2026-09-14T00:52:45.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.14646",
+    "title": "CompCQR: Compositional Query Generation for Training-Free Conversational Search",
+    "abstract": "Multi-turn interactions with LLMs are becoming increasingly common in information-seeking scenarios. However, user queries are often ambiguous and context-dependent, making them ill-suited for direct use as retriever queries. Conversational query reformulation (CQR) addresses this issue by rewriting the current utterance into a stand-alone query grounded in the dialogue history. Recent LLM-based CQR approaches achieve strong performance; however, their repeated LLM invocations and misalignment with downstream retrievers remain challenges. In this work, we begin from the observation that retrievers are highly sensitive to content ordering: simply reordering the same content can lead to changes in retrieval coverage and performance. Based on this, we propose a novel training-free method that generates a very large number of queries with minimal LLM usage by compositionally combining a small set of atomic components. We further apply LLM reasoning to construct a high-quality document set that balances precision and recall while capturing the user's core intent. Our framework generalizes across both open- and closed-source LLMs as well as dense and sparse retrievers. It achieves strong performance on four widely used conversational benchmarks, with up to 22.5% relative MRR improvement over the previous state-of-the-art baseline with far fewer LLM calls.",
+    "publicationDate": "2026-09-13T16:31:22.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.13905",
+    "title": "ADORE: Iterative Query Expansion with Retrieval-Grounded Relevance Feedback",
+    "abstract": "LLM-based query expansion improves retrieval by enriching the original query with additional context. Yet most methods remain generation-driven, producing plausible pseudo-documents or expansions without checking how the target corpus responds. This can introduce retrieval drift, amplify misleading vocabulary, or miss terms that distinguish relevant from non-relevant documents. We argue that effective expansion requires retrieval-grounded feedback, not just single-pass generation or unverified iteration. We introduce ADORE (ADapt, Observe, Relevance Evaluate), an iterative framework that turns retrieval outcomes into feedback for the next expansion. At each round, an LLM generates pseudo-passages, a retriever exposes the corpus response, and a relevance assessor evaluates retrieved documents against the original query. These judgments identify what to reinforce, what remains undercovered, and what to suppress. Across TREC Deep Learning, BEIR, and BRIGHT, ADORE consistently outperforms strong query expansion baselines with notable improvements across nearly all evaluation settings, improving average nDCG@10 by 24.5% over BM25 and 3.6% over the strongest prior query expansion method on BEIR, and by 122.9% over BM25 and 9.2% over the best query expansion baseline on BRIGHT. Our code and data are publicly available.",
+    "publicationDate": "2026-06-11T20:52:37.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.05087",
+    "title": "Document Optimization for Black-Box Retrieval via Reinforcement Learning",
+    "abstract": "Generative large language models (LLMs) are increasingly used as inference-time components in retrieval pipelines, for tasks such as query rewriting and document reranking. However, these online approaches place costly autoregressive computation directly on the latency-critical retrieval path. We explore an alternative axis: using LLMs to improve documents instead, rewriting them into better representations and shifting computation offline. Yet producing a useful document rewrite is not straightforward: retrieval is inherently discriminative, so an effective rewrite must make a document more similar to relevant queries than competing candidates under the retriever's notion of similarity. We therefore formulate document transformation as an optimization problem, directly training an LLM or VLM to produce rewrites that improve retrieval. Our approach, DocOpt, uses GRPO with retriever ranking improvements as rewards, requires only black-box access to retrieval ranks, and applies across single-vector, multi-vector, and lexical retrievers. We evaluate zero-shot LLM rewriting and DocOpt on code and visual retrieval tasks, finding that document rewriting can improve retrieval and that optimizing rewrites yields further gains. For example, OpenAI text-embedding-3-small achieves 58.35 nDCG@5 on average with direct retrieval; zero-shot rewriting improves this to 60.83 with GPT-5.4-mini, 63.75 with Claude Haiku 4.5, and 64.23 with Qwen3. DocOpt further improves performance to 67.94, surpassing the 6.5X more expensive text-embedding-3-large retriever at 66.15.",
+    "publicationDate": "2026-04-06T18:41:40.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.11008",
+    "title": "A Systematic Study of Pseudo-Relevance Feedback with LLMs",
+    "abstract": "Pseudo-relevance feedback (PRF) methods built on large language models (LLMs) can be organized along two key design dimensions: the feedback source, which is where the feedback text is derived from and the feedback model, which is how the given feedback text is used to refine the query representation. However, the independent role that each dimension plays is unclear, as both are often entangled in empirical evaluations. In this paper, we address this gap by systematically studying how the choice of feedback source and feedback model impact PRF effectiveness through controlled experimentation. Across 13 low-resource BEIR tasks with five LLM PRF methods, our results show: (1) the choice of feedback model can play a critical role in PRF effectiveness; (2) feedback derived solely from LLM-generated text provides the most cost-effective solution; and (3) feedback derived from the corpus is most beneficial when utilizing candidate documents from a strong first-stage retriever. Together, our findings provide a better understanding of which elements in the PRF design space are most important.",
+    "publicationDate": "2026-03-11T17:31:50.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.20513",
+    "title": "ReBOL: Retrieval via Bayesian Optimization with Batched LLM Relevance Observations and Query Reformulation",
+    "abstract": "LLM-reranking is limited by the top-k documents retrieved by vector similarity, which neither enables contextual query-document token interactions nor captures multimodal relevance distributions. While LLM query reformulation attempts to improve recall by generating improved or additional queries, it is still followed by vector similarity retrieval. We thus propose to address these top-k retrieval stage failures by introducing ReBOL, which 1) uses LLM query reformulations to initialize a multimodal Bayesian Optimization (BO) posterior over document relevance, and 2) iteratively acquires document batches for LLM query-document relevance scoring followed by posterior updates to optimize relevance. After exploring query reformulation and document batch diversification techniques, we evaluate ReBOL against LLM reranker baselines on five BEIR datasets and using two LLMs (Gemini-2.5-Flash-Lite, GPT-5.2). ReBOL consistently achieves higher recall and competitive rankings, for example compared to the best LLM reranker on the Robust04 dataset with 46.5% vs. 35.0% recall@100 and 63.6% vs. 61.2% NDCG@10. We also show that ReBOL can achieve comparable latency to LLM rerankers.",
+    "publicationDate": "2026-03-20T21:30:13.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.01417",
+    "title": "ReFeed: Retrieval Feedback-Guided Dataset Construction for Style-Aware Query Rewriting",
+    "abstract": "Retrieval systems often fail when user queries differ stylistically or semantically from the language used in domain documents. Query rewriting has been proposed to bridge this gap, improving retrieval by reformulating user queries into semantically equivalent forms. However, most existing approaches overlook the stylistic characteristics of target documents-their domain-specific phrasing, tone, and structure-which are crucial for matching real-world data distributions. We introduce a retrieval feedback-driven dataset generation framework that automatically identifies failed retrieval cases, leverages large language models to rewrite queries in the style of relevant documents, and verifies improvement through re-retrieval. The resulting corpus of (original, rewritten) query pairs enables the training of rewriter models that are explicitly aware of document style and retrieval feedback. This work highlights a new direction in data-centric information retrieval, emphasizing how feedback loops and document-style alignment can enhance the reasoning and adaptability of RAG systems in real-world, domain-specific contexts.",
+    "publicationDate": "2026-03-02T03:43:53.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.11841",
+    "title": "Improving Neural Retrieval with Attribution-Guided Query Rewriting",
+    "abstract": "Neural retrievers are effective but brittle: underspecified or ambiguous queries can misdirect ranking even when relevant documents exist. Existing approaches address this brittleness only partially: LLMs rewrite queries without retriever feedback, and explainability methods identify misleading tokens but are used for post-hoc analysis. We close this loop and propose an attribution-guided query rewriting method that uses token-level explanations to guide query rewriting. For each query, we compute gradient-based token attributions from the retriever and then use these scores as soft guidance in a structured prompt to an LLM that clarifies weak or misleading query components while preserving intent. Evaluated on BEIR collections, the resulting rewrites consistently improve retrieval effectiveness over strong baselines, with larger gains for implicit or ambiguous information needs.",
+    "publicationDate": "2026-02-12T11:34:06.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.11238",
+    "title": "LLM-Assisted Pseudo-Relevance Feedback",
+    "abstract": "Query expansion is a long-standing technique to mitigate vocabulary mismatch in ad hoc Information Retrieval. Pseudo-relevance feedback methods, such as RM3, estimate an expanded query model from the top-ranked documents, but remain vulnerable to topic drift when early results include noisy or tangential content. Recent approaches instead prompt Large Language Models to generate synthetic expansions or query variants. While effective, these methods risk hallucinations and misalignment with collection-specific terminology. We propose a hybrid alternative that preserves the robustness and interpretability of classical PRF while leveraging LLM semantic judgement. Our method inserts an LLM-based filtering stage prior to RM3 estimation: the LLM judges the documents in the initial top-$k$ ranking, and RM3 is computed only over those accepted as relevant. This simple intervention improves over blind PRF and a strong baseline across several datasets and metrics.",
+    "publicationDate": "2026-01-16T12:31:43.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.19349",
+    "title": "Revisiting Feedback Models for HyDE",
+    "abstract": "Recent approaches that leverage large language models (LLMs) for pseudo-relevance feedback (PRF) have generally not utilized well-established feedback models like Rocchio and RM3 when expanding queries for sparse retrievers like BM25. Instead, they often opt for a simple string concatenation of the query and LLM-generated expansion content. But is this optimal? To answer this question, we revisit and systematically evaluate traditional feedback models in the context of HyDE, a popular method that enriches query representations with LLM-generated hypothetical answer documents. Our experiments show that HyDE's effectiveness can be substantially improved when leveraging feedback algorithms such as Rocchio to extract and weight expansion terms, providing a simple way to further enhance the accuracy of LLM-based PRF methods.",
+    "publicationDate": "2025-11-24T17:50:18.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.25488",
+    "title": "Generalized Pseudo-Relevance Feedback",
+    "abstract": "Query rewriting is a fundamental technique in information retrieval (IR). It typically employs the retrieval result as relevance feedback to refine the query and thereby addresses the vocabulary mismatch between user queries and relevant documents. Traditional pseudo-relevance feedback (PRF) and its vector-based extension (VPRF) improve retrieval performance by leveraging top-retrieved documents as relevance feedback. However, they are constructed based on two major hypotheses: the relevance assumption (top documents are relevant) and the model assumption (rewriting methods need to be designed specifically for particular model architectures). While recent large language models (LLMs)-based generative relevance feedback (GRF) enables model-free query reformulation, it either suffers from severe LLM hallucination or, again, relies on the relevance assumption to guarantee the effectiveness of rewriting quality. To overcome these limitations, we introduce an assumption-relaxed framework: \\textit{Generalized Pseudo Relevance Feedback} (GPRF), which performs model-free, natural language rewriting based on retrieved documents, not only eliminating the model assumption but also reducing dependence on the relevance assumption. Specifically, we design a utility-oriented training pipeline with reinforcement learning to ensure robustness against noisy feedback. Extensive experiments across multiple benchmarks and retrievers demonstrate that GPRF consistently outperforms strong baselines, establishing it as an effective and generalizable framework for query rewriting.",
+    "publicationDate": "2025-10-29T13:08:35.000Z",
+    "votes": 4
+  }
+]

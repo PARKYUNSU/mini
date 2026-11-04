@@ -1,0 +1,272 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2606.13905",
+    "title": "ADORE: Iterative Query Expansion with Retrieval-Grounded Relevance Feedback",
+    "abstract": "LLM-based query expansion improves retrieval by enriching the original query with additional context. Yet most methods remain generation-driven, producing plausible pseudo-documents or expansions without checking how the target corpus responds. This can introduce retrieval drift, amplify misleading vocabulary, or miss terms that distinguish relevant from non-relevant documents. We argue that effective expansion requires retrieval-grounded feedback, not just single-pass generation or unverified iteration. We introduce ADORE (ADapt, Observe, Relevance Evaluate), an iterative framework that turns retrieval outcomes into feedback for the next expansion. At each round, an LLM generates pseudo-passages, a retriever exposes the corpus response, and a relevance assessor evaluates retrieved documents against the original query. These judgments identify what to reinforce, what remains undercovered, and what to suppress. Across TREC Deep Learning, BEIR, and BRIGHT, ADORE consistently outperforms strong query expansion baselines with notable improvements across nearly all evaluation settings, improving average nDCG@10 by 24.5% over BM25 and 3.6% over the strongest prior query expansion method on BEIR, and by 122.9% over BM25 and 9.2% over the best query expansion baseline on BRIGHT. Our code and data are publicly available.",
+    "publicationDate": "2026-06-11T20:52:37.000Z",
+    "votes": 7,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "ADORE: Iterative Query Expansion with Retrieval-Grounded Relevance\nFeedback\nAmin Bigdeli\n1\n, Negar Arabzadeh\n4\n, Radin Hamidi Rad\n2\n, Sajad Ebrahimi\n3\n,\nCharles L. A. Clarke\n1\n, Ebrahim Bagheri\n3\n1\nUn..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "...Mila – Quebec AI Institute,\n3\nUniversity of Toronto, \n4\nUniversity of California, Berkeley\nAbstract\nLLM-based query expansion improves retrieval\nby enriching the original query with additional\ncontext..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.14875",
+    "title": "EviQE: Evidence Selection for LLM-Based Query Expansion",
+    "abstract": "LLM-based query expansion increasingly conditions reformulation on documents retrieved from the target corpus, yet most work focuses on how to generate expansions rather than which documents the model should read. We propose EviQE, which aggregates documents retrieved by multiple reformulators, selects a compact evidence set, and uses it for one grounded expansion step. This separates evidence selection from generation and treats reformulators as complementary retrieval perspectives. Across three TREC DL and five BEIR benchmarks, reformulators frequently retrieve distinct relevant documents, so pooled candidates provide higher relevant-document coverage than any individual source. The strongest gains come from relevance-based evidence selection: LLM-Score consistently outperforms direct reformulation, cold-start expansion, and single-source seeded expansion. Additional retrieval-generation rounds provide little benefit once strong conditioning evidence has been selected and can reduce effectiveness.",
+    "publicationDate": "2026-09-14T00:52:45.000Z",
+    "votes": 3,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "EviQE: Evidence Selection for LLM-Based Query Expansion\nHai Son Le\nToronto Metropolitan University\nToronto, Canada\nAmin Bigdeli\nUniversity of Waterloo\nToronto, Canada\nShirin Seyedsalehi\nToronto Metrop..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "EviQE: Evidence Selection for LLM-Based Query Expansion\nHai Son Le\nToronto Metropolitan University\nToronto, Canada\nAmin Bigdeli\nUniversity of Waterloo\nToronto, Canada\nShirin Seyedsalehi\nToronto Metrop..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.29464",
+    "title": "Directional Posterior Feedback Fusion for Query Reformulation in Dense Retrieval",
+    "abstract": "Dense retrieval has become a fundamental paradigm for modern information retrieval, supporting efficient semantic search across a wide range of applications. Its effectiveness, however, relies critically on query embeddings that adequately capture users' information needs, which can be difficult for short, ambiguous, or underspecified queries. Feedback-based query reformulation approaches like pseudo-relevance feedback (PRF) alleviate this by incorporating additional evidence from retrieved or generated content. However, existing embedding-space approaches commonly aggregate or interpolate feedback vectors, implicitly treating them as complete target representations. Such pointwise fusion can unnecessarily suppress query corrections along directions not expressed by individual feedback items, even when these directions are supported by complementary evidence. To address this limitation, we propose Directional Posterior Feedback Fusion (DIFF), a query reformulation framework that models feedback as directional evidence rather than target points. DIFF represents feedback as confidence-weighted directional evidence in the tangent space of the original query and jointly infers a controlled query update through prior-regularized posterior fusion, without retraining the underlying dense retriever. Experiments across multiple dense retrievers and different feedback sources show that DIFF achieves the best overall retrieval performance, demonstrating the effectiveness of explicitly modeling how feedback should constrain query updates.",
+    "publicationDate": "2026-10-21T09:20:56.000Z",
+    "votes": 3,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "...r short, ambiguous, or under-\nspecified queries. Feedback-based query reformulation approaches\nlike pseudo-relevance feedback (PRF) alleviate this by incorporating\nadditional evidence from retrieved o..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "Directional Posterior Feedback Fusion for Query Reformulation\nin Dense Retrieval\nYiteng Tu\nTsinghua University\nBeijing, China\ntyt24@mails.tsinghua.edu.cn\nQingyi Pan\nTsinghua University\nBeijing, China\n..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.13810",
+    "title": "Tracing and Taming Hallucinated Terms via Subsequence-Association Filtering and Breadth-Aware Selection for LLM Query Expansion",
+    "abstract": "Large language models (LLMs) are now a standard source of query expansion terms but they hallucinate. They inject non existent entities and off-topic terms that add ranking noise and can hurt strong retrievers. Existing remedies such as corpus grounding, mutual verification and preference alignment treat hallucinated terms as an undifferentiated nuisance to be filtered by agreement heuristics, without a mechanistic account of why a given term appears or a principled criterion for how many terms to keep. We propose Subsequence-Association Filtered, breadth-aware query expansion (SAFE-QE), a training-free, retriever agnostic method that draws on the subsequence-association account of hallucination. We score each candidate expansion term by its corpus conditioned cross-context reproducibility, terms that reappear under randomised query contexts yet lack support in the pseudo-relevant set are flagged as products of dominant hallucinatory associations and down-weighted. Drawing on the characterisation of language generation as a trade-off between consistency (no hallucination) and breadth (coverage), we cast term selection as constrained coverage maximisation over the pseudo-relevant set, keeping a set that is approximately broad but consistent and stable across resampling. We also introduce the Hallucinated Expansion Term Rate, a query side faithfulness metric that counts injected expansion terms no relevant document supports. We evaluate our approach on benchmarked TREC and BEIR collections. Our SAFE-QE is statistically indistinguishable from generative and corpus-steered expansion on nDCG@10 while injecting fewer unsupported terms 4.3 per query against 27.8 for Query2doc and 57.5 for HyDE and on a strong learned sparse retriever, where every expansion method regresses. Faithfulness is therefore available at no measurable cost in ranking quality.",
+    "publicationDate": "2026-10-09T16:22:16.000Z",
+    "votes": 1,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "...urable cost in ranking quality.\nKeywords: Query expansion · Hallucination · Large language models ·\nPseudo-relevance feedback · Neural retrieval.\narXiv:2610.13810v1 [cs.IR] 9 Oct 2026"
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "...nking quality.\nKeywords: Query expansion · Hallucination · Large language models ·\nPseudo-relevance feedback · Neural retrieval.\narXiv:2610.13810v1 [cs.IR] 9 Oct 2026"
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.18626",
+    "title": "PLAID-PRF: Pseudo-Relevance Feedback with Centroid-like Tokens in PLAID",
+    "abstract": "Multi-vector dense retrieval models, such as ColBERT, achieve strong retrieval effectiveness by modelling fine-grained token-level interactions between queries and documents. Methods such as PLAID use centroid-based quantisation of each token's vector to reduce the index size and speed up retrieval while maintaining strong effectiveness. In this work, we introduce PLAID-PRF, a method that performs Pseudo-Relevance Feedback (PRF) over PLAID to reformulate ColBERT's query vectors based on the top-retrieved results. In contrast with prior methods that perform PRF on multi-vector retrieval models, PLAID-PRF keeps computational costs low by leveraging the internal PLAID centroid vectors, treating them similarly to tokens in traditional PRF methods. The method selects a small and diverse set of high-utility expansion vectors and appends them to the original query, rerunning PLAID to refine both candidate generation and final scoring. Extensive experiments on the standard in-domain MSMARCO and four out-of-domain BEIR benchmarks show that PLAID-PRF consistently improves retrieval effectiveness over various baselines. In particular, PLAID-PRF improves over PLAID by up to 4.3% nDCG@10 and 7.3% MRR@10, while introducing substantially less computation overhead than prior PRF methods. The results demonstrate that our proposed centroid-aware PRF method offers an effective and lightweight mechanism to improve the quality of top-ranked retrieved results. Overall, this work enables effective and efficient feedback-aware late-interaction retrieval without expensive query-time document-token clustering.",
+    "publicationDate": "2026-07-21T01:50:11.000Z",
+    "votes": 2,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "PLAID-PRF: Pseudo-Relevance Feedback\nwith Centroid-like Tokens in PLAID\nXiao Wang\nUniversity of International Business\nand Economics\nBeijing, China\nxiao.wang@uibe.edu.cn\nSean MacAvaney\nUniversity of G..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "PLAID-PRF: Pseudo-Relevance Feedback\nwith Centroid-like Tokens in PLAID\nXiao Wang\nUniversity of International Business\nand Economics\nBeijing, China\nxiao.wang@uibe.edu.cn\nSean MacAvaney\nUniversity of G..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.11238",
+    "title": "LLM-Assisted Pseudo-Relevance Feedback",
+    "abstract": "Query expansion is a long-standing technique to mitigate vocabulary mismatch in ad hoc Information Retrieval. Pseudo-relevance feedback methods, such as RM3, estimate an expanded query model from the top-ranked documents, but remain vulnerable to topic drift when early results include noisy or tangential content. Recent approaches instead prompt Large Language Models to generate synthetic expansions or query variants. While effective, these methods risk hallucinations and misalignment with collection-specific terminology. We propose a hybrid alternative that preserves the robustness and interpretability of classical PRF while leveraging LLM semantic judgement. Our method inserts an LLM-based filtering stage prior to RM3 estimation: the LLM judges the documents in the initial top-$k$ ranking, and RM3 is computed only over those accepted as relevant. This simple intervention improves over blind PRF and a strong baseline across several datasets and metrics.",
+    "publicationDate": "2026-01-16T12:31:43.000Z",
+    "votes": 1,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "LLM-Assisted Pseudo-Relevance Feedback\nDavid Otero\n[0000−0003−1139−0449] \nand Javier Parapar\n[0000−0002−5997−8252]\nIRLab, CITIC, Universidade da Coruña, Spain\ndavid.otero.freijeiro@udc.es javier.parap..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "LLM-Assisted Pseudo-Relevance Feedback\nDavid Otero\n[0000−0003−1139−0449] \nand Javier Parapar\n[0000−0002−5997−8252]\nIRLab, CITIC, Universidade da Coruña, Spain\ndavid.otero.freijeiro@udc.es javier.parap..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.09724",
+    "title": "Towards Explaining Query Expansion Performance in Information Retrieval",
+    "abstract": "Query Expansion (QE) techniques have long been widely used in Information Retrieval (IR) to address the vocabulary mismatch problem. They remain relevant in modern retrieval systems, including those based on large language models (LLMs). However, no single QE method consistently outperforms others across all queries. This work seeks to explain the variation in QE performance through two complementary perspectives. The first is the concept of an Ideal Expanded Query (IEQ)--a hypothetical query that maximizes retrieval effectiveness with a downstream BM25 retrieval model. The second is a separability perspective, which quantifies how distinctly relevant and non-relevant documents are scored for a given expanded query using Cohen's (d). We develop a separability measure and practical formulations to approximate the IEQ and investigate how these factors relate to retrieval effectiveness. Extensive experiments on the TREC Robust collection, TREC DL 2019-2022 passage collections, and TREC DL 2019-2020 document collections reveal several interesting patterns. In particular, we find that expanded queries that are closer to the ideal expanded query tend to achieve higher retrieval effectiveness. We further show that the separability of relevant and non-relevant documents provides a complementary perspective for understanding QE performance.",
+    "publicationDate": "2026-10-07T09:21:17.000Z",
+    "votes": 7,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "....\nThey remain relevant in modern retrieval systems, including those based on large language models (LLMs). However, no single QE\nmethod consistently outperforms others across all queries. This work se..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "Towards Explaining Query Expansion Performance in Information Retrieval\nSOURAV SAHA, Indian Statistical Institute, India\nADITYA DUTTA, IIT Bombay, India\nSOUMAJIT PRAMANIK, IIT Bhilai, India\nMANDAR MIT..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2607.12098",
+    "title": "Explaining When PRF Fails: Participatory Auditing for Selective Query Expansion",
+    "abstract": "Pseudo-Relevance Feedback (PRF) improves retrieval effectiveness on average, but harms a substantial fraction of queries through query drift, an asymmetry hidden by aggregate offline metrics. Existing Selective PRF (sPRF) approaches typically rely on Query Performance Prediction (QPP) methods derived from the same ranking statistics, and therefore inherit, rather than resolve, this opacity. We argue that this is a core explainability problem in IR, and propose a two-stage audit-then-automate framework. In Stage 1, a participatory audit with 108 users across 43 TREC Deep Learning 2019 queries shows that only 20.9% of queries benefit from PRF, while 25.6% suffer a degraded user experience, and that avoiding harm is nearly twice as valuable as exploiting successful expansion. In Stage 2, we repurpose LLM-based rerankers as system preference predictors that replicate these user-derived labels automatically, grounded in inspectable document evidence. Together, the two stages explain which queries PRF harms, why an sPRF decision is made, and how the decision can be inspected at scale, turning an opaque retrieval component into an auditable, user-grounded one.",
+    "publicationDate": "2026-07-13T19:14:21.000Z",
+    "votes": 1,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "...sgow.ac.uk\nIadh Ounis\nUniversity of Glasgow\nGlasgow, Scotland, UK\niadh.ounis@glasgow.ac.uk\nAbstract\nPseudo-Relevance Feedback (PRF) improves retrieval effectiveness\non average, but harms a substantial..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "...unis\nUniversity of Glasgow\nGlasgow, Scotland, UK\niadh.ounis@glasgow.ac.uk\nAbstract\nPseudo-Relevance Feedback (PRF) improves retrieval effectiveness\non average, but harms a substantial fraction of quer..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.37911",
+    "title": "Generated Query Expansion Still Helps Strong Sparse Retrieval: A Controlled Study with SPLADE-v3",
+    "abstract": "Scientific queries are often brief, while relevant papers use specialized vocabulary. Generated query expansion can bridge this mismatch, but earlier work suggests that its value shrinks as the underlying retriever becomes stronger. We test the four generated formats of term lists, a pseudo-document, multiple pseudo-references, and corpus-steered text all together with SPLADE-v3 on NFCorpus, TREC-COVID, and SciDocs. Every condition searches the same frozen document index and follows the same query-side integration rule and 256-dimension budget, isolating the effect of the added content. All twelve method-collection comparisons improve aggregate nDCG@10, with best relative gains of 4.81%, 8.92%, and 9.47%. Eleven remain significant after Holm correction. The gain persists in 103 of 114 interpolation settings, including every setting that assigns at least 30% of the mixture weight to the original query. Shuffled-text and non-contextual lexical-bag controls also remain above baseline in all 24 aggregate comparisons, showing that the added vocabulary carries most of the benefit. A corpus-induced typed concept graph, by contrast, produces no consistent gain, and its relation, depth, validation, random, and gating controls do not rescue it. Generated vocabulary can therefore complement a strong learned sparse retriever, provided that the original query remains strongly represented.",
+    "publicationDate": "2026-09-29T16:07:06.000Z",
+    "votes": 3,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "Generated Query Expansion Still Helps Strong\nSparse Retrieval: A Controlled Study with\nSPLADE-v3\nRyan C. Barron\n∗\n, Cade W. Trotter\n†\n, Maksim E. Eren\n∗\n, Kim Ø. Rasmussen\n‡\n, Liz D. Miller\n§ \nBenjami..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "Generated Query Expansion Still Helps Strong\nSparse Retrieval: A Controlled Study with\nSPLADE-v3\nRyan C. Barron\n∗\n, Cade W. Trotter\n†\n, Maksim E. Eren\n∗\n, Kim Ø. Rasmussen\n‡\n, Liz D. Miller\n§ \nBenjami..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.16927",
+    "title": "WeFair: Fidelity-Aware Alignment from Human Feedback for Personalized Query Rewriting in Short-Video Search",
+    "abstract": "Short-video search needs compact query rewriters that recover users' personalized intent from ambiguous queries under strict latency constraints. Existing LLM-based methods have improved rewriting by using synthetic reasoning and subsequent consumption-behavioral feedback. However, overemphasizing subsequent consumption can favor engaging content over the user's immediate need, causing intent drift even when rewritten queries are grounded in behavioral history. We propose WeFair, Fidelity-Aware Alignment from Human Feedback for Personalized Query Rewriting in WeChat short-video search. WeFair uses human feedback according to how directly it reflects personalized intent, assigning feedback fidelity to a progression from demonstration to preference to verification. We first mine actual queries and user reformulations from search sessions, and then screen them for contextual support. In the demonstration stage, a supervised fine-tuning curriculum progresses from large-scale context-to-query learning to reasoning and direct prediction on human reformulation and preservation. In the preference stage, direct preference optimization learns relative preferences from subsequent consumption feedback. In the verification stage, group relative policy optimization rewards exact agreement with reformulation or preservation targets to constrain intent drift. Further analysis shows that broad supervision benefits the full curriculum supervised training, while strict verification achieves better performance than auxiliary rewards. In offline experiments, WeFair-2B outperforms strong rewriting baselines in overall accuracy and intent preservation. An online A/B test shows relative increases of 2.593% in effective video-view rate and a 2.350% relative reduction in query reformulation rate. WeFair-2B has been deployed in the WeChat short-video search system, which serves over 100 million queries per day.",
+    "publicationDate": "2026-10-12T15:10:01.000Z",
+    "votes": 2,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "WeFair: Fidelity-Aware Alignment from Human Feedback for\nPersonalized Query Rewriting in Short-Video Search\nYingtao Ren\n∗\nAolin Li\n∗\nCheng Cheng\n∗\nyingtaoren@tencent.com\nchurenli@tencent.com\ntrcheng@t..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "...ecover\nusers’ personalized intent from ambiguous queries under strict\nlatency constraints. Existing LLM-based methods have improved\nrewriting by using synthetic reasoning and subsequent consumption-\nb..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2603.11008",
+    "title": "A Systematic Study of Pseudo-Relevance Feedback with LLMs",
+    "abstract": "Pseudo-relevance feedback (PRF) methods built on large language models (LLMs) can be organized along two key design dimensions: the feedback source, which is where the feedback text is derived from and the feedback model, which is how the given feedback text is used to refine the query representation. However, the independent role that each dimension plays is unclear, as both are often entangled in empirical evaluations. In this paper, we address this gap by systematically studying how the choice of feedback source and feedback model impact PRF effectiveness through controlled experimentation. Across 13 low-resource BEIR tasks with five LLM PRF methods, our results show: (1) the choice of feedback model can play a critical role in PRF effectiveness; (2) feedback derived solely from LLM-generated text provides the most cost-effective solution; and (3) feedback derived from the corpus is most beneficial when utilizing candidate documents from a strong first-stage retriever. Together, our findings provide a better understanding of which elements in the PRF design space are most important.",
+    "publicationDate": "2026-03-11T17:31:50.000Z",
+    "votes": 4,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "A Systematic Study of Pseudo-Relevance Feedback with LLMs\nNour Jedidi\nUniversity of Waterloo\nWaterloo, ON, Canada\nnjedidi@uwaterloo.ca\nJimmy Lin\nUniversity of Waterloo\nWaterloo, ON, Canada\njimmylin@uw..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "A Systematic Study of Pseudo-Relevance Feedback with LLMs\nNour Jedidi\nUniversity of Waterloo\nWaterloo, ON, Canada\nnjedidi@uwaterloo.ca\nJimmy Lin\nUniversity of Waterloo\nWaterloo, ON, Canada\njimmylin@uw..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.15851",
+    "title": "Query Expansion Should Be Coordinated: Dense Expands, Sparse Anchors",
+    "abstract": "Retrieval-augmented generation (RAG) systems rely on retrieval modules to ground large language model (LLM) outputs. LLM-based query expansion enriches retrieval with document-like passages, but evaluations of hybrid retrieval often fuse fixed top-L prefixes of dense and sparse rankings. Because L controls cross-channel contributions and ranking access, it can alter measured expansion gains. We therefore evaluate complete-list effectiveness and record per-channel replay stopping depths required to certify the ordered top-K. This changes the design: because both rankings determine the fused result, their query constructions should be coordinated rather than designed independently. We present DESA (Dense Expansion and Sparse Anchoring), which shares generated references across channels but specializes their integration. Orthogonal residual expansion adds new semantic directions to the dense query, whereas score-product anchoring reorders the original sparse support without admitting expansion-only matches. The same references thus play complementary roles: Dense expands; Sparse anchors. Across seven BEIR datasets, DESA improves nDCG@10 and Recall@20 over the unexpanded query by 3.82% and 2.38%, while reducing dense and sparse replay stopping depths by 36.90% and 36.56%.",
+    "publicationDate": "2026-08-16T16:43:49.000Z",
+    "votes": 4,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "...eval-augmented generation (RAG) sys-\ntems rely on retrieval modules to ground\nlarge language model (LLM) outputs. LLM-\nbased query expansion enriches retrieval with\ndocument-like passages, but evaluat..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "Query Expansion Should Be Coordinated: Dense Expands, Sparse Anchors\nChunran Zhang\nSchool of Computing and Artificial Intelligence\nSouthwest Jiaotong University\nChengdu, China\nchronis@my.swjtu.edu.cn\n..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.10955",
+    "title": "Learning Multi-Step Query Rewriting via Corpus Feedback for Conversational Search",
+    "abstract": "Conversational Query Rewriting (CQR) turns a context dependent user turn into a standalone query for a retriever, and most methods do this in a single step from the dialogue history before retrieving once. The rewrite is therefore fixed before any corpus evidence is available to correct its reference resolution or its vocabulary. We recast CQR as a sequential retrieval problem: an agent rewrites the current turn, retrieves, and conditions its next rewrite on the returned passages. The agent acts in a typed space of three rewriting operations, resolving conversational intent into a standalone query, generating lexical reformulations, or synthesizing pseudo-documents for document-to-document matching, together with a stop action that ends the episode. We train the policy with supervised fine-tuning followed by reinforcement learning against a single retrieval-quality reward, using no human rewrite annotations. Across TopiOCQA and QReCC, the agent outperforms several retrieval-aligned baselines, while remaining effective across retrieval backends and generalizing to the CAsT benchmarks without additional training. Further analysis shows that, through retrieval-reward optimization alone, the learned policy develops a behavior of grounding pseudo-documents in passages retrieved by earlier steps, substantially improving retrieval.",
+    "publicationDate": "2026-10-07T22:14:05.000Z",
+    "votes": 2,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "Learning Multi-Step Query Rewriting via\nCorpus Feedback for Conversational Search\nJoão Coelho\n1⋆\n, Hong Wang\n2\n, Jie Yuan\n2\n, Zhuoer Wang\n2\n, Samson Koelle\n2\n, and\nWei Niu\n2\n1 \nINESC-ID and Carnegie M..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "... earlier steps, substantially improving retrieval.\nKeywords: Query Rewriting · Retrieval Feedback · LLM Agents\n1 Introduction\nConversational search systems must handle queries whose meaning depends on..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.06968",
+    "title": "Tracing Query Expansion Effects through Sparse Autoencoder Features",
+    "abstract": "Query expansion (QE) is a critical technique in information retrieval that enriches underspecified queries with additional textual context. However, its effect is often unreliable in modern dense retrieval, especially for strong off-the-shelf retrievers without retraining. Existing studies mainly examine expansion quality, semantic drift, or retrieval outcomes, but rarely explain how QE changes dense retrievers internally. In this work, we trace QE effects through sparse autoencoder (SAE) features. Using paired original and expanded queries, we decompose layer-wise retriever representations into sparse latent activations, identify QE-related latents from expansion-induced activation shifts, and interpret them with natural-language descriptions and retrieval cases. Our analysis shows that effective QE induces layer-concentrated changes in sparse latents aligned with retrieval intent and entity attributes, rather than only perturbing final query embeddings. SAE-based activation steering further validates these latents improve retrieval more consistently than random interventions or vanilla QE across four benchmarks, suggesting that SAEs can explain QE effects and offer a lightweight option for precise retrieval behavior modulation without query rewriting or retriever fine-tuning.",
+    "publicationDate": "2026-09-07T03:07:22.000Z",
+    "votes": 4,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "Tracing Query Expansion Effects through Sparse Autoencoder Features\nFangan Dong\n1\n, Weiran Shi\n1\n, Zhiwei Xu\n1\n, Xuri Ge\n1\n, Ben He\n2,3\n,\nXin Xin\n1\n, Zhumin Chen\n1\n, Ying Zhou\n1\n*\n1\nShandong Universit..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "Tracing Query Expansion Effects through Sparse Autoencoder Features\nFangan Dong\n1\n, Weiran Shi\n1\n, Zhiwei Xu\n1\n, Xuri Ge\n1\n, Ben He\n2,3\n,\nXin Xin\n1\n, Zhumin Chen\n1\n, Ying Zhou\n1\n*\n1\nShandong Universit..."
+      }
+    ]
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.17632",
+    "title": "DEPT: Document Embedding Preservation Tuning for Unified Query Expansion and Retrieval",
+    "abstract": "Large language models (LLMs) can both expand underspecified queries and encode text as dense representations, suggesting a unified model for query expansion and retrieval. Existing systems usually rely on prompted expansions, independently trained modules, or staged optimization, leaving generated expansions only indirectly aligned with the retrieval loss that judges them. We train a single decoder-only LLM end to end, where the same model generates the expansion and encodes both the expanded query and candidate documents. This unified setting creates a moving-target problem: retrieval supervision should improve query-side expansion, but the same update also shifts the document embeddings that serve as retrieval targets. We introduce Document Embedding Preservation Tuning (DEPT), which keeps tuned document embeddings close to cached initial embeddings while allowing retrieval gradients to pass through straight-through decoding into the generator. DEPT converts joint query--document movement into query-side adaptation against approximately stable, whitened document embeddings that support index reuse and online hard-negative mining. Experiments with Qwen3-4B-Instruct-2507 and LLaMA-3.2-3B-Instruct on five datasets in BEIR benchmark show that DEPT improves average retrieval quality over training-free, independently trained, and staged unified baselines, while ablations isolate the effects of preservation, whitening, end-to-end expansion training, and online negatives. Code is available at this https URL.",
+    "publicationDate": "2026-08-18T10:52:08.000Z",
+    "votes": 15,
+    "snippets": [
+      {
+        "pageNumber": 1,
+        "snippet": "...n trade-off.\ndifferent signals: expansion is judged by textual plausibil-\nity or indirect retrieval feedback, whereas the final system\nis judged by whether the resulting representation ranks the\nright..."
+      },
+      {
+        "pageNumber": 1,
+        "snippet": "...ang University, China\nwangjy25@buaa.edu.cn, zhangrc@act.buaa.edu.cn\nAbstract\nLarge language models (LLMs) can both expand underspec-\nified queries and encode text as dense representations, sug-\ngestin..."
+      }
+    ]
+  }
+]

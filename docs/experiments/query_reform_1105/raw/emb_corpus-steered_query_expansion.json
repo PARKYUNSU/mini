@@ -1,0 +1,98 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2609.14875",
+    "title": "EviQE: Evidence Selection for LLM-Based Query Expansion",
+    "abstract": "LLM-based query expansion increasingly conditions reformulation on documents retrieved from the target corpus, yet most work focuses on how to generate expansions rather than which documents the model should read. We propose EviQE, which aggregates documents retrieved by multiple reformulators, selects a compact evidence set, and uses it for one grounded expansion step. This separates evidence selection from generation and treats reformulators as complementary retrieval perspectives. Across three TREC DL and five BEIR benchmarks, reformulators frequently retrieve distinct relevant documents, so pooled candidates provide higher relevant-document coverage than any individual source. The strongest gains come from relevance-based evidence selection: LLM-Score consistently outperforms direct reformulation, cold-start expansion, and single-source seeded expansion. Additional retrieval-generation rounds provide little benefit once strong conditioning evidence has been selected and can reduce effectiveness.",
+    "publicationDate": "2026-09-14T00:52:45.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.17632",
+    "title": "DEPT: Document Embedding Preservation Tuning for Unified Query Expansion and Retrieval",
+    "abstract": "Large language models (LLMs) can both expand underspecified queries and encode text as dense representations, suggesting a unified model for query expansion and retrieval. Existing systems usually rely on prompted expansions, independently trained modules, or staged optimization, leaving generated expansions only indirectly aligned with the retrieval loss that judges them. We train a single decoder-only LLM end to end, where the same model generates the expansion and encodes both the expanded query and candidate documents. This unified setting creates a moving-target problem: retrieval supervision should improve query-side expansion, but the same update also shifts the document embeddings that serve as retrieval targets. We introduce Document Embedding Preservation Tuning (DEPT), which keeps tuned document embeddings close to cached initial embeddings while allowing retrieval gradients to pass through straight-through decoding into the generator. DEPT converts joint query--document movement into query-side adaptation against approximately stable, whitened document embeddings that support index reuse and online hard-negative mining. Experiments with Qwen3-4B-Instruct-2507 and LLaMA-3.2-3B-Instruct on five datasets in BEIR benchmark show that DEPT improves average retrieval quality over training-free, independently trained, and staged unified baselines, while ablations isolate the effects of preservation, whitening, end-to-end expansion training, and online negatives. Code is available at this https URL.",
+    "publicationDate": "2026-08-18T10:52:08.000Z",
+    "votes": 15
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.13905",
+    "title": "ADORE: Iterative Query Expansion with Retrieval-Grounded Relevance Feedback",
+    "abstract": "LLM-based query expansion improves retrieval by enriching the original query with additional context. Yet most methods remain generation-driven, producing plausible pseudo-documents or expansions without checking how the target corpus responds. This can introduce retrieval drift, amplify misleading vocabulary, or miss terms that distinguish relevant from non-relevant documents. We argue that effective expansion requires retrieval-grounded feedback, not just single-pass generation or unverified iteration. We introduce ADORE (ADapt, Observe, Relevance Evaluate), an iterative framework that turns retrieval outcomes into feedback for the next expansion. At each round, an LLM generates pseudo-passages, a retriever exposes the corpus response, and a relevance assessor evaluates retrieved documents against the original query. These judgments identify what to reinforce, what remains undercovered, and what to suppress. Across TREC Deep Learning, BEIR, and BRIGHT, ADORE consistently outperforms strong query expansion baselines with notable improvements across nearly all evaluation settings, improving average nDCG@10 by 24.5% over BM25 and 3.6% over the strongest prior query expansion method on BEIR, and by 122.9% over BM25 and 9.2% over the best query expansion baseline on BRIGHT. Our code and data are publicly available.",
+    "publicationDate": "2026-06-11T20:52:37.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.07637",
+    "title": "Private-RAG: Answering Multiple Queries with LLMs while Keeping Your Data Private",
+    "abstract": "Retrieval-augmented generation (RAG) enhances large language models (LLMs) by retrieving documents from an external corpus at inference time. When this corpus contains sensitive information, however, unprotected RAG systems are at risk of leaking private information. Prior work has introduced differential privacy (DP) guarantees for RAG, but only in single-query settings, which fall short of realistic usage. In this paper, we study the more practical multi-query setting and propose two DP-RAG algorithms. The first, MURAG, leverages an individual privacy filter so that the accumulated privacy loss only depends on how frequently each document is retrieved rather than the total number of queries. The second, MURAG-ADA, further improves utility by privately releasing query-specific thresholds, enabling more precise selection of relevant documents. Our experiments across multiple LLMs and datasets demonstrate that the proposed methods scale to hundreds of queries within a practical DP budget ($\\varepsilon\\approx10$), while preserving meaningful utility.",
+    "publicationDate": "2025-11-10T21:12:32.000Z",
+    "votes": 20
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2602.08917",
+    "title": "Automatic In-Domain Exemplar Construction and LLM-Based Refinement of Multi-LLM Expansions for Query Expansion",
+    "abstract": "Query expansion with large language models is promising but often relies on hand-crafted prompts, manually chosen exemplars, or a single LLM, making it non-scalable and sensitive to domain shift. We present an automated, domain-adaptive QE framework that builds in-domain exemplar pools by harvesting pseudo-relevant passages using a BM25-MonoT5 pipeline. A training-free cluster-based strategy selects diverse demonstrations, yielding strong and stable in-context QE without supervision. To further exploit model complementarity, we introduce a two-LLM ensemble in which two heterogeneous LLMs independently generate expansions and a refinement LLM consolidates them into one coherent expansion. Across TREC DL20, DBPedia, and SciFact, the refined ensemble delivers consistent and statistically significant gains over BM25, Rocchio, zero-shot, and fixed few-shot baselines. The framework offers a reproducible testbed for exemplar selection and multi-LLM generation, and a practical, label-free solution for real-world QE.",
+    "publicationDate": "2026-02-09T17:16:39.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2509.07794",
+    "title": "Query Expansion in the Age of Pre-trained and Large Language Models: A Comprehensive Survey",
+    "abstract": "Modern information retrieval must reconcile short, ambiguous queries with increasingly diverse and dynamic corpora. Query expansion (QE) remains a core technique for mitigating vocabulary mismatch, but its design space has been reshaped by pre-trained and large language models (PLMs/LLMs). This survey reviews QE methods in the PLM/LLM era and provides a unified view of the emerging landscape. We first summarize how different model families enable new expansion behaviors, including stronger contextualization, more controllable generation, and instruction-following. We then organize recent techniques along four complementary design dimensions: where expansion is injected in the pipeline, how it is grounded and interacts with corpus evidence, how it is learned or aligned, and how structured knowledge such as knowledge graphs is incorporated. Beyond taxonomy, we synthesize application patterns and deployment considerations across representative retrieval settings, highlighting practical trade-offs among effectiveness, controllability, grounding quality, and operating cost. Finally, we outline open challenges and future directions toward more reliable, safe, efficient, and continually adaptive QE under real-world constraints.",
+    "publicationDate": "2025-09-09T14:31:11.000Z",
+    "votes": 26
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.19325",
+    "title": "Generative Query Expansion with Multilingual LLMs for Cross-Lingual Information Retrieval",
+    "abstract": "Query expansion is the reformulation of a user query by adding semantically related information, and is an essential component of monolingual and cross-lingual information retrieval used to ensure that relevant documents are not missed. Recently, multilingual large language models (mLLMs) have shifted query expansion from semantic augmentation with synonyms and related words to pseudo-document generation. Pseudo-documents both introduce additional relevant terms and bridge the gap between short queries and long documents, which is particularly beneficial in dense retrieval. This study evaluates recent mLLMs and fine-tuned variants across several generative expansion strategies to identify factors that drive cross-lingual retrieval performance. Results show that query length largely determines which prompting technique is effective, and that more elaborate prompts often do not yield further gains. Substantial linguistic disparities persist: cross-lingual query expansion can produce the largest improvements for languages with the weakest baselines, yet retrieval is especially poor between languages written in different scripts. Fine-tuning is found to lead to performance gains only when the training and test data are of similar format. These outcomes underline the need for more balanced multilingual and cross-lingual training and evaluation resources.",
+    "publicationDate": "2025-11-24T17:18:25.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.11238",
+    "title": "LLM-Assisted Pseudo-Relevance Feedback",
+    "abstract": "Query expansion is a long-standing technique to mitigate vocabulary mismatch in ad hoc Information Retrieval. Pseudo-relevance feedback methods, such as RM3, estimate an expanded query model from the top-ranked documents, but remain vulnerable to topic drift when early results include noisy or tangential content. Recent approaches instead prompt Large Language Models to generate synthetic expansions or query variants. While effective, these methods risk hallucinations and misalignment with collection-specific terminology. We propose a hybrid alternative that preserves the robustness and interpretability of classical PRF while leveraging LLM semantic judgement. Our method inserts an LLM-based filtering stage prior to RM3 estimation: the LLM judges the documents in the initial top-$k$ ranking, and RM3 is computed only over those accepted as relevant. This simple intervention improves over blind PRF and a strong baseline across several datasets and metrics.",
+    "publicationDate": "2026-01-16T12:31:43.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2510.02657",
+    "title": "Less LLM, More Documents: Searching for Improved RAG",
+    "abstract": "Retrieval-Augmented Generation (RAG) couples document retrieval with large language models (LLMs). While scaling generators often improves accuracy, it also increases inference and deployment overhead. We study an orthogonal axis: enlarging the retriever's corpus, and how it trades off with generator scale. Across multiple open-domain QA benchmarks, corpus scaling consistently strengthens RAG and can in many cases match the gains of moving to a larger model tier, though with diminishing returns at larger scales. Small- and mid-sized generators paired with larger corpora often rival much larger models with smaller corpora; mid-sized models tend to gain the most, while tiny and very large models benefit less. Our analysis suggests that these improvements arise primarily from increased coverage of answer-bearing passages, while utilization efficiency remains largely unchanged. Overall, our results characterize a corpus-generator trade-off in RAG and provide empirical guidance on how corpus scale and model capacity interact in this setting.",
+    "publicationDate": "2025-10-03T01:26:13.000Z",
+    "votes": 11
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2511.19349",
+    "title": "Revisiting Feedback Models for HyDE",
+    "abstract": "Recent approaches that leverage large language models (LLMs) for pseudo-relevance feedback (PRF) have generally not utilized well-established feedback models like Rocchio and RM3 when expanding queries for sparse retrievers like BM25. Instead, they often opt for a simple string concatenation of the query and LLM-generated expansion content. But is this optimal? To answer this question, we revisit and systematically evaluate traditional feedback models in the context of HyDE, a popular method that enriches query representations with LLM-generated hypothetical answer documents. Our experiments show that HyDE's effectiveness can be substantially improved when leveraging feedback algorithms such as Rocchio to extract and weight expansion terms, providing a simple way to further enhance the accuracy of LLM-based PRF methods.",
+    "publicationDate": "2025-11-24T17:50:18.000Z",
+    "votes": 6
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2601.05268",
+    "title": "Separating Semantic Expansion from Linear Geometry for PubMed-Scale Vector Search",
+    "abstract": "We describe a PubMed scale retrieval framework that separates semantic interpretation from metric geometry. A large language model expands a natural language query into concise biomedical phrases; retrieval then operates in a fixed, mean free, approximately isotropic embedding space. Each document and query vector is formed as a weighted mean of token embeddings, projected onto the complement of nuisance axes and compressed by a Johnson Lindenstrauss transform. No parameters are trained. The system retrieves coherent biomedical clusters across the full MEDLINE corpus (about 40 million records) using exact cosine search on 256 dimensional int8 vectors. Evaluation is purely geometric: head cosine, compactness, centroid closure, and isotropy are compared with random vector baselines. Recall is not defined, since the language-model expansion specifies the effective target set.",
+    "publicationDate": "2025-11-14T17:55:16.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2506.18670",
+    "title": "Harnessing the Power of Reinforcement Learning for Language-Model-Based Information Retriever via Query-Document Co-Augmentation",
+    "abstract": "Recent studies have proposed leveraging Large Language Models (LLMs) as information retrievers through query rewriting. However, for challenging corpora, we argue that enhancing queries alone is insufficient for robust semantic matching; the LLM should also have sufficient understanding of the corpus by directly handling and augmenting the documents themselves. To this end, we present an LLM-based retriever empowered to augment both user queries and corpus documents, with its policy fully explored via reinforcement learning (RL) and minimal human inductive bias. Notably, we find that simply allowing the LLM to modify documents yields little benefit unless paired with our carefully designed bidirectional RL framework, which enables the LLM to simultaneously learn and collaborate on both query and document augmentation policies. A key technical challenge in realizing such a framework lies in jointly updating both policies during training, where the rewards for the two directions depend on each other, making their entangled reward intractable. Our approach addresses this by introducing a reward sampling strategy and a specifically designed RL algorithm that enables effective training with these sampled rewards. Experimental results demonstrate that our approach significantly enhances LLM-based retrieval performance in both sparse and dense settings, particularly in difficult retrieval domains, and achieves strong cross-benchmark generalization. Our code is released at this https URL.",
+    "publicationDate": "2025-06-23T14:14:43.000Z",
+    "votes": 4
+  }
+]

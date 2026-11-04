@@ -51,6 +51,7 @@ from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.conclusion_rewrite import brief_findings, rewrite_conclusion
 from core.llm.conclusion_swap import swap_conclusion
 from core.llm.relevance_filter import filter_relevant
+from core.llm.query_reform import fill_slots
 from core.llm.question_conditions import count_notice, filter_by_year
 from core.llm.body_numbers import check_body_numbers
 from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
@@ -1342,8 +1343,17 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     _da_trace("rag_context list mode (compact top-10)", f"len={len(rag_context)}")
                 else:
                     if _filter_first:
+                        _pool = rag_context
                         rag_context, _rf_pre = filter_relevant(user_request, rag_context, RAG_ANSWER_MODEL)
                         print(f"[DEBUG] DirectAnswer: 관련 문서 거르기(자르기 앞) = {_rf_pre}")
+                        # 5편이 안 되면 찾은 문서로 검색어를 다시 써 빈 칸을 채운다 (RAG_QUERY_REFORM, docs/experiments/query_reform_1105)
+                        if os.getenv("RAG_QUERY_REFORM", "0").strip() == "1":
+                            rag_trace.mark(chat_id, "select_first", filter=_rf_pre, ids=rag_trace.paper_ids(rag_context))
+                            rag_context, _reform = fill_slots(
+                                user_request, rag_query, _pool, rag_context, model=RAG_ANSWER_MODEL,
+                                search=lambda q: rag.search(q, top_k=top_k, session_context=_recent_ctx, wants_depth=wants_depth),
+                            )
+                            rag_trace.mark(chat_id, "reform", **_reform)
                     rag_context = _rag_context_top_n_hits(rag_context, n=5)
                     _da_trace("rag_context top-5 only", f"len={len(rag_context)}")
 

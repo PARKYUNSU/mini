@@ -1,0 +1,98 @@
+[
+  {
+    "source": "alphaxiv",
+    "id": "2611.04625",
+    "title": "QueryFlow: Multi-Hop Graph Retrieval with Adaptive Query Evolution",
+    "abstract": "Multi-hop retrieval-augmented generation (RAG) supports Web information seeking and fact verification by recovering complementary evidence across related pages within a limited retrieval budget. Scoring evidence independently against the original question can miss supporting units whose relevance emerges through intermediate facts. Iterative retrieval incorporates these facts into subsequent queries, while graph retrieval explicitly models relations among evidence units. Yet fixed-query graph retrievers update entity representations without adapting the query condition to accumulated relational context. We view multi-hop evidence recovery as the coupled evolution of evidence representations and query conditions, with accumulated context informing both what the retriever represents and how it searches for complementary evidence. QueryFlow realizes this perspective by recurrently integrating query-conditioned summaries of graph context into a shared query state, which controls boundary inputs and relation features for subsequent propagation. Across four representative multi-hop question answering (QA) datasets, QueryFlow achieves macro Recall@10 (R@10), Full Recall@10 (FR@10), and LLM-Acc gains of 4.98, 8.40, and 8.0 percentage points over representative baselines, respectively.",
+    "publicationDate": "2026-11-03T10:14:30.000Z",
+    "votes": 1
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.19398",
+    "title": "RCER: Reconstructing Cross-Evidence Relations for Iterative Retrieval-Augmented Generation",
+    "abstract": "Iterative retrieval-augmented generation (RAG) accumulates knowledge from retrieved evidence to answer complex questions, but existing methods struggle to reconstruct entity correspondences and inferential dependencies across retrieved passages as new information emerges. We propose RCER, an iterative RAG method that reconstructs these cross-evidence relations directly from accumulated source passages. Inter-round relational evidence acquisition identifies entity correspondences and relational dependencies to drive dynamic problem decomposition and iterative retrieval. Reasoning context reconstruction independently constructs a coherent reasoning context through joint selection of complementary passages and derivation of cross-evidence inferences. Cross-evidence compositional reasoning leverages these inferences to establish entity correspondences and compose relations across selected passages for answer derivation. Experiments show that RCER outperforms the best baselines by 2.83 EM and 3.06 F1 points on average across three multi-hop QA benchmarks and achieves superior performance on narrative and implicit reasoning tasks.",
+    "publicationDate": "2026-10-14T01:47:17.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2610.29464",
+    "title": "Directional Posterior Feedback Fusion for Query Reformulation in Dense Retrieval",
+    "abstract": "Dense retrieval has become a fundamental paradigm for modern information retrieval, supporting efficient semantic search across a wide range of applications. Its effectiveness, however, relies critically on query embeddings that adequately capture users' information needs, which can be difficult for short, ambiguous, or underspecified queries. Feedback-based query reformulation approaches like pseudo-relevance feedback (PRF) alleviate this by incorporating additional evidence from retrieved or generated content. However, existing embedding-space approaches commonly aggregate or interpolate feedback vectors, implicitly treating them as complete target representations. Such pointwise fusion can unnecessarily suppress query corrections along directions not expressed by individual feedback items, even when these directions are supported by complementary evidence. To address this limitation, we propose Directional Posterior Feedback Fusion (DIFF), a query reformulation framework that models feedback as directional evidence rather than target points. DIFF represents feedback as confidence-weighted directional evidence in the tangent space of the original query and jointly infers a controlled query update through prior-regularized posterior fusion, without retraining the underlying dense retriever. Experiments across multiple dense retrievers and different feedback sources show that DIFF achieves the best overall retrieval performance, demonstrating the effectiveness of explicitly modeling how feedback should constrain query updates.",
+    "publicationDate": "2026-10-21T09:20:56.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.27912",
+    "title": "ITER: Interaction-Aware Retrieval for Agentic Search",
+    "abstract": "Deep-research agents answer complex user questions through an iterative sequence of search steps, where the agent autonomously formulates sub-queries to retrieve the evidence needed at each stage. However, existing retriever training typically relies only on the sub-query and its corresponding search results at the current step as training signals, leaving the information accumulated from previous interactions largely underutilized.\nWe introduce ITER, an agent interaction-aware dense retriever trained using agent trajectory learning signals. ITER represents each query by incorporating not only the current sub-query, but also the main question, the agent's pre-search reasoning, and preceding sub-queries, and is trained using trajectory-relative learning signals derived from the agent's interactions.\nAcross six agent backbones from three model families, ITER consistently outperforms the existing agent-trajectory-trained dense retriever, LRAT, achieving an average relative improvement of 6.9% on InfoSeek-Eval and 15.4% on BrowseComp-Plus. At the matched 4B scale, ITER outperforms AgentIR on InfoSeek-Eval for five of six backbones while achieving a higher visit-to-search recall ratio on BrowseComp-Plus across all six backbones. Ablations further show that structured interaction history and pre-search reasoning provide complementary retrieval context, while previously visited and useful documents, used as redundancy negatives in subsequent searches, provide the strongest trajectory-relative supervision.",
+    "publicationDate": "2026-08-28T04:36:02.000Z",
+    "votes": 25
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.28980",
+    "title": "Seek: Self-Evaluative Exploration for Knowledge Retrieval",
+    "abstract": "LLM-based retrievers and rerankers have advanced passage ranking, yet both paradigms interact with the corpus in a single pass and commit to the resulting candidate set, leaving relevant documents permanently unrecoverable once missed. We introduce Seek, Self-Evaluative Exploration for Knowledge Retrieval, a training-free framework that addresses this limitation through iterative corpus interaction at test time. At each round, an LLM generates pseudo-passages conditioned on accumulated relevance feedback, a retriever surfaces fresh candidates, and a dedicated assessor assigns graded relevance judgments that guide subsequent rounds. On TREC Deep Learning, Seek matches trained rerankers in ranking quality while consistently improving Recall@100 over single-pass BM25. On the reasoning-intensive BRIGHT benchmark, Seek with Qwen2.5-7B achieves an 82% relative gain over BM25, surpassing all trained baselines, and Seek with GPT-4.1 reaches 37.4 average nDCG@10, exceeding the strongest baseline by 37%.",
+    "publicationDate": "2026-09-24T03:47:32.000Z",
+    "votes": 8
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.07050",
+    "title": "Beyond One-Shot Expansion: Contrastive Evidence Exploration for Multi-Hop Retrieval",
+    "abstract": "Retrieval-augmented generation (RAG) critically depends on retrieving the evidence necessary for effective reasoning. However, this remains particularly challenging in multi-hop question answering (QA), where supporting passages are often linked through intermediate entities and relations that must be progressively uncovered. Existing retrieval approaches typically rely on a single retrieval intent or one-shot query expansion, limiting their ability to adapt to newly retrieved evidence and potentially introducing noisy or redundant retrieval signals. To address these limitations, we propose a training-free multi-hop retrieval framework that integrates evidence-conditioned exploration, passage-specific contrastive refinement, and coverage-aware final ranking. During offline indexing, the framework constructs passage-specific contrastive facets that characterize each passage relative to its semantically similar neighbors, providing fine-grained signals to distinguish closely related candidates. At inference time, the framework iteratively retrieves evidence, generates probes targeting unresolved information needs, refines candidate relevance using the contrastive facets, and selects a complementary set of passages that collectively cover diverse evidence-seeking intents. Experiments on MuSiQue, HotpotQA, and 2WikiMultihopQA demonstrate consistent improvements in retrieval quality and downstream QA performance over baselines.",
+    "publicationDate": "2026-09-07T05:13:56.000Z",
+    "votes": 2
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2609.02188",
+    "title": "Group-Aware Adaptive Retrieval for Evidence Navigation",
+    "abstract": "Reasoning-intensive retrieval addresses queries whose relevance cannot be identified by surface-level matching, thereby requiring multi-step reasoning. Because relevant documents rarely appear in the initial candidate set, retrieval systems suffer from the bounded recall problem. Existing methods iteratively expand a candidate pool at the document level over a corpus graph, examining each neighbor in isolation and drifting toward a narrow region of the corpus. To address this problem, we propose Group-Aware Adaptive Retrieval for Evidence Navigation (GAREN), which explores the corpus graph through group-level expansion. GAREN organizes documents into semantically coherent and distinguishable groups based on their connections in the corpus graph. The information in each group indicates what can be accessed by expanding through it, providing guidance beyond individual document-level signals. At each iteration, GAREN uses a group-level navigator to identify promising expansion directions, retrieves documents from the selected groups, and applies a document-level reranker to evaluate the updated candidate set. Extensive experiments show that GAREN achieves up to 8.0% improvement over the strongest baseline on BRIGHT. The source code is available at this https URL",
+    "publicationDate": "2026-09-02T06:51:06.000Z",
+    "votes": 4
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2608.13006",
+    "title": "EviReform: Evidence-Guided Query Reformulation for Multi-Hop Graph Retrieval",
+    "abstract": "Multi-hop retrieval must recover passages that provide sufficient evidence together. An initial passage often resolves an entity or relation implicit in the question, making the missing evidence easier to describe only after retrieval begins. Graph retrieval improves access to related evidence through stored corpus structure, but its retrieval signal is commonly derived from the original question. Complementary evidence must then be reached through stored relations even when an observed passage provides a more direct semantic cue. We introduce EviReform, which separates revising the retrieval request from aggregating evidence in the graph. Retrieved source passages formulate residual queries for the unresolved information need. The original and residual retrieval signals are normalized separately, combined, and propagated between propositions that share entities. On 2WikiMultiHopQA, HotpotQA, and MuSiQue, EviReform exceeds the strongest baseline by up to 5.59 Recall@5 points and 4.50 F1 points. These results show that observed evidence can guide graph retrieval toward the part of a supporting chain left underspecified by the original question. Code is available at this https URL.",
+    "publicationDate": "2026-08-13T09:25:39.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.13905",
+    "title": "ADORE: Iterative Query Expansion with Retrieval-Grounded Relevance Feedback",
+    "abstract": "LLM-based query expansion improves retrieval by enriching the original query with additional context. Yet most methods remain generation-driven, producing plausible pseudo-documents or expansions without checking how the target corpus responds. This can introduce retrieval drift, amplify misleading vocabulary, or miss terms that distinguish relevant from non-relevant documents. We argue that effective expansion requires retrieval-grounded feedback, not just single-pass generation or unverified iteration. We introduce ADORE (ADapt, Observe, Relevance Evaluate), an iterative framework that turns retrieval outcomes into feedback for the next expansion. At each round, an LLM generates pseudo-passages, a retriever exposes the corpus response, and a relevance assessor evaluates retrieved documents against the original query. These judgments identify what to reinforce, what remains undercovered, and what to suppress. Across TREC Deep Learning, BEIR, and BRIGHT, ADORE consistently outperforms strong query expansion baselines with notable improvements across nearly all evaluation settings, improving average nDCG@10 by 24.5% over BM25 and 3.6% over the strongest prior query expansion method on BEIR, and by 122.9% over BM25 and 9.2% over the best query expansion baseline on BRIGHT. Our code and data are publicly available.",
+    "publicationDate": "2026-06-11T20:52:37.000Z",
+    "votes": 7
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2606.00590",
+    "title": "Critic-R: Improving Agentic Search using Instruction-tuned Retrievers with Natural Language Introspective Feedback",
+    "abstract": "Agentic search systems iteratively interact with retrieval models to answer complex queries. Despite substantial progress, optimizing retrievers for agentic search remains challenging, often requiring heavy co-training or gold-standard annotations that limit real-world applicability. We propose Critic-R, a framework that explicitly closes the feedback loop between the reasoning agent and the retrieval model during both inference and training. Critic-R introduces a critic model that evaluates the agent's introspective reasoning trace after consuming retrieved evidence to determine whether the retrieved context sufficiently supports the next reasoning step. Critic-R has two complementary mechanisms: Critic-R-Zero, an inference-time query refinement loop that iteratively rewrites queries and retrieval instructions, and Critic-Embed, an optimization approach for retrieval models that leverages successful and failed refinement trajectories as automatic supervision without requiring manual relevance annotation. We evaluate Critic-R on HotpotQA, 2WikiMultihopQA, MuSiQue, and Bamboogle. Results show that Critic-R significantly improves both retrieval quality and downstream answer accuracy.",
+    "publicationDate": "2026-05-30T07:42:22.000Z",
+    "votes": 3
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2604.27577",
+    "title": "Reproducing Adaptive Reranking for Reasoning-Intensive IR",
+    "abstract": "The classical cascading pipeline of retrieve--rerank suffers from a bounded recall problem, stemming from limitations of the first-stage retriever. Most current approaches address the bounded recall problem by improving the first-stage retriever, but this incurs substantial training and inference costs, especially to handle queries that require substantial reasoning. To circumvent the computational costs of reasoning-based retrievers, we replicate the findings of GAR, Graph-based Adaptive Reranking, on the BRIGHT reasoning-intensive retrieval benchmark. GAR addresses the bounded recall problem by modifying the reranking process itself through iterative exploration of a corpus graph, but it was previously only tested on models designed for topical and question-answering-style queries. Hence, reproduce GAR in reasoning-intensive settings with reasoning and non-reasoning reranking models. We observe that the quality of the reranker's signal plays an important role in identifying additional relevant documents within the corpus graph. Overall, we find that GAR boosts the effectiveness of reasoning-intensive retrieval across a variety of models while contributing minimally to computational overheads. Ultimately, this work enables more practical deployment of retrieval systems that can address reasoning-intensive queries.",
+    "publicationDate": "2026-04-30T08:30:09.000Z",
+    "votes": 9
+  },
+  {
+    "source": "alphaxiv",
+    "id": "2605.00560",
+    "title": "When More Reformulations Hurt: Avoiding Drift using Ranker Feedback",
+    "abstract": "Modern retrieval pipelines increasingly rely on query reformulation and neural reranking to improve effectiveness, but this comes at a significant computational cost and introduces a fundamental tradeoff between recall and query drift. Generating many reformulated queries can substantially increase recall, yet naively merging or exhaustively reranking their results is prohibitively expensive. In this work, we argue that the core challenge is not reformulation generation itself, but the adaptive selection of reformulations and their retrieved documents under a strict inference budget. We propose ReformIR, a budget-aware retrieval framework that treats query reformulations as first-class features and performs online relevance estimation using a strong reranker as a teacher. Given multiple reformulated queries, ReformIR constructs a large candidate pool and learns a lightweight surrogate model that estimates document utility from reformulation-specific retrieval signals. Under a fixed reranking budget, the surrogate adaptively prioritizes both reformulations and documents, selectively querying a teacher reranker anchored to the original query. This process increases recall while actively suppressing drift through online feature selection over reformulations. We conduct extensive experiments on the MSMARCO passage corpora and TREC Deep Learning benchmarks (DL19-DL22). Our results show that ReformIR consistently outperforms existing reformulation strategies, particularly as the number of reformulations increases, where prior methods suffer from severe quality degradation due to drift. Our findings also suggest a shift in retrieval system design, rather than using large language models as rerankers, their capacity is more effectively leveraged in the reformulation stage with feedback-driven optimization.",
+    "publicationDate": "2026-05-01T10:58:18.000Z",
+    "votes": 2
+  }
+]
