@@ -102,7 +102,7 @@ def main():
     r0, r1 = noff[0] / max(1, ndoc[0]), noff[1] / max(1, ndoc[1])
     print(f"보호 1: 주제 밖 문서 비율 {r0:.1%} → {r1:.1%} ({r1 - r0:+.1%}p, 기준 ≤ +10%p) · 편수 {ndoc[0]} → {ndoc[1]}"
           f" · 문항별 주제 밖 많음 {off_more} : 적음 {off_less}")
-    print(f"보호 1b: 처리만 3편 미만으로 준 문항 {shrink} (기준 ≤ 3)")
+    print(f"보호 1b: 처리만 3편 미만으로 준 문항 {shrink} (기준 ≤ 4)")
     split = [q for q in t if next((x.get("topics") for x in t[q].get("trace", []) if x.get("stage") == "search"), None)]
     st = lambda r: sum(x.get("s", 0) for x in r.get("trace", []) if x.get("stage") in ("search", "select", "filter"))
     if split:

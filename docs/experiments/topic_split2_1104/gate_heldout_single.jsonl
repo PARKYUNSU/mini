@@ -1,0 +1,15 @@
+{"id": "HN01", "q": "벡터 검색, 키워드 검색, 그래프 검색을 한 모델에 합친 하이브리드 RAG 연구 요약해줘", "cand": false, "got": []}
+{"id": "HN02", "q": "RAG의 정확도, 속도, 비용을 함께 최적화한 논문 알려줘", "cand": true, "got": ["RAG accuracy optimization papers", "RAG speed improvement research articles", "RAG cost reduction studies"]}
+{"id": "HN03", "q": "GPT-4, Claude, Gemini를 같은 벤치마크로 비교한 연구 있어?", "cand": false, "got": []}
+{"id": "HN04", "q": "양자화, 가지치기, 지식 증류를 한 번에 적용한 경량화 프레임워크 논문 찾아줘", "cand": false, "got": []}
+{"id": "HN05", "q": "입력, 출력, 중간 상태를 모두 암호화하는 LLM 추론 연구 알려줘", "cand": false, "got": []}
+{"id": "HN06", "q": "코드, 문서, 이슈를 같이 읽어 버그를 고치는 에이전트 논문 있어?", "cand": false, "got": []}
+{"id": "HN07", "q": "Llama 1, 2, 3을 비교한 논문 알려줘", "cand": true, "got": ["Llama-1 comparison research papers", "Llama-2 performance evaluation studies", "Llama-3 benchmark analysis articles", "Comparative study of Llama models across versions"]}
+{"id": "HN08", "q": "1단계 검색, 2단계 재순위, 3단계 생성으로 구성된 RAG 구조를 설명한 논문 찾아줘", "cand": false, "got": []}
+{"id": "HN09", "q": "A/B 테스트, 온라인 평가, 오프라인 평가의 차이를 다룬 논문 알려줘", "cand": true, "got": ["A/B testing online evaluation difference study comparative analysis of A/B", "A/B testing offline evaluation comparison analysis Korean translation AB test"]}
+{"id": "HN10", "q": "논문 3편 찾아서 1. 제목 2. 저자 3. 핵심 결과 순으로 정리해줘. 주제는 LLM 양자화야.", "cand": true, "got": []}
+{"id": "HN11", "q": "RAG 평가를 다룬 논문을 찾아줘. (1) 서베이 제외 (2) 2024년 이후 (3) 다섯 편", "cand": true, "got": ["RAG evaluation metrics comparison study retrieval augmented generation benchmarking performance", "Retrieval Augmented Generation (RAG), Large Language Model (LLM) performance analysis"]}
+{"id": "HN12", "q": "에이전트 평가 논문 찾아줘: 1. 벤치마크 이름 2. 성공률 수치 3. 실험 모델을 적어 줘", "cand": true, "got": []}
+{"id": "HN13", "q": "토크나이저, 임베딩, 어텐션 순서로 트랜스포머 구조를 설명한 논문 알려줘", "cand": false, "got": []}
+{"id": "HN14", "q": "긴 문맥에서 검색, 요약, 질의응답 성능이 같이 떨어지는 현상을 다룬 논문 있어?", "cand": true, "got": []}
+{"id": "HN15", "q": "학습, 추론, 배포 전 과정의 탄소 배출을 측정한 연구 찾아줘", "cand": false, "got": []}
