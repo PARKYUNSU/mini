@@ -1,0 +1,122 @@
+# topic_answer_1104: ta1_hu 답을 하위 주제별로 읽은 분류(처리 답인 줄 알고 단 것). 문항	주제	문서(C 있음 · U 없음)	처리(S 근거 있게 다룸 · X 근거 없이 다룸 · H 그 주제는 없다고 밝히고 안 다룸 · G 전체 없음 문구에 묻힘 · N 언급 안 함)	안내(Y: 앞머리 · 본문이 그 주제를 없다고 함)	전체 없음 문구	메모
+HU01	1	C	S			
+HU01	2	U	X	Y		경계: HiRAG(문서-청크 계층 검색)를 'Hierarchical' 항목으로 씀 — 안내와 모순
+HU01	3	U	H	Y		
+HU02	1	C	H	Y		거짓 없음: KV Admission 안 씀
+HU02	2	C	S			
+HU02	3	C	S			
+HU03	1	C	H	Y		거짓 없음: 2412.15266 안 씀
+HU03	2	C	S			
+HU03	3	U	H	Y		
+HU04	1	U	H	Y		
+HU04	2	U	S			경계: 이미지 워터마크 문서를 이미지라고 밝히고 씀(라벨이 엄격) — 대조는 H
+HU04	3	C	S			
+HU05	1	C	S			
+HU05	2	U	X			'실험 결과 제시 안 됨' 이라 하고도 '세 방법 모두 효과 입증' — 판정 거짓 있음
+HU05	3	C	S			
+HU06	1	C	S	Y		SRM 초록의 강화학습 언급으로 다룸 — 안내와 모순, 거짓 없음
+HU06	2	C	S			
+HU06	3	C	S			
+HU06	4	U	H	Y		
+HU07	1	C	S			
+HU07	2	U	N			판정 거짓 있음 — 대조는 H
+HU07	3	U	H	Y		
+HU08	1	C	S			
+HU08	2	C	X			대조와 같음: Budgeted · UQLM 을 보정 연구로 묶음
+HU09	1	C	S		Y	
+HU09	2	C	X		Y	문화 벤치마크 항목에 2406.18192(문화 적응) 인용, 2412.08846 안 씀 — 대조는 S
+HU09	3	U	H	Y	Y	
+HU10	1	C	S			
+HU10	2	C	N			판정은 있음인데 답이 M-Ped 빠뜨림 — 대조는 S
+HU10	3	U	H	Y		
+HU11	1	C	S			
+HU11	2	C	N			판정은 있음인데 답이 자기 선호 문서 빠뜨림(서론 언급뿐) — 대조는 S
+HU11	3	U	H	Y		
+HU12	1	C	H	Y		거짓 없음: SlimGPT 안 씀. 결론은 '헤드 분리' 로 정직
+HU12	2	C	S			
+HU12	3	C	S			
+HU13	1	C	S			
+HU13	2	C	S			
+HU13	3	C	S			대조는 N
+HU14	1	C	S			
+HU14	2	C	H	Y		거짓 없음: TofuEval 대화 요약 — 대조도 H
+HU14	3	C	S			
+HU15	1	C	S			
+HU15	2	C	S			
+HU15	3	U	H	Y		안내 문구 꼬리 잘림 오류('…민감도 순서로 대표')
+HU16	1	U	X			QT(DB 쿼리 튜닝)를 쿼리 성능 예측으로 씀 — 판정 거짓 있음
+HU16	2	U	H	Y		
+HU16	3	C	S			
+HU17	1	C	S	Y		T-FREE · BoundlessBPE 로 다룸 — 안내와 모순, 거짓 없음
+HU17	2	C	S			
+HU17	3	C	S			대조는 X
+HU18	1	C	S			
+HU18	2	U	H	Y		
+HU18	3	C	S			
+HU19	1	C	S			
+HU19	2	C	S			
+HU19	3	C	S			
+HU20	1	C	S			
+HU20	2	U	H	Y		
+HU20	3	U	H	Y		
+HU21	1	C	S			
+HU21	2	C	S			
+HU21	3	U	H	Y		
+HU22	1	U	G		Y	항목 전부 없음 경로
+HU22	2	U	G		Y	
+HU22	3	C	S		Y	거짓 없음(전체): ExecutionAgent 를 본론에 쓰고 '없음' 결론
+HU23	1	C	S			
+HU23	2	U	X			서론이 지식 충돌을 문서 인용으로 단정 — 판정 거짓 있음
+HU23	3	C	S			
+HU24	1	C	S			
+HU24	2	C	S			
+HU24	3	U	X	Y		경계: 서론 '인용 편향 위험' 단정(인용 없음, 대조는 인용 있음) — 안내와 모순
+HU25	1	C	S			
+HU25	2	C	S			
+HU25	3	C	S			
+HU26	1	C	S			
+HU26	2	U	H	Y		대조는 X
+HU26	3	U	H	Y		
+HU27	1	C	S			
+HU27	2	C	X			Constitutional Classifiers 를 레드팀 데이터셋으로 씀, SAGE-RT 안 씀
+HU27	3	U	X			'거부 응답 과잉 문제는 여전히 존재' — 문서에 없음, 판정 거짓 있음
+HU28	1	U	X			경계: 긴 컨텍스트 벤치마크 결과 제시라 단정(Orthros 128K 시험뿐) — 판정 거짓 있음
+HU28	2	C	S			
+HU28	3	C	S			대조는 X
+HU29	1	C	S			본문 정의는 틀림(사실 오류는 재지 않음)
+HU29	2	C	S			
+HU29	3	C	H	Y		거짓 없음: 2602.16974 — 대조도 H
+HU30	1	U	H	Y		
+HU30	2	C	S			경계: 초록의 debate 설명을 인용('제안' 은 틀림), Courtroom 안 씀 — 대조는 N
+HU30	3	C	S			
+HU31	1	U	H	Y		
+HU31	2	U	X	Y		결론 '직접 언급 없음' + 본론은 다른 논문의 선행 연구 언급으로 씀 — 대조도 X
+HU31	3	U	X	Y		결론 '직접 언급 없음' + 본론 'Typical Decoding' 지어냄
+HU32	1	U	S			대조와 같은 기준(라벨 엄격)
+HU32	2	U	S			대조와 같은 기준(라벨 엄격)
+HU32	3	U	H	Y		
+HU33	1	U	H	Y		
+HU33	2	C	S			
+HU33	3	C	S			
+HU34	1	C	S		Y	
+HU34	2	U	H	Y	Y	
+HU34	3	U	H	Y	Y	
+HU34	4	U	H	Y	Y	
+HU35	1	C	X	Y		대조와 같음: scoring bias 를 모델 간 불일치 근거로 씀 — 안내와 모순, 거짓 없음
+HU35	2	C	S			
+HU35	3	U	H	Y		대조는 X(job 140 꼴) — 앙상블 지어내기 사라짐
+HU36	1	U	X	Y		결론 '모델 라우팅 … 가능해집니다' — 안내와 모순
+HU36	2	C	S	Y		Specter 로 다룸 — 안내와 모순, 거짓 없음
+HU36	3	C	S			
+HU37	1	U	S			경계: CaseSumm 전문가 평가의 환각 지적을 씀(라벨 엄격)
+HU37	2	U	X			'인용 생성 모델이 오류를 줄임을 입증' — 문서에 없음, 판정 거짓 있음
+HU37	3	C	S			
+HU37	4	C	S			
+HU38	1	C	H	Y		거짓 없음 — 대조는 S
+HU38	2	C	S			
+HU38	3	C	N			판정은 있음인데 답이 TACO 빠뜨림 — 대조는 S
+HU39	1	C	N			판정은 있음인데 답이 IRSC 빠뜨림 — 대조는 S
+HU39	2	C	S			
+HU39	3	C	S			
+HU40	1	C	S			
+HU40	2	C	X			SUV · KG 를 모델 출력 저작권으로 묶음, 2403.18920 안 씀 — 대조는 S

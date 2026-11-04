@@ -4,7 +4,7 @@ sys.path.insert(0, "docs/experiments/topic_split2_1104")
 import score as S
 
 D = "docs/experiments/topic_filter_1104/"  # 풀 라벨
-rows = S.rows("ans_hu")
+rows = S.rows(sys.argv[1] if len(sys.argv) > 1 else "ans_hu")
 gold = {g["id"]: g for g in map(json.loads, open(S.D + "heldout_gold.jsonl", encoding="utf-8"))}
 lab = {}
 for f in (S.D + "labels_hu.tsv", D + "labels_pool.tsv"):
