@@ -112,7 +112,7 @@ def tune():
         print(f"\n{qid} {q}\n  첫 검색어 {en}\n  거르기 {status}")
         if info.get("on"):
             docs = docs_of(filled)
-            print(f"  새 검색어 {info['query']}\n  새 문서 {info['new']} · 거르기 {info['filter']} · 시간 {info['s']}")
+            print(f"  새 검색어 {info['query']}\n  새 문서 {info['new']} · 거르기 {info['filter']} · 시간 {info['laps']}")
             print("  찾은 문서", [docs[p]["title"][:60] for p in ids(kept)])
             print("  더한 문서", [docs[p]["title"][:60] for p in info["added"]])
 
@@ -161,7 +161,7 @@ def status():
     on = [x for x in r if x["reform"].get("on")]
     print("끝난 문항", len(r), "· 발동", len(on), "· 첫 검색 중앙", statistics.median(x["search_s"] for x in r), "· 거르기 중앙", statistics.median(x["filter_s"] for x in r))
     if on:
-        print("추가 시간 중앙", statistics.median(sum(x["reform"]["s"].values()) for x in on))
+        print("추가 시간 중앙", statistics.median(sum(x["reform"]["laps"].values()) for x in on))
 
 
 def changed(x):
@@ -231,7 +231,7 @@ def score():
     r0, r1 = base[2] / max(1, n0), (base[2] + added[2]) / max(1, n1)
     bad = sum(x["reform"]["filter"] in ("호출 실패", "못 읽음") for x in on)
     noq = sum(x["reform"]["filter"] == "검색어 없음" for x in on)
-    extra = [sum(x["reform"]["s"].values()) for x in on]
+    extra = [sum(x["reform"]["laps"].values()) for x in on]
     reps = [x for x in on if "rep" in x]
     rep_diff = sum(x["rep"]["added"] != x["reform"]["added"] for x in reps)
     print(f"문항 {len(r)} · 발동 {len(on)} · 바뀜 {len(ch)} · 추가 문서 {sum(added.values())} · 평균 최종 편수 {sum(len(x['final0']) for x in r) / len(r):.2f} → {sum(len(x['final1']) for x in r) / len(r):.2f}")
@@ -239,7 +239,7 @@ def score():
     print(f"크기: '2' 를 1편 이상 얻은 문항 {gained} / 발동 {len(on)} ({gained / max(1, len(on)):.1%})")
     print(f"보호 1: 바뀐 문항 최종 '2' 비율 {r0:.1%} → {r1:.1%} (대조 등급 {base} · 추가 등급 {added})")
     print(f"보호 2: 추가 문서 중 '0' {added[0]}/{sum(added.values())} ({added[0] / max(1, sum(added.values())):.1%})")
-    print(f"보호 3: 추가 시간 중앙 {statistics.median(extra) if extra else 0:.1f}s · 단계 중앙 " + str({k: statistics.median(x['reform']['s'][k] for x in on if k in x['reform']['s']) for k in ('rewrite', 'search', 'filter')}))
+    print(f"보호 3: 추가 시간 중앙 {statistics.median(extra) if extra else 0:.1f}s · 단계 중앙 " + str({k: statistics.median(x['reform']['laps'][k] for x in on if k in x['reform']['laps']) for k in ('rewrite', 'search', 'filter')}))
     print(f"보호 4: 검색어 못 씀 {noq} · 못 읽음/호출 실패 {bad} / 발동 {len(on)}")
     print(f"신뢰: 재실행 추가 문서 달라짐 {rep_diff}/{len(reps)}")
     print(f"세트별 이김:짐:동점 {per_set}")

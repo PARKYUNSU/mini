@@ -80,12 +80,12 @@ def fill_slots(
     blocks = _blocks(kept)
     if not 1 <= len(blocks) < n or _NO_RETRY & set(gate_types(question)):
         return kept, {"on": False}
-    info: dict = {"on": True, "query": "", "new": 0, "filter": "", "added": [], "s": {}}
+    info: dict = {"on": True, "query": "", "new": 0, "filter": "", "added": [], "laps": {}}
     t = time.perf_counter()
 
     def lap(name: str) -> None:
         nonlocal t
-        info["s"][name] = round(time.perf_counter() - t, 2)
+        info["laps"][name] = round(time.perf_counter() - t, 2)
         t = time.perf_counter()
 
     try:

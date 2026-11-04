@@ -55,7 +55,8 @@ def test_fills_only_new_docs_after_kept(monkeypatch):
     assert "2401.00002" not in calls["filter"][0] and "2401.00003" in calls["filter"][0]
     assert out == RAG_HIT_SEP.join([kept, _ctx("2401.00003")])
     assert info["added"] == ["2401.00003"] and info["new"] == 2 and info["query"] == "new search terms for papers"
-    assert set(info["s"]) == {"rewrite", "search", "filter"}
+    assert set(info["laps"]) == {"rewrite", "search", "filter"}
+    assert "s" not in info  # rag_trace.mark 의 단계 시간 s 를 덮어쓰지 않는다
 
 
 def test_filter_outcomes_add_nothing(monkeypatch):
