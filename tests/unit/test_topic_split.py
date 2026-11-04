@@ -1,5 +1,6 @@
 """core.graph.agent_nodes 여러 주제 질문 나눠 검색 — 후보 고르기 · 블록 번갈아 합치기 (docs/experiments/topic_split_1103)."""
-from core.graph.agent_nodes import _RAG_HIT_SEP, _explicit_subtopics, _interleave_topic_blocks, _parse_subtopics, topic_split_candidate
+from core.llm.presence_judge import item_docs_note, parse_item_docs
+from core.graph.agent_nodes import _RAG_HIT_SEP, _explicit_subtopics, _interleave_topic_blocks, _parse_subtopics, topic_answer_items, topic_split_candidate
 
 
 def _blk(pid: str, text: str = "x") -> str:
@@ -91,3 +92,32 @@ def test_parse_rag_context_and_repeats():
     assert _parse_subtopics("Agent planning\nSelf reflection\n\n1: Agent planning studies\n2: Reflection studies\n3: Error recovery", "q") == [
         "Agent planning", "Self reflection"]
     assert _parse_subtopics("Topics are as follows:\n1: model pruning\n2: model quantization", "q") == ["model pruning", "model quantization"]
+
+
+def test_answer_items():
+    assert topic_answer_items("찾아 주세요.\n1. 질의 재작성\n2. reranking\n3. faithfulness 평가") == ["질의 재작성", "reranking", "faithfulness 평가"]
+    # 마지막 항목의 요청 꼬리는 잘라낸다
+    assert topic_answer_items("(1) 자기 지도 학습 (2) 대조 학습 (3) 메타 학습에 대한 논문을 알려줘.") == ["자기 지도 학습", "대조 학습", "메타 학습"]
+    assert topic_answer_items("1) 문장 임베딩 평가 2) 다국어 임베딩 3) 임베딩 압축 쪽으로 찾아줘") == ["문장 임베딩 평가", "다국어 임베딩", "임베딩 압축"]
+    # 쉼표 목록 · 괄호 안 쉼표는 나누지 않는다
+    assert topic_answer_items("어텐션 희소화(예: a, b), 저정밀도 부동소수점, 모델 샤딩을 다룬 최신 논문 알려줘") == ["어텐션 희소화(예: a, b)", "저정밀도 부동소수점", "모델 샤딩"]
+    assert topic_answer_items("연합 학습, 차등 프라이버시, 기계 언러닝 논문 추천해줘") == ["연합 학습", "차등 프라이버시", "기계 언러닝"]
+    assert topic_answer_items("'late chunking', 'contextual retrieval', 'proposition indexing' 로 논문 찾아줘") == ["late chunking", "contextual retrieval", "proposition indexing"]
+    # 항목이 아니면 빈 목록
+    assert topic_answer_items("RAG의 정확도, 속도, 비용을 함께 최적화한 논문 알려줘") == []
+    assert topic_answer_items("Llama 1, 2, 3을 비교한 논문 알려줘") == []
+    assert topic_answer_items("LLM-as-a-Judge 판정 불일치 논문 찾아줘") == []
+    assert topic_answer_items("논문 3편 찾아서 1. 제목 2. 저자 3. 핵심 결과 순으로 정리해줘. 주제는 LLM 양자화야.") == []
+
+
+def test_parse_item_docs():
+    raw = "문서 1: 항목 2\n문서 2: 없음\n문서 3: 항목 1, 항목 2\n문서 4: 항목 9"
+    assert parse_item_docs(raw, 3) == {1: [3], 2: [1, 3], 3: []}
+    assert parse_item_docs("답: 없음", 3) is None
+    assert parse_item_docs("", 2) is None
+
+
+def test_item_docs_note():
+    note = item_docs_note(["A", "B"], {1: [2, 3], 2: []})
+    assert "1. A: [문서 2], [문서 3]" in note
+    assert "2. B: 없음" in note

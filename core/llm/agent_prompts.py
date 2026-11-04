@@ -184,6 +184,7 @@ def direct_answer_rag_user(
     last_ai_max: int = 800,
     doc_count: int | None = None,
     list_mode: bool = False,
+    extra_note: str = "",
 ) -> str:
     ref = rag_context[:rag_max_chars] if rag_context != "관련 문서 없음" else "없음"
     empty_note = ""
@@ -233,7 +234,7 @@ def direct_answer_rag_user(
 {last_ai_section}
 [사용자]
 {user_request}
-{empty_note}{doc_note}
+{empty_note}{doc_note}{extra_note}
 {output_template_strict}"""
 
 

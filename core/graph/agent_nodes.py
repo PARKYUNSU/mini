@@ -58,6 +58,8 @@ from core.rag.external_search import ExternalSearch, external_search_active, for
 from core.graph import rag_trace
 from core.llm.presence_judge import (
     NO_DOC_HINT,
+    item_docs_note,
+    judge_items,
     gate_types,
     judge_presence,
     judge_presence_shared,
@@ -457,14 +459,17 @@ def _merge_rag_blocks(primary: str, extras: list[str], *, per_extra: int = 2) ->
 _ENUM_ITEM_RE = re.compile(r"(?:^|[\s:：])\(?([1-9])[.)](?!\d)|([①-⑨])")
 _QUOTED_ITEM_RE = re.compile(r"['‘\"“]([^'’\"”\n]{2,80})['’\"”]")
 # 쉼표 목록 뒤가 "… 관련 논문" · "…을 다룬 연구" 처럼 일반 꼬리일 때만 주제 목록이다 — "…를 합친 RAG 연구" · "…에서도 통하는지 비교한 연구" 는 한 주제
-_LIST_TAIL_RE = re.compile(r"^[^,]{0,40}?(?:관련|다룬|다루는|쪽|대한|관한|분야|각각)|^\s*\S+(?:\s\S+){0,2}\s*(?:논문|연구)")
+_LIST_TAIL_RE = re.compile(r"^[^,]{0,40}?(?:관련|다룬|다루는|쪽|대한|관한|분야|각각)|^\s*\S+(?:\s\S+)?(?<!한)\s*(?:논문|연구)")
+# 마지막 항목 뒤에 붙은 요청 — "메타 학습에 대한 논문을 알려줘" · "임베딩 압축 쪽으로 찾아줘"
+_ITEM_TAIL_CUT_RE = re.compile(r"(?:을|를|의|에)?\s*(?:관련|다룬|다루는|쪽으로|쪽|에?\s*대한|에?\s*관한|분야|각각|논문|연구).*$")
 # 지시문("표로 정리해줘") · 조건("서베이 제외" · "2024년 이후" · "다섯 편")은 주제 항목이 아니다
-_ITEM_REQUEST_RE = re.compile(r"(?:주세요|줘|[아어여빼하]라|시오|세요|할 것|합니다)[.!?\s]*$|\?\s*$|논문(?:별|마다)|제외|이후|이전|\d+\s*편|[두세네]\s*편|다섯\s*편")
+_ITEM_REQUEST_RE = re.compile(r"(?:주세요|줘|[아어여빼하]라|시오|세요|할 것|합니다)[.!?\s]*$|\?\s*$|논문(?:별|마다)|정리해|순으로|제외|이후|이전|\d+\s*편|[두세네]\s*편|다섯\s*편")
 _SUBTOPIC_NOTE_RE = re.compile(r"^\W*(?:note|no separate|shared context|there is only)\b|[:：]\s*$", re.I)
 # "RAG를" 처럼 조사가 붙고, 줄에는 소문자로 나온다 — \b 는 한글 앞에서 안 끊긴다. "storage" · "FRAGMENT" 는 아니다
 _RAG_WORD_RE = re.compile(r"(?<![A-Z])RAG(?![a-z])|(?<![A-Za-z])rag(?![A-Za-z])|검색\s*증강|[Rr]etrieval[- ][Aa]ugmented(?:\s[Gg]eneration)?")
 TOPIC_SPLIT_MAX = 4
 TOPIC_SPLIT_PER_TOPIC = 3
+TOPIC_ITEMS_MAX = 6
 
 
 def _enum_items(user_request: str) -> list[int]:
@@ -510,9 +515,26 @@ def _explicit_subtopics(user_request: str) -> list[str]:
         elif runs and num == len(runs[-1]) + 1:
             runs[-1].append(item)
     for run in runs:
+        run[-1] = _ITEM_TAIL_CUT_RE.sub("", run[-1]).strip() or run[-1]
         # 지시문이 하나라도 끼면 항목을 믿지 않는다 — "1) 배경 2) 방법 3) 결과 순으로 정리해줘"
         if len(run) >= 2 and all(x and not _ITEM_REQUEST_RE.search(x) for x in run):
             return run
+    return []
+
+
+def topic_answer_items(user_request: str) -> list[str]:
+    """답 틀에 쓸 질문의 항목(LLM 없음). 직접 적은 항목, 아니면 일반 꼬리 쉼표 목록. 후보가 아니거나 못 읽으면 빈 목록 — 지금 경로로 답한다."""
+    q = user_request or ""
+    if not topic_split_candidate(q):
+        return []
+    items = _explicit_subtopics(q)
+    if items:
+        return items[:TOPIC_ITEMS_MAX]
+    for line in q.split("\n"):
+        parts = [x.strip() for x in re.split(r"[,、]\s*(?![^()（）]*[)）])", line) if x.strip()]
+        if len(parts) >= 3 and _LIST_TAIL_RE.search(parts[-1]):
+            parts[-1] = _ITEM_TAIL_CUT_RE.sub("", parts[-1]).strip() or parts[-1]
+            return parts[:TOPIC_ITEMS_MAX]
     return []
 
 
@@ -1382,7 +1404,34 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 list_mode=_list_on,
             )
             _pick = None
-            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request) and not _topics:
+            # 여러 주제 질문은 한 편을 찾는 판정이 '없음'으로 기운다 — 항목마다 문서를 묻고, 없는 항목은 답 앞에 밝힌다
+            # (RAG_TOPIC_ANSWER, docs/experiments/topic_answer_1104). 항목을 못 읽거나 판정이 실패하면 기존 판정으로 간다.
+            _items = (
+                topic_answer_items(user_request)
+                if os.getenv("RAG_TOPIC_ANSWER", "0").strip() == "1" and _doc_ids and not prefer_single_hit and not _topics
+                else []
+            )
+            _item_docs = judge_items(system_prompt, prompt, _items, RAG_ANSWER_MODEL) if _items and not image_base64 else None
+            _missing = [x for k, x in enumerate(_items, 1) if not _item_docs[k]] if _item_docs else []
+            _rewrite_q = user_request
+            if _item_docs and len(_missing) == len(_items):
+                _pick = "없음"
+                system_prompt = system_prompt + NO_DOC_HINT
+            elif _item_docs:
+                prompt = direct_answer_rag_user(
+                    _answer_session_ctx,
+                    rag_context,
+                    last_ai,
+                    user_request,
+                    output_template_strict=output_template,
+                    rag_max_chars=rag_max_chars,
+                    doc_count=len(_doc_ids),
+                    list_mode=_list_on,
+                    extra_note=item_docs_note(_items, _item_docs),
+                )
+                if _missing:
+                    _rewrite_q = f"{user_request}\n(문서에 없는 항목: {', '.join(_missing)} — 결론에서 다루지 마라)"
+            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request) and not _topics and not _item_docs:
                 # 답변과 같은 앞부분으로 판정하면 답변 호출이 컨텍스트를 다시 읽지 않는다 (docs/experiments/judge_cache_1017)
                 if shared_prefix_active() and not image_base64:
                     _pick = judge_presence_shared(system_prompt, prompt, user_request, RAG_ANSWER_MODEL)
@@ -1391,10 +1440,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 print(f"[DEBUG] DirectAnswer: 정답 유무 판정 = {_pick}")
                 if _pick == "없음":
                     system_prompt = system_prompt + NO_DOC_HINT
-            rag_trace.mark(chat_id, "judge", gates=gate_types(user_request), pick=_pick)
+            rag_trace.mark(chat_id, "judge", gates=gate_types(user_request), pick=_pick,
+                           **({"items": _items, "item_docs": _item_docs} if _items else {}))
             # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다
             if external_search_active() and (
-                _pick == "없음" or _list_on
+                _pick == "없음" or _list_on or _item_docs
             ):
                 # 학회판(arXiv ID 없음)은 제목으로 거른다 — job 129 · 130 에서 본론 2406.01549 의 ACL 판이 다시 실렸다
                 _titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context))
@@ -1464,7 +1514,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             rag_trace.mark(chat_id, "post", cit={k: _cit.get(k) for k in ("fixed", "dropped", "bad_refs")})
             if os.getenv("RAG_CONCLUSION_REWRITE", "0").strip() == "1" and not _keep_nodoc:  # docs/experiments/conclusion_rewrite_1021
                 _before = answer
-                answer, _cr = rewrite_conclusion(answer, user_request, rag_context, _doc_ids, RAG_ANSWER_MODEL)
+                answer, _cr = rewrite_conclusion(answer, _rewrite_q, rag_context, _doc_ids, RAG_ANSWER_MODEL)
                 print(f"[DEBUG] DirectAnswer: 결론 다시 쓰기 = {_cr}")
                 rag_trace.mark(chat_id, "rewrite", result=_cr, before=_before[:4000])
             if os.getenv("RAG_CITE_CLEANUP", "0").strip() == "1":  # docs/experiments/cite_cleanup_1022
@@ -1475,6 +1525,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 answer, _cn = count_notice(user_request, answer, _yf)
                 if _cn:
                     print(f"[DEBUG] DirectAnswer: 조건 고지 = {_cn}")
+            if _missing and _pick != "없음":  # 위 RAG_TOPIC_ANSWER — 결론 다시 쓰기가 지우지 못하게 코드가 붙인다
+                answer = f"※ 제공된 문서에서 찾지 못한 항목: {', '.join(_missing)}\n\n{answer}"
             # 결론의 인용 문장을 그 논문 원문 문장(번역)으로 (RAG_CONCLUSION_SWAP, docs/experiments/conclusion_struct_1102)
             if os.getenv("RAG_CONCLUSION_SWAP", "0").strip() == "1" and not _keep_nodoc:
                 answer, _sw, _ = swap_conclusion(answer, rag_context, _doc_ids, RAG_ANSWER_MODEL)

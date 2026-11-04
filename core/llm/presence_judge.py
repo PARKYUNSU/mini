@@ -13,7 +13,8 @@ import os
 import re
 
 __all__ = ["PROMPT", "gate_types", "should_judge", "NO_DOC_HINT", "parse_pick", "judge_presence",
-           "SHARED_TAIL", "shared_prefix_active", "shared_judge_messages", "judge_presence_shared"]
+           "SHARED_TAIL", "shared_prefix_active", "shared_judge_messages", "judge_presence_shared",
+           "ITEM_TAIL", "parse_item_docs", "item_docs_note", "judge_items"]
 
 PROMPT = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 **특정한 연구 하나**를 찾고 있다.
 
@@ -144,3 +145,68 @@ def judge_presence_shared(system_prompt: str, answer_prompt: str, question: str,
         print(f"[DEBUG] presence_judge(shared) 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return None
     return parse_pick(raw)
+
+
+# 여러 주제 질문: "특정한 연구 하나"를 묻는 판정은 '없음'으로 기운다(answer_gap_1104 — 21/36). 항목마다 문서가 있는지 묻는다
+# (docs/experiments/topic_answer_1104). 항목 → 문서로 물으면 문서 있는 주제의 27~39% 를 없다고 해서 문서 → 항목으로 묻는다.
+ITEM_TAIL = """
+[판정 요청 — 답변을 쓰지 말고 판정만]
+위 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 아래 [항목]마다 논문을 찾고 있다.
+
+문서마다 그 문서가 다루는 항목 번호를 적어라. 어느 항목도 다루지 않으면 `없음`이라고 적어라.
+- 단어만 겹치고 다른 문제를 다루는 문서는 `없음`이다.
+
+출력은 문서마다 한 줄, 다른 말 없이:
+문서 1: 항목 2
+문서 2: 없음
+
+[항목]
+{items}"""
+
+
+def parse_item_docs(raw: str, n_items: int) -> dict[int, list[int]] | None:
+    """``'문서 1: 항목 2'`` 줄들 → ``{항목: [문서 번호]}``. 그런 줄이 없으면 None (호출 쪽은 기존 판정)."""
+    rows = re.findall(r"문서\s*(\d{1,2})\s*[:：]\s*(.*)", raw or "")
+    if not rows:
+        return None
+    got: dict[int, list[int]] = {k: [] for k in range(1, n_items + 1)}
+    for doc, val in rows:
+        if "없음" in val:
+            continue
+        for k in re.findall(r"\d{1,2}", val):
+            if int(k) in got and int(doc) not in got[int(k)]:
+                got[int(k)].append(int(doc))
+    return got
+
+
+def item_docs_note(items: list[str], item_docs: dict[int, list[int]]) -> str:
+    """답변 프롬프트에 넣는 항목별 문서 표."""
+    rows = [
+        f"{k}. {x}: " + (", ".join(f"[문서 {d}]" for d in item_docs[k]) if item_docs[k] else "없음")
+        for k, x in enumerate(items, 1)
+    ]
+    return (
+        "\n[항목별 문서 — 사전 판정]\n" + "\n".join(rows)
+        + "\n본론은 문서가 있는 항목을 항목 순서대로 쓰고, 그 항목에 적힌 문서의 내용만 쓴다. "
+        "`없음` 항목은 본론 · 결론에서 다루지 마라(따로 안내한다). 문서에 없는 내용을 지어내지 마라.\n"
+    )
+
+
+def judge_items(system_prompt: str, answer_prompt: str, items: list[str], model: str) -> dict[int, list[int]] | None:
+    """답변과 같은 앞부분으로 항목별 판정. 실패 · 형식 밖이면 None — 호출 쪽은 기존 판정으로 간다."""
+    from langchain_core.messages import HumanMessage, SystemMessage
+    from langchain_ollama import ChatOllama
+
+    from core.config.agent_config import ollama_kwargs
+
+    cut = answer_prompt.rfind(_USER_MARK)
+    if cut < 0:
+        return None
+    tail = ITEM_TAIL.format(items="\n".join(f"{k}. {x}" for k, x in enumerate(items, 1)))
+    llm = ChatOllama(**ollama_kwargs(model=model, temperature=0.0, seed=0, reasoning=False, num_predict=120))
+    try:
+        raw = str(llm.invoke([SystemMessage(content=system_prompt), HumanMessage(content=answer_prompt[:cut] + "\n" + tail)]).content or "")
+    except Exception as exc:
+        print(f"[DEBUG] presence_judge(items) 실패: {type(exc).__name__}: {str(exc)[:120]}")
+        return None
+    return parse_item_docs(raw, len(items))
