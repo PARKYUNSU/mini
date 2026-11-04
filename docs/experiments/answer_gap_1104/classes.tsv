@@ -1,0 +1,122 @@
+# answer_gap_1104: ans_hu 답을 하위 주제별로 읽은 분류. 문항\t주제\t문서(C 있음 · U 없음)\t처리(S 근거 있게 다룸 · X 근거 없이 다룸 · H 그 주제는 없다고 밝힘 · G 전체 없음 문구에 묻힘 · N 언급 안 함)\t전체 없음 문구\t메모
+HU01	1	C	S	Y	
+HU01	2	U	G	Y	
+HU01	3	U	G	Y	
+HU02	1	C	S		
+HU02	2	C	S		
+HU02	3	C	S		
+HU03	1	C	S		
+HU03	2	C	S		
+HU03	3	U	H		
+HU04	1	U	H		
+HU04	2	U	H		
+HU04	3	C	S		
+HU05	1	C	S		
+HU05	2	U	N		
+HU05	3	C	S		
+HU06	1	C	N	Y	
+HU06	2	C	S	Y	
+HU06	3	C	S	Y	
+HU06	4	U	G	Y	
+HU07	1	C	S		
+HU07	2	U	H		
+HU07	3	U	H		
+HU08	1	C	S		
+HU08	2	C	X		UQLM · Budgeted Act-or-Defer 를 보정 연구로 묶음(보정 문서 2412.17411 은 안 씀)
+HU09	1	C	S	Y	
+HU09	2	C	S	Y	
+HU09	3	U	G	Y	
+HU10	1	C	S		
+HU10	2	C	S		
+HU10	3	U	X		'세 가지 접근법 모두 … 성능 향상이 확인' — 초안 + 다듬기 문서 없음
+HU11	1	C	S		
+HU11	2	C	S		
+HU11	3	U	N		
+HU12	1	C	X		IHA(헤드 구성 확장)를 헤드 가지치기로 씀, SlimGPT 는 안 씀
+HU12	2	C	S		
+HU12	3	C	S		
+HU13	1	C	S		
+HU13	2	C	S		
+HU13	3	C	N		
+HU14	1	C	S		
+HU14	2	C	H		
+HU14	3	C	S		
+HU15	1	C	S	Y	
+HU15	2	C	S	Y	
+HU15	3	U	G	Y	
+HU16	1	U	G	Y	
+HU16	2	U	G	Y	
+HU16	3	C	S	Y	
+HU17	1	C	S		
+HU17	2	C	S		
+HU17	3	C	X		BoundlessBPE 를 문맥 압축으로 씀, 압축 문서 3편은 안 씀
+HU18	1	C	S		
+HU18	2	U	H		
+HU18	3	C	S		
+HU19	1	C	S		
+HU19	2	C	S		
+HU19	3	C	S		
+HU20	1	C	S		
+HU20	2	U	N		
+HU20	3	U	N		
+HU21	1	C	S	Y	
+HU21	2	C	S	Y	
+HU21	3	U	G	Y	
+HU22	1	U	G	Y	
+HU22	2	U	G	Y	
+HU22	3	C	N	Y	
+HU23	1	C	S		
+HU23	2	U	N		
+HU23	3	C	S		
+HU24	1	C	S		
+HU24	2	C	S		
+HU24	3	U	X		서론이 '인용 편향' 위험을 GEO 문서 인용으로 단정
+HU25	1	C	S	Y	
+HU25	2	C	S	Y	
+HU25	3	C	S	Y	
+HU26	1	C	S		
+HU26	2	U	X		테스트 실행 에이전트를 테스트 코드 생성으로 씀
+HU26	3	U	H		
+HU27	1	C	S		
+HU27	2	C	N		
+HU27	3	U	N		
+HU28	1	U	N		
+HU28	2	C	S		
+HU28	3	C	X		Orthros 를 슬라이딩 윈도우로 씀, 2606.15378 은 안 씀
+HU29	1	C	S		
+HU29	2	C	S		
+HU29	3	C	H		
+HU30	1	U	G	Y	
+HU30	2	C	N	Y	
+HU30	3	C	S	Y	
+HU31	1	U	X		contrastive decoding 을 contrastive search 로 씀
+HU31	2	U	X		다른 논문의 선행 연구 언급을 nucleus sampling 근거로 씀
+HU31	3	U	N		
+HU32	1	U	S		
+HU32	2	U	S		
+HU32	3	U	N		
+HU33	1	U	N		
+HU33	2	C	S		
+HU33	3	C	S		
+HU34	1	C	X	Y	ConFiQA 를 다른 논문(2412.18004)에 인용
+HU34	2	U	G	Y	
+HU34	3	U	G	Y	
+HU34	4	U	G	Y	
+HU35	1	C	X	Y	scoring bias 논문을 모델 간 불일치 근거로 씀, 2610.05094 는 안 씀
+HU35	2	C	S	Y	
+HU35	3	U	X	Y	'앙상블 접근이 필요함을 시사' — 앙상블 문서 없음(job 140 과 같은 꼴)
+HU36	1	U	G	Y	
+HU36	2	C	S	Y	
+HU36	3	C	S	Y	
+HU37	1	U	G	Y	
+HU37	2	U	X	Y	LegalBench-RAG 가 '인용 생성 정확도를 향상' — 문서에 없는 주장
+HU37	3	C	S	Y	
+HU37	4	C	S	Y	
+HU38	1	C	S		
+HU38	2	C	S		
+HU38	3	C	S		
+HU39	1	C	S		
+HU39	2	C	S		
+HU39	3	C	S		
+HU40	1	C	S		
+HU40	2	C	S		
