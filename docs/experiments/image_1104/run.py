@@ -224,9 +224,29 @@ def sample() -> None:
     print("표본", len(picked))
 
 
+def score() -> None:
+    """분류표를 표본과 맞춰 보고 §5 기준을 판정한다. 옆 세션 pytest 와 겹친 85–94번째는 속도에서 뺀다."""
+    from collections import Counter
+
+    rows = [x.rstrip("\n").split("\t") for x in open(ROOT / "classes.tsv", encoding="utf-8") if x.strip() and not x.startswith("#")]
+    assert [r[1] for r in rows] == [json.loads(x)["id"] for x in open(ROOT / "sample.jsonl", encoding="utf-8")]
+    assert all(r[3] in ("O", "△", "X") and r[4] in ("Y", "N") and r[5] in ("Y", "N") for r in rows)
+    acc = Counter(r[3] for r in rows)
+    new = sum(r[5] == "Y" for r in rows)
+    print(f"정확 {dict(acc)} · 숫자 오독 {sum(r[4] == 'Y' for r in rows)} · 새 정보 {new} · 맞으면서 새 정보(O · △) {sum(r[5] == 'Y' and r[3] != 'X' for r in rows)}")
+    print("G1 X ≤ 6:", "통과" if acc["X"] <= 6 else "미달", "· G2 Y ≥ 9:", "통과" if new >= 9 else "미달")
+    for kind in sorted({r[2] for r in rows}):
+        part = [r for r in rows if r[2] == kind]
+        print(f"  {kind} {len(part)}: {dict(Counter(r[3] for r in part))} · 새 정보 {sum(r[5] == 'Y' for r in part)}")
+    desc = {json.loads(x)["id"]: json.loads(x) for x in open(ROOT / "desc.jsonl", encoding="utf-8")}
+    figs = [json.loads(x)["id"] for x in open(ROOT / "figures.jsonl", encoding="utf-8")]
+    clean = [desc[i]["total_s"] - desc[i]["load_s"] for k, i in enumerate(figs, 1) if not 85 <= k <= 94]
+    print(f"장당 중앙 {statistics.median(clean):.1f}s ({len(clean)}장)")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "parse_one":
         parse_one(sys.argv[2], sys.argv[3])
     else:
-        {"select": select, "extract": extract, "describe": describe, "sample": sample}[cmd]()
+        {"select": select, "extract": extract, "describe": describe, "sample": sample, "score": score}[cmd]()
