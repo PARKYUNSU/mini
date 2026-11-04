@@ -7,9 +7,11 @@
 
 from __future__ import annotations
 
+import os
 import re
 
 from core.llm.citation_fix import RAG_HIT_SEP
+from core.llm.conclusion_rewrite import brief_findings
 
 __all__ = ["PROMPT", "parse_relevant", "protected", "filter_relevant"]
 
@@ -67,6 +69,9 @@ def _brief(i: int, block: str) -> str:
     lines = block.strip().split("\n")
     k = next((j for j, l in enumerate(lines) if re.match(r"\[\d{4}\.\d{4,5}", l)), 0)
     body = re.sub(r"\s+", " ", " ".join(lines[k + 1:])).strip()
+    # 앞 600자는 배경 문장이 많다 — 제안 · 결과 · 대상 문장을 고른다 (RAG_FILTER_FINDINGS, docs/experiments/filter_input_1104)
+    if os.getenv("RAG_FILTER_FINDINGS", "0").strip() == "1" and "[초록] " in block:
+        body = "[초록] " + brief_findings(block.split("[초록] ", 1)[1].split("\n\n", 1)[0], _ABS - 5)
     return f"[{i}] {re.sub(r'^\[[^\]]+\]\s*', '', lines[k])}\n{body[:_ABS]}"
 
 

@@ -19,6 +19,20 @@ def test_brief_skips_header():
     assert _brief(2, b) == "[2] LongPiBench\n[초록] Positional bias in long context."
 
 
+def test_brief_findings_flag(monkeypatch):
+    background = "Retrieval systems are widely used across many different applications today. " * 9
+    abstract = f"{background}We propose LongPiBench for long context. The results show a 40% accuracy drop."
+    b = f"[2410.14641v3] LongPiBench\n[초록] {abstract}\n\n청크 본문"
+    monkeypatch.delenv("RAG_FILTER_FINDINGS", raising=False)
+    assert "We propose" not in _brief(1, b)  # 기본은 앞 600자
+    monkeypatch.setenv("RAG_FILTER_FINDINGS", "1")
+    out = _brief(1, b)
+    assert out.startswith("[1] LongPiBench\n[초록] ") and "We propose LongPiBench" in out and "40%" in out
+    assert "청크" not in out and len(out.split("\n", 1)[1]) <= 600
+    no_abstract = "[2410.14641v3] LongPiBench\n본문 앞부분"
+    assert _brief(1, no_abstract) == "[1] LongPiBench\n본문 앞부분"  # 초록 없는 블록은 그대로
+
+
 def test_protected_names():
     from core.llm.relevance_filter import _names, protected
 
