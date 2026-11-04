@@ -19,3 +19,22 @@ def test_check_body_numbers():
     assert "1. <b>RAGSmith</b>: 46,080 가지 구성을 탐색한다.[2511.01386v1]" in out
     assert "12개 언어" in out  # 문장이 하나뿐이면 항목은 그대로
     assert "3.8% 향상" in out and out.endswith("<b>결론</b>\n끝.")
+
+
+def test_item_stays_when_only_fragments_remain():
+    # 빈 항목 재현 꼴: 줄 끝 공백 · 마침표 뒤 인용 · 인용 뒤 마침표 · 이름만 남는 문장 (ans_hu HU37 · ta1_hu HU07 · HU14)
+    for item in (
+        "**Multi-LCB**: 12개 언어로 넓힌다[2606.20517v1].  ",
+        "**Multi-LCB**: 12개 언어로 넓힌다. [2606.20517v1]  ",
+        "**Multi-LCB**: 12개 언어로 넓힌다. [2606.20517v1].",
+        "**Multi-LCB**. 12개 언어로 넓힌다[2606.20517v1]",
+    ):
+        ans = f"### 본론\n1. {item}\n\n### 결론\n끝."
+        assert check_body_numbers(ans, CTX, IDS) == (ans, 0)
+
+
+def test_trailing_spaces_keep_dropping_bad_sentence():
+    ans = "### 본론\n1. **Multi-LCB**: 24개 언어로 넓힌다. 12개 언어다[2606.20517v1].  \n\n### 결론\n끝."
+    out, n = check_body_numbers(ans, CTX, IDS)
+    assert n == 1 and "12개" not in out
+    assert "1. **Multi-LCB**: 24개 언어로 넓힌다. [2606.20517v1]\n" in out

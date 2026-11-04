@@ -3,6 +3,7 @@
 왜: list_findings_1023 에서 목록 블록에 결과 문장을 넣자 근거 수치 항목이 7 → 41 로 늘었지만, 숫자를 잘못 옮긴
 항목도 생겼다(RAGSmith 46,080 → "약 10만", Multi-LCB 24 → 12). 결론 다시 쓰기의 숫자 검사와 같은 방식으로,
 블록에 그대로 없는 숫자가 든 문장을 항목에서 뺀다. 문장을 다 빼야 하면 항목은 그대로 둔다.
+줄 끝 공백이 만든 빈 조각이나 마침표 뒤에 따로 선 인용은 문장으로 세지 않는다 — 그것만 남기면 번호와 인용뿐인 항목이 된다.
 """
 
 from __future__ import annotations
@@ -18,6 +19,7 @@ _ITEM = re.compile(r"^(\s*(?:<b>)?\d+\.\s)(.*)$", re.M)
 _DOC_N = re.compile(r"\[\s*문서\s*(\d{1,2})\s*\]")
 _NUM = re.compile(r"\d+(?:[.,]\d+)?")
 _YEAR = re.compile(r"\b(?:19|20)\d{2}\b")
+_NOT_TEXT = re.compile(r"\[[^\]\n]*\]|\([^()\n]*\)|<b>[^<\n]*</b>|\*\*[^*\n]*\*\*|<[^>]+>")  # 인용 · 괄호 · 굵은 이름 · 태그
 
 
 def _norm(text: str) -> str:
@@ -44,6 +46,10 @@ def _bad(sentence: str, src: str) -> bool:
     return False
 
 
+def _has_text(sentence: str) -> bool:
+    return bool(re.search(r"\w", _NOT_TEXT.sub(" ", sentence)))
+
+
 def check_body_numbers(answer: str, numbered_context: str, doc_ids: dict[int, str]) -> tuple[str, int]:
     """``(답, 뺀 문장 수)``. 본론 번호 항목에서 인용 블록에 없는 숫자가 든 문장을 뺀다."""
     b, c = _find("본론", answer), _find("결론", answer)
@@ -62,7 +68,7 @@ def check_body_numbers(answer: str, numbered_context: str, doc_ids: dict[int, st
             return m.group(0)
         sents = re.split(r"(?<=[.!?。])\s+", text)
         keep = [s for s in sents if not _bad(s, src)]
-        if len(keep) == len(sents) or not keep:
+        if len(keep) == len(sents) or not any(_has_text(s) for s in keep):
             return m.group(0)
         out = " ".join(keep)
         missing = [t for r, t in dict(zip(refs, (x.group(0) for x in _CITED.finditer(text)))).items() if r not in _CITED.findall(out)]
