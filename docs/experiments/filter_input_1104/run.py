@@ -202,7 +202,7 @@ def score():
     print(f"주: 많음 {win} : 적음 {lose} (동점 {len(r) - win - lose}) · p {sign_p(win, lose):.4f} · 갈린 문서 중 '2' 대조만 {two_only[0]} · 처리만 {two_only[1]}")
     print(f"세트별 많음:적음:동점 {per_set}")
     print(f"보호 1: 갈린 문서 중 '0' 대조만 {zero[0]} · 처리만 {zero[1]} (처리 ≤ 대조 + 2)")
-    print(f"보호 2: 정답 문항 {len(gold)} 중 대조 {ok[0]} · 처리 {ok[1]} · 얻음 {ok_win} · 잃음 {ok_lose}")
+    print(f"보호 2: 정답 문항 {sum(x['id'] in gold for x in r)} 중 대조 {ok[0]} · 처리 {ok[1]} · 얻음 {ok_win} · 잃음 {ok_lose}")
     print(f"보호 3: 3편 미만으로 준 문항 {shrink} · 평균 최종 편수 {n_final[0] / len(r):.2f} → {n_final[1] / len(r):.2f} · 거르기 뒤 남은 편수 중앙 {keep[0]} → {keep[1]}")
     print(f"보호 4: 못 읽음 · 호출 실패 {bad[0]} → {bad[1]} · 상태 대조 {st[0]} · 처리 {st[1]}")
     print(f"보호 5: 거르기 호출 중앙 {t[0]}s → {t[1]}s")
