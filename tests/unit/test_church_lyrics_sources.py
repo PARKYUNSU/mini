@@ -134,7 +134,16 @@ def test_bugs_alone_needs_artist_or_a_single_track(monkeypatch):
     assert sources.bugs_candidate("곡", None, []).url.endswith("/track/1")
 
 
+def test_bugs_is_off_by_default(fake, monkeypatch):
+    monkeypatch.delenv("CHURCH_LYRICS_BUGS", raising=False)
+    asked = []
+    monkeypatch.setattr(sources, "bugs_tracks", lambda title: asked.append(title) or [])
+    sources.candidates("첫째 곡")
+    assert asked == []
+
+
 def test_bugs_failure_keeps_web_results(fake, monkeypatch):
+    monkeypatch.setenv("CHURCH_LYRICS_BUGS", "1")
     def boom(title):
         raise OSError("페이지 바뀜")
     monkeypatch.setattr(sources, "bugs_tracks", boom)
@@ -170,7 +179,6 @@ def test_youtube_song_title(hint, title, want):
 def test_second_search_uses_title_from_video(fake, monkeypatch):
     asked = []
     monkeypatch.setattr(sources, "youtube_title", lambda url: "팀 - 첫째 곡 노래 / Song")
-    monkeypatch.setattr(sources, "bugs_tracks", lambda title: asked.append(title) or [])
-    monkeypatch.setattr(sources, "search", lambda q: [])
+    monkeypatch.setattr(sources, "search", lambda q: asked.append(q) or [])
     assert sources.candidates("첫째 곡 노래 가사말", "https://youtu.be/x") == []
-    assert asked == ["첫째 곡 노래 가사말", "첫째 곡 노래"]
+    assert asked == ["첫째 곡 노래 가사말 가사 찬양 CCM", "첫째 곡 노래 가사 찬양 CCM"]

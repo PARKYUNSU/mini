@@ -3,7 +3,7 @@ from datetime import date
 
 import pytest
 
-from apps.church_lyrics import jobs, notion, sources
+from apps.church_lyrics import compare, jobs, notion, sources
 
 pytestmark = pytest.mark.unit
 
@@ -207,7 +207,7 @@ def test_one_line_source_verifies_but_multi_line_source_is_posted(world, monkeyp
     b = world["appended"][0][2][0]
     assert "출처 2곳 일치" in header(b)
     code = [k for k in b["callout"]["children"] if k["type"] == "code"][0]["code"]["rich_text"][0]["text"]["content"]
-    assert code == LYRICS
+    assert code == compare.slides(LYRICS)
 
 
 def test_only_one_line_source_is_posted_with_a_warning(world, monkeypatch):

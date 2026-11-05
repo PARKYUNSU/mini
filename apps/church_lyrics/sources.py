@@ -226,6 +226,9 @@ def _collect(title: str, hint: str | None, want: int, max_docs: int) -> list[Can
             if len(key(lyrics)) >= 15 and len(lyrics.splitlines()) <= 150:
                 out.append(Candidate(page_url, lyrics))
     out = out[:want]
+    # 벅스 robots.txt 가 자동 수집을 막고 있어 기본은 끕니다
+    if os.getenv("CHURCH_LYRICS_BUGS") != "1":
+        return out
     try:
         bugs = bugs_candidate(title, hint, out)
     except Exception:  # 벅스 페이지가 바뀌거나 막혀도 웹 검색 결과로 계속
