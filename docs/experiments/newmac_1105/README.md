@@ -6,7 +6,7 @@
 
 | 단계 | 내용 | 사람 손 | 맥미니 시간(추정) | Claude 사용량(추정) |
 |---|---|---|---|---|
-| 1 | 도착 전 준비 (§2) | 결정 3개 남음 (§8) | — | 작음 |
+| 1 | 도착 전 준비 (§2) | 결정 끝남 (§8) | — | 작음 |
 | 2 | 옮기기 (§3) | 초기 설정 · 권한 · T7 옮겨 꽂기 | 반나절, 봇 멈춤 1시간 안팎 | 작음 |
 | 3 | 같은 설정 기준선 (§4) | 없음 | 1시간 | 작음 |
 | 4 | 후보 속도 (§6.1) | 내려받기 승인 | 후보당 10분 | 작음 |
@@ -31,11 +31,11 @@
 | Python 3.12.13 | brew `python@3.12`, `.venv` 가 `/opt/homebrew/opt/python@3.12` 를 가리킴 | 같은 경로로 brew 설치한다 |
 | 대화 기록 DB 62MB | `~/Library/Application Support/mini-agent/agent_checkpoints.db*` | 봇을 멈춘 뒤 세 파일을 복사한다 |
 | launchd | `com.mini.chroma` · `com.mini.runscheduler` · `com.mini.telegrambot`, 기동기 `~/Library/Application Support/mini/` | 복사한다. 사본은 `ops/launchd/` |
-| 별도 서비스 | `com.yunsupark.chatbot` → `~/bin/chatbot_service.sh` → T7 `chatbot_dev`, 포트 8081 | 결정 3 |
+| 별도 서비스 | `com.yunsupark.chatbot` → `~/bin/chatbot_service.sh` → T7 `chatbot_dev`, 포트 8081 | plist · `~/bin` 을 복사해 같이 옮긴다(결정 3). 프로젝트 내용은 안 봤으니 포트 8081 응답으로 확인한다 |
 | 임베딩 · 재순위 모델 3.3GB | `~/.cache/huggingface` | 복사한다 |
 | 기타 | `~/.config/gh` · `~/.config/openresearch*` · `~/orx` · `~/backups`. LoRA 머지 때만 `~/llama.cpp` · `~/llama_venv` | 복사한다 |
 | 접속 | 맥북 `~/.ssh/config` `Host mini` = Tailscale `100.101.238.38`, 맥북 `/Volumes/T7 Shield` = `//YUNSU의 Mac mini._smb._tcp.local/T7 Shield` | IP 를 고친다. 컴퓨터 이름 · 공유 이름이 같으면 마운트 주소는 그대로다 |
-| 전원 · 로그인 | `sleep 0` · `autorestart 1`, FileVault 켜짐, 자동 로그인 없음 | `pmset` 를 같게 둔다. 결정 2 |
+| 전원 · 로그인 | `sleep 0` · `autorestart 1`, FileVault 켜짐, 자동 로그인 없음 | `pmset` 와 FileVault 를 같게 둔다(결정 2) |
 
 **옮기지 않는 것:** `com.mini.run-scheduler`(옛 파일, 안 올라가 있음), crontab 4줄(T7 권한 문제로 매일 실패, 같은 작업은 스케줄러 쪽), 게임 · 기타 앱(필요할 때 사용자가 설치).
 
@@ -54,7 +54,7 @@
 
 ### A. 옛 기기를 돌린 채 준비 (T7 은 옛 기기에)
 
-1. [사용자] 초기 설정. 계정 짧은 이름 `yunsupark`, 컴퓨터 이름은 임시로 `mini-new`.
+1. [사용자] 초기 설정. 계정 짧은 이름 `yunsupark`, 컴퓨터 이름은 임시로 `mini-new`, FileVault 켬.
 2. [사용자] 원격 로그인 켜기 + 원격 사용자 전체 디스크 접근 허용, 파일 공유 켜기, Tailscale 로그인, `sudo pmset -a sleep 0 autorestart 1`, Homebrew 설치, 맥북에서 `ssh-copy-id -i ~/.ssh/id_ed25519_macmini.pub yunsupark@<새 IP>`.
 3. [Claude] `brew install python@3.12 gh tesseract node cmake`. `python3.12 -V` 가 3.12.13 과 다르면 기록한다.
 4. [사용자 승인 후 Claude] Ollama 앱 0.40.9 설치. 내려받기는 파일 · 출처 · 크기를 밝혀 승인받는다.
@@ -86,7 +86,7 @@
 12. [사용자, 화면 필요] launchd 의 Python 이 T7 을 처음 읽을 때 뜨는 권한 창을 허용한다. launchd 의 bash 는 T7 을 못 읽어 기동기가 venv Python 을 쓴다(`ops/launchd/README.md`).
 13. [Claude] 컨텍스트를 4096 으로 고정한다. Ollama 기본값은 VRAM 24GiB 미만 4k · 24~48GiB 32k · 48GiB 이상 256k 다. 새 기기는 어느 칸인지 미확인이고, 그대로 두면 큰 KV 캐시로 시간과 메모리가 달라진다. 앱 설정 슬라이더나 `OLLAMA_CONTEXT_LENGTH` 로 맞추고, `ollama ps` 의 CONTEXT 와 PROCESSOR(100% GPU)로 확인한다.
 14. [Claude] 3문항으로 답까지 돌려 오류가 없는지 본다(`eval_e2e_ko.py --answer --ids ...`).
-15. [Claude] 스케줄러와 봇을 올린다. [사용자] 텔레그램으로 질문 하나를 보낸다. `bot_receiver.log` 에 409 가 없는지 본다.
+15. [Claude] 스케줄러 · 봇 · `com.yunsupark.chatbot` 을 올린다. 포트 8081 응답을 본다. [사용자] 텔레그램으로 질문 하나를 보낸다. `bot_receiver.log` 에 409 가 없는지 본다.
 
 ### C. 되돌리기
 
@@ -193,12 +193,12 @@ real40 앞 5문항(`--ids N01,N02,N03,N04,N05`)을 답까지 돌린다. `ollama 
 | 6 | [`image_1104`](../image_1104/README.md) | X 10>6 · 새 정보 8<9 | `run.py` 의 `MODEL` 만 바꿔 같은 30장, 같은 기준. G2 미달이면 접는다. C 는 이미지를 못 받는다 |
 | 7 | 재학습 | 9B 파인튜닝은 내용을 깎은 전례 | 위가 끝나고 형식 문제만 남을 때 작은 LoRA |
 
-## 8. 사용자 결정 (도착 전)
+## 8. 사용자 결정 (11-05 모두 정함)
 
 1. **응답 시간 상한: 응답 중앙 120s 로 정함(사용자 결정 11-05).** 지금은 약 80s 다. 후보 탈락과 70B 생사를 가른다.
-2. **FileVault · 자동 로그인.** 지금은 FileVault 켜짐 · 자동 로그인 없음이라, 재부팅이나 정전 뒤에는 사람이 로그인해야 봇이 돈다. 제안은 지금처럼 두는 것이다. 자동 복구를 원하면 FileVault 를 꺼야 한다.
-3. **`com.yunsupark.chatbot`(포트 8081) 을 옮길지.** 별도 프로젝트이고 내용은 보지 않았다. 제안은 같이 옮기는 것이다.
-4. **70B 후보.** `llama3.3` 은 이전 세대이고 글만 받는다. 제안은 §6.1 속도까지만 재 보는 것이다.
+2. **FileVault · 자동 로그인: 지금처럼 FileVault 켜 둠.** 재부팅이나 정전 뒤에는 사람이 로그인해야 봇이 돈다. 자동 복구를 원하면 FileVault 를 꺼야 한다.
+3. **`com.yunsupark.chatbot`(포트 8081): 같이 옮김.** 별도 프로젝트이고 내용은 보지 않았다.
+4. **70B 후보: §6.1 속도를 재고, 120s 안이면 다음 단계로 올림.** `llama3.3` 은 이전 세대이고 글만 받는다.
 
 ## 9. 옛 맥미니
 
