@@ -10,8 +10,10 @@
   .venv/bin/python docs/experiments/jeff_1105/run.py score
 
 결과는 results/<SYS1_LABEL>_<자리>.jsonl 에 이어 쓴다.
+진짜 Jev 는 README §8: SYS1_URL=https://api.typesafe.ai SYS1_KEY_FILE=~/dev/jeff_1105/jev.key SYS1_LABEL=jev SYS1_MODEL=jev-1.14.0
+로컬이 아닌 URL 에는 실사용 질문을 보내지 않는다.
 """
-import ast, hashlib, json, os, re, sqlite3, statistics, subprocess, sys, time, urllib.parse, urllib.request
+import ast, hashlib, json, os, re, sqlite3, statistics, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
 
 sys.path.insert(0, ".")
 
@@ -41,7 +43,7 @@ ROUTE_CRIT = {"paper_research": "asks about academic papers, research findings, 
               "coding": "asks to write, run, or debug code"}
 
 URL = os.environ.get("SYS1_URL", "http://127.0.0.1:8090").rstrip("/")
-KEY = os.environ.get("SYS1_KEY", "devkey")
+KEY = open(os.path.expanduser(os.environ["SYS1_KEY_FILE"])).read().strip() if os.environ.get("SYS1_KEY_FILE") else os.environ.get("SYS1_KEY", "devkey")
 LABEL = os.environ.get("SYS1_LABEL", "jeff")
 MODEL = os.environ.get("SYS1_MODEL", "jev-latest")
 LOCAL = urllib.parse.urlparse(URL).hostname in ("127.0.0.1", "localhost")
@@ -51,9 +53,18 @@ def ask(state, questions):
     req = urllib.request.Request(URL + "/v1/systemone", headers={"Authorization": "Bearer " + KEY, "Content-Type": "application/json"},
                                  data=json.dumps({"model": MODEL, "state": state, "questions": questions}, ensure_ascii=False).encode("utf-8"))
     t0 = time.time()
-    with urllib.request.urlopen(req, timeout=600) as r:
-        out = json.load(r)
-    return out["answers"], round(time.time() - t0, 3), out["usage"]["input_tokens"]
+    for attempt in range(8):
+        try:
+            with urllib.request.urlopen(req, timeout=600) as r:
+                out = json.load(r)
+            return out["answers"], round(time.time() - t0, 3), out["usage"]["input_tokens"]
+        except urllib.error.HTTPError as e:
+            if e.code not in (429, 503, 529) or attempt == 7:
+                sys.exit(f"HTTP {e.code}: {e.read()[:300]!r} — 멈춤(이어 하기 가능)")
+            wait = float(e.headers.get("retry-after-ms") or 2000) / 1000
+            print(f"HTTP {e.code} — {wait:.1f}초 대기", flush=True)
+            time.sleep(wait)
+            t0 = time.time()
 
 
 def noul(state, q):
@@ -66,7 +77,7 @@ def noul(state, q):
 
 def mem_guard(k):
     """README §2 — 25건마다. 여유 12% 미만이면 기다리고, 스왑 6GB 초과면 멈춘다."""
-    if k % 25:
+    if k % 25 or not LOCAL:
         return
     for _ in range(20):
         free = int(re.search(r"free percentage: (\d+)%", subprocess.run(["memory_pressure"], capture_output=True, text=True).stdout).group(1))
@@ -78,6 +89,27 @@ def mem_guard(k):
         print(f"여유 메모리 {free}% — 60초 대기", flush=True)
         time.sleep(60)
     sys.exit("여유 메모리 부족이 20분 이어짐 — 멈춤(이어 하기 가능)")
+
+
+def norm(t):
+    return re.sub(r"\s+", "", t or "").lower()
+
+
+_real = None
+
+
+def is_real(q):
+    """봇에 실제로 온 질문인가(브리지 DB 와 글자 비교)."""
+    global _real
+    if _real is None:
+        c = sqlite3.connect("file:.bridge/agent_bridge.sqlite?mode=ro", uri=True)
+        _real = {norm(t) for (t,) in c.execute("select user_text from bridge_jobs") if t and t.strip()}
+    return norm(q) in _real
+
+
+def blocked(it):
+    """외부 전송 금지 — jn_dev 는 실사용 질문을 넣은 세트라 통째로 뺀다(judge_none_1103 README)."""
+    return not LOCAL and (it["src"] == "jn_dev" or is_real(it["q"]))
 
 
 def jsonl(p):
@@ -138,7 +170,7 @@ def run_judge(arm, labeled_only=False):
     n = 0
     with open(out, "a", encoding="utf-8") as w:
         for it in judge_items():
-            if labeled_only and not it["label"]:
+            if (labeled_only and not it["label"]) or blocked(it):
                 continue
             q = it["q"] if arm == "K" or not it["en"] else it["en"]
             for no, block in BLK.findall(it["ctx"]):
@@ -166,7 +198,7 @@ def router_items():
     ids = {r["id"] for r in jsonl(R + "pc1_real40.jsonl") if str(r.get("route", "")).endswith("/B")}
     for l in open("docs/experiments/real_eval_1013/questions.tsv", encoding="utf-8"):
         p = l.rstrip("\n").split("\t")
-        if len(p) >= 2 and p[0] in ids:
+        if len(p) >= 2 and p[0] in ids and (LOCAL or not is_real(p[1])):
             items.append(("real40", p[1], "rag"))
     if LOCAL:
         from core.graph import agent_nodes as N
@@ -355,6 +387,10 @@ def score():
     base2 = [{"id": x["id"], "stored": x["stored"], "label": lab.get(x["id"]), "new": x["new"]} for x in jsonl(OJ + "oj_dev_v2.jsonl")]
     judge_gates("판정 9B v2 꼬리", base2, False)
     assert len(items) == len(base)
+    sent = {x["id"] for x in jsonl(out_path("judge_K"))}
+    if sent and len(sent) < len(base):  # 실사용 질문을 뺀 경우 9B 도 같은 문항으로 비교
+        judge_gates(f"판정 9B v1 꼬리 · 같은 {len(sent)}문항", [b for b in base if b["id"] in sent], False)
+        judge_gates(f"판정 9B v2 꼬리 · 같은 {len(sent)}문항", [b for b in base2 if b["id"] in sent], False)
     score_judge("K")
     score_judge("E")
     score_router()
