@@ -139,3 +139,38 @@ def test_bugs_failure_keeps_web_results(fake, monkeypatch):
         raise OSError("페이지 바뀜")
     monkeypatch.setattr(sources, "bugs_tracks", boom)
     assert len(sources.candidates("첫째 곡")) == 2
+
+
+def test_bugs_alone_uses_majority_of_same_title_tracks(monkeypatch):
+    three = [("1", "곡", "갑"), ("2", "곡", "을"), ("3", "곡", "병")]
+    _bugs(monkeypatch, three, {"1": OTHER, "2": SONG, "3": SONG})
+    assert sources.bugs_candidate("곡", "곡 - 다른 팀", []).url.endswith("/track/2")
+    # 과반이 아니면(1:1) 쓰지 않음, 가수가 맞으면 과반보다 먼저
+    _bugs(monkeypatch, three[:2], {"1": OTHER, "2": SONG})
+    assert sources.bugs_candidate("곡", None, []) is None
+    _bugs(monkeypatch, three + [("4", "곡", "어노인팅")], {"1": SONG, "2": SONG, "3": SONG, "4": OTHER})
+    assert sources.bugs_candidate("곡", "곡 어노인팅", []).url.endswith("/track/4")
+    # 가사 있는 트랙이 하나뿐이면 그 트랙(⚠️ 출처 1곳뿐으로 게시됨)
+    _bugs(monkeypatch, three[:2], {"1": "", "2": SONG})
+    assert sources.bugs_candidate("곡", None, []).url.endswith("/track/2")
+
+
+@pytest.mark.parametrize("hint,title,want", [
+    ("F.I.A LIVE WORSHIP - 주 예수 내 맘에 들어와 (찬송가 289장/피아버전) / WHAT A WONDERFUL CHANGE IN MY LIFE (FIA.ver)",
+     "주 예수 내 맘에 들어와 계시니", "주 예수 내 맘에 들어와"),
+    ("주의 사랑을 주의 선하심을   I   레브워십", "주의 사랑을 주의 선하심을", None),   # 같으면 다시 찾지 않음
+    ("[AGAPAO Worship] 베드로의 고백 / Peter's Confession", "베드로의 고백", None),
+    ("전혀 다른 영상 - 다른 노래", "베드로의 고백", None),
+    (None, "베드로의 고백", None),
+])
+def test_youtube_song_title(hint, title, want):
+    assert sources.youtube_song_title(hint, title) == want
+
+
+def test_second_search_uses_title_from_video(fake, monkeypatch):
+    asked = []
+    monkeypatch.setattr(sources, "youtube_title", lambda url: "팀 - 첫째 곡 노래 / Song")
+    monkeypatch.setattr(sources, "bugs_tracks", lambda title: asked.append(title) or [])
+    monkeypatch.setattr(sources, "search", lambda q: [])
+    assert sources.candidates("첫째 곡 노래 가사말", "https://youtu.be/x") == []
+    assert asked == ["첫째 곡 노래 가사말", "첫째 곡 노래"]

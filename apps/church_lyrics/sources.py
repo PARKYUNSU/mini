@@ -21,6 +21,7 @@ from .compare import OTHER_SONG, agreement, key, tidy
 EXCLUDED_DOMAINS = ("youtube.com", "youtu.be")
 BUGS = "https://music.bugs.co.kr"
 MAX_BUGS_TRACKS = 8
+SAME_SONG = 0.5  # 트랙끼리 줄이 이만큼 겹치면 같은 곡을 다른 팀이 부른 것으로 봅니다
 MAX_LINES = 500
 MAX_CHARS = 20000
 
@@ -149,9 +150,20 @@ def _artist_in(artist: str, hint: str | None) -> bool:
     return bool(hint) and any(len(norm(n)) >= 2 and norm(n) in norm(hint) for n in re.split(r"[()（）,&/]", artist))
 
 
+def _majority_track(tracks: list[tuple[str, str, str]]) -> tuple[str, str] | None:
+    """가사가 있는 트랙의 과반이 같은 가사면 그 트랙. 같은 곡을 여러 팀이 부른 경우입니다."""
+    texts = {t[0]: lyrics for t in tracks if (lyrics := bugs_lyrics(t[0]))}
+    for track_id, lyrics in texts.items():
+        same = sum(agreement(lyrics, other) >= SAME_SONG for other in texts.values())  # 자기 자신 포함
+        if same * 2 > len(texts):
+            return track_id, lyrics
+    return None
+
+
 def bugs_candidate(title: str, hint: str | None, others: list[Candidate]) -> Candidate | None:
     """같은 제목의 다른 곡이 많아 트랙을 가려 고릅니다. 다른 출처가 있으면 가장 많이 겹치는 트랙,
-    없으면 유튜브 제목의 가수와 같은 트랙, 제목이 같은 트랙이 하나뿐이면 그 트랙. 못 가리면 쓰지 않습니다."""
+    없으면 유튜브 제목의 가수와 같은 트랙, 제목이 같은 트랙이 하나뿐이면 그 트랙,
+    그것도 아니면 과반이 같은 가사인 트랙. 못 가리면 쓰지 않습니다."""
     from .setlist import norm
 
     tracks = [t for t in bugs_tracks(title) if norm(t[1]) == norm(title)]
@@ -170,14 +182,28 @@ def bugs_candidate(title: str, hint: str | None, others: list[Candidate]) -> Can
             if lyrics:
                 found = (track_id, lyrics)
                 break
+        if not picks:
+            found = _majority_track(tracks[:MAX_BUGS_TRACKS])
     return Candidate(f"{BUGS}/track/{found[0]}", found[1], verify_only=True) if found else None
 
 
-def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int = 4) -> list[Candidate]:
-    """서로 다른 사이트에서 가사 후보를 최대 want개 모읍니다."""
+def youtube_song_title(hint: str | None, title: str) -> str | None:
+    """영상 제목에서 콘티 곡명과 앞뒤로 포함 관계인 한글 조각. 콘티 곡명이 실제 곡명과 조금 다를 때 다시 찾는 데 씁니다:
+    'F.I.A LIVE WORSHIP - 주 예수 내 맘에 들어와 (찬송가 289장) / WHAT A...' + '주 예수 내 맘에 들어와 계시니' → '주 예수 내 맘에 들어와'."""
     from .setlist import norm
 
-    hint = youtube_title(url) if url else None
+    text = re.sub(r"\[[^\]]*\]|\([^)]*\)", " ", hint or "")
+    for piece in re.split(r"\s[-–—|/·I]\s|[|/]", text):
+        piece = " ".join(re.sub(r"[A-Za-z]+", " ", piece).split()).strip(" -·")
+        short, whole = norm(piece), norm(title)
+        if len(short) >= 4 and short != whole and (short in whole or whole in short):
+            return piece
+    return None
+
+
+def _collect(title: str, hint: str | None, want: int, max_docs: int) -> list[Candidate]:
+    from .setlist import norm
+
     hits, domains = [], set()
     for hit in search(f"{title} 가사 찬양 CCM"):
         domain = urllib.parse.urlparse(hit["url"]).netloc
@@ -205,6 +231,15 @@ def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int 
     except Exception:  # 벅스 페이지가 바뀌거나 막혀도 웹 검색 결과로 계속
         bugs = None
     return out + [bugs] if bugs else out
+
+
+def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int = 4) -> list[Candidate]:
+    """서로 다른 사이트에서 가사 후보를 최대 want개 모읍니다. 없으면 영상 제목의 곡명으로 한 번 더 찾습니다."""
+    hint = youtube_title(url) if url else None
+    out = _collect(title, hint, want, max_docs)
+    if not out and (other := youtube_song_title(hint, title)):
+        out = _collect(other, hint, want, max_docs)
+    return out
 
 
 def proofread(lyrics: str, title: str = "") -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
