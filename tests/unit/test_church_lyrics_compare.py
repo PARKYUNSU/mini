@@ -80,3 +80,11 @@ def test_english_lyric_lines_are_dropped_but_mixed_and_short_lines_stay():
     raw = ("Here I am again just looking\n내 마음을 가득 채운\nfor the words that help me say that\n"
            "주 향한 찬양과 사랑\nHallelujah\nOh Lord\n주님 You are my king")
     assert tidy(raw) == "내 마음을 가득 채운\n주 향한 찬양과 사랑\nHallelujah\nOh Lord\n주님 You are my king"
+
+
+def test_verify_only_source_is_not_the_base_when_another_has_line_breaks():
+    web = "가 나 다 라 마\n바 사 아 자 차\n카 타 파 하 가\n나 다 라 마 바"
+    bugs = web + "\n가사가 하나 더 있는 줄"   # 벅스 쪽이 틀린 줄이 적어도 기준은 웹
+    assert compare([web, bugs], verify_only=(1,)).base == 0
+    assert compare([" ".join(web.splitlines()), web], verify_only=(1,)).base == 1  # 웹이 한 줄뿐이면 벅스
+    assert compare([web], verify_only=(0,)).status == "single"

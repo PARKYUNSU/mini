@@ -6,16 +6,21 @@
 """
 from __future__ import annotations
 
+import html
 import json
 import os
+import re
+import time
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 
-from .compare import key, tidy
+from .compare import OTHER_SONG, agreement, key, tidy
 
 # 유튜브 페이지 본문은 자동 생성 자막(음성 인식)이라 '잔치→친트' 같은 오타가 섞입니다. 출처로 쓰지 않습니다.
 EXCLUDED_DOMAINS = ("youtube.com", "youtu.be")
+BUGS = "https://music.bugs.co.kr"
+MAX_BUGS_TRACKS = 8
 MAX_LINES = 500
 MAX_CHARS = 20000
 
@@ -24,6 +29,7 @@ MAX_CHARS = 20000
 class Candidate:
     url: str
     lyrics: str
+    verify_only: bool = False   # 다른 출처가 있으면 대조에만 씁니다(벅스)
 
 
 def _tavily_key() -> str:
@@ -111,6 +117,62 @@ def locate(title: str, hint: str | None, docs: list[list[str]]) -> list[tuple[in
     return out
 
 
+def _bugs_get(url: str) -> str:
+    time.sleep(0.5)  # 곡당 여러 번 받으므로 간격을 둡니다
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=20) as res:
+        return res.read().decode("utf-8", "replace")
+
+
+def bugs_tracks(title: str) -> list[tuple[str, str, str]]:
+    """벅스 곡 검색 결과 (트랙 번호, 곡명, 가수). 검색 페이지 HTML 을 읽습니다."""
+    page = _bugs_get(f"{BUGS}/search/track?q=" + urllib.parse.quote(title))
+    out = []
+    for m in re.finditer(r'<tr[^>]*trackId="(\d+)"[^>]*>(.*?)</tr>', page, re.S):
+        name = re.search(r'<p class="title"[^>]*>.*?title="([^"]*)"', m.group(2), re.S)
+        artist = re.search(r'<p class="artist"[^>]*>.*?title="([^"]*)"', m.group(2), re.S)
+        if name:
+            out.append((m.group(1), html.unescape(name.group(1)), html.unescape(artist.group(1)) if artist else ""))
+    return out
+
+
+def bugs_lyrics(track_id: str) -> str:
+    """벅스 곡 페이지의 가사. Tavily 를 거치면 사라지는 줄바꿈이 직접 받으면 남아 있습니다."""
+    m = re.search(r"<xmp>(.*?)</xmp>", _bugs_get(f"{BUGS}/track/{track_id}"), re.S)
+    return tidy(html.unescape(m.group(1))) if m else ""
+
+
+def _artist_in(artist: str, hint: str | None) -> bool:
+    """'어노인팅(Anointing)' 의 어느 이름이든 유튜브 영상 제목에 있으면 같은 가수로 봅니다."""
+    from .setlist import norm
+
+    return bool(hint) and any(len(norm(n)) >= 2 and norm(n) in norm(hint) for n in re.split(r"[()（）,&/]", artist))
+
+
+def bugs_candidate(title: str, hint: str | None, others: list[Candidate]) -> Candidate | None:
+    """같은 제목의 다른 곡이 많아 트랙을 가려 고릅니다. 다른 출처가 있으면 가장 많이 겹치는 트랙,
+    없으면 유튜브 제목의 가수와 같은 트랙, 제목이 같은 트랙이 하나뿐이면 그 트랙. 못 가리면 쓰지 않습니다."""
+    from .setlist import norm
+
+    tracks = [t for t in bugs_tracks(title) if norm(t[1]) == norm(title)]
+    found = None
+    if others:
+        best = OTHER_SONG
+        for track_id, _, _ in tracks[:MAX_BUGS_TRACKS]:
+            lyrics = bugs_lyrics(track_id)
+            score = max((agreement(lyrics, c.lyrics) for c in others), default=0.0) if lyrics else 0.0
+            if score >= best:
+                best, found = score, (track_id, lyrics)
+    else:
+        picks = [t for t in tracks if _artist_in(t[2], hint)] or (tracks if len(tracks) == 1 else [])
+        for track_id, _, _ in picks[:MAX_BUGS_TRACKS]:
+            lyrics = bugs_lyrics(track_id)
+            if lyrics:
+                found = (track_id, lyrics)
+                break
+    return Candidate(f"{BUGS}/track/{found[0]}", found[1], verify_only=True) if found else None
+
+
 def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int = 4) -> list[Candidate]:
     """서로 다른 사이트에서 가사 후보를 최대 want개 모읍니다."""
     from .setlist import norm
@@ -120,7 +182,7 @@ def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int 
     for hit in search(f"{title} 가사 찬양 CCM"):
         domain = urllib.parse.urlparse(hit["url"]).netloc
         text = hit["raw_content"][:MAX_CHARS]
-        if domain.endswith(EXCLUDED_DOMAINS):
+        if domain.endswith(EXCLUDED_DOMAINS) or domain.endswith("bugs.co.kr"):  # 벅스는 아래에서 직접 받습니다
             continue
         if site(hit["url"]) in domains or norm(title) not in norm(text):  # 곡명이 없는 페이지는 모델에 보내지 않음
             continue
@@ -128,17 +190,21 @@ def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int 
         hits.append((hit["url"], [ln.rstrip() for ln in text.splitlines()][:MAX_LINES]))
         if len(hits) >= max_docs:
             break
-    if not hits:
-        return []
     out = []
-    for (page_url, lines), span in zip(hits, locate(title, hint, [lines for _, lines in hits])):
-        if not span:
-            continue
-        lyrics = tidy("\n".join(lines[span[0]:span[1] + 1]))
-        # 줄바꿈 없이 한 줄로 붙은 가사도 대조용으로 받습니다(너무 짧은 조각만 버림)
-        if len(key(lyrics)) >= 15 and len(lyrics.splitlines()) <= 150:
-            out.append(Candidate(page_url, lyrics))
-    return out[:want]
+    if hits:
+        for (page_url, lines), span in zip(hits, locate(title, hint, [lines for _, lines in hits])):
+            if not span:
+                continue
+            lyrics = tidy("\n".join(lines[span[0]:span[1] + 1]))
+            # 줄바꿈 없이 한 줄로 붙은 가사도 대조용으로 받습니다(너무 짧은 조각만 버림)
+            if len(key(lyrics)) >= 15 and len(lyrics.splitlines()) <= 150:
+                out.append(Candidate(page_url, lyrics))
+    out = out[:want]
+    try:
+        bugs = bugs_candidate(title, hint, out)
+    except Exception:  # 벅스 페이지가 바뀌거나 막혀도 웹 검색 결과로 계속
+        bugs = None
+    return out + [bugs] if bugs else out
 
 
 def proofread(lyrics: str, title: str = "") -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:

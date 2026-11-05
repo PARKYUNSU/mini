@@ -88,6 +88,11 @@ def overlap(a: str, b: str) -> float:
     return sum(k in blob for k in lines) / len(lines) if lines else 0.0
 
 
+def agreement(a: str, b: str) -> float:
+    """양쪽으로 봅니다: 줄바꿈 없이 한 줄로 붙은 출처는 그 줄이 남에게 통째로 들어 있지 않아도, 남의 줄들을 품고 있습니다."""
+    return max(overlap(a, b), overlap(b, a))
+
+
 def unify_spacing(lyrics: str, sources: list[str]) -> tuple[str, list[tuple[str, str]]]:
     """띄어쓰기만 다른 같은 줄을 한 표기로 맞춥니다. 새 표기를 만들지 않고, 출처들에 실제로 있는 표기 가운데
     더 많은 출처가 쓴 것을 고릅니다(동점이면 붙여 쓴 쪽). 한 출처 안의 반복은 한 번으로 셉니다 —
@@ -109,7 +114,7 @@ def unify_spacing(lyrics: str, sources: list[str]) -> tuple[str, list[tuple[str,
     return "\n".join(out), changed
 
 
-def compare(sources: list[str], title: str = "") -> Result:
+def compare(sources: list[str], title: str = "", verify_only: tuple[int, ...] = ()) -> Result:
     """기준 가사의 각 줄이 다른 출처에도 있는지 봅니다(줄바꿈 위치가 달라도 일치로 봅니다).
 
     다른 어느 출처와도 거의 겹치지 않는 출처는 다른 곡으로 보고 대조에서 뺍니다. 전부 서로 다르면
@@ -119,9 +124,8 @@ def compare(sources: list[str], title: str = "") -> Result:
     if not texts:
         raise ValueError("가사가 없습니다")
     ids = list(texts)
-    # 양쪽으로 봅니다: 줄바꿈 없이 한 줄로 붙은 출처는 그 줄이 남에게 통째로 들어 있지 않아도, 남의 줄들을 품고 있습니다
     kept = [i for i in ids if len(ids) == 1
-            or max(max(overlap(texts[i], texts[j]), overlap(texts[j], texts[i])) for j in ids if j != i) >= OTHER_SONG]
+            or max(agreement(texts[i], texts[j]) for j in ids if j != i) >= OTHER_SONG]
     if not kept:
         kept = [next((i for i in ids if title and key(title) in key(texts[i])), ids[0])]
     excluded = [i for i in ids if i not in kept]
@@ -129,8 +133,10 @@ def compare(sources: list[str], title: str = "") -> Result:
         best = Result("single", texts[kept[0]], kept[0], used=kept, excluded=excluded)
     else:
         best = None
-        # 게시할 기준은 줄바꿈이 살아 있는 출처에서 고르고, 한 줄짜리 출처는 대조에만 씁니다
-        for i in [i for i in kept if lines_of(texts[i]) >= MIN_LINES] or kept:
+        # 게시할 기준은 줄바꿈이 살아 있는 출처에서 고르고, 한 줄짜리 출처는 대조에만 씁니다.
+        # verify_only(벅스)는 줄 나눔이 들쭉날쭉해서 줄바꿈 있는 다른 출처가 있으면 기준으로 삼지 않습니다
+        multi = [i for i in kept if lines_of(texts[i]) >= MIN_LINES]
+        for i in [i for i in multi if i not in verify_only] or multi or kept:
             issues = _issues(texts[i], [texts[j] for j in kept if j != i])
             if best is None or len(issues) < len(best.issues):
                 best = Result("differ" if issues else "agree", texts[i], i, issues, kept, excluded)

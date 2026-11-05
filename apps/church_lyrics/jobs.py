@@ -195,7 +195,8 @@ def build(song, index):
     if not found:
         return callout(song, "❌", "red_background", "가사를 찾지 못함. 직접 붙여넣고 체크", "")
 
-    result = compare.compare([c.lyrics for c in found], song.title)
+    result = compare.compare([c.lyrics for c in found], song.title,
+                             tuple(i for i, c in enumerate(found) if c.verify_only))
     try:
         spacing, typos = sources.proofread(result.lyrics, song.title)
     except Exception:  # 검증이 실패해도 가사 게시는 계속

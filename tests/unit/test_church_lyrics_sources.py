@@ -26,6 +26,7 @@ def fake(monkeypatch):
         calls["prompts"].append(prompt)
         return calls["answer"]
     monkeypatch.setattr(agent_gemini, "gemini_sdk_generate_json", generate)
+    monkeypatch.setattr(sources, "bugs_tracks", lambda title: [])
     monkeypatch.setattr(sources, "search", lambda q: [
         {"url": "https://a.example/1", "raw_content": PAGE},
         {"url": "https://a.example/2", "raw_content": PAGE},          # 같은 사이트는 한 번만
@@ -97,3 +98,44 @@ def test_naver_blogs_and_daum_cafes_count_per_owner():
     assert sources.site("https://m.blog.naver.com/97grace/1") != sources.site("https://blog.naver.com/js_cjw/2")
     assert sources.site("https://m.cafe.daum.net/speakjesus/RdMN/47") != sources.site("https://cafe.daum.net/lordfirst/IJYq/1")
     assert sources.site("https://inamen.tistory.com/4521") == "inamen.tistory.com"
+
+
+SONG = "아침 햇살이 창을 두드리면\n나는 일어나 길을 나서네\n함께 걷는 이 길 위에서\n노래하리 오늘도"
+OTHER = "전혀 다른 노래의 첫 줄\n겹치지 않는 둘째 줄\n또 다른 셋째 줄\n마지막 넷째 줄"
+
+
+def test_bugs_page_parsing(monkeypatch):
+    search = """<tr albumId="1" trackId="33" rowType="track"><p class="title" adult_yn="N"><a onclick="x" title="첫째 &amp; 곡">a</a></p>
+    <p class="artist"><a href="u" title="어노인팅(Anointing)">b</a></p></tr>"""
+    monkeypatch.setattr(sources, "_bugs_get", lambda url: search if "search" in url else f"<xmp>{SONG}\n&lt;후렴&gt;</xmp>")
+    assert sources.bugs_tracks("곡") == [("33", "첫째 & 곡", "어노인팅(Anointing)")]
+    assert sources.bugs_lyrics("33") == SONG
+
+
+def _bugs(monkeypatch, tracks, lyrics):
+    monkeypatch.setattr(sources, "bugs_tracks", lambda title: tracks)
+    monkeypatch.setattr(sources, "bugs_lyrics", lambda track_id: lyrics[track_id])
+
+
+def test_bugs_picks_track_that_matches_other_sources(monkeypatch):
+    _bugs(monkeypatch, [("1", "곡", "갑"), ("2", "곡", "을"), ("3", "다른 곡", "병")], {"1": OTHER, "2": SONG})
+    got = sources.bugs_candidate("곡", None, [sources.Candidate("https://a.example", SONG)])
+    assert got.url.endswith("/track/2") and got.verify_only
+    assert sources.bugs_candidate("곡", None, [sources.Candidate("https://a.example", "관계없는 가사 한 줄\n또 한 줄")]) is None
+
+
+def test_bugs_alone_needs_artist_or_a_single_track(monkeypatch):
+    two = [("1", "곡", "갑"), ("2", "곡", "어노인팅(Anointing)")]
+    _bugs(monkeypatch, two, {"1": OTHER, "2": SONG})
+    assert sources.bugs_candidate("곡", "곡 - 어노인팅 공식", []).url.endswith("/track/2")
+    assert sources.bugs_candidate("곡", None, []) is None          # 같은 제목 둘, 가수 모름: 쓰지 않음
+    assert sources.bugs_candidate("곡", "곡 - 다른 팀", []) is None
+    _bugs(monkeypatch, [("1", "곡", "갑")], {"1": SONG})
+    assert sources.bugs_candidate("곡", None, []).url.endswith("/track/1")
+
+
+def test_bugs_failure_keeps_web_results(fake, monkeypatch):
+    def boom(title):
+        raise OSError("페이지 바뀜")
+    monkeypatch.setattr(sources, "bugs_tracks", boom)
+    assert len(sources.candidates("첫째 곡")) == 2
