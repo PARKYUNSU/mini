@@ -61,3 +61,16 @@ def test_parse_leader_names_medley_and_bulleted_songs():
         Song("내 영혼은 안전합니다", None, "헌금찬양"),
         Song("내 아버지 집에는 기쁨이 넘쳐나네", "https://youtu.be/e"),
     ]
+
+
+def test_plus_inside_parens_and_star_memo():
+    """11-01 페이지 모양: 괄호 안 + 는 한 곡의 메모, (*메모) 는 곡명이 아님."""
+    items = [
+        ("numbered", "겸손의 왕 (E) (*뉴송?)\nhttps://youtu.be/a", []),
+        ("numbered", "빛 되신 주 (E) + 예수 예수 예수 (E, 브릿지+후렴만)\nhttps://youtu.be/b", []),
+    ]
+    assert parse(items) == [
+        Song("겸손의 왕", "https://youtu.be/a", note="뉴송?"),
+        Song("빛 되신 주", "https://youtu.be/b"),
+        Song("예수 예수 예수", "https://youtu.be/b", note="브릿지+후렴만"),
+    ]
