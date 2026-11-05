@@ -6,6 +6,7 @@
   .venv/bin/python docs/experiments/jeff_1105/run.py judge K
   .venv/bin/python docs/experiments/jeff_1105/run.py judge E [labeled]
   .venv/bin/python docs/experiments/jeff_1105/run.py router
+  .venv/bin/python docs/experiments/jeff_1105/run.py control   # 배관 점검(본 뒤 추가, 보고만) — README §7
   .venv/bin/python docs/experiments/jeff_1105/run.py score
 
 결과는 results/<SYS1_LABEL>_<자리>.jsonl 에 이어 쓴다.
@@ -30,6 +31,9 @@ INSTR = "Does this paper mainly address the topic of the request below? Request:
 CRIT = {"true": "the paper's main subject is this topic, even if its methods or wording differ",
         "false": "it only shares some words or the broad field, and its main subject is a different problem"}
 THR = 0.5
+# 본 뒤 추가한 단순 문구(README §7, 힌트 전용 — 통과 판정에 쓰지 않는다). SYS1_TEMPLATE=v2 · SYS1_LABEL=jeff_v2
+if os.environ.get("SYS1_TEMPLATE") == "v2":
+    INSTR, CRIT = "Is this paper about: {q}?", None
 ROUTE_INSTR = "What kind of request is this message to a research assistant bot?"
 ROUTE_CRIT = {"paper_research": "asks about academic papers, research findings, or AI and machine learning concepts that should be answered from a paper database",
               "chat": "casual conversation or a general question that needs no papers",
@@ -53,7 +57,10 @@ def ask(state, questions):
 
 
 def noul(state, q):
-    a, s, tok = ask(state, {"topic": {"type": "noul", "instructions": INSTR.format(q=q), "criteria": CRIT}})
+    question = {"type": "noul", "instructions": INSTR.format(q=q)}
+    if CRIT:
+        question["criteria"] = CRIT
+    a, s, tok = ask(state, {"topic": question})
     return a["topic"]["noul"], s, tok
 
 
@@ -189,6 +196,39 @@ def run_router():
     print("분기 끝", n)
 
 
+def run_control():
+    """무관해야 할 짝 100건: 다른 문항의 주제 줄 50 · 분야가 전혀 다른 요청 50. 모델이 '아니오'를 낼 수 있는지 본다."""
+    import random
+    from core.llm.relevance_filter import _brief
+    out = out_path("control")
+    if os.path.exists(out):
+        return
+    rows = jsonl(TF + "pool_hu.jsonl")
+    rng = random.Random(1105)
+    far = ["medieval French poetry", "how to bake sourdough bread", "the history of the Roman Empire", "marine biology of coral reefs", "tax law for small businesses"]
+    with open(out, "w", encoding="utf-8") as w:
+        for i in range(100):
+            a = rng.choice(rows)
+            block = rng.choice(a["blocks"][:5])
+            if i < 50:
+                q = rng.choice([r for r in rows if r["id"] != a["id"]])["line"]
+                kind = "other_question"
+            else:
+                q = far[i % len(far)]
+                kind = "far_field"
+            v, s, tok = noul(re.sub(r"^\[1\] ", "", _brief(1, block)), q)
+            w.write(json.dumps({"kind": kind, "doc_of": a["id"], "p": pid(block), "noul": v, "s": s}, ensure_ascii=False) + "\n")
+    print("점검 끝")
+
+
+def score_control():
+    res = jsonl(out_path("control"))
+    for kind in ("other_question", "far_field"):
+        xs = [x["noul"] for x in res if x["kind"] == kind]
+        if xs:
+            print(f"[배관 점검] {kind}: {len(xs)}건 · noul 중앙 {statistics.median(xs):.3f} · 0.5 이상 {sum(v >= THR for v in xs)}/{len(xs)}")
+
+
 def load_oj_labels():
     lab = {}
     for f in ("labels.tsv", "labels_extra.tsv", "labels_extra_v2.tsv"):
@@ -318,6 +358,7 @@ def score():
     score_judge("K")
     score_judge("E")
     score_router()
+    score_control()
 
 
 if __name__ == "__main__":
@@ -330,5 +371,7 @@ if __name__ == "__main__":
         run_judge(sys.argv[2], len(sys.argv) > 3 and sys.argv[3] == "labeled")
     elif cmd == "router":
         run_router()
+    elif cmd == "control":
+        run_control()
     elif cmd == "score":
         score()

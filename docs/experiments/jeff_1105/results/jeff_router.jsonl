@@ -1,0 +1,130 @@
+{"h": "f844df0d2b0b", "src": "합성-지킴", "q": "최근 논문 알려줘", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.3371, "chat": 0.3415, "tool": 0.1933, "coding": 0.1281}, "s": 1.202}
+{"h": "75155ac7d2f2", "src": "합성-지킴", "q": "최신 논문 알려줘", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.3347, "chat": 0.3412, "tool": 0.1897, "coding": 0.1344}, "s": 0.132}
+{"h": "4d53dc9cd9fe", "src": "합성-지킴", "q": "DB에 논문 뭐 있어?", "ref": "not_rag", "choice": "paper_research", "p": {"paper_research": 0.3332, "chat": 0.3118, "tool": 0.2155, "coding": 0.1396}, "s": 0.189}
+{"h": "f4bd18d1d02a", "src": "합성-지킴", "q": "저장된 논문 목록 보여줘", "ref": "not_rag", "choice": "paper_research", "p": {"paper_research": 0.3815, "chat": 0.2887, "tool": 0.1839, "coding": 0.1459}, "s": 0.283}
+{"h": "5f1697aa9ff7", "src": "합성-지킴", "q": "논문 몇 편 있어?", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.342, "chat": 0.3692, "tool": 0.1671, "coding": 0.1218}, "s": 0.265}
+{"h": "dbc56a549e9b", "src": "합성-지킴", "q": "크로마DB에 저장된 논문 개수 알려줘", "ref": "not_rag", "choice": "paper_research", "p": {"paper_research": 0.4183, "chat": 0.2665, "tool": 0.1652, "coding": 0.1501}, "s": 0.23}
+{"h": "3e078d8dd773", "src": "합성-지킴", "q": "요즘 들어온 논문 뭐 있어", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2098, "chat": 0.4576, "tool": 0.1856, "coding": 0.147}, "s": 0.277}
+{"h": "11092669915e", "src": "합성-지킴", "q": "논문 목록 알려줘", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.3333, "chat": 0.3546, "tool": 0.1788, "coding": 0.1333}, "s": 0.269}
+{"h": "5ad3fd04125b", "src": "합성-지킴", "q": "어떤 논문이 저장되어 있어?", "ref": "not_rag", "choice": "paper_research", "p": {"paper_research": 0.4352, "chat": 0.3009, "tool": 0.1312, "coding": 0.1327}, "s": 0.241}
+{"h": "4c1a54557760", "src": "합성-지킴", "q": "DB에 무슨 논문 있어?", "ref": "not_rag", "choice": "paper_research", "p": {"paper_research": 0.3841, "chat": 0.2411, "tool": 0.235, "coding": 0.1398}, "s": 0.259}
+{"h": "894a42488660", "src": "합성-지킴", "q": "저장된 논문 보여줘", "ref": "not_rag", "choice": "paper_research", "p": {"paper_research": 0.3723, "chat": 0.2765, "tool": 0.2066, "coding": 0.1446}, "s": 0.235}
+{"h": "735e6793374e", "src": "합성-지킴", "q": "내일 부산 날씨 어때?", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2268, "chat": 0.3979, "tool": 0.2386, "coding": 0.1367}, "s": 0.256}
+{"h": "1636873e4fdc", "src": "합성-지킴", "q": "오늘 IT 뉴스 알려줘", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.1848, "chat": 0.4196, "tool": 0.2465, "coding": 0.1491}, "s": 0.257}
+{"h": "2b976285612c", "src": "합성-지킴", "q": "웹 검색해서 엔비디아 주가 알려줘", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.3254, "chat": 0.3478, "tool": 0.1991, "coding": 0.1277}, "s": 0.276}
+{"h": "48934d4d93b4", "src": "합성-지킴", "q": "인터넷에서 맛집 찾아줘", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.1892, "chat": 0.4019, "tool": 0.248, "coding": 0.1609}, "s": 0.257}
+{"h": "55251ccd2f07", "src": "합성-지킴", "q": "최신 뉴스 요약해줘", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2403, "chat": 0.3878, "tool": 0.2297, "coding": 0.1422}, "s": 0.257}
+{"h": "e76cd9eaf870", "src": "합성-지킴", "q": "오늘 뉴스 알려줘", "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.1779, "chat": 0.4308, "tool": 0.252, "coding": 0.1393}, "s": 0.227}
+{"h": "8da3d60d6d58", "src": "합성-RAG", "q": "LLM 양자화 최신 논문 두 편 알려줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3926, "chat": 0.2555, "tool": 0.2069, "coding": 0.145}, "s": 0.281}
+{"h": "771aa65d71b9", "src": "합성-RAG", "q": "음성 인식 논문 중 재밌는 거 알려줘", "ref": "rag", "choice": "chat", "p": {"paper_research": 0.2778, "chat": 0.3871, "tool": 0.1941, "coding": 0.1411}, "s": 0.291}
+{"h": "9f0df3b91139", "src": "합성-RAG", "q": "그래프 신경망 괜찮은 논문 있으면 알려줘", "ref": "rag", "choice": "chat", "p": {"paper_research": 0.3, "chat": 0.3821, "tool": 0.1857, "coding": 0.1322}, "s": 0.239}
+{"h": "ae0d0c243f10", "src": "합성-RAG", "q": "강화학습 보상 설계 연구 중 볼만한 논문 하나 알려줘", "ref": "rag", "choice": "chat", "p": {"paper_research": 0.3512, "chat": 0.3624, "tool": 0.1502, "coding": 0.1361}, "s": 0.24}
+{"h": "74b81d4bf254", "src": "합성-RAG", "q": "기상 예측 딥러닝 논문 알려줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3349, "chat": 0.3338, "tool": 0.2042, "coding": 0.1271}, "s": 0.231}
+{"h": "ff961e4e3395", "src": "합성-RAG", "q": "날씨 데이터로 전력 수요를 예측하는 연구 알려줘", "ref": "rag", "choice": "tool", "p": {"paper_research": 0.2829, "chat": 0.2693, "tool": 0.3373, "coding": 0.1105}, "s": 0.274}
+{"h": "5140fa392f0f", "src": "합성-RAG", "q": "뉴스 기사를 요약하는 LLM 연구 알려줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3477, "chat": 0.337, "tool": 0.1938, "coding": 0.1214}, "s": 0.261}
+{"h": "d33d0dd0868c", "src": "합성-RAG", "q": "웹 검색을 쓰는 에이전트 연구 알려줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.382, "chat": 0.2726, "tool": 0.2273, "coding": 0.1182}, "s": 0.259}
+{"h": "5524a2ed7dd6", "src": "real40", "q": "추론 시점 스케일링에서 샘플링 폭이랑 깊이를 같이 조절하는 DDC라는 방법 있던데, 토큰을 얼마나 줄였대?", "ref": "rag", "choice": "tool", "p": {"paper_research": 0.2594, "chat": 0.1586, "tool": 0.3974, "coding": 0.1845}, "s": 0.341}
+{"h": "90a4f29fabfc", "src": "real40", "q": "지식 그래프로 이종 멀티로봇 계획 세우는 LLM 방법이 MAT-THOR에서 성능 몇 % 올렸어?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3761, "chat": 0.2087, "tool": 0.2644, "coding": 0.1507}, "s": 0.271}
+{"h": "91af3a4635dd", "src": "real40", "q": "건강 질문으로 LLM 문화 역량을 평가한 벤치마크에서 제일 좋은 모델도 문화적으로 적절한 답을 몇 % 정도밖에 못 했어?", "ref": "rag", "choice": "chat", "p": {"paper_research": 0.3196, "chat": 0.3563, "tool": 0.2091, "coding": 0.1151}, "s": 0.293}
+{"h": "38cab466c3ef", "src": "real40", "q": "코드가 깔끔하면 코딩 에이전트가 토큰을 덜 쓴다는 연구 있던데 얼마나 줄었어?", "ref": "rag", "choice": "coding", "p": {"paper_research": 0.3059, "chat": 0.2208, "tool": 0.1629, "coding": 0.3104}, "s": 0.265}
+{"h": "f4777a680a8d", "src": "real40", "q": "MXNorm이 RMSNorm보다 커널 속도가 최대 몇 배 빨라?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3501, "chat": 0.1829, "tool": 0.315, "coding": 0.152}, "s": 0.297}
+{"h": "e86f9e4226e2", "src": "real40", "q": "의미는 같은데 표현만 바꾼 입력에 LLM 에이전트가 얼마나 일관되게 답하는지 본 연구에서 제일 안정적인 모델이랑 그 비율 알려줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4025, "chat": 0.2311, "tool": 0.1997, "coding": 0.1668}, "s": 0.338}
+{"h": "4e28e15a82ff", "src": "real40", "q": "PBI-Attack 탈옥 공격이 오픈소스 LVLM에서 평균 공격 성공률 몇 %였어?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3343, "chat": 0.2717, "tool": 0.2374, "coding": 0.1567}, "s": 0.26}
+{"h": "629585687114", "src": "real40", "q": "VLM에 이미지 올릴 때 프롬프트 보고 덜 중요한 영역을 뭉개서 압축하는 방법이 비트레이트를 얼마나 줄였어?", "ref": "rag", "choice": "tool", "p": {"paper_research": 0.214, "chat": 0.1627, "tool": 0.3225, "coding": 0.3008}, "s": 0.283}
+{"h": "0d52371f158d", "src": "real40", "q": "우주 로봇팔로 회전하는 물체 잡는 궤적 최적화에서 트랜스포머 warm-start가 반복 횟수를 몇 % 줄였어?", "ref": "rag", "choice": "tool", "p": {"paper_research": 0.322, "chat": 0.1643, "tool": 0.3768, "coding": 0.1369}, "s": 0.277}
+{"h": "e05f854bf4d5", "src": "real40", "q": "LightKV는 비전 토큰을 몇 %만 쓰고 연산을 얼마나 줄였어?", "ref": "rag", "choice": "tool", "p": {"paper_research": 0.2701, "chat": 0.1653, "tool": 0.2995, "coding": 0.2651}, "s": 0.301}
+{"h": "302804ba7046", "src": "real40", "q": "AI가 사람 스킬 수요를 늘리는지 채용공고로 분석한 연구에서, 회복탄력성 같은 스킬 있는 데이터 과학자는 연봉을 몇 % 더 받는대?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3829, "chat": 0.2138, "tool": 0.2533, "coding": 0.15}, "s": 0.347}
+{"h": "e54639cad530", "src": "real40", "q": "성공한 궤적만으로 학습해서 에이전트 실패 단계를 찾는 OAT가 프롬프팅 기반 방법보다 얼마나 빨라?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4082, "chat": 0.1595, "tool": 0.1678, "coding": 0.2645}, "s": 0.283}
+{"h": "687d200585a8", "src": "real40", "q": "재료과학 분야 LLM 환각을 여러 단계로 검증해서 잡는 방법이 환각을 몇 % 줄였어?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4311, "chat": 0.1742, "tool": 0.2645, "coding": 0.1303}, "s": 0.282}
+{"h": "39b5bddbf63b", "src": "real40", "q": "재귀적 하네스 자기개선(RHI)이 추론 비용을 최대 몇 % 줄였어?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3879, "chat": 0.207, "tool": 0.2613, "coding": 0.1438}, "s": 0.26}
+{"h": "c91bd0ff7e88", "src": "real40", "q": "개인 PC 파일 관리 에이전트 벤치마크 HippoCamp에서 최고 상용 모델의 사용자 프로파일링 정확도가 몇 %야?", "ref": "rag", "choice": "tool", "p": {"paper_research": 0.2628, "chat": 0.1508, "tool": 0.3399, "coding": 0.2465}, "s": 0.278}
+{"h": "498601df435a", "src": "real40", "q": "speculative decoding에서 JetSpec이랑 DSpark는 드래프트 만드는 방식이 어떻게 달라?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.2951, "chat": 0.2213, "tool": 0.268, "coding": 0.2155}, "s": 0.252}
+{"h": "f950798b9365", "src": "real40", "q": "KV 캐시 줄이는 방법 중에 LightKV랑 CommVQ 차이가 뭐야?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3645, "chat": 0.1602, "tool": 0.2851, "coding": 0.1903}, "s": 0.282}
+{"h": "107502fa5cb7", "src": "real40", "q": "LLM 탈옥에서 논리식으로 바꿔서 뚫는 방법이랑, 텍스트 탈옥을 오디오로 옮기는 연구는 뭐가 다른 거야?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4151, "chat": 0.2617, "tool": 0.1696, "coding": 0.1536}, "s": 0.281}
+{"h": "719561e1e4d3", "src": "real40", "q": "HyperGraphRAG랑 Plasma GraphRAG는 그래프 RAG를 각각 어떻게 쓰는 거야? 비교해줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.2972, "chat": 0.2274, "tool": 0.2963, "coding": 0.1791}, "s": 0.27}
+{"h": "07ef8772fa3d", "src": "real40", "q": "환각 탐지에서 Semantic Entropy Probes랑 ChainPoll 비교해줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3322, "chat": 0.2504, "tool": 0.2881, "coding": 0.1294}, "s": 0.28}
+{"h": "aaa8251955e4", "src": "real40", "q": "프로세스 보상 모델 EDU-PRM이랑 DPRM은 각각 뭘 해결하려는 거고 어떻게 달라?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4099, "chat": 0.1458, "tool": 0.2645, "coding": 0.1799}, "s": 0.258}
+{"h": "5a03a853251b", "src": "real40", "q": "Text-to-SQL에서 Reasoning-SQL이랑 Solid-SQL 접근 방식 차이 알려줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3295, "chat": 0.2443, "tool": 0.2932, "coding": 0.133}, "s": 0.248}
+{"h": "f54100172fe6", "src": "real40", "q": "RAG에 프롬프트 인젝션 공격하는 DeRAG랑, 브라우저 에이전트를 인젝션에서 막는 Cognitive Firewall 비교해줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3798, "chat": 0.2206, "tool": 0.2133, "coding": 0.1863}, "s": 0.269}
+{"h": "737cdb90f0d9", "src": "real40", "q": "MoE-Mamba랑 BlackMamba는 둘 다 Mamba에 MoE 붙인 건데 뭐가 달라?", "ref": "rag", "choice": "chat", "p": {"paper_research": 0.2801, "chat": 0.3228, "tool": 0.2185, "coding": 0.1786}, "s": 0.253}
+{"h": "e05e1a92947a", "src": "real40", "q": "RAG 리랭킹에서 DynamicRAG랑 DeepEra는 어떻게 달라?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3372, "chat": 0.2369, "tool": 0.2883, "coding": 0.1376}, "s": 0.293}
+{"h": "6c5ac7699451", "src": "real40", "q": "멀티에이전트 토론을 번역 평가에 쓴 M-MAD랑 주장 검증에 쓴 PROClaim 비교해줘", "ref": "rag", "choice": "chat", "p": {"paper_research": 0.3291, "chat": 0.3623, "tool": 0.153, "coding": 0.1556}, "s": 0.32}
+{"h": "b068b939386f", "src": "real40", "q": "요즘 speculative decoding 연구 동향 정리해줘", "ref": "rag", "choice": "chat", "p": {"paper_research": 0.2944, "chat": 0.3385, "tool": 0.1848, "coding": 0.1822}, "s": 0.276}
+{"h": "b85deb95efe6", "src": "real40", "q": "KV 캐시 압축 관련 논문 5개 찾아서 설명해줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3533, "chat": 0.3354, "tool": 0.1959, "coding": 0.1154}, "s": 0.238}
+{"h": "879ce78dcbd1", "src": "real40", "q": "LLM 탈옥 공격 논문들 정리해줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4247, "chat": 0.2314, "tool": 0.1982, "coding": 0.1457}, "s": 0.234}
+{"h": "fd23d23dae5d", "src": "real40", "q": "Text-to-SQL 최근 연구들 어떤 방향으로 가고 있어?", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3564, "chat": 0.3169, "tool": 0.1913, "coding": 0.1355}, "s": 0.283}
+{"h": "28d8bff3c3e6", "src": "real40", "q": "프롬프트 인젝션 공격이랑 방어 연구 정리해줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3541, "chat": 0.3147, "tool": 0.1783, "coding": 0.1529}, "s": 0.245}
+{"h": "e2903bb8cdeb", "src": "real40", "q": "LLM 보상 모델(reward model) 관련 논문들 알려줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3977, "chat": 0.2833, "tool": 0.1687, "coding": 0.1502}, "s": 0.248}
+{"h": "878ee0ea50eb", "src": "real40", "q": "LLM 환각 탐지 방법 논문들 비교해서 정리해줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4005, "chat": 0.2658, "tool": 0.2036, "coding": 0.1301}, "s": 0.26}
+{"h": "ab3308edf347", "src": "real40", "q": "RAG에서 리랭킹 개선하는 연구들 정리해줘", "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3777, "chat": 0.2804, "tool": 0.198, "coding": 0.1438}, "s": 0.224}
+{"h": "509df025a816", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4415, "chat": 0.2337, "tool": 0.1975, "coding": 0.1273}, "s": 0.278}
+{"h": "264be0a59594", "src": "실사용", "q": null, "ref": "rag", "choice": "chat", "p": {"paper_research": 0.3147, "chat": 0.4091, "tool": 0.1294, "coding": 0.1468}, "s": 0.278}
+{"h": "ce84b6c21ba3", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3329, "chat": 0.3307, "tool": 0.173, "coding": 0.1634}, "s": 0.294}
+{"h": "a3d78d560dcd", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.4111, "chat": 0.2529, "tool": 0.2181, "coding": 0.1179}, "s": 0.303}
+{"h": "eb67bbc317f7", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2467, "chat": 0.3822, "tool": 0.2354, "coding": 0.1357}, "s": 0.274}
+{"h": "ab648e8ab1d1", "src": "실사용", "q": null, "ref": "rag", "choice": "chat", "p": {"paper_research": 0.1561, "chat": 0.5551, "tool": 0.1628, "coding": 0.126}, "s": 0.277}
+{"h": "8aaf89a6742b", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3618, "chat": 0.3086, "tool": 0.1877, "coding": 0.1419}, "s": 0.274}
+{"h": "bc61871afeda", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.344, "chat": 0.3364, "tool": 0.1919, "coding": 0.1277}, "s": 0.261}
+{"h": "c649b25e04a3", "src": "실사용", "q": null, "ref": "rag", "choice": "tool", "p": {"paper_research": 0.3166, "chat": 0.2319, "tool": 0.3195, "coding": 0.1319}, "s": 0.331}
+{"h": "f1401d2f76ea", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3379, "chat": 0.3108, "tool": 0.216, "coding": 0.1353}, "s": 0.266}
+{"h": "26ba241c1da5", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4963, "chat": 0.1945, "tool": 0.1505, "coding": 0.1587}, "s": 0.299}
+{"h": "ae298ae6cdba", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.3866, "chat": 0.3008, "tool": 0.1803, "coding": 0.1322}, "s": 0.274}
+{"h": "63ebb7588d37", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4215, "chat": 0.1809, "tool": 0.2548, "coding": 0.1428}, "s": 0.293}
+{"h": "7975789c93bd", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4358, "chat": 0.1991, "tool": 0.1983, "coding": 0.1668}, "s": 0.391}
+{"h": "8fa336b6db07", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4706, "chat": 0.1108, "tool": 0.2079, "coding": 0.2107}, "s": 0.462}
+{"h": "37d0921a9b1c", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4556, "chat": 0.1138, "tool": 0.3158, "coding": 0.1148}, "s": 0.263}
+{"h": "49b4405069f4", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.4011, "chat": 0.3065, "tool": 0.1882, "coding": 0.1042}, "s": 0.268}
+{"h": "2991766cf4b9", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.4052, "chat": 0.3104, "tool": 0.1736, "coding": 0.1108}, "s": 0.257}
+{"h": "cf7ee6cacabd", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.4486, "chat": 0.2725, "tool": 0.1437, "coding": 0.1351}, "s": 0.268}
+{"h": "6b6009813d18", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.3606, "chat": 0.1662, "tool": 0.3502, "coding": 0.123}, "s": 0.284}
+{"h": "afdafd845f3c", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.396, "chat": 0.2459, "tool": 0.2106, "coding": 0.1476}, "s": 0.164}
+{"h": "fe742d3064dd", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.4097, "chat": 0.2153, "tool": 0.2611, "coding": 0.1138}, "s": 0.288}
+{"h": "e46699967c07", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4291, "chat": 0.2268, "tool": 0.213, "coding": 0.1311}, "s": 0.282}
+{"h": "23a01be0d2f2", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3764, "chat": 0.3168, "tool": 0.1768, "coding": 0.13}, "s": 0.256}
+{"h": "729dd9323f26", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4314, "chat": 0.2342, "tool": 0.1875, "coding": 0.1469}, "s": 0.268}
+{"h": "cd8d68743bf3", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.4933, "chat": 0.134, "tool": 0.2329, "coding": 0.1398}, "s": 0.272}
+{"h": "bed3ca8a5708", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.3031, "chat": 0.2016, "tool": 0.2572, "coding": 0.238}, "s": 0.283}
+{"h": "cdfd64c20403", "src": "실사용", "q": null, "ref": "rag", "choice": "chat", "p": {"paper_research": 0.2015, "chat": 0.4881, "tool": 0.1728, "coding": 0.1376}, "s": 0.26}
+{"h": "e05d861074e5", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.5037, "chat": 0.1235, "tool": 0.2035, "coding": 0.1693}, "s": 0.465}
+{"h": "c026846b1eba", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2696, "chat": 0.3427, "tool": 0.2405, "coding": 0.1472}, "s": 0.248}
+{"h": "24fdb5d29dd1", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.323, "chat": 0.3032, "tool": 0.2264, "coding": 0.1473}, "s": 0.278}
+{"h": "7a66824775f4", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.3851, "chat": 0.2946, "tool": 0.2, "coding": 0.1203}, "s": 0.243}
+{"h": "60d3ddf05d9f", "src": "실사용", "q": null, "ref": null, "choice": "chat", "p": {"paper_research": 0.3131, "chat": 0.3849, "tool": 0.1476, "coding": 0.1544}, "s": 0.307}
+{"h": "30c82d7cec4b", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.1881, "chat": 0.4664, "tool": 0.2226, "coding": 0.1229}, "s": 0.273}
+{"h": "d6e0e42ad0f7", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3866, "chat": 0.3017, "tool": 0.164, "coding": 0.1478}, "s": 0.273}
+{"h": "7c7edc4f8a94", "src": "실사용", "q": null, "ref": "rag", "choice": "chat", "p": {"paper_research": 0.1945, "chat": 0.4816, "tool": 0.1789, "coding": 0.145}, "s": 0.265}
+{"h": "96097fde11c6", "src": "실사용", "q": null, "ref": "rag", "choice": "chat", "p": {"paper_research": 0.2033, "chat": 0.4603, "tool": 0.1852, "coding": 0.1511}, "s": 0.258}
+{"h": "ac03971cf649", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.3624, "chat": 0.2406, "tool": 0.2722, "coding": 0.1248}, "s": 0.272}
+{"h": "ffdf8782f12c", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2424, "chat": 0.3997, "tool": 0.2091, "coding": 0.1489}, "s": 0.233}
+{"h": "d42e25d7eb2b", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2172, "chat": 0.4441, "tool": 0.2299, "coding": 0.1087}, "s": 0.239}
+{"h": "15dbf7fdd846", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2038, "chat": 0.4945, "tool": 0.1702, "coding": 0.1315}, "s": 0.253}
+{"h": "ecd95dd709b3", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.334, "chat": 0.3044, "tool": 0.2363, "coding": 0.1254}, "s": 0.288}
+{"h": "2ba50664148a", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3481, "chat": 0.3419, "tool": 0.1692, "coding": 0.1408}, "s": 0.25}
+{"h": "9af56eacb235", "src": "실사용", "q": null, "ref": "rag", "choice": "chat", "p": {"paper_research": 0.3253, "chat": 0.3771, "tool": 0.1584, "coding": 0.1392}, "s": 0.277}
+{"h": "7c60c9baa56b", "src": "실사용", "q": null, "ref": "rag", "choice": "chat", "p": {"paper_research": 0.2891, "chat": 0.3972, "tool": 0.1704, "coding": 0.1433}, "s": 0.223}
+{"h": "04c297db15b4", "src": "실사용", "q": null, "ref": "rag", "choice": "chat", "p": {"paper_research": 0.3562, "chat": 0.3594, "tool": 0.1683, "coding": 0.1161}, "s": 0.272}
+{"h": "fc9fb4d339bc", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.6045, "chat": 0.1297, "tool": 0.1436, "coding": 0.1221}, "s": 0.406}
+{"h": "adbd8c1b2ec9", "src": "실사용", "q": null, "ref": "rag", "choice": "tool", "p": {"paper_research": 0.3007, "chat": 0.2268, "tool": 0.3575, "coding": 0.1149}, "s": 0.341}
+{"h": "a78469c4a534", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3625, "chat": 0.2088, "tool": 0.301, "coding": 0.1277}, "s": 0.306}
+{"h": "3db0bce4755e", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.3965, "chat": 0.3081, "tool": 0.1591, "coding": 0.1363}, "s": 0.309}
+{"h": "d62edfaf1989", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.246, "chat": 0.351, "tool": 0.2527, "coding": 0.1503}, "s": 0.219}
+{"h": "a90a2daa7a84", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2557, "chat": 0.3468, "tool": 0.2511, "coding": 0.1463}, "s": 0.253}
+{"h": "c2d125c3e72d", "src": "실사용", "q": null, "ref": "rag", "choice": "coding", "p": {"paper_research": 0.2797, "chat": 0.2479, "tool": 0.1783, "coding": 0.294}, "s": 0.39}
+{"h": "30209043a541", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2276, "chat": 0.3698, "tool": 0.2545, "coding": 0.1482}, "s": 0.259}
+{"h": "4fd3315dab00", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.4082, "chat": 0.1595, "tool": 0.1678, "coding": 0.2645}, "s": 0.333}
+{"h": "b4fd1919d824", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2711, "chat": 0.3356, "tool": 0.2436, "coding": 0.1497}, "s": 0.259}
+{"h": "1b0422e50561", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.3371, "chat": 0.3037, "tool": 0.2273, "coding": 0.132}, "s": 0.256}
+{"h": "2160829d6755", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.4128, "chat": 0.1773, "tool": 0.1741, "coding": 0.2358}, "s": 0.27}
+{"h": "a5050dccc05a", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.4756, "chat": 0.1442, "tool": 0.1544, "coding": 0.2259}, "s": 0.252}
+{"h": "86621f2a81d8", "src": "실사용", "q": null, "ref": null, "choice": "coding", "p": {"paper_research": 0.3394, "chat": 0.1074, "tool": 0.1975, "coding": 0.3558}, "s": 0.393}
+{"h": "6d5448f5cc43", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.3363, "chat": 0.1467, "tool": 0.3351, "coding": 0.1819}, "s": 0.604}
+{"h": "81ad10545617", "src": "실사용", "q": null, "ref": null, "choice": "chat", "p": {"paper_research": 0.2597, "chat": 0.3525, "tool": 0.2335, "coding": 0.1543}, "s": 0.181}
+{"h": "cdc59a7b7847", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2297, "chat": 0.4272, "tool": 0.2077, "coding": 0.1354}, "s": 0.188}
+{"h": "0945a3972e41", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.3596, "chat": 0.1719, "tool": 0.3392, "coding": 0.1293}, "s": 0.344}
+{"h": "3493ffb539f4", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2168, "chat": 0.4073, "tool": 0.2425, "coding": 0.1335}, "s": 0.259}
+{"h": "58328c414cba", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2042, "chat": 0.4088, "tool": 0.2518, "coding": 0.1353}, "s": 0.27}
+{"h": "7af2ce68771c", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2144, "chat": 0.3848, "tool": 0.2825, "coding": 0.1183}, "s": 0.242}
+{"h": "10013419e3ae", "src": "실사용", "q": null, "ref": "not_rag", "choice": "chat", "p": {"paper_research": 0.2267, "chat": 0.3644, "tool": 0.2554, "coding": 0.1535}, "s": 0.25}
+{"h": "261ba189c012", "src": "실사용", "q": null, "ref": null, "choice": "paper_research", "p": {"paper_research": 0.3692, "chat": 0.2434, "tool": 0.2604, "coding": 0.127}, "s": 0.302}
+{"h": "46dcdd50209d", "src": "실사용", "q": null, "ref": "rag", "choice": "paper_research", "p": {"paper_research": 0.6208, "chat": 0.1056, "tool": 0.1417, "coding": 0.1319}, "s": 1.181}
+{"h": "b7b788c7f44d", "src": "실사용", "q": null, "ref": "rag", "choice": "chat", "p": {"paper_research": 0.2825, "chat": 0.431, "tool": 0.1575, "coding": 0.129}, "s": 0.146}
