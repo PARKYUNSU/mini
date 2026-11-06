@@ -1,0 +1,55 @@
+{
+ "rows": 249,
+ "per_file": {
+  "weekly_20261101": 40,
+  "pl0_dev": 30,
+  "qt0_s2": 34,
+  "ogb0_s2": 20,
+  "ans_hu": 40,
+  "sg0_new": 13,
+  "sg0_old": 23,
+  "nk1": 15,
+  "us_1027": 34
+ },
+ "dropped": {
+  "held-out": 10,
+  "답 또는 컨텍스트 없음": 1
+ },
+ "counts": {
+  "단위 모름": 1168,
+  "일치": 278,
+  "단위 없음": 31,
+  "숫자 없음": 37,
+  "후보": 11
+ },
+ "with_pair": 128,
+ "with_flag": 9,
+ "cand": 10,
+ "unknown_total": 24,
+ "sample": [
+  "us_1027|U5-2|32|times",
+  "us_1027|U3-5|5|doc",
+  "qt0_s2|Q_D02|56.7|percent",
+  "ans_hu|HU39|87|percent",
+  "us_1027|U5-2|64|times",
+  "qt0_s2|Q_A05|10|doc",
+  "ans_hu|HU36|9|billion",
+  "weekly_20261101|C09|35|times",
+  "pl0_dev|P29|1024|token",
+  "weekly_20261101|T02|32|times",
+  "weekly_20261101|R02|3|doc",
+  "ogb0_s2|OB_069|2|man",
+  "qt0_s2|H_F04|2|doc",
+  "us_1027|U5-4|8.3|times",
+  "weekly_20261101|T02|64|times",
+  "weekly_20261101|N03|60|person",
+  "us_1027|U5-4|2.1|times",
+  "qt0_s2|Q_C07|28.6|times",
+  "qt0_s2|Q_D02|6|times",
+  "qt0_s2|Q_A05|1|doc",
+  "weekly_20261101|R02|5|doc",
+  "qt0_s2|Q_C07|3,072|dim",
+  "qt0_s2|Q_A04|2|doc",
+  "us_1027|U3-5|3|doc"
+ ]
+}

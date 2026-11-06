@@ -2,6 +2,7 @@
 
   .venv/bin/python docs/experiments/unit_check_1106/run.py scan    # 후보 · 표본 → flagged.md · scan.json
   .venv/bin/python docs/experiments/unit_check_1106/run.py score   # labels.tsv 집계
+  .venv/bin/python docs/experiments/unit_check_1106/run.py scan2   # 본 뒤 고친 규칙(README §7, 힌트 전용) → flagged2.md · scan2.json
 """
 import collections, json, os, random, re, sys
 
@@ -205,5 +206,50 @@ def score():
     print(f"단위 없음 표본 {len(sample)}: T {s['T']} · F {s['F']} · ? {s['?']}")
 
 
+def use_v2():
+    """본 뒤 고침: 한글 조사 앞 라틴 단위(%p를 · 12ms로), LaTeX 곱셈($2.35\\times$ · 64 $\\times$), 대문자 X, 특수 하이픈(GPT‑2)."""
+    global NUM, UNIT_RE, pairs, clean
+    NUM = re.compile(r"(?<![A-Za-z0-9_.\-\u2010\u2011])(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)")
+    table = []
+    for n, p in UNITS:
+        p = p.replace(r"\b", r"(?![A-Za-z0-9])")
+        if n == "times":
+            p = r"\$?\s*\\times|_?×_?|X(?![A-Za-z0-9])|" + p
+        table.append((n, re.compile(p)))
+    UNIT_RE = table
+    old_clean = clean
+
+    def clean2(text):
+        return "\n".join(l for l in old_clean(text).split("\n") if "요청한" not in l)
+    clean = clean2
+
+    def pairs2(text):
+        out = []
+        for m in NUM.finditer(text):
+            rest = text[m.end():m.end() + 24]
+            if rest.startswith("  "):
+                out.append((to_num(m.group(1)), m.group(1), None, m.start()))
+                continue
+            rest = rest.lstrip(" ")
+            unit = next((n for n, p in UNIT_RE if p.match(rest)), None)
+            out.append((to_num(m.group(1)), m.group(1), unit, m.start()))
+        return out
+    pairs = pairs2
+
+
+def scan2():
+    global D
+    use_v2()
+    t = lambda x: [(p[1], p[2]) for p in pairs(x)]
+    assert t("2.0%p를 달성") == [("2.0", "pp")] and t("12ms로") == [("12", "ms")] and t("$2.35\\times$ fewer") == [("2.35", "times")]
+    assert t("64 $\\times$ compression") == [("64", "times")] and t("2.1X to 8.3X") == [("2.1", "times"), ("8.3", "times")] and t("GPT\u20112만") == []
+    os.makedirs(D + "v2", exist_ok=True)
+    D += "v2/"
+    # scan() 앞의 자체 시험은 v1 규칙용이라 건너뛴다
+    global _selftest
+    _selftest = lambda: None
+    scan()
+
+
 if __name__ == "__main__":
-    {"scan": scan, "score": score}[sys.argv[1]]()
+    {"scan": scan, "score": score, "scan2": scan2}[sys.argv[1]]()

@@ -1,0 +1,35 @@
+# 키	라벨(T F ?)	이유 — README §4. flagged.md 를 읽고 달았다.
+weekly_20261101|N14|2.0|percent	F	답 2.0%p = 원문 2.0 percentage points. 규칙이 %p 뒤 조사를 못 읽음
+weekly_20261101|C09|2.35|times	F	원문 LaTeX 곱셈($N\times$)을 규칙이 달러로 읽음. 답의 배수는 맞음
+weekly_20261101|T01|1.62|times	F	원문 LaTeX 곱셈($N\times$)을 규칙이 달러로 읽음. 답의 배수는 맞음
+weekly_20261101|R01|3.66|times	F	원문 LaTeX 곱셈($N\times$)을 규칙이 달러로 읽음. 답의 배수는 맞음
+pl0_dev|P08|1.62|times	F	원문 LaTeX 곱셈($N\times$)을 규칙이 달러로 읽음. 답의 배수는 맞음
+qt0_s2|H_F04|5|doc	F	답의 '요청한 5편' 안내 문구
+qt0_s2|Q_C07|60|times	F	원문 LaTeX 곱셈($N\times$)을 규칙이 달러로 읽음. 답의 배수는 맞음
+ans_hu|HU27|59|percent	F	답 59%p = 원문 59 percentage points. 규칙이 %p 뒤 조사를 못 읽음
+ans_hu|HU27|0.38|pp	F	원문 absolute 0.38% increase = 0.38%p 로 맞게 옮김
+ans_hu|HU28|21.9|times	F	원문 LaTeX 곱셈($N\times$)을 규칙이 달러로 읽음. 답의 배수는 맞음
+us_1027|U5-2|32|times	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+us_1027|U3-5|5|doc	F	답의 '요청한 N편' 안내 문구
+qt0_s2|Q_D02|56.7|percent	?	원문 'by 34.9 and 56.7' 에 단위가 없어 가릴 수 없음
+ans_hu|HU39|87|percent	F	단위는 맞음. 원문 87 _._ 5% 의 깨진 소수점으로 숫자가 87.5→87 (§7 다른 발견)
+us_1027|U5-2|64|times	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+qt0_s2|Q_A05|10|doc	F	답의 '요청한 N편' 안내 문구
+ans_hu|HU36|9|billion	F	질문의 '9B 모델' 이고 원문 9 는 그림 번호
+weekly_20261101|C09|35|times	F	단위는 맞음. 원문 2 _._ 35 의 깨진 소수점으로 '2 × 35배' (§7 다른 발견)
+pl0_dev|P29|1024|token	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+weekly_20261101|T02|32|times	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+weekly_20261101|R02|3|doc	F	답의 '요청한 N편' 안내 문구
+ogb0_s2|OB_069|2|man	F	GPT‑2 뒤 '만' 을 규모로 읽은 규칙 잡음
+qt0_s2|H_F04|2|doc	F	답의 '요청한 N편' 안내 문구
+us_1027|U5-4|8.3|times	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+weekly_20261101|T02|64|times	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+weekly_20261101|N03|60|person	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+us_1027|U5-4|2.1|times	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+qt0_s2|Q_C07|28.6|times	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+qt0_s2|Q_D02|6|times	F	원문 3x-6x 범위
+qt0_s2|Q_A05|1|doc	F	답의 '요청한 N편' 안내 문구
+weekly_20261101|R02|5|doc	F	답의 '요청한 N편' 안내 문구
+qt0_s2|Q_C07|3,072|dim	F	원문과 같은 사실. 원문 쪽 표기를 규칙이 못 읽음(×, X, or, 하이픈 등)
+qt0_s2|Q_A04|2|doc	F	답의 '요청한 N편' 안내 문구
+us_1027|U3-5|3|doc	F	답의 '요청한 N편' 안내 문구
