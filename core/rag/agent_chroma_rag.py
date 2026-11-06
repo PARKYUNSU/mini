@@ -2146,6 +2146,16 @@ def _front_named(
     return [docs[i] for i in order], [metas[i] for i in order], None if dists is None else [dists[i] for i in order]
 
 
+_PDF_DECIMAL = re.compile(r"(?<=\d) *_\._ *(?=\d)")
+
+
+def _fix_pdf_decimal(text: str) -> str:
+    """PDF 추출이 깬 소수점 ``87 _._ 5%`` 를 ``87.5%`` 로 (RAG_FIX_PDF_DECIMAL, docs/experiments/pdf_decimal_1107)."""
+    if os.getenv("RAG_FIX_PDF_DECIMAL", "0").strip() != "1":
+        return text
+    return _PDF_DECIMAL.sub(".", text)
+
+
 def _format_chroma_hits(
     docs: list[str],
     metas: list[dict[str, str]],
@@ -2174,7 +2184,7 @@ def _format_chroma_hits(
         pid = meta.get("paper_id", "")
         title = meta.get("title", "")
         header = f"[{pid}] {title}\n" if (pid or title) else ""
-        body = doc[:1200] if doc else ""
+        body = _fix_pdf_decimal(doc)[:1200] if doc else ""
         if _context_abstract_enabled():
             body = _with_abstract(body, meta.get("abstract") or "")
         prefix = f"{pub}\n" if pub else ""
