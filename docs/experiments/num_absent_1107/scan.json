@@ -1,0 +1,69 @@
+{
+"rows": 249,
+"counts": {
+"숫자": 458,
+"있음": 437,
+"B": 8,
+"질문에 있음": 13
+},
+"sect": {
+"본론|B": 5,
+"결론|B": 3
+},
+"unique": 8,
+"read": [
+"weekly_20261101|N03|120",
+"weekly_20261101|C09|35",
+"pl0_dev|P26|50",
+"pl0_dev|P26|70",
+"pl0_dev|P28|0.7",
+"ans_hu|HU39|87",
+"nk1|H_H29|27",
+"nk1|H_H29|26"
+],
+"answers_A": 0,
+"answers_B": 6,
+"no_question": 0,
+"all": {
+"weekly_20261101|N03|120": {
+"kind": "B",
+"sect": "본론",
+"numbered": true
+},
+"weekly_20261101|C09|35": {
+"kind": "B",
+"sect": "본론",
+"numbered": true
+},
+"pl0_dev|P26|50": {
+"kind": "B",
+"sect": "결론",
+"numbered": false
+},
+"pl0_dev|P26|70": {
+"kind": "B",
+"sect": "결론",
+"numbered": false
+},
+"pl0_dev|P28|0.7": {
+"kind": "B",
+"sect": "결론",
+"numbered": false
+},
+"ans_hu|HU39|87": {
+"kind": "B",
+"sect": "본론",
+"numbered": true
+},
+"nk1|H_H29|27": {
+"kind": "B",
+"sect": "본론",
+"numbered": true
+},
+"nk1|H_H29|26": {
+"kind": "B",
+"sect": "본론",
+"numbered": true
+}
+}
+}

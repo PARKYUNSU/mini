@@ -165,5 +165,40 @@ def score():
     print("O · X 까닭:", collections.Counter(v[1].split(" ")[0] for v in lab.values()).most_common(12))
 
 
+def sent():
+    """본 뒤 추가(README §7, 힌트 전용): 문장 단위로 인용 블록과 대조해 다른 논문의 숫자를 붙인 자리를 찾는다."""
+    rows, _ = U.load_rows()
+    Q = questions()
+    total, hits = 0, []
+    for r in rows:
+        ctx = r["numbered_context"]
+        by = _blocks(ctx, U.doc_map(r))
+        whole = src_vals(ctx)
+        qv = src_vals(Q.get(r["_file"], {}).get(r["id"]) or "")
+        for sect, body in sections(r["answer"]):
+            for line in body.split("\n"):
+                if len(set(_CITED.findall(line))) < 2 or "요청한" in line:
+                    continue
+                for snt in re.split(r"(?<=[.!?。])\s+", line):
+                    refs = _CITED.findall(snt)
+                    src = "\n".join(by.get(x, "") for x in refs).strip()
+                    if not src:
+                        continue
+                    got = line_tokens(snt)
+                    if not got or not got[0]:
+                        continue
+                    cited = src_vals(src)
+                    for t in got[0]:
+                        v = val(t)
+                        total += 1
+                        if v in qv or v in cited or v not in whole:
+                            continue
+                        other = [k for k, b in by.items() if k not in refs and v in src_vals(b)]
+                        hits.append((r["_file"], r["id"], t, sect, got[1].strip()[:230], other[:2], near(ctx, v)[:1]))
+    print("여러 논문을 인용한 줄의 문장 숫자", total, "· 다른 논문에 있는 숫자", len(hits))
+    for h in hits:
+        print(" ", h)
+
+
 if __name__ == "__main__":
-    {"scan": scan, "score": score}[sys.argv[1]]()
+    {"scan": scan, "score": score, "sent": sent}[sys.argv[1]]()
