@@ -4,6 +4,8 @@
   .venv/bin/python docs/experiments/topic_filter_1104/pool.py packet  # 라벨 없는 풀 문서 + 라벨 있는 대조 문서 섞어 → label_packet_pool.md
   .venv/bin/python docs/experiments/topic_filter_1104/pool.py filter  # 주제 줄마다 거르기 호출(5편 · 3편) → filter_hu.jsonl (이어 하기)
   .venv/bin/python docs/experiments/topic_filter_1104/pool.py score   # 판별 채점
+
+다른 모델: RAG_ANSWER_MODEL=<모델> 을 앞에 붙이면 filter · score 가 filter_hu.<모델>.jsonl 을 쓴다.
 """
 import json, math, os, random, re, statistics, sys, time
 sys.path.insert(0, ".")
@@ -12,6 +14,12 @@ sys.path.insert(0, "docs/experiments/topic_split2_1104")
 D = "docs/experiments/topic_filter_1104/"
 S2 = "docs/experiments/topic_split2_1104/"
 PID = re.compile(r"\[(\d{4}\.\d{4,5})(?:v\d+)?\]\s*([^\n]*)")
+
+
+def model_sfx():
+    """저장된 filter_hu.jsonl 은 yunsur_v13 결과다. 다른 모델은 파일을 따로 써 이어 하기 · 채점이 섞이지 않게 한다 (newmac_1105 §6.2)."""
+    import core.config.agent_config as cfg  # .env
+    return "" if cfg.RAG_ANSWER_MODEL == "yunsur_v13" else "." + re.sub(r"[^A-Za-z0-9._-]+", "_", cfg.RAG_ANSWER_MODEL)
 
 
 def split_lines():
@@ -97,7 +105,7 @@ def filter_all():
     import core.config.agent_config as cfg  # .env
     from core.llm import relevance_filter as RF
     from core.llm.citation_fix import RAG_HIT_SEP
-    out = D + "filter_hu.jsonl"
+    out = D + f"filter_hu{model_sfx()}.jsonl"
     done = {(json.loads(l)["id"], json.loads(l)["k"], json.loads(l)["n"]) for l in open(out, encoding="utf-8")} if os.path.exists(out) else set()
     with open(out, "a", encoding="utf-8") as w:
         for r in rows():
@@ -146,8 +154,10 @@ def score():
     for r in pool_rows:
         by_q.setdefault(r["id"], []).append(r)
     fil = {}
-    if os.path.exists(D + "filter_hu.jsonl"):
-        fil = {(x["id"], x["k"], x["n"]): x for x in map(json.loads, open(D + "filter_hu.jsonl", encoding="utf-8"))}
+    path = D + f"filter_hu{model_sfx()}.jsonl"
+    print("거르기 결과 파일:", path, "· 있음" if os.path.exists(path) else "· 없음")
+    if os.path.exists(path):
+        fil = {(x["id"], x["k"], x["n"]): x for x in map(json.loads, open(path, encoding="utf-8"))}
 
     def topic_docs(r, v):
         ids = [head(b)[0] for b in r["blocks"]]

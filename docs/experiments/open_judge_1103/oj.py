@@ -5,6 +5,7 @@
   .venv/bin/python docs/experiments/open_judge_1103/oj.py extra    # 새로 '없음'이 된 문항 라벨 묶음(어느 꼬리인지 안 보임)
   .venv/bin/python docs/experiments/open_judge_1103/oj.py score
   (뒤에 v2 를 붙이면 v2 꼬리 · oj_dev_v2.jsonl — README §8.2)
+  다른 모델: RAG_ANSWER_MODEL=<모델> 을 앞에 붙이면 oj_dev.<모델>.jsonl 을 쓴다. G0 은 같은 모델 재현 점검이라 그때는 보지 않는다.
 
 판정 입력은 저장 행에서 운영과 같은 글자로 다시 만들고 answer_input sha1 로 확인한다.
 판정 호출은 운영 함수 judge_presence_shared 그대로이고 꼬리(SHARED_TAIL)만 바꾼다.
@@ -54,6 +55,11 @@ OPEN_TAIL_V2 = """
 [질문]
 {question}"""
 TAILS = {"v1": (OPEN_TAIL, ""), "v2": (OPEN_TAIL_V2, "_v2")}
+
+
+def model_sfx():
+    """저장된 oj_dev*.jsonl 은 yunsur_v13 결과다. 다른 모델은 파일을 따로 써 이어 하기 · 채점이 섞이지 않게 한다 (newmac_1105 §6.2)."""
+    return "" if cfg.RAG_ANSWER_MODEL == "yunsur_v13" else "." + re.sub(r"[^A-Za-z0-9._-]+", "_", cfg.RAG_ANSWER_MODEL)
 
 
 def tsv(p):
@@ -112,12 +118,13 @@ def is_none(x):
 def main():
     cmd = sys.argv[1]
     open_tail, sfx = TAILS[sys.argv[2] if len(sys.argv) > 2 else "v1"]
+    msfx = model_sfx()
     items = pool()
     print("문항", len(items), "· 저장 '없음'", sum(is_none(i["stored"]) for i in items), flush=True)
     if cmd == "packet":
         packet([i for i in items if is_none(i["stored"])], D + "label_packet.md")
     elif cmd == "run":
-        out = D + f"oj_dev{sfx}.jsonl"
+        out = D + f"oj_dev{sfx}{msfx}.jsonl"
         done = {json.loads(l)["id"] for l in open(out, encoding="utf-8")} if os.path.exists(out) else set()
         old_tail = pj.SHARED_TAIL
         with open(out, "a", encoding="utf-8") as w:
@@ -137,13 +144,13 @@ def main():
                 w.flush()
                 print(f"[{k}/{len(items)}] {it['id']} 저장 {it['stored']} · 옛 {row['old']} · 새 {row['new']} ({row['old_s']}s+{row['new_s']}s)", flush=True)
     elif cmd == "extra":
-        res = {r["id"]: r for r in map(json.loads, open(D + f"oj_dev{sfx}.jsonl", encoding="utf-8"))}
+        res = {r["id"]: r for r in map(json.loads, open(D + f"oj_dev{sfx}{msfx}.jsonl", encoding="utf-8"))}
         ids = sorted(i for i, r in res.items() if not is_none(r["stored"]) and (is_none(r["old"]) or is_none(r["new"])))
-        packet([i for i in items if i["id"] in ids], D + f"label_packet_extra{sfx}.md")
+        packet([i for i in items if i["id"] in ids], D + f"label_packet_extra{sfx}{msfx}.md")
     elif cmd == "score":
-        res = {r["id"]: r for r in map(json.loads, open(D + f"oj_dev{sfx}.jsonl", encoding="utf-8"))}
+        res = {r["id"]: r for r in map(json.loads, open(D + f"oj_dev{sfx}{msfx}.jsonl", encoding="utf-8"))}
         lab = {}
-        for f in ("labels.tsv", "labels_extra.tsv", f"labels_extra{sfx}.tsv"):
+        for f in ("labels.tsv", "labels_extra.tsv", f"labels_extra{sfx}.tsv", f"labels_extra{sfx}{msfx}.tsv"):
             if os.path.exists(D + f):
                 lab.update({l.split("\t")[0]: l.split("\t")[1] for l in open(D + f, encoding="utf-8") if l.strip() and not l.startswith("#")})
         rs = list(res.values())
