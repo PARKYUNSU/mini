@@ -1,0 +1,30 @@
+NM1	Self-RAG가 뭐야?
+NM2	검색 결과가 틀렸을 때 고쳐 주는 Corrective RAG(CRAG)는 어떻게 동작해?
+NM3	Lost in the Middle 논문에서 긴 컨텍스트 중간에 있는 정보를 모델이 놓친다는 결과 알려줘
+NM4	RAG 평가 벤치마크 RGB가 LLM에서 본 네 가지 능력이 뭐야?
+T07	LLM 환각 탐지 방법 논문들 비교해서 정리해줘
+T01	요즘 speculative decoding 연구 동향 정리해줘
+T05	프롬프트 인젝션 공격이랑 방어 연구 정리해줘
+T04	Text-to-SQL 최근 연구들 어떤 방향으로 가고 있어?
+HU17	토크나이저 연구 찾아줘: (1) 서브워드 분할 방식 비교 (2) 다국어 토크나이저 (3) 토큰 수를 줄이는 문맥 압축
+HU27	LLM 정렬에서 헌법 AI(constitutional AI), 레드팀 데이터셋, 거부 응답 과잉(over-refusal)에 관한 논문 찾아줘
+HU39	1) 문장 임베딩 평가 2) 다국어 임베딩 3) 임베딩 압축 쪽으로 찾아줘
+MU1	RAG에서 검색된 문서 중 관련 없거나 다른 주체(다른 회사)의 문서가 섞였을 때, 생성 모델이 그걸 사실로 쓰는 비율을 측정하고 줄인 연구는? 방해 문서(distractor)를 일부러 섞는 평가 방법도.\n(keywords: context contamination, distractor robustness, irrelevant context, entity confusion)
+C02	KV 캐시 줄이는 방법 중에 LightKV랑 CommVQ 차이가 뭐야?
+C01	speculative decoding에서 JetSpec이랑 DSpark는 드래프트 만드는 방식이 어떻게 달라?
+C07	Text-to-SQL에서 Reasoning-SQL이랑 Solid-SQL 접근 방식 차이 알려줘
+C05	환각 탐지에서 Semantic Entropy Probes랑 ChainPoll 비교해줘
+N08	VLM에 이미지 올릴 때 프롬프트 보고 덜 중요한 영역을 뭉개서 압축하는 방법이 비트레이트를 얼마나 줄였어?
+N04	코드가 깔끔하면 코딩 에이전트가 토큰을 덜 쓴다는 연구 있던데 얼마나 줄었어?
+N11	AI가 사람 스킬 수요를 늘리는지 채용공고로 분석한 연구에서, 회복탄력성 같은 스킬 있는 데이터 과학자는 연봉을 몇 % 더 받는대?
+N10	LightKV는 비전 토큰을 몇 %만 쓰고 연산을 얼마나 줄였어?
+MS1	LLM이 관련 없는 문장이 섞인 수학 문제에서 쉽게 흔들린다는 GSM-IC 연구 알려줘
+MS2	HyDE처럼 가상 문서를 먼저 만들어서 검색하는 방법 설명해줘
+MS3	필요할 때마다 다시 검색하는 FLARE(Active Retrieval Augmented Generation) 방법 알려줘
+MS4	LLM이 인용을 달아 답하게 하는 ALCE 벤치마크 연구 알려줘
+NM1E	What is Self-RAG?
+NM3E	What did the Lost in the Middle paper find about language models missing information placed in the middle of a long context?
+T01E	Summarize recent research trends in speculative decoding.
+C02E	Among methods for reducing the KV cache, what is the difference between LightKV and CommVQ?
+N10E	LightKV keeps what percentage of vision tokens, and how much does it reduce computation?
+MU1E	In RAG, when the retrieved documents include irrelevant ones or documents about a different entity (another company), which studies measured and reduced how often the generator states them as facts? Also, evaluation methods that deliberately mix in distractor documents.\n(keywords: context contamination, distractor robustness, irrelevant context, entity confusion)
