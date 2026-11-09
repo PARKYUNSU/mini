@@ -46,7 +46,8 @@ def _drop_repeats(stanzas: list[list[str]]) -> list[list[str]]:
 
 
 def slides(text: str) -> str:
-    """자막 규격: 한 줄이 슬라이드 하나, 절 안에서 2줄마다 빈 줄. 글자는 바꾸지 않습니다."""
+    """자막 규격: 한 줄이 슬라이드 한 줄, 빈 줄 없이 이어 붙입니다(프로프리젠터가 2줄씩 슬라이드를 나눔).
+    긴 줄만 나누고 통째로 반복되는 절은 한 번만 적습니다. 글자는 바꾸지 않습니다."""
     stanzas, current = [], []
     for ln in text.splitlines():
         if ln.strip():
@@ -56,7 +57,7 @@ def slides(text: str) -> str:
             current = []
     if current:
         stanzas.append(current)
-    return "\n\n".join("\n".join(st[i:i + 2]) for st in _drop_repeats(stanzas) for i in range(0, len(st), 2))
+    return "\n".join(ln for st in _drop_repeats(stanzas) for ln in st)
 
 
 def key(s: str) -> str:

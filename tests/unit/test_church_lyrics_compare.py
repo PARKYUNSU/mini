@@ -91,10 +91,10 @@ def test_verify_only_source_is_not_the_base_when_another_has_line_breaks():
 
 
 def test_slides_format():
-    # 절 안에서 2줄마다 빈 줄, 절이 홀수 줄이면 마지막 줄은 혼자
-    done = "첫째 줄 가사입니다\n둘째 줄 가사입니다\n\n셋째 줄 가사입니다\n넷째 줄 가사입니다\n\n다섯째 줄 혼자입니다"
-    assert slides(done) == done    # 이미 규격이면 그대로
-    assert slides("하나 줄\n둘 줄\n셋 줄\n\n넷 줄") == "하나 줄\n둘 줄\n\n셋 줄\n\n넷 줄"
+    # 빈 줄 없이 한 줄씩 이어 붙임. 다시 넣어도 그대로
+    raw = "첫째 줄 가사입니다\n둘째 줄 가사입니다\n\n셋째 줄 가사입니다\n\n\n넷째 줄"
+    flat = "첫째 줄 가사입니다\n둘째 줄 가사입니다\n셋째 줄 가사입니다\n넷째 줄"
+    assert slides(raw) == flat and slides(flat) == flat
     assert slides("") == ""
 
 
@@ -108,5 +108,6 @@ def test_slides_cuts_long_lines_without_changing_letters():
 
 def test_slides_writes_repeated_stanza_once():
     chorus = "후렴 첫째 줄\n후렴 둘째 줄"
-    assert slides(f"{chorus}\n\n절 가사 한 줄\n\n{chorus}") == f"{chorus}\n\n절 가사 한 줄"
-    assert slides("같은 줄\n\n같은 줄") == "같은 줄\n\n같은 줄"   # 한 줄짜리 반복은 남김
+    out = slides(f"{chorus}\n\n절 가사 한 줄\n\n{chorus}")
+    assert out == f"{chorus}\n절 가사 한 줄" and slides(out) == out
+    assert slides("같은 줄\n\n같은 줄") == "같은 줄\n같은 줄"   # 한 줄짜리 반복은 남김
