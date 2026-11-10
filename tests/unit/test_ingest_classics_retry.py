@@ -29,7 +29,7 @@ def fake_get(monkeypatch):
             return _Resp(c)
 
         monkeypatch.setattr(ic.requests, "get", get)
-        monkeypatch.setattr(ic.time, "sleep", lambda s: None)
+        monkeypatch.setattr(ic._get.retry, "sleep", lambda s: None)  # tenacity 대기(1 · 3 · 5분) 건너뜀
         return calls
 
     return setup
@@ -41,11 +41,11 @@ def test_retries_429_and_timeout_then_succeeds(fake_get):
     assert len(calls) == 3
 
 
-def test_gives_up_after_all_waits(fake_get):
+def test_gives_up_after_all_attempts(fake_get):
     calls = fake_get(*[503] * 10)
     with pytest.raises(requests.HTTPError):
         ic._get("u")
-    assert len(calls) == len(ic.RETRY_WAITS) + 1
+    assert len(calls) == ic._get.retry.stop.max_attempt_number
 
 
 def test_no_retry_on_404(fake_get):

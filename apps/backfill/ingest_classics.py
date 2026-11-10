@@ -40,6 +40,7 @@ from pipelines.ingest.pdf_parser import PdfParser  # noqa: E402
 from pipelines.ingest.rag_processor import RagProcessor  # noqa: E402
 from core.config.agent_config import CHROMA_DB_DIR  # noqa: E402
 from core.config.chroma_lock import chroma_write_lock  # noqa: E402
+from core.execution.retry_utils import retry_on_network_error  # noqa: E402
 
 CLASSICS_YAML = Path(__file__).parent / "classics.yaml"
 RAW_DATA_DIR = _ROOT / "raw_data_queue"
@@ -48,25 +49,15 @@ CHROMA_DIR = CHROMA_DB_DIR
 ATOM_NS = "http://www.w3.org/2005/Atom"
 ARXIV_API = "http://export.arxiv.org/api/query"
 DELAY_SEC = 5
-# 429 · 5xx · 연결 오류 · 시간 초과 때 기다릴 초. 11-10 canon_1110 에서 arXiv 429 로 38편이 조용히 빠졌다.
-RETRY_WAITS = (10, 30, 60)
 
 
+@retry_on_network_error
 def _get(url: str, **kwargs) -> requests.Response:
-    """GET. 429 · 5xx · 연결 오류 · 시간 초과는 RETRY_WAITS 만큼 기다렸다 다시 시도하고, 끝내 실패하면 예외를 올린다."""
-    for wait in (*RETRY_WAITS, None):
-        try:
-            resp = requests.get(url, **kwargs)
-            if resp.status_code != 429 and resp.status_code < 500:
-                resp.raise_for_status()  # 그 밖의 4xx 는 다시 시도하지 않는다
-                return resp
-            err: Exception = requests.HTTPError(f"{resp.status_code} for url: {url}", response=resp)
-        except (requests.ConnectionError, requests.Timeout) as e:
-            err = e
-        if wait is None:
-            raise err
-        print(f"  ↻ {err} — {wait}초 뒤 다시 시도")
-        time.sleep(wait)
+    """GET. 429 · 5xx · 연결 오류 · 시간 초과는 1 → 3 → 5분 기다려 다시 시도한다(정기 수집과 같은 도우미).
+    11-10 canon_1110 에서 arXiv 429 로 38편이 재시도 없이 빠졌다."""
+    resp = requests.get(url, **kwargs)
+    resp.raise_for_status()  # 429 도 예외로 올려야 재시도된다
+    return resp
 
 
 @dataclass
