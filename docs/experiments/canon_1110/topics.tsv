@@ -1,0 +1,10 @@
+T01	RAG 일반	retrieval-augmented generation
+T02	밀집 검색	dense passage retrieval
+T03	재순위	passage reranking language model
+T04	환각	hallucination large language models
+T05	긴 컨텍스트	long context language models
+T06	검색어 재작성	query rewriting retrieval
+T07	LLM 판정자	LLM-as-a-judge
+T08	방해 문서 강건성	irrelevant context retrieval-augmented robustness
+T09	LoRA 계열	low-rank adaptation fine-tuning
+T10	인용 생성	citation generation large language models
