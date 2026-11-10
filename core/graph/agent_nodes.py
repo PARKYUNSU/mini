@@ -73,6 +73,7 @@ from core.llm.agent_prompts import (
     DIRECT_ANSWER_PYTHON_EXAMPLE_SYSTEM,
     DIRECT_ANSWER_RAG_SYSTEM_BASE,
     RAG_OUTPUT_TEMPLATE_MULTI_STRICT,
+    doc_slots_template,
     list_slots_template,
     EXECUTOR_INTENTIONAL_SYNTAX_BLOCK,
     EXECUTOR_SYSTEM_CODE_RUN,
@@ -1450,8 +1451,25 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 print(f"[DEBUG] DirectAnswer: 정답 유무 판정 = {_pick}")
                 if _pick == "없음":
                     system_prompt = system_prompt + NO_DOC_HINT
+            # 일반 질문도 문서마다 한 칸 (RAG_DOC_SLOTS, docs/experiments/doc_slots_1111) — v13 은 일반 템플릿에서 거의 늘 2개만 채운다.
+            # 판정 뒤에 바꾼다: 판정 호출의 프롬프트는 그대로이고, '없음' 판정은 v13 의 정답 없음 형식(최대 2개)을 그대로 둔다.
+            _doc_slots = (
+                os.getenv("RAG_DOC_SLOTS", "0").strip() == "1"
+                and len(_doc_ids) >= 3 and not _list_on and _pick != "없음" and not _item_docs
+            )
+            if _doc_slots:
+                prompt = direct_answer_rag_user(
+                    _answer_session_ctx,
+                    rag_context,
+                    last_ai,
+                    user_request,
+                    output_template_strict=doc_slots_template(len(_doc_ids)),
+                    rag_max_chars=rag_max_chars,
+                    doc_count=len(_doc_ids),
+                )
             rag_trace.mark(chat_id, "judge", gates=gate_types(user_request), pick=_pick,
-                           **({"items": _items, "item_docs": _item_docs} if _items else {}))
+                           **({"items": _items, "item_docs": _item_docs} if _items else {}),
+                           **({"doc_slots": True} if _doc_slots else {}))
             # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다
             if external_search_active() and (
                 _pick == "없음" or _list_on or _item_docs
