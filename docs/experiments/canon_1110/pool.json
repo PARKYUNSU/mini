@@ -1,0 +1,1145 @@
+[
+ {
+  "k": 0,
+  "set": "canon",
+  "q": "CN37",
+  "question": "언어 모델 답변에 출처 인용을 달게 하고 그 품질을 평가하는 연구 알려줘",
+  "p": "2412.18004",
+  "title": "Correctness is not Faithfulness in RAG Attributions",
+  "abstract": "Retrieving relevant context is a common approach to reduce hallucinations and enhance answer reliability. Explicitly citing source documents allows users to verify generated responses and increases trust. Prior work largely evaluates citation correctness - whether cited documents support the corresponding statements. But citation correctness alone is insufficient. To establish trust in attributed answers, we must examine both citation correctness and citation faithfulness. In this work, we first disentangle the notions of citation correctness and faithfulness, which have been applied inconsistently in previous studies. Faithfulness ensures that the model's reliance on cited documents is genuine, reflecting actual reference use rather than superficial alignment with prior beliefs, which we call post-rationalization. We design an experiment that reveals the prevalent issue of post-rationalization, which undermines reliable attribution and may result in misplaced trust. Our findings suggest that current attributed answers often lack citation faithfulness (up to 57 percent of the citations), highlighting the need to evaluate correctness and faithfulness for trustworthy attribution in language models."
+ },
+ {
+  "k": 1,
+  "set": "canon",
+  "q": "CN14",
+  "question": "외부 자료 없이 모델 답이 지어낸 것인지 알아내는 방법을 다룬 논문 있어?",
+  "p": "2411.09689",
+  "title": "Probing LLM Hallucination from Within: Perturbation-Driven Approach via Internal Knowledge",
+  "abstract": "LLM hallucination, where unfaithful text is generated, presents a critical challenge for LLMs' practical applications. Current detection methods often resort to external knowledge, LLM fine-tuning, or supervised training with large hallucination-labeled datasets. Moreover, these approaches do not distinguish between different types of hallucinations, which is crucial for enhancing detection performance. To address such limitations, we introduce hallucination probing, a new task that classifies LLM-generated text into three categories: aligned, misaligned, and fabricated. Driven by our novel discovery that perturbing key entities in prompts affects LLM's generation of these three types of text differently, we propose SHINE, a novel hallucination probing method that does not require external knowledge, supervised training, or LLM fine-tuning. SHINE is effective in hallucination probing across three modern LLMs, and achieves state-of-the-art performance in hallucination detection, outperforming seven competing methods across four datasets and four LLMs, underscoring the importance of probing for accurate detection."
+ },
+ {
+  "k": 2,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2406.19497",
+  "title": "Inclusivity in Large Language Models: Personality Traits and Gender Bias in Scientific Abstracts",
+  "abstract": "Large language models (LLMs) are increasingly utilized to assist in scientific and academic writing, helping authors enhance the coherence of their articles. Previous studies have highlighted stereotypes and biases present in LLM outputs, emphasizing the need to evaluate these models for their alignment with human narrative styles and potential gender biases. In this study, we assess the alignment of three prominent LLMs - Claude 3 Opus, Mistral AI Large, and Gemini 1.5 Flash - by analyzing their performance on benchmark text-generation tasks for scientific abstracts. We employ the Linguistic Inquiry and Word Count (LIWC) framework to extract lexical, psychological, and social features from the generated texts. Our findings indicate that, while these models generally produce text closely resembling human authored content, variations in stylistic features suggest significant gender biases. This research highlights the importance of developing LLMs that maintain a diversity of writing styles to promote inclusivity in academic discourse."
+ },
+ {
+  "k": 3,
+  "set": "canon",
+  "q": "CN39",
+  "question": "생성형 검색 엔진 답변이 인용을 얼마나 정확하게 다는지 조사한 연구 찾아줘",
+  "p": "2509.21557",
+  "title": "Generation-Time vs. Post-hoc Citation: A Holistic Evaluation of LLM Attribution",
+  "abstract": "Trustworthy Large Language Models (LLMs) must cite human-verifiable sources in high-stakes domains such as healthcare, law, academia, and finance, where even small errors can have severe consequences. Practitioners and researchers face a choice: let models generate citations during decoding, or let models draft answers first and then attach appropriate citations. To clarify this choice, we introduce two paradigms: Generation-Time Citation (G-Cite), which produces the answer and citations in one pass, and Post-hoc Citation (P-Cite), which adds or verifies citations after drafting. We conduct a comprehensive evaluation from zero-shot to advanced retrieval-augmented methods across four popular attribution datasets and provide evidence-based recommendations that weigh trade-offs across use cases. Our results show a consistent trade-off between coverage and citation correctness, with retrieval as the main driver of attribution quality in both paradigms. P-Cite methods achieve high coverage with competitive correctness and moderate latency, whereas G-Cite methods prioritize precision at the cost of coverage and speed. We recommend a retrieval-centric, P-Cite-first approach for high-stakes applications, reserving G-Cite for precision-critical settings such as strict claim verification. Our codes and human evaluation results are available at https://anonymous.4open.science/r/Citation_Paradigms-BBB5/"
+ },
+ {
+  "k": 4,
+  "set": "canon",
+  "q": "CN23",
+  "question": "검색어에 관련 단어를 덧붙여 넓히는 작업을 LLM으로 하는 연구 찾아줘",
+  "p": "2412.15249",
+  "title": "LitLLMs, LLMs for Literature Review: Are we there yet?",
+  "abstract": "Literature reviews are an essential component of scientific research, but they remain time-intensive and challenging to write, especially due to the recent influx of research papers. This paper explores the zero-shot abilities of recent Large Language Models (LLMs) in assisting with the writing of literature reviews based on an abstract. We decompose the task into two components: 1. Retrieving related works given a query abstract, and 2. Writing a literature review based on the retrieved results. We analyze how effective LLMs are for both components. For retrieval, we introduce a novel two-step search strategy that first uses an LLM to extract meaningful keywords from the abstract of a paper and then retrieves potentially relevant papers by querying an external knowledge base. Additionally, we study a prompting-based re-ranking mechanism with attribution and show that re-ranking doubles the normalized recall compared to naive search methods, while providing insights into the LLM's decision-making process. In the generation phase, we propose a two-step approach that first outlines a plan for the review and then executes steps in the plan to generate the actual review. To evaluate different LLM-based literature review methods, we create test sets from arXiv papers using a protocol designed for rolling use with newly released LLMs to avoid test set contamination in zero-shot evaluations. We release this evaluation protocol to promote additional research and development in this regard. Our empirical results suggest that LLMs show promising potential for writing literature reviews when the task is decomposed into smaller components of retrieval and planning. Our project page including a demonstration system and toolkit can be accessed here: https://litllm.github.io."
+ },
+ {
+  "k": 5,
+  "set": "canon",
+  "q": "CN31",
+  "question": "관련 없는 문서를 무시하도록 RAG 모델을 학습시키는 방법 연구 찾아줘",
+  "p": "2409.12468",
+  "title": "Familiarity-Aware Evidence Compression for Retrieval-Augmented Generation",
+  "abstract": "Retrieval-augmented generation (RAG) improves large language models (LMs) by incorporating non-parametric knowledge through evidence retrieved from external sources. However, it often struggles to cope with inconsistent and irrelevant information that can distract the LM from its tasks, especially when multiple evidence pieces are required. While compressing the retrieved evidence with a compression model aims to address this issue, the compressed evidence may still be unfamiliar to the target model used for downstream tasks, potentially failing to utilize the evidence effectively. We propose FaviComp (Familarity-Aware Evidence Compression), a novel training-free evidence compression technique that makes retrieved evidence more familiar to the target model, while seamlessly integrating parametric knowledge from the model. Experimental results show that FaviComp consistently outperforms most recent evidence compression baselines across multiple open-domain QA datasets, improving accuracy by up to 28.1% while achieving high compression rates. Additionally, we demonstrate the effective integration of both parametric and non-parametric knowledge during evidence compression."
+ },
+ {
+  "k": 6,
+  "set": "canon",
+  "q": "CN24",
+  "question": "복잡한 질문을 작은 질문 여러 개로 쪼개서 검색하는 방법 연구 정리해줘",
+  "p": "2503.21248",
+  "title": "ResearchBench: Benchmarking LLMs in Scientific Discovery via Inspiration-Based Task Decomposition",
+  "abstract": "Large language models (LLMs) have demonstrated potential in assisting scientific research, yet their ability to discover high-quality research hypotheses remains unexamined due to the lack of a dedicated benchmark. To address this gap, we introduce the first large-scale benchmark for evaluating LLMs with a near-sufficient set of sub-tasks of scientific discovery: inspiration retrieval, hypothesis composition, and hypothesis ranking. We develop an automated framework that extracts critical components - research questions, background surveys, inspirations, and hypotheses - from scientific papers across 12 disciplines, with expert validation confirming its accuracy. To prevent data contamination, we focus exclusively on papers published in 2024, ensuring minimal overlap with LLM pretraining data. Our evaluation reveals that LLMs perform well in retrieving inspirations, an out-of-distribution task, suggesting their ability to surface novel knowledge associations. This positions LLMs as \"research hypothesis mines\", capable of facilitating automated scientific discovery by generating innovative hypotheses at scale with minimal human intervention."
+ },
+ {
+  "k": 7,
+  "set": "canon",
+  "q": "CN04",
+  "question": "모델 크기를 키우는 대신 검색을 붙여서 성능을 올린 연구 찾아줘",
+  "p": "2511.01386",
+  "title": "RAGSmith: A Framework for Finding the Optimal Composition of Retrieval-Augmented Generation Methods Across Datasets",
+  "abstract": "Retrieval-Augmented Generation (RAG) quality depends on many interacting choices across retrieval, ranking, augmentation, prompting, and generation, so optimizing modules in isolation is brittle. We introduce RAGSmith, a modular framework that treats RAG design as an end-to-end architecture search over nine technique families and 46{,}080 feasible pipeline configurations. A genetic search optimizes a scalar objective that jointly aggregates retrieval metrics (recall@k, mAP, nDCG, MRR) and generation metrics (LLM-Judge and semantic similarity). We evaluate on six Wikipedia-derived domains (Mathematics, Law, Finance, Medicine, Defense Industry, Computer Science), each with 100 questions spanning factual, interpretation, and long-answer types. RAGSmith finds configurations that consistently outperform naive RAG baseline by +3.8\\% on average (range +1.2\\% to +6.9\\% across domains), with gains up to +12.5\\% in retrieval and +7.5\\% in generation. The search typically explores $\\approx 0.2\\%$ of the space ($\\sim 100$ candidates) and discovers a robust backbone -- vector retrieval plus post-generation reflection/revision -- augmented by domain-dependent choices in expansion, reranking, augmentation, and prompt reordering; passage compression is never selected. Improvement magnitude correlates with question type, with larger gains on factual/long-answer mixes than interpretation-heavy sets. These results provide practical, domain-aware guidance for assembling effective RAG systems and demonstrate the utility of evolutionary search for full-pipeline optimization."
+ },
+ {
+  "k": 8,
+  "set": "canon",
+  "q": "CN36",
+  "question": "어댑터나 프롬프트 튜닝처럼 적은 파라미터만 바꾸는 방법들의 성능 차이를 본 논문 있어?",
+  "p": "2406.19486",
+  "title": "LoPT: Low-Rank Prompt Tuning for Parameter Efficient Language Models",
+  "abstract": "In prompt tuning, a prefix or suffix text is added to the prompt, and the embeddings (soft prompts) or token indices (hard prompts) of the prefix/suffix are optimized to gain more control over language models for specific tasks. This approach eliminates the need for hand-crafted prompt engineering or explicit model fine-tuning. Prompt tuning is significantly more parameter-efficient than model fine-tuning, as it involves optimizing partial inputs of language models to produce desired outputs.   In this work, we aim to further reduce the amount of trainable parameters required for a language model to perform well on specific tasks. We propose Low-rank Prompt Tuning (LoPT), a low-rank model for prompts that achieves efficient prompt optimization. The proposed method demonstrates similar outcomes to full parameter prompt tuning while reducing the number of trainable parameters by a factor of 5. It also provides promising results compared to the state-of-the-art methods that would require 10 to 20 times more parameters."
+ },
+ {
+  "k": 9,
+  "set": "canon",
+  "q": "CN08",
+  "question": "문서를 벡터 하나로 줄이지 않고 단어마다 벡터를 둬서 검색하는 방법 연구 있어?",
+  "p": "2601.00891",
+  "title": "Enhancing Retrieval-Augmented Generation with Topic-Enriched Embeddings: A Hybrid Approach Integrating Traditional NLP Techniques",
+  "abstract": "Retrieval-augmented generation (RAG) systems rely on accurate document retrieval to ground large language models (LLMs) in external knowledge, yet retrieval quality often degrades in corpora where topics overlap and thematic variation is high. This work proposes topic-enriched embeddings that integrate term-based signals and topic structure with contextual sentence embeddings. The approach combines TF-IDF with topic modeling and dimensionality reduction, using Latent Semantic Analysis (LSA) and Latent Dirichlet Allocation (LDA) to encode latent topical organization, and fuses these representations with a compact contextual encoder (all-MiniLM). By jointly capturing term-level and topic-level semantics, topic-enriched embeddings improve semantic clustering, increase retrieval precision, and reduce computational burden relative to purely contextual baselines. Experiments on a legal-text corpus show consistent gains in clustering coherence and retrieval metrics, suggesting that topic-enriched embeddings can serve as a practical component for more reliable knowledge-intensive RAG pipelines."
+ },
+ {
+  "k": 10,
+  "set": "canon",
+  "q": "CN37",
+  "question": "언어 모델 답변에 출처 인용을 달게 하고 그 품질을 평가하는 연구 알려줘",
+  "p": "2603.07287",
+  "title": "Do Deployment Constraints Make LLMs Hallucinate Citations? An Empirical Study across Four Models and Five Prompting Regimes",
+  "abstract": "LLMs are increasingly used to draft academic text and to support software engineering (SE) evidence synthesis, but they often hallucinate bibliographic references that look legitimate. We study how deployment-motivated prompting constraints affect citation verifiability in a closed-book setting. Using 144 claims (24 in SE&CS) and a deterministic verification pipeline (Crossref + Semantic Scholar), we evaluate two proprietary models (Claude Sonnet, GPT-4o) and two open-weight models (LLaMA~3.1-8B, Qwen~2.5-14B) across five regimes: Baseline, Temporal (publication-year window), Survey-style breadth, Non-Disclosure policy, and their combination. Across 17,443 generated citations, no model exceeds a citation-level existence rate of 0.475; Temporal and Combo conditions produce the steepest drops while outputs remain format-compliant (well-formed bibliographic fields). Unresolved outcomes dominate (36-61%); a 100-citation audit indicates that a substantial fraction of Unresolved cases are fabricated. Results motivate post-hoc citation verification before LLM outputs enter SE literature reviews or tooling pipelines."
+ },
+ {
+  "k": 11,
+  "set": "canon",
+  "q": "CN15",
+  "question": "환각을 종류별로 나누고 원인을 분석한 연구 찾아줘",
+  "p": "2404.18930",
+  "title": "Hallucination of Multimodal Large Language Models: A Survey",
+  "abstract": "This survey presents a comprehensive analysis of the phenomenon of hallucination in multimodal large language models (MLLMs), also known as Large Vision-Language Models (LVLMs), which have demonstrated significant advancements and remarkable abilities in multimodal tasks. Despite these promising developments, MLLMs often generate outputs that are inconsistent with the visual content, a challenge known as hallucination, which poses substantial obstacles to their practical deployment and raises concerns regarding their reliability in real-world applications. This problem has attracted increasing attention, prompting efforts to detect and mitigate such inaccuracies. We review recent advances in identifying, evaluating, and mitigating these hallucinations, offering a detailed overview of the underlying causes, evaluation benchmarks, metrics, and strategies developed to address this issue. Additionally, we analyze the current challenges and limitations, formulating open questions that delineate potential pathways for future research. By drawing the granular classification and landscapes of hallucination causes, evaluation benchmarks, and mitigation methods, this survey aims to deepen the understanding of hallucinations in MLLMs and inspire further advancements in the field. Through our thorough and in-depth review, we contribute to the ongoing dialogue on enhancing the robustness and reliability of MLLMs, providing valuable insights and resources for researchers and practitioners alike. Resources are available at: https://github.com/showlab/Awesome-MLLM-Hallucination."
+ },
+ {
+  "k": 12,
+  "set": "canon",
+  "q": "CN04",
+  "question": "모델 크기를 키우는 대신 검색을 붙여서 성능을 올린 연구 찾아줘",
+  "p": "2412.12322",
+  "title": "RAG Playground: A Framework for Systematic Evaluation of Retrieval Strategies and Prompt Engineering in RAG Systems",
+  "abstract": "We present RAG Playground, an open-source framework for systematic evaluation of Retrieval-Augmented Generation (RAG) systems. The framework implements and compares three retrieval approaches: naive vector search, reranking, and hybrid vector-keyword search, combined with ReAct agents using different prompting strategies. We introduce a comprehensive evaluation framework with novel metrics and provide empirical results comparing different language models (Llama 3.1 and Qwen 2.5) across various retrieval configurations. Our experiments demonstrate significant performance improvements through hybrid search methods and structured self-evaluation prompting, achieving up to 72.7% pass rate on our multi-metric evaluation framework. The results also highlight the importance of prompt engineering in RAG systems, with our custom-prompted agents showing consistent improvements in retrieval accuracy and response quality."
+ },
+ {
+  "k": 13,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2610.13948",
+  "title": "Can Language Models Play the Wikipedia Game?",
+  "abstract": "Language models increasingly support or automate information retrieval from document collections too large to index. This task is difficult when it requires specialist linguistic or scientific knowledge. We used the Wikipedia Game to test language models on an analogous information retrieval task. In the game, players must reach a target article using only article links. We compared sentence embedding models and LLMs across five Wikipedia languages and five academic-literature datasets. We construct very large local graphs of Wikipedia pages and of paper citations using OpenAlex and provide code to build and navigate them. This allows the study of language models' navigation capabilities without relying on third-party APIs. We compared the models with human and TF-IDF benchmarks. The Wikipedia Game format enables robust comparisons across techniques, languages, and domains. No model significantly outperformed humans, although the best models (GPT-o3 mini, GPT-4o, QwQ:32B, and DeepSeek-R1:70B) achieved comparable success. Performance and rankings varied across languages and topics, with implications for practitioners utilising these techniques."
+ },
+ {
+  "k": 14,
+  "set": "heldout",
+  "q": "H_F10",
+  "question": "결론 문장이 여러 논문의 결과를 한 문장에 섞으면 출처가 잘못 붙는다. 여러 문서를 요약할 때 출처 혼동을 측정하거나 줄인 연구가 있는가.",
+  "p": "2310.05634",
+  "title": "Towards Verifiable Generation: A Benchmark for Knowledge-aware Language Model Attribution",
+  "abstract": "Although achieving great success, Large Language Models (LLMs) usually suffer from unreliable hallucinations. Although language attribution can be a potential solution, there are no suitable benchmarks and evaluation metrics to attribute LLMs to structured knowledge. In this paper, we define a new task of Knowledge-aware Language Model Attribution (KaLMA) that improves upon three core concerns with conventional attributed LMs. First, we extend attribution source from unstructured texts to Knowledge Graph (KG), whose rich structures benefit both the attribution performance and working scenarios. Second, we propose a new ``Conscious Incompetence\" setting considering the incomplete knowledge repository, where the model identifies the need for supporting knowledge beyond the provided KG. Third, we propose a comprehensive automatic evaluation metric encompassing text quality, citation quality, and text citation alignment. To implement the above innovations, we build a dataset in biography domain BioKaLMA via evolutionary question generation strategy, to control the question complexity and necessary knowledge to the answer. For evaluation, we develop a baseline solution and demonstrate the room for improvement in LLMs' citation generation, emphasizing the importance of incorporating the \"Conscious Incompetence\" setting, and the critical role of retrieval accuracy."
+ },
+ {
+  "k": 15,
+  "set": "canon",
+  "q": "CN33",
+  "question": "큰 모델 전체를 학습하지 않고 작은 행렬만 추가로 학습해서 미세조정하는 방법 연구 알려줘",
+  "p": "2210.07558",
+  "title": "DyLoRA: Parameter Efficient Tuning of Pre-trained Models using Dynamic Search-Free Low-Rank Adaptation",
+  "abstract": "With the ever-growing size of pretrained models (PMs), fine-tuning them has become more expensive and resource-hungry. As a remedy, low-rank adapters (LoRA) keep the main pretrained weights of the model frozen and just introduce some learnable truncated SVD modules (so-called LoRA blocks) to the model. While LoRA blocks are parameter-efficient, they suffer from two major problems: first, the size of these blocks is fixed and cannot be modified after training (for example, if we need to change the rank of LoRA blocks, then we need to re-train them from scratch); second, optimizing their rank requires an exhaustive search and effort. In this work, we introduce a dynamic low-rank adaptation (DyLoRA) technique to address these two problems together. Our DyLoRA method trains LoRA blocks for a range of ranks instead of a single rank by sorting the representation learned by the adapter module at different ranks during training. We evaluate our solution on different natural language understanding (GLUE benchmark) and language generation tasks (E2E, DART and WebNLG) using different pretrained models such as RoBERTa and GPT with different sizes. Our results show that we can train dynamic search-free models with DyLoRA at least 4 to 7 times (depending to the task) faster than LoRA without significantly compromising performance. Moreover, our models can perform consistently well on a much larger range of ranks compared to LoRA."
+ },
+ {
+  "k": 16,
+  "set": "canon",
+  "q": "CN09",
+  "question": "검색으로 뽑은 문서들을 언어 모델로 다시 순위 매기는 방법 연구 알려줘",
+  "p": "2402.02764",
+  "title": "List-aware Reranking-Truncation Joint Model for Search and Retrieval-augmented Generation",
+  "abstract": "The results of information retrieval (IR) are usually presented in the form of a ranked list of candidate documents, such as web search for humans and retrieval-augmented generation for large language models (LLMs). List-aware retrieval aims to capture the list-level contextual features to return a better list, mainly including reranking and truncation. Reranking finely re-scores the documents in the list. Truncation dynamically determines the cut-off point of the ranked list to achieve the trade-off between overall relevance and avoiding misinformation from irrelevant documents. Previous studies treat them as two separate tasks and model them separately. However, the separation is not optimal. First, it is hard to share the contextual information of the ranking list between the two tasks. Second, the separate pipeline usually meets the error accumulation problem, where the small error from the reranking stage can largely affect the truncation stage. To solve these problems, we propose a Reranking-Truncation joint model (GenRT) that can perform the two tasks concurrently. GenRT integrates reranking and truncation via generative paradigm based on encoder-decoder architecture. We also design the novel loss functions for joint optimization to make the model learn both tasks. Sharing parameters by the joint model is conducive to making full use of the common modeling information of the two tasks. Besides, the two tasks are performed concurrently and co-optimized to solve the error accumulation problem between separate stages. Experiments on public learning-to-rank benchmarks and open-domain Q\\&A tasks show that our method achieves SOTA performance on both reranking and truncation tasks for web search and retrieval-augmented LLMs."
+ },
+ {
+  "k": 17,
+  "set": "canon",
+  "q": "CN08",
+  "question": "문서를 벡터 하나로 줄이지 않고 단어마다 벡터를 둬서 검색하는 방법 연구 있어?",
+  "p": "2603.08429",
+  "title": "One Model Is Enough: Native Retrieval Embeddings from LLM Agent Hidden States",
+  "abstract": "LLM agents that retrieve external knowledge typically generate a search query as text, then run a separate embedding model to encode it into a vector. This two-model pipeline adds infrastructure complexity and latency, yet is redundant: the LLM already encodes the full conversational context in its hidden states. We propose equipping LLM agents with native retrieval capability by adding a lightweight projection head that maps hidden states directly into the embedding space, eliminating the need for a separate embedding model. Trained with a combination of alignment, contrastive, and rank distillation losses, our method retains 97\\% of baseline retrieval quality while enabling the LLM agent to search with its own representations. Experiments on the QReCC conversational search benchmark show competitive Recall@10 and MRR@10 compared to the standard generate-then-encode pipeline, with systematic ablations confirming the contribution of each loss component."
+ },
+ {
+  "k": 18,
+  "set": "canon",
+  "q": "CN36",
+  "question": "어댑터나 프롬프트 튜닝처럼 적은 파라미터만 바꾸는 방법들의 성능 차이를 본 논문 있어?",
+  "p": "2208.13474",
+  "title": "Prompt Tuning with Soft Context Sharing for Vision-Language Models",
+  "abstract": "Vision-language models have recently shown great potential on many tasks in computer vision. Meanwhile, prior work demonstrates prompt tuning designed for vision-language models could acquire superior performance on few-shot image recognition compared to linear probe, a strong baseline. In practice, many few-shot tasks are inherently correlated, particularly within specialized domains. However, such information is overlooked previously. Inspired by the fact that modeling task relationship by multi-task learning can usually boost performance, we propose a novel method SoftCPT (Soft Context Sharing for Prompt Tuning) to tune pre-trained vision-language models on multiple target few-shot tasks jointly. Specifically, we design a task-shared meta network to generate prompt context for each task using task name together with a learnable task context as input. The parameters of this meta network as well as the task context are tuned on the joint training set of all tasks. As such, the prompt context of all tasks will be shared in a soft manner. Extensive experiments across four multi-task few-shot datasets covering 44 tasks and 1593 categories demonstrate that SoftCPT significantly outperforms single-task prompt tuning methods, highlighting the effectiveness of multi-task learning for vision-language prompt tuning. Code is available at https://github.com/kding1225/softcpt."
+ },
+ {
+  "k": 19,
+  "set": "canon",
+  "q": "CN03",
+  "question": "위키피디아 같은 큰 문서 모음에서 찾아서 질문에 답하는 오픈 도메인 질의응답 연구 정리해줘",
+  "p": "2406.15187",
+  "title": "UDA: A Benchmark Suite for Retrieval Augmented Generation in Real-world Document Analysis",
+  "abstract": "The use of Retrieval-Augmented Generation (RAG) has improved Large Language Models (LLMs) in collaborating with external data, yet significant challenges exist in real-world scenarios. In areas such as academic literature and finance question answering, data are often found in raw text and tables in HTML or PDF formats, which can be lengthy and highly unstructured. In this paper, we introduce a benchmark suite, namely Unstructured Document Analysis (UDA), that involves 2,965 real-world documents and 29,590 expert-annotated Q&A pairs. We revisit popular LLM- and RAG-based solutions for document analysis and evaluate the design choices and answer qualities across multiple document domains and diverse query types. Our evaluation yields interesting findings and highlights the importance of data parsing and retrieval. We hope our benchmark can shed light and better serve real-world document analysis applications. The benchmark suite and code can be found at https://github.com/qinchuanhui/UDA-Benchmark."
+ },
+ {
+  "k": 20,
+  "set": "canon",
+  "q": "CN35",
+  "question": "파라미터 효율적 미세조정 방법들을 비교 정리한 연구 찾아줘",
+  "p": "2412.13488",
+  "title": "Refining Salience-Aware Sparse Fine-Tuning Strategies for Language Models",
+  "abstract": "Parameter-Efficient Fine-Tuning (PEFT) has gained prominence through low-rank adaptation methods like LoRA. In this paper, we focus on sparsity-based PEFT (SPEFT), which introduces trainable sparse adaptations to the weight matrices in the model, offering greater flexibility in selecting fine-tuned parameters compared to low-rank methods. We conduct the first systematic evaluation of salience metrics for SPEFT, inspired by zero-cost NAS proxies, and identify simple gradient-based metrics is reliable, and results are on par with the best alternatives, offering both computational efficiency and robust performance. Additionally, we compare static and dynamic masking strategies, finding that static masking, which predetermines non-zero entries before training, delivers efficiency without sacrificing performance, while dynamic masking offers no substantial benefits. Across NLP tasks, a simple gradient-based, static SPEFT consistently outperforms other fine-tuning methods for LLMs, providing a simple yet effective baseline for SPEFT. Our work challenges the notion that complexity is necessary for effective PEFT, while our open-source framework establishes a reproducible benchmark for future research, which is available at [https://github.com/0-ml/speft]."
+ },
+ {
+  "k": 21,
+  "set": "canon",
+  "q": "CN31",
+  "question": "관련 없는 문서를 무시하도록 RAG 모델을 학습시키는 방법 연구 찾아줘",
+  "p": "2601.01896",
+  "title": "Tackling the Inherent Difficulty of Noise Filtering in RAG",
+  "abstract": "Retrieval-Augmented Generation (RAG) has become a widely adopted approach to enhance Large Language Models (LLMs) by incorporating external knowledge and reducing hallucinations. However, noisy or irrelevant documents are often introduced during RAG, potentially degrading performance and even causing hallucinated outputs. While various methods have been proposed to filter out such noise, we argue that identifying irrelevant information from retrieved content is inherently difficult and limited number of transformer layers can hardly solve this. Consequently, retrievers fail to filter out irrelevant documents entirely. Therefore, LLMs must be robust against such noise, but we demonstrate that standard fine-tuning approaches are often ineffective in enabling the model to selectively utilize relevant information while ignoring irrelevant content due to the structural constraints of attention patterns. To address this, we propose a novel fine-tuning method designed to enhance the model's ability to distinguish between relevant and irrelevant information within retrieved documents. Extensive experiments across multiple benchmarks show that our approach significantly improves the robustness and performance of LLMs."
+ },
+ {
+  "k": 22,
+  "set": "canon",
+  "q": "CN09",
+  "question": "검색으로 뽑은 문서들을 언어 모델로 다시 순위 매기는 방법 연구 알려줘",
+  "p": "2411.00437",
+  "title": "E2E-AFG: An End-to-End Model with Adaptive Filtering for Retrieval-Augmented Generation",
+  "abstract": "Retrieval-augmented generation methods often neglect the quality of content retrieved from external knowledge bases, resulting in irrelevant information or potential misinformation that negatively affects the generation results of large language models. In this paper, we propose an end-to-end model with adaptive filtering for retrieval-augmented generation (E2E-AFG), which integrates answer existence judgment and text generation into a single end-to-end framework. This enables the model to focus more effectively on relevant content while reducing the influence of irrelevant information and generating accurate answers. We evaluate E2E-AFG on six representative knowledge-intensive language datasets, and the results show that it consistently outperforms baseline models across all tasks, demonstrating the effectiveness and robustness of the proposed approach."
+ },
+ {
+  "k": 23,
+  "set": "canon",
+  "q": "CN37",
+  "question": "언어 모델 답변에 출처 인용을 달게 하고 그 품질을 평가하는 연구 알려줘",
+  "p": "2510.17853",
+  "title": "CiteGuard: Faithful Citation Attribution for LLMs via Retrieval-Augmented Validation",
+  "abstract": "Large Language Models (LLMs) have emerged as powerful assistants for scientific writing. However, concerns remain about the quality and reliability of the generated text, including citation accuracy and faithfulness. While most recent work relies on methods such as LLM-as-a-Judge, the reliability of LLM-as-a-Judge alone is also in doubt. In this work, we reframe citation evaluation as a problem of citation attribution alignment, which assesses whether LLM-generated citations match those a human author would include for the same text. We propose CiteGuard, a retrieval-aware agent framework designed to provide more faithful grounding for citation validation. CiteGuard improves over the prior baseline by 10 percentage points and achieves up to 68.1% accuracy on the CiteME benchmark, approaching human performance (69.2%). It also identifies alternative valid citations and demonstrates generalization ability for cross-domain citation attribution. Our code is available at https://github.com/KathCYM/CiteGuard."
+ },
+ {
+  "k": 24,
+  "set": "canon",
+  "q": "CN33",
+  "question": "큰 모델 전체를 학습하지 않고 작은 행렬만 추가로 학습해서 미세조정하는 방법 연구 알려줘",
+  "p": "2504.00254",
+  "title": "ElaLoRA: Elastic & Learnable Low-Rank Adaptation for Efficient Model Fine-Tuning",
+  "abstract": "Low-Rank Adaptation (LoRA) has become a widely adopted technique for fine-tuning large-scale pre-trained models with minimal parameter updates. However, existing methods rely on fixed ranks or focus solely on either rank pruning or expansion, failing to adapt ranks dynamically to match the importance of different layers during training. In this work, we propose ElaLoRA, an adaptive low-rank adaptation framework that dynamically prunes and expands ranks based on gradient-derived importance scores. To the best of our knowledge, ElaLoRA is the first method that enables both rank pruning and expansion during fine-tuning. Experiments across multiple benchmarks demonstrate that ElaLoRA consistently outperforms existing PEFT methods across different parameter budgets. Furthermore, our studies validate that layers receiving higher rank allocations contribute more significantly to model performance, providing theoretical justification for our adaptive strategy. By introducing a principled and adaptive rank allocation mechanism, ElaLoRA offers a scalable and efficient fine-tuning solution, particularly suited for resource-constrained environments."
+ },
+ {
+  "k": 25,
+  "set": "canon",
+  "q": "CN38",
+  "question": "생성된 문장이 인용한 문서로 정말 뒷받침되는지 자동으로 확인하는 방법 연구 있어?",
+  "p": "2609.15830",
+  "title": "CiteGuard-RAG: A Validation-Centered AI System for Evidence-Grounded Question Answering",
+  "abstract": "Retrieval-augmented generation (RAG) can improve access to complex information; however, retrieving evidence alone does not ensure that answers are grounded, citation-valid, or appropriately refused. This paper introduces CiteGuard-RAG, a validation-centered AI system for evidence-grounded question answering. The system integrates hybrid semantic-lexical retrieval, citation-constrained generation, sentence-level grounding validation, and single-pass regeneration. Validation is used at runtime to determine whether a candidate answer should be accepted, refused, or regenerated before final delivery.   CiteGuard-RAG is evaluated on 400 questions across a controlled housing-law dataset, PrivacyQA, and CUAD. In the controlled evaluation, it achieves 99.1% retrieval accuracy, 98.3% grounded-answer accuracy, and 98.3% citation validity, with no validation-detected hallucinations. Ablation results show that grounded-answer accuracy drops sharply when validation is removed, even when retrieval accuracy remains unchanged. External evaluation shows that while citation validity remains strong, evidence utilization, span alignment, and refusal calibration become harder under domain shift.   These findings indicate that trustworthy RAG systems require explicit validation between retrieval and final answer delivery. CiteGuard-RAG provides a practical architecture for linking retrieval, generation, citation checking, abstention, and regeneration in high-stakes information access."
+ },
+ {
+  "k": 26,
+  "set": "heldout",
+  "q": "H_H05",
+  "question": "llm 할루시네이숀 줄이는 법 논문",
+  "p": "2401.00396",
+  "title": "RAGTruth: A Hallucination Corpus for Developing Trustworthy Retrieval-Augmented Language Models",
+  "abstract": "Retrieval-augmented generation (RAG) has become a main technique for alleviating hallucinations in large language models (LLMs). Despite the integration of RAG, LLMs may still present unsupported or contradictory claims to the retrieved contents. In order to develop effective hallucination prevention strategies under RAG, it is important to create benchmark datasets that can measure the extent of hallucination. This paper presents RAGTruth, a corpus tailored for analyzing word-level hallucinations in various domains and tasks within the standard RAG frameworks for LLM applications. RAGTruth comprises nearly 18,000 naturally generated responses from diverse LLMs using RAG. These responses have undergone meticulous manual annotations at both the individual cases and word levels, incorporating evaluations of hallucination intensity. We not only benchmark hallucination frequencies across different LLMs, but also critically assess the effectiveness of several existing hallucination detection methodologies. Furthermore, we show that using a high-quality dataset such as RAGTruth, it is possible to finetune a relatively small LLM and achieve a competitive level of performance in hallucination detection when compared to the existing prompt-based approaches using state-of-the-art large language models such as GPT-4."
+ },
+ {
+  "k": 27,
+  "set": "canon",
+  "q": "CN09",
+  "question": "검색으로 뽑은 문서들을 언어 모델로 다시 순위 매기는 방법 연구 알려줘",
+  "p": "2406.14449",
+  "title": "APEER: Automatic Prompt Engineering Enhances Large Language Model Reranking",
+  "abstract": "Large Language Models (LLMs) have significantly enhanced Information Retrieval (IR) across various modules, such as reranking. Despite impressive performance, current zero-shot relevance ranking with LLMs heavily relies on human prompt engineering. Existing automatic prompt engineering algorithms primarily focus on language modeling and classification tasks, leaving the domain of IR, particularly reranking, underexplored. Directly applying current prompt engineering algorithms to relevance ranking is challenging due to the integration of query and long passage pairs in the input, where the ranking complexity surpasses classification tasks. To reduce human effort and unlock the potential of prompt optimization in reranking, we introduce a novel automatic prompt engineering algorithm named APEER. APEER iteratively generates refined prompts through feedback and preference optimization. Extensive experiments with four LLMs and ten datasets demonstrate the substantial performance improvement of APEER over existing state-of-the-art (SoTA) manual prompts. Furthermore, we find that the prompts generated by APEER exhibit better transferability across diverse tasks and LLMs."
+ },
+ {
+  "k": 28,
+  "set": "canon",
+  "q": "CN14",
+  "question": "외부 자료 없이 모델 답이 지어낸 것인지 알아내는 방법을 다룬 논문 있어?",
+  "p": "2508.14314",
+  "title": "Zero-knowledge LLM hallucination detection and mitigation through fine-grained cross-model consistency",
+  "abstract": "Large language models (LLMs) have demonstrated impressive capabilities across diverse tasks, but they remain susceptible to hallucinations--generating content that appears plausible but contains factual inaccuracies. We present Finch-Zk, a black-box framework that leverages fine-grained cross-model consistency to detect and mitigate hallucinations in LLM outputs without requiring external knowledge sources. Finch-Zk introduces two key innovations: 1) a cross-model consistency checking strategy that reveals fine-grained inaccuracies by comparing responses generated by diverse models from semantically-equivalent prompts, and 2) a targeted mitigation technique that applies precise corrections to problematic segments while preserving accurate content. Experiments on the FELM dataset show Finch-Zk improves hallucination detection F1 scores by 6-39\\% compared to existing approaches. For mitigation, Finch-Zk achieves up to 9 absolute percentage points improvement in answer accuracy on the GPQA-diamond dataset when applied to state-of-the-art models like Llama 4 Maverick and Claude 4 Sonnet. Extensive evaluation on multiple datasets demonstrates that Finch-Zk provides a practical, deployment-ready safeguard for enhancing factual reliability in production LLM systems."
+ },
+ {
+  "k": 29,
+  "set": "canon",
+  "q": "CN15",
+  "question": "환각을 종류별로 나누고 원인을 분석한 연구 찾아줘",
+  "p": "2311.05232",
+  "title": "A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions",
+  "abstract": "The emergence of large language models (LLMs) has marked a significant breakthrough in natural language processing (NLP), fueling a paradigm shift in information acquisition. Nevertheless, LLMs are prone to hallucination, generating plausible yet nonfactual content. This phenomenon raises significant concerns over the reliability of LLMs in real-world information retrieval (IR) systems and has attracted intensive research to detect and mitigate such hallucinations. Given the open-ended general-purpose attributes inherent to LLMs, LLM hallucinations present distinct challenges that diverge from prior task-specific models. This divergence highlights the urgency for a nuanced understanding and comprehensive overview of recent advances in LLM hallucinations. In this survey, we begin with an innovative taxonomy of hallucination in the era of LLM and then delve into the factors contributing to hallucinations. Subsequently, we present a thorough overview of hallucination detection methods and benchmarks. Our discussion then transfers to representative methodologies for mitigating LLM hallucinations. Additionally, we delve into the current limitations faced by retrieval-augmented LLMs in combating hallucinations, offering insights for developing more robust IR systems. Finally, we highlight the promising research directions on LLM hallucinations, including hallucination in large vision-language models and understanding of knowledge boundaries in LLM hallucinations."
+ },
+ {
+  "k": 30,
+  "set": "canon",
+  "q": "CN30",
+  "question": "문제에 관계없는 문장을 끼워 넣으면 모델이 쉽게 헷갈리는지 본 연구 있어?",
+  "p": "2302.00093",
+  "title": "Large Language Models Can Be Easily Distracted by Irrelevant Context",
+  "abstract": "Large language models have achieved impressive performance on various natural language processing tasks. However, so far they have been evaluated primarily on benchmarks where all information in the input context is relevant for solving the task. In this work, we investigate the distractibility of large language models, i.e., how the model problem-solving accuracy can be influenced by irrelevant context. In particular, we introduce Grade-School Math with Irrelevant Context (GSM-IC), an arithmetic reasoning dataset with irrelevant information in the problem description. We use this benchmark to measure the distractibility of cutting-edge prompting techniques for large language models, and find that the model performance is dramatically decreased when irrelevant information is included. We also identify several approaches for mitigating this deficiency, such as decoding with self-consistency and adding to the prompt an instruction that tells the language model to ignore the irrelevant information."
+ },
+ {
+  "k": 31,
+  "set": "canon",
+  "q": "CN07",
+  "question": "정답 라벨 없이 검색 모델을 학습시키는 방법을 다룬 연구 찾아줘",
+  "p": "2402.00943",
+  "title": "Approximate Nearest Neighbor Search with Window Filters",
+  "abstract": "We define and investigate the problem of $\\textit{c-approximate window search}$: approximate nearest neighbor search where each point in the dataset has a numeric label, and the goal is to find nearest neighbors to queries within arbitrary label ranges. Many semantic search problems, such as image and document search with timestamp filters, or product search with cost filters, are natural examples of this problem. We propose and theoretically analyze a modular tree-based framework for transforming an index that solves the traditional c-approximate nearest neighbor problem into a data structure that solves window search. On standard nearest neighbor benchmark datasets equipped with random label values, adversarially constructed embeddings, and image search embeddings with real timestamps, we obtain up to a $75\\times$ speedup over existing solutions at the same level of recall."
+ },
+ {
+  "k": 32,
+  "set": "canon",
+  "q": "CN23",
+  "question": "검색어에 관련 단어를 덧붙여 넓히는 작업을 LLM으로 하는 연구 찾아줘",
+  "p": "2410.09090",
+  "title": "Automating Bibliometric Analysis with Sentence Transformers and Retrieval-Augmented Generation (RAG): A Pilot Study in Semantic and Contextual Search for Customized Literature Characterization for High-Impact Urban Research",
+  "abstract": "Bibliometric analysis is essential for understanding research trends, scope, and impact in urban science, especially in high-impact journals, such Nature Portfolios. However, traditional methods, relying on keyword searches and basic NLP techniques, often fail to uncover valuable insights not explicitly stated in article titles or keywords. These approaches are unable to perform semantic searches and contextual understanding, limiting their effectiveness in classifying topics and characterizing studies. In this paper, we address these limitations by leveraging Generative AI models, specifically transformers and Retrieval-Augmented Generation (RAG), to automate and enhance bibliometric analysis. We developed a technical workflow that integrates a vector database, Sentence Transformers, a Gaussian Mixture Model (GMM), Retrieval Agent, and Large Language Models (LLMs) to enable contextual search, topic ranking, and characterization of research using customized prompt templates. A pilot study analyzing 223 urban science-related articles published in Nature Communications over the past decade highlights the effectiveness of our approach in generating insightful summary statistics on the quality, scope, and characteristics of papers in high-impact journals. This study introduces a new paradigm for enhancing bibliometric analysis and knowledge retrieval in urban research, positioning an AI agent as a powerful tool for advancing research evaluation and understanding."
+ },
+ {
+  "k": 33,
+  "set": "heldout",
+  "q": "H_A03",
+  "question": "RAG에서 검색 결과가 별로면 웹 검색으로 보충하고 문서를 걸러내는 방법 다룬 논문 있어?",
+  "p": "2409.15364",
+  "title": "VERA: Validation and Enhancement for Retrieval Augmented systems",
+  "abstract": "Large language models (LLMs) exhibit remarkable capabilities but often produce inaccurate responses, as they rely solely on their embedded knowledge. Retrieval-Augmented Generation (RAG) enhances LLMs by incorporating an external information retrieval system, supplying additional context along with the query to mitigate inaccuracies for a particular context. However, accuracy issues still remain, as the model may rely on irrelevant documents or extrapolate incorrectly from its training knowledge. To assess and improve the performance of both the retrieval system and the LLM in a RAG framework, we propose \\textbf{VERA} (\\textbf{V}alidation and \\textbf{E}nhancement for \\textbf{R}etrieval \\textbf{A}ugmented systems), a system designed to: 1) Evaluate and enhance the retrieved context before response generation, and 2) Evaluate and refine the LLM-generated response to ensure precision and minimize errors. VERA employs an evaluator-cum-enhancer LLM that first checks if external retrieval is necessary, evaluates the relevance and redundancy of the retrieved context, and refines it to eliminate non-essential information. Post-response generation, VERA splits the response into atomic statements, assesses their relevance to the query, and ensures adherence to the context. Our experiments demonstrate VERA's remarkable efficacy not only in improving the performance of smaller open-source models, but also larger state-of-the art models. These enhancements underscore VERA's potential to produce accurate and relevant responses, advancing the state-of-the-art in retrieval-augmented language modeling. VERA's robust methodology, combining multiple evaluation and refinement steps, effectively mitigates hallucinations and improves retrieval and response processes, making it a valuable tool for applications demanding high accuracy and reliability in information generation. ."
+ },
+ {
+  "k": 34,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2601.15457",
+  "title": "Chunking, Retrieval, and Re-ranking: An Empirical Evaluation of RAG Architectures for Policy Document Question Answering",
+  "abstract": "The integration of Large Language Models (LLMs) into the public health policy sector offers a transformative approach to navigating the vast repositories of regulatory guidance maintained by agencies such as the Centers for Disease Control and Prevention (CDC). However, the propensity for LLMs to generate hallucinations, defined as plausible but factually incorrect assertions, presents a critical barrier to the adoption of these technologies in high-stakes environments where information integrity is non-negotiable. This empirical evaluation explores the effectiveness of Retrieval-Augmented Generation (RAG) architectures in mitigating these risks by grounding generative outputs in authoritative document context. Specifically, this study compares a baseline Vanilla LLM against Basic RAG and Advanced RAG pipelines utilizing cross-encoder re-ranking. The experimental framework employs a Mistral-7B-Instruct-v0.2 model and an all-MiniLM-L6-v2 embedding model to process a corpus of official CDC policy analytical frameworks and guidance documents. The analysis measures the impact of two distinct chunking strategies, recursive character-based and token-based semantic splitting, on system accuracy, measured through faithfulness and relevance scores across a curated set of complex policy scenarios. Quantitative findings indicate that while Basic RAG architectures provide a substantial improvement in faithfulness (0.621) over Vanilla baselines (0.347), the Advanced RAG configuration achieves a superior faithfulness average of 0.797. These results demonstrate that two-stage retrieval mechanisms are essential for achieving the precision required for domain-specific policy question answering, though structural constraints in document segmentation remain a significant bottleneck for multi-step reasoning tasks."
+ },
+ {
+  "k": 35,
+  "set": "canon",
+  "q": "CN20",
+  "question": "긴 입력을 통째로 넣는 것과 검색해서 일부만 넣는 것 중 뭐가 나은지 비교한 연구 있어?",
+  "p": "2409.17422",
+  "title": "Discovering the Gems in Early Layers: Accelerating Long-Context LLMs with 1000x Input Token Reduction",
+  "abstract": "Large Language Models (LLMs) have demonstrated remarkable capabilities in handling long context inputs, but this comes at the cost of increased computational resources and latency. Our research introduces a novel approach for the long context bottleneck to accelerate LLM inference and reduce GPU memory consumption. Our research demonstrates that LLMs can identify relevant tokens in the early layers before generating answers to a query. Leveraging this insight, we propose an algorithm that uses early layers of an LLM as filters to select and compress input tokens, significantly reducing the context length for subsequent processing. Our method, GemFilter, demonstrates substantial improvements in both speed and memory efficiency compared to existing techniques, such as standard attention and SnapKV/H2O. Notably, it achieves a 2.4$\\times$ speedup and 30\\% reduction in GPU memory usage compared to SOTA methods. Evaluation on the Needle in a Haystack task shows that GemFilter significantly outperforms standard attention, SnapKV and demonstrates comparable performance on the LongBench challenge. GemFilter is simple, training-free, and broadly applicable across different LLMs. Crucially, it provides interpretability by allowing humans to inspect the selected input sequence. These findings not only offer practical benefits for LLM deployment, but also enhance our understanding of LLM internal mechanisms, paving the way for further optimizations in LLM design and inference. Our code is available at \\url{https://github.com/SalesforceAIResearch/GemFilter}."
+ },
+ {
+  "k": 36,
+  "set": "canon",
+  "q": "CN36",
+  "question": "어댑터나 프롬프트 튜닝처럼 적은 파라미터만 바꾸는 방법들의 성능 차이를 본 논문 있어?",
+  "p": "2503.20282",
+  "title": "Faster Parameter-Efficient Tuning with Token Redundancy Reduction",
+  "abstract": "Parameter-efficient tuning (PET) aims to transfer pre-trained foundation models to downstream tasks by learning a small number of parameters. Compared to traditional fine-tuning, which updates the entire model, PET significantly reduces storage and transfer costs for each task regardless of exponentially increasing pre-trained model capacity. However, most PET methods inherit the inference latency of their large backbone models and often introduce additional computational overhead due to additional modules (e.g. adapters), limiting their practicality for compute-intensive applications. In this paper, we propose Faster Parameter-Efficient Tuning (FPET), a novel approach that enhances inference speed and training efficiency while maintaining high storage efficiency. Specifically, we introduce a plug-and-play token redundancy reduction module delicately designed for PET. This module refines tokens from the self-attention layer using an adapter to learn the accurate similarity between tokens and cuts off the tokens through a fully-differentiable token merging strategy, which uses a straight-through estimator for optimal token reduction. Experimental results prove that our FPET achieves faster inference and higher memory efficiency than the pre-trained backbone while keeping competitive performance on par with state-of-the-art PET methods."
+ },
+ {
+  "k": 37,
+  "set": "canon",
+  "q": "CN38",
+  "question": "생성된 문장이 인용한 문서로 정말 뒷받침되는지 자동으로 확인하는 방법 연구 있어?",
+  "p": "2305.14627",
+  "title": "Enabling Large Language Models to Generate Text with Citations",
+  "abstract": "Large language models (LLMs) have emerged as a widely-used tool for information seeking, but their generated outputs are prone to hallucination. In this work, our aim is to allow LLMs to generate text with citations, improving their factual correctness and verifiability. Existing work mainly relies on commercial search engines and human evaluation, making it challenging to reproduce and compare different modeling approaches. We propose ALCE, the first benchmark for Automatic LLMs' Citation Evaluation. ALCE collects a diverse set of questions and retrieval corpora and requires building end-to-end systems to retrieve supporting evidence and generate answers with citations. We develop automatic metrics along three dimensions -- fluency, correctness, and citation quality -- and demonstrate their strong correlation with human judgements. Our experiments with state-of-the-art LLMs and novel prompting strategies show that current systems have considerable room for improvement -- For example, on the ELI5 dataset, even the best models lack complete citation support 50% of the time. Our analyses further highlight promising future directions, including developing better retrievers, advancing long-context LLMs, and improving the ability to synthesize information from multiple sources."
+ },
+ {
+  "k": 38,
+  "set": "canon",
+  "q": "CN33",
+  "question": "큰 모델 전체를 학습하지 않고 작은 행렬만 추가로 학습해서 미세조정하는 방법 연구 알려줘",
+  "p": "2412.20004",
+  "title": "Adaptive Parameter-Efficient Federated Fine-Tuning on Heterogeneous Devices",
+  "abstract": "Federated fine-tuning (FedFT) has been proposed to fine-tune the pre-trained language models in a distributed manner. However, there are two critical challenges for efficient FedFT in practical applications, i.e., resource constraints and system heterogeneity. Existing works rely on parameter-efficient fine-tuning methods, e.g., low-rank adaptation (LoRA), but with major limitations. Herein, based on the inherent characteristics of FedFT, we observe that LoRA layers with higher ranks added close to the output help to save resource consumption while achieving comparable fine-tuning performance. Then we propose a novel LoRA-based FedFT framework, termed LEGEND, which faces the difficulty of determining the number of LoRA layers (called, LoRA depth) and the rank of each LoRA layer (called, rank distribution). We analyze the coupled relationship between LoRA depth and rank distribution, and design an efficient LoRA configuration algorithm for heterogeneous devices, thereby promoting fine-tuning efficiency. Extensive experiments are conducted on a physical platform with 80 commercial devices. The results show that LEGEND can achieve a speedup of 1.5-2.8$\\times$ and save communication costs by about 42.3% when achieving the target accuracy, compared to the advanced solutions."
+ },
+ {
+  "k": 39,
+  "set": "canon",
+  "q": "CN09",
+  "question": "검색으로 뽑은 문서들을 언어 모델로 다시 순위 매기는 방법 연구 알려줘",
+  "p": "2505.07233",
+  "title": "DynamicRAG: Leveraging Outputs of Large Language Model as Feedback for Dynamic Reranking in Retrieval-Augmented Generation",
+  "abstract": "Retrieval-augmented generation (RAG) systems combine large language models (LLMs) with external knowledge retrieval, making them highly effective for knowledge-intensive tasks. A crucial but often under-explored component of these systems is the reranker. Since irrelevant documents in RAG systems can mislead the generator, the reranker plays a vital role in refining retrieved documents to enhance generation quality and explainability. However, it is challenging to determine the appropriate number of documents ($k$) that the reranker should select: too few may result in missing critical information, while too many introduce noise and inefficiencies. Although recent studies have explored LLM-based rerankers, they primarily leverage internal model knowledge and overlook the rich supervisory signals that LLMs can provide, such as using response quality as feedback for optimizing reranking decisions. In this paper, we propose DynamicRAG, a novel RAG framework where the reranker dynamically adjusts both the order and number of retrieved documents based on the query. We model the reranker as an agent optimized through reinforcement learning (RL), using rewards derived from LLM output quality. Across seven knowledge-intensive datasets, DynamicRAG demonstrates superior performance, achieving state-of-the-art results among models of same parameter sizes. The model, data and code are available at https://github.com/GasolSun36/DynamicRAG."
+ },
+ {
+  "k": 40,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2405.15374",
+  "title": "Leveraging Large Language Models for Semantic Query Processing in a Scholarly Knowledge Graph",
+  "abstract": "The proposed research aims to develop an innovative semantic query processing system that enables users to obtain comprehensive information about research works produced by Computer Science (CS) researchers at the Australian National University (ANU). The system integrates Large Language Models (LLMs) with the ANU Scholarly Knowledge Graph (ASKG), a structured repository of all research-related artifacts produced at ANU in the CS field. Each artifact and its parts are represented as textual nodes stored in a Knowledge Graph (KG).\n  To address the limitations of traditional scholarly KG construction and utilization methods, which often fail to capture fine-grained details, we propose a novel framework that integrates the Deep Document Model (DDM) for comprehensive document representation and the KG-enhanced Query Processing (KGQP) for optimized complex query handling. DDM enables a fine-grained representation of the hierarchical structure and semantic relationships within academic papers, while KGQP leverages the KG structure to improve query accuracy and efficiency with LLMs.\n  By combining the ASKG with LLMs, our approach enhances knowledge utilization and natural language understanding capabilities. The proposed system employs an automatic LLM-SPARQL fusion to retrieve relevant facts and textual nodes from the ASKG. Initial experiments demonstrate that our framework is superior to baseline methods in terms of accuracy retrieval and query efficiency.\n  We showcase the practical application of our framework in academic research scenarios, highlighting its potential to revolutionize scholarly knowledge management and discovery. This work empowers researchers to acquire and utilize knowledge from documents more effectively and provides a foundation for developing precise and reliable interactions with LLMs."
+ },
+ {
+  "k": 41,
+  "set": "canon",
+  "q": "CN14",
+  "question": "외부 자료 없이 모델 답이 지어낸 것인지 알아내는 방법을 다룬 논문 있어?",
+  "p": "2310.18344",
+  "title": "Chainpoll: A high efficacy method for LLM hallucination detection",
+  "abstract": "Large language models (LLMs) have experienced notable advancements in generating coherent and contextually relevant responses. However, hallucinations - incorrect or unfounded claims - are still prevalent, prompting the creation of automated metrics to detect these in LLM outputs. Our contributions include: introducing ChainPoll, an innovative hallucination detection method that excels compared to its counterparts, and unveiling RealHall, a refined collection of benchmark datasets to assess hallucination detection metrics from recent studies. While creating RealHall, we assessed tasks and datasets from previous hallucination detection studies and observed that many are not suitable for the potent LLMs currently in use. Overcoming this, we opted for four datasets challenging for modern LLMs and pertinent to real-world scenarios. Using RealHall, we conducted a comprehensive comparison of ChainPoll with numerous hallucination metrics from recent studies. Our findings indicate that ChainPoll outperforms in all RealHall benchmarks, achieving an overall AUROC of 0.781. This surpasses the next best theoretical method by 11% and exceeds industry standards by over 23%. Additionally, ChainPoll is cost-effective and offers greater transparency than other metrics. We introduce two novel metrics to assess LLM hallucinations: Adherence and Correctness. Adherence is relevant to Retrieval Augmented Generation workflows, evaluating an LLM's analytical capabilities within given documents and contexts. In contrast, Correctness identifies logical and reasoning errors."
+ },
+ {
+  "k": 42,
+  "set": "canon",
+  "q": "CN36",
+  "question": "어댑터나 프롬프트 튜닝처럼 적은 파라미터만 바꾸는 방법들의 성능 차이를 본 논문 있어?",
+  "p": "2403.19979",
+  "title": "Continual Adapter Tuning with Semantic Shift Compensation for Class-Incremental Learning",
+  "abstract": "Class-incremental learning (CIL) aims to enable models to continuously learn new classes while overcoming catastrophic forgetting. The introduction of pre-trained models has brought new tuning paradigms to CIL. In this paper, we revisit different parameter-efficient tuning (PET) methods within the context of continual learning. We observe that adapter tuning demonstrates superiority over prompt-based methods, even without parameter expansion in each learning session. Motivated by this, we propose incrementally tuning the shared adapter without imposing parameter update constraints, enhancing the learning capacity of the backbone. Additionally, we employ feature sampling from stored prototypes to retrain a unified classifier, further improving its performance. We estimate the semantic shift of old prototypes without access to past samples and update stored prototypes session by session. Our proposed method eliminates model expansion and avoids retaining any image samples. It surpasses previous pre-trained model-based CIL methods and demonstrates remarkable continual learning capabilities. Experimental results on five CIL benchmarks validate the effectiveness of our approach, achieving state-of-the-art (SOTA) performance."
+ },
+ {
+  "k": 43,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2404.09763",
+  "title": "KG-CTG: Citation Generation through Knowledge Graph-guided Large Language Models",
+  "abstract": "Citation Text Generation (CTG) is a task in natural language processing (NLP) that aims to produce text that accurately cites or references a cited document within a source document. In CTG, the generated text draws upon contextual cues from both the source document and the cited paper, ensuring accurate and relevant citation information is provided. Previous work in the field of citation generation is mainly based on the text summarization of documents. Following this, this paper presents a framework, and a comparative study to demonstrate the use of Large Language Models (LLMs) for the task of citation generation. Also, we have shown the improvement in the results of citation generation by incorporating the knowledge graph relations of the papers in the prompt for the LLM to better learn the relationship between the papers. To assess how well our model is performing, we have used a subset of standard S2ORC dataset, which only consists of computer science academic research papers in the English Language. Vicuna performs best for this task with 14.15 Meteor, 12.88 Rouge-1, 1.52 Rouge-2, and 10.94 Rouge-L. Also, Alpaca performs best, and improves the performance by 36.98% in Rouge-1, and 33.14% in Meteor by including knowledge graphs."
+ },
+ {
+  "k": 44,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2509.12765",
+  "title": "InfoGain-RAG: Boosting Retrieval-Augmented Generation via Document Information Gain-based Reranking and Filtering",
+  "abstract": "Retrieval-Augmented Generation (RAG) has emerged as a promising approach to address key limitations of Large Language Models (LLMs), such as hallucination, outdated knowledge, and lacking reference. However, current RAG frameworks often struggle with identifying whether retrieved documents meaningfully contribute to answer generation. This shortcoming makes it difficult to filter out irrelevant or even misleading content, which notably impacts the final performance. In this paper, we propose Document Information Gain (DIG), a novel metric designed to quantify the contribution of retrieved documents to correct answer generation. DIG measures a document's value by computing the difference of LLM's generation confidence with and without the document augmented. Further, we introduce InfoGain-RAG, a framework that leverages DIG scores to train a specialized reranker, which prioritizes each retrieved document from exact distinguishing and accurate sorting perspectives. This approach can effectively filter out irrelevant documents and select the most valuable ones for better answer generation. Extensive experiments across various models and benchmarks demonstrate that InfoGain-RAG can significantly outperform existing approaches, on both single and multiple retrievers paradigm. Specifically on NaturalQA, it achieves the improvements of 17.9%, 4.5%, 12.5% in exact match accuracy against naive RAG, self-reflective RAG and modern ranking-based RAG respectively, and even an average of 15.3% increment on advanced proprietary model GPT-4o across all datasets. These results demonstrate the feasibility of InfoGain-RAG as it can offer a reliable solution for RAG in multiple applications."
+ },
+ {
+  "k": 45,
+  "set": "canon",
+  "q": "CN14",
+  "question": "외부 자료 없이 모델 답이 지어낸 것인지 알아내는 방법을 다룬 논문 있어?",
+  "p": "2311.05232",
+  "title": "A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions",
+  "abstract": "The emergence of large language models (LLMs) has marked a significant breakthrough in natural language processing (NLP), fueling a paradigm shift in information acquisition. Nevertheless, LLMs are prone to hallucination, generating plausible yet nonfactual content. This phenomenon raises significant concerns over the reliability of LLMs in real-world information retrieval (IR) systems and has attracted intensive research to detect and mitigate such hallucinations. Given the open-ended general-purpose attributes inherent to LLMs, LLM hallucinations present distinct challenges that diverge from prior task-specific models. This divergence highlights the urgency for a nuanced understanding and comprehensive overview of recent advances in LLM hallucinations. In this survey, we begin with an innovative taxonomy of hallucination in the era of LLM and then delve into the factors contributing to hallucinations. Subsequently, we present a thorough overview of hallucination detection methods and benchmarks. Our discussion then transfers to representative methodologies for mitigating LLM hallucinations. Additionally, we delve into the current limitations faced by retrieval-augmented LLMs in combating hallucinations, offering insights for developing more robust IR systems. Finally, we highlight the promising research directions on LLM hallucinations, including hallucination in large vision-language models and understanding of knowledge boundaries in LLM hallucinations."
+ },
+ {
+  "k": 46,
+  "set": "canon",
+  "q": "CN39",
+  "question": "생성형 검색 엔진 답변이 인용을 얼마나 정확하게 다는지 조사한 연구 찾아줘",
+  "p": "2603.14170",
+  "title": "Citation-Enforced RAG for Fiscal Document Intelligence: Cited, Explainable Knowledge Retrieval in Tax Compliance",
+  "abstract": "Tax authorities and public-sector financial agencies rely on large volumes of unstructured and semi-structured fiscal documents - including tax forms, instructions, publications, and jurisdiction-specific guidance - to support compliance analysis and audit workflows. While recent advances in generative AI and retrieval-augmented generation (RAG) have shown promise for document-centric question answering, existing approaches often lack the transparency, citation fidelity, and conservative behaviour required in high-stakes regulatory domains. This paper presents a multimodal, citation-enforced RAG framework for fiscal document intelligence that prioritises explainability and auditability. The framework adopts a source-first ingestion strategy, preserves page-level provenance, enforces citations during generation, and supports abstention when evidence is insufficient. Evaluation on real IRS and state tax documents demonstrates improved citation fidelity, reduced hallucination, and analyst-usable explanations, illustrating a pathway toward trustworthy AI for tax compliance."
+ },
+ {
+  "k": 47,
+  "set": "canon",
+  "q": "CN35",
+  "question": "파라미터 효율적 미세조정 방법들을 비교 정리한 연구 찾아줘",
+  "p": "2406.19486",
+  "title": "LoPT: Low-Rank Prompt Tuning for Parameter Efficient Language Models",
+  "abstract": "In prompt tuning, a prefix or suffix text is added to the prompt, and the embeddings (soft prompts) or token indices (hard prompts) of the prefix/suffix are optimized to gain more control over language models for specific tasks. This approach eliminates the need for hand-crafted prompt engineering or explicit model fine-tuning. Prompt tuning is significantly more parameter-efficient than model fine-tuning, as it involves optimizing partial inputs of language models to produce desired outputs.   In this work, we aim to further reduce the amount of trainable parameters required for a language model to perform well on specific tasks. We propose Low-rank Prompt Tuning (LoPT), a low-rank model for prompts that achieves efficient prompt optimization. The proposed method demonstrates similar outcomes to full parameter prompt tuning while reducing the number of trainable parameters by a factor of 5. It also provides promising results compared to the state-of-the-art methods that would require 10 to 20 times more parameters."
+ },
+ {
+  "k": 48,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2406.15187",
+  "title": "UDA: A Benchmark Suite for Retrieval Augmented Generation in Real-world Document Analysis",
+  "abstract": "The use of Retrieval-Augmented Generation (RAG) has improved Large Language Models (LLMs) in collaborating with external data, yet significant challenges exist in real-world scenarios. In areas such as academic literature and finance question answering, data are often found in raw text and tables in HTML or PDF formats, which can be lengthy and highly unstructured. In this paper, we introduce a benchmark suite, namely Unstructured Document Analysis (UDA), that involves 2,965 real-world documents and 29,590 expert-annotated Q&A pairs. We revisit popular LLM- and RAG-based solutions for document analysis and evaluate the design choices and answer qualities across multiple document domains and diverse query types. Our evaluation yields interesting findings and highlights the importance of data parsing and retrieval. We hope our benchmark can shed light and better serve real-world document analysis applications. The benchmark suite and code can be found at https://github.com/qinchuanhui/UDA-Benchmark."
+ },
+ {
+  "k": 49,
+  "set": "canon",
+  "q": "CN37",
+  "question": "언어 모델 답변에 출처 인용을 달게 하고 그 품질을 평가하는 연구 알려줘",
+  "p": "2305.14627",
+  "title": "Enabling Large Language Models to Generate Text with Citations",
+  "abstract": "Large language models (LLMs) have emerged as a widely-used tool for information seeking, but their generated outputs are prone to hallucination. In this work, our aim is to allow LLMs to generate text with citations, improving their factual correctness and verifiability. Existing work mainly relies on commercial search engines and human evaluation, making it challenging to reproduce and compare different modeling approaches. We propose ALCE, the first benchmark for Automatic LLMs' Citation Evaluation. ALCE collects a diverse set of questions and retrieval corpora and requires building end-to-end systems to retrieve supporting evidence and generate answers with citations. We develop automatic metrics along three dimensions -- fluency, correctness, and citation quality -- and demonstrate their strong correlation with human judgements. Our experiments with state-of-the-art LLMs and novel prompting strategies show that current systems have considerable room for improvement -- For example, on the ELI5 dataset, even the best models lack complete citation support 50% of the time. Our analyses further highlight promising future directions, including developing better retrievers, advancing long-context LLMs, and improving the ability to synthesize information from multiple sources."
+ },
+ {
+  "k": 50,
+  "set": "canon",
+  "q": "CN35",
+  "question": "파라미터 효율적 미세조정 방법들을 비교 정리한 연구 찾아줘",
+  "p": "2412.20004",
+  "title": "Adaptive Parameter-Efficient Federated Fine-Tuning on Heterogeneous Devices",
+  "abstract": "Federated fine-tuning (FedFT) has been proposed to fine-tune the pre-trained language models in a distributed manner. However, there are two critical challenges for efficient FedFT in practical applications, i.e., resource constraints and system heterogeneity. Existing works rely on parameter-efficient fine-tuning methods, e.g., low-rank adaptation (LoRA), but with major limitations. Herein, based on the inherent characteristics of FedFT, we observe that LoRA layers with higher ranks added close to the output help to save resource consumption while achieving comparable fine-tuning performance. Then we propose a novel LoRA-based FedFT framework, termed LEGEND, which faces the difficulty of determining the number of LoRA layers (called, LoRA depth) and the rank of each LoRA layer (called, rank distribution). We analyze the coupled relationship between LoRA depth and rank distribution, and design an efficient LoRA configuration algorithm for heterogeneous devices, thereby promoting fine-tuning efficiency. Extensive experiments are conducted on a physical platform with 80 commercial devices. The results show that LEGEND can achieve a speedup of 1.5-2.8$\\times$ and save communication costs by about 42.3% when achieving the target accuracy, compared to the advanced solutions."
+ },
+ {
+  "k": 51,
+  "set": "canon",
+  "q": "CN31",
+  "question": "관련 없는 문서를 무시하도록 RAG 모델을 학습시키는 방법 연구 찾아줘",
+  "p": "2409.15364",
+  "title": "VERA: Validation and Enhancement for Retrieval Augmented systems",
+  "abstract": "Large language models (LLMs) exhibit remarkable capabilities but often produce inaccurate responses, as they rely solely on their embedded knowledge. Retrieval-Augmented Generation (RAG) enhances LLMs by incorporating an external information retrieval system, supplying additional context along with the query to mitigate inaccuracies for a particular context. However, accuracy issues still remain, as the model may rely on irrelevant documents or extrapolate incorrectly from its training knowledge. To assess and improve the performance of both the retrieval system and the LLM in a RAG framework, we propose \\textbf{VERA} (\\textbf{V}alidation and \\textbf{E}nhancement for \\textbf{R}etrieval \\textbf{A}ugmented systems), a system designed to: 1) Evaluate and enhance the retrieved context before response generation, and 2) Evaluate and refine the LLM-generated response to ensure precision and minimize errors. VERA employs an evaluator-cum-enhancer LLM that first checks if external retrieval is necessary, evaluates the relevance and redundancy of the retrieved context, and refines it to eliminate non-essential information. Post-response generation, VERA splits the response into atomic statements, assesses their relevance to the query, and ensures adherence to the context. Our experiments demonstrate VERA's remarkable efficacy not only in improving the performance of smaller open-source models, but also larger state-of-the art models. These enhancements underscore VERA's potential to produce accurate and relevant responses, advancing the state-of-the-art in retrieval-augmented language modeling. VERA's robust methodology, combining multiple evaluation and refinement steps, effectively mitigates hallucinations and improves retrieval and response processes, making it a valuable tool for applications demanding high accuracy and reliability in information generation. ."
+ },
+ {
+  "k": 52,
+  "set": "canon",
+  "q": "CN39",
+  "question": "생성형 검색 엔진 답변이 인용을 얼마나 정확하게 다는지 조사한 연구 찾아줘",
+  "p": "2510.17853",
+  "title": "CiteGuard: Faithful Citation Attribution for LLMs via Retrieval-Augmented Validation",
+  "abstract": "Large Language Models (LLMs) have emerged as powerful assistants for scientific writing. However, concerns remain about the quality and reliability of the generated text, including citation accuracy and faithfulness. While most recent work relies on methods such as LLM-as-a-Judge, the reliability of LLM-as-a-Judge alone is also in doubt. In this work, we reframe citation evaluation as a problem of citation attribution alignment, which assesses whether LLM-generated citations match those a human author would include for the same text. We propose CiteGuard, a retrieval-aware agent framework designed to provide more faithful grounding for citation validation. CiteGuard improves over the prior baseline by 10 percentage points and achieves up to 68.1% accuracy on the CiteME benchmark, approaching human performance (69.2%). It also identifies alternative valid citations and demonstrates generalization ability for cross-domain citation attribution. Our code is available at https://github.com/KathCYM/CiteGuard."
+ },
+ {
+  "k": 53,
+  "set": "canon",
+  "q": "CN35",
+  "question": "파라미터 효율적 미세조정 방법들을 비교 정리한 연구 찾아줘",
+  "p": "2402.09353",
+  "title": "DoRA: Weight-Decomposed Low-Rank Adaptation",
+  "abstract": "Among the widely used parameter-efficient fine-tuning (PEFT) methods, LoRA and its variants have gained considerable popularity because of avoiding additional inference costs. However, there still often exists an accuracy gap between these methods and full fine-tuning (FT). In this work, we first introduce a novel weight decomposition analysis to investigate the inherent differences between FT and LoRA. Aiming to resemble the learning capacity of FT from the findings, we propose Weight-Decomposed Low-Rank Adaptation (DoRA). DoRA decomposes the pre-trained weight into two components, magnitude and direction, for fine-tuning, specifically employing LoRA for directional updates to efficiently minimize the number of trainable parameters. By employing \\ours, we enhance both the learning capacity and training stability of LoRA while avoiding any additional inference overhead. \\ours~consistently outperforms LoRA on fine-tuning LLaMA, LLaVA, and VL-BART on various downstream tasks, such as commonsense reasoning, visual instruction tuning, and image/video-text understanding. Code is available at https://github.com/NVlabs/DoRA."
+ },
+ {
+  "k": 54,
+  "set": "canon",
+  "q": "CN38",
+  "question": "생성된 문장이 인용한 문서로 정말 뒷받침되는지 자동으로 확인하는 방법 연구 있어?",
+  "p": "2508.05666",
+  "title": "HySemRAG: A Hybrid Semantic Retrieval-Augmented Generation Framework for Automated Literature Synthesis and Methodological Gap Analysis",
+  "abstract": "We present HySemRAG, a framework that combines Extract, Transform, Load (ETL) pipelines with Retrieval-Augmented Generation (RAG) to automate large-scale literature synthesis and identify methodological research gaps. The system addresses limitations in existing RAG architectures through a multi-layered approach: hybrid retrieval combining semantic search, keyword filtering, and knowledge graph traversal; an agentic self-correction framework with iterative quality assurance; and post-hoc citation verification ensuring complete traceability. Our implementation processes scholarly literature through eight integrated stages: multi-source metadata acquisition, asynchronous PDF retrieval, custom document layout analysis using modified Docling architecture, bibliographic management, LLM-based field extraction, topic modeling, semantic unification, and knowledge graph construction. The system creates dual data products - a Neo4j knowledge graph enabling complex relationship queries and Qdrant vector collections supporting semantic search - serving as foundational infrastructure for verifiable information synthesis. Evaluation across 643 observations from 60 testing sessions demonstrates structured field extraction achieving 35.1% higher semantic similarity scores (0.655 $\\pm$ 0.178) compared to PDF chunking approaches (0.485 $\\pm$ 0.204, p < 0.000001). The agentic quality assurance mechanism achieves 68.3% single-pass success rates with 99.0% citation accuracy in validated responses. Applied to geospatial epidemiology literature on ozone exposure and cardiovascular disease, the system identifies methodological trends and research gaps, demonstrating broad applicability across scientific domains for accelerating evidence synthesis and discovery."
+ },
+ {
+  "k": 55,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2411.08438",
+  "title": "Towards Optimizing a Retrieval Augmented Generation using Large Language Model on Academic Data",
+  "abstract": "Given the growing trend of many organizations integrating Retrieval Augmented Generation (RAG) into their operations, we assess RAG on domain-specific data and test state-of-the-art models across various optimization techniques. We incorporate four optimizations; Multi-Query, Child-Parent-Retriever, Ensemble Retriever, and In-Context-Learning, to enhance the functionality and performance in the academic domain. We focus on data retrieval, specifically targeting various study programs at a large technical university. We additionally introduce a novel evaluation approach, the RAG Confusion Matrix designed to assess the effectiveness of various configurations within the RAG framework. By exploring the integration of both open-source (e.g., Llama2, Mistral) and closed-source (GPT-3.5 and GPT-4) Large Language Models, we offer valuable insights into the application and optimization of RAG frameworks in domain-specific contexts. Our experiments show a significant performance increase when including multi-query in the retrieval phase."
+ },
+ {
+  "k": 56,
+  "set": "heldout",
+  "q": "H_B09",
+  "question": "RankGPT 논문에서 LLM으로 재순위하는 방법 설명해줘",
+  "p": "2406.14449",
+  "title": "APEER: Automatic Prompt Engineering Enhances Large Language Model Reranking",
+  "abstract": "Large Language Models (LLMs) have significantly enhanced Information Retrieval (IR) across various modules, such as reranking. Despite impressive performance, current zero-shot relevance ranking with LLMs heavily relies on human prompt engineering. Existing automatic prompt engineering algorithms primarily focus on language modeling and classification tasks, leaving the domain of IR, particularly reranking, underexplored. Directly applying current prompt engineering algorithms to relevance ranking is challenging due to the integration of query and long passage pairs in the input, where the ranking complexity surpasses classification tasks. To reduce human effort and unlock the potential of prompt optimization in reranking, we introduce a novel automatic prompt engineering algorithm named APEER. APEER iteratively generates refined prompts through feedback and preference optimization. Extensive experiments with four LLMs and ten datasets demonstrate the substantial performance improvement of APEER over existing state-of-the-art (SoTA) manual prompts. Furthermore, we find that the prompts generated by APEER exhibit better transferability across diverse tasks and LLMs."
+ },
+ {
+  "k": 57,
+  "set": "canon",
+  "q": "CN20",
+  "question": "긴 입력을 통째로 넣는 것과 검색해서 일부만 넣는 것 중 뭐가 나은지 비교한 연구 있어?",
+  "p": "2412.12322",
+  "title": "RAG Playground: A Framework for Systematic Evaluation of Retrieval Strategies and Prompt Engineering in RAG Systems",
+  "abstract": "We present RAG Playground, an open-source framework for systematic evaluation of Retrieval-Augmented Generation (RAG) systems. The framework implements and compares three retrieval approaches: naive vector search, reranking, and hybrid vector-keyword search, combined with ReAct agents using different prompting strategies. We introduce a comprehensive evaluation framework with novel metrics and provide empirical results comparing different language models (Llama 3.1 and Qwen 2.5) across various retrieval configurations. Our experiments demonstrate significant performance improvements through hybrid search methods and structured self-evaluation prompting, achieving up to 72.7% pass rate on our multi-metric evaluation framework. The results also highlight the importance of prompt engineering in RAG systems, with our custom-prompted agents showing consistent improvements in retrieval accuracy and response quality."
+ },
+ {
+  "k": 58,
+  "set": "canon",
+  "q": "CN38",
+  "question": "생성된 문장이 인용한 문서로 정말 뒷받침되는지 자동으로 확인하는 방법 연구 있어?",
+  "p": "2509.21557",
+  "title": "Generation-Time vs. Post-hoc Citation: A Holistic Evaluation of LLM Attribution",
+  "abstract": "Trustworthy Large Language Models (LLMs) must cite human-verifiable sources in high-stakes domains such as healthcare, law, academia, and finance, where even small errors can have severe consequences. Practitioners and researchers face a choice: let models generate citations during decoding, or let models draft answers first and then attach appropriate citations. To clarify this choice, we introduce two paradigms: Generation-Time Citation (G-Cite), which produces the answer and citations in one pass, and Post-hoc Citation (P-Cite), which adds or verifies citations after drafting. We conduct a comprehensive evaluation from zero-shot to advanced retrieval-augmented methods across four popular attribution datasets and provide evidence-based recommendations that weigh trade-offs across use cases. Our results show a consistent trade-off between coverage and citation correctness, with retrieval as the main driver of attribution quality in both paradigms. P-Cite methods achieve high coverage with competitive correctness and moderate latency, whereas G-Cite methods prioritize precision at the cost of coverage and speed. We recommend a retrieval-centric, P-Cite-first approach for high-stakes applications, reserving G-Cite for precision-critical settings such as strict claim verification. Our codes and human evaluation results are available at https://anonymous.4open.science/r/Citation_Paradigms-BBB5/"
+ },
+ {
+  "k": 59,
+  "set": "canon",
+  "q": "CN09",
+  "question": "검색으로 뽑은 문서들을 언어 모델로 다시 순위 매기는 방법 연구 알려줘",
+  "p": "2509.12765",
+  "title": "InfoGain-RAG: Boosting Retrieval-Augmented Generation via Document Information Gain-based Reranking and Filtering",
+  "abstract": "Retrieval-Augmented Generation (RAG) has emerged as a promising approach to address key limitations of Large Language Models (LLMs), such as hallucination, outdated knowledge, and lacking reference. However, current RAG frameworks often struggle with identifying whether retrieved documents meaningfully contribute to answer generation. This shortcoming makes it difficult to filter out irrelevant or even misleading content, which notably impacts the final performance. In this paper, we propose Document Information Gain (DIG), a novel metric designed to quantify the contribution of retrieved documents to correct answer generation. DIG measures a document's value by computing the difference of LLM's generation confidence with and without the document augmented. Further, we introduce InfoGain-RAG, a framework that leverages DIG scores to train a specialized reranker, which prioritizes each retrieved document from exact distinguishing and accurate sorting perspectives. This approach can effectively filter out irrelevant documents and select the most valuable ones for better answer generation. Extensive experiments across various models and benchmarks demonstrate that InfoGain-RAG can significantly outperform existing approaches, on both single and multiple retrievers paradigm. Specifically on NaturalQA, it achieves the improvements of 17.9%, 4.5%, 12.5% in exact match accuracy against naive RAG, self-reflective RAG and modern ranking-based RAG respectively, and even an average of 15.3% increment on advanced proprietary model GPT-4o across all datasets. These results demonstrate the feasibility of InfoGain-RAG as it can offer a reliable solution for RAG in multiple applications."
+ },
+ {
+  "k": 60,
+  "set": "canon",
+  "q": "CN09",
+  "question": "검색으로 뽑은 문서들을 언어 모델로 다시 순위 매기는 방법 연구 알려줘",
+  "p": "2310.08319",
+  "title": "Fine-Tuning LLaMA for Multi-Stage Text Retrieval",
+  "abstract": "The effectiveness of multi-stage text retrieval has been solidly demonstrated since before the era of pre-trained language models. However, most existing studies utilize models that predate recent advances in large language models (LLMs). This study seeks to explore potential improvements that state-of-the-art LLMs can bring. We conduct a comprehensive study, fine-tuning the latest LLaMA model both as a dense retriever (RepLLaMA) and as a pointwise reranker (RankLLaMA) for both passage retrieval and document retrieval using the MS MARCO datasets. Our findings demonstrate that the effectiveness of large language models indeed surpasses that of smaller models. Additionally, since LLMs can inherently handle longer contexts, they can represent entire documents holistically, obviating the need for traditional segmenting and pooling strategies. Furthermore, evaluations on BEIR demonstrate that our RepLLaMA-RankLLaMA pipeline exhibits strong zero-shot effectiveness. Model checkpoints from this study are available on HuggingFace."
+ },
+ {
+  "k": 61,
+  "set": "canon",
+  "q": "CN37",
+  "question": "언어 모델 답변에 출처 인용을 달게 하고 그 품질을 평가하는 연구 알려줘",
+  "p": "2404.09763",
+  "title": "KG-CTG: Citation Generation through Knowledge Graph-guided Large Language Models",
+  "abstract": "Citation Text Generation (CTG) is a task in natural language processing (NLP) that aims to produce text that accurately cites or references a cited document within a source document. In CTG, the generated text draws upon contextual cues from both the source document and the cited paper, ensuring accurate and relevant citation information is provided. Previous work in the field of citation generation is mainly based on the text summarization of documents. Following this, this paper presents a framework, and a comparative study to demonstrate the use of Large Language Models (LLMs) for the task of citation generation. Also, we have shown the improvement in the results of citation generation by incorporating the knowledge graph relations of the papers in the prompt for the LLM to better learn the relationship between the papers. To assess how well our model is performing, we have used a subset of standard S2ORC dataset, which only consists of computer science academic research papers in the English Language. Vicuna performs best for this task with 14.15 Meteor, 12.88 Rouge-1, 1.52 Rouge-2, and 10.94 Rouge-L. Also, Alpaca performs best, and improves the performance by 36.98% in Rouge-1, and 33.14% in Meteor by including knowledge graphs."
+ },
+ {
+  "k": 62,
+  "set": "canon",
+  "q": "CN15",
+  "question": "환각을 종류별로 나누고 원인을 분석한 연구 찾아줘",
+  "p": "2309.01219",
+  "title": "Siren's Song in the AI Ocean: A Survey on Hallucination in Large Language Models",
+  "abstract": "While large language models (LLMs) have demonstrated remarkable capabilities across a range of downstream tasks, a significant concern revolves around their propensity to exhibit hallucinations: LLMs occasionally generate content that diverges from the user input, contradicts previously generated context, or misaligns with established world knowledge. This phenomenon poses a substantial challenge to the reliability of LLMs in real-world scenarios. In this paper, we survey recent efforts on the detection, explanation, and mitigation of hallucination, with an emphasis on the unique challenges posed by LLMs. We present taxonomies of the LLM hallucination phenomena and evaluation benchmarks, analyze existing approaches aiming at mitigating LLM hallucination, and discuss potential directions for future research."
+ },
+ {
+  "k": 63,
+  "set": "canon",
+  "q": "CN21",
+  "question": "사용자 질문을 검색하기 좋게 언어 모델로 다시 써서 검색하는 방법 연구 알려줘",
+  "p": "2404.00610",
+  "title": "RQ-RAG: Learning to Refine Queries for Retrieval Augmented Generation",
+  "abstract": "Large Language Models (LLMs) exhibit remarkable capabilities but are prone to generating inaccurate or hallucinatory responses. This limitation stems from their reliance on vast pretraining datasets, making them susceptible to errors in unseen scenarios. To tackle these challenges, Retrieval-Augmented Generation (RAG) addresses this by incorporating external, relevant documents into the response generation process, thus leveraging non-parametric knowledge alongside LLMs' in-context learning abilities. However, existing RAG implementations primarily focus on initial input for context retrieval, overlooking the nuances of ambiguous or complex queries that necessitate further clarification or decomposition for accurate responses. To this end, we propose learning to Refine Query for Retrieval Augmented Generation (RQ-RAG) in this paper, endeavoring to enhance the model by equipping it with capabilities for explicit rewriting, decomposition, and disambiguation. Our experimental results indicate that our method, when applied to a 7B Llama2 model, surpasses the previous state-of-the-art (SOTA) by an average of 1.9\\% across three single-hop QA datasets, and also demonstrates enhanced performance in handling complex, multi-hop QA datasets. Our code is available at https://github.com/chanchimin/RQ-RAG."
+ },
+ {
+  "k": 64,
+  "set": "canon",
+  "q": "CN35",
+  "question": "파라미터 효율적 미세조정 방법들을 비교 정리한 연구 찾아줘",
+  "p": "2503.20282",
+  "title": "Faster Parameter-Efficient Tuning with Token Redundancy Reduction",
+  "abstract": "Parameter-efficient tuning (PET) aims to transfer pre-trained foundation models to downstream tasks by learning a small number of parameters. Compared to traditional fine-tuning, which updates the entire model, PET significantly reduces storage and transfer costs for each task regardless of exponentially increasing pre-trained model capacity. However, most PET methods inherit the inference latency of their large backbone models and often introduce additional computational overhead due to additional modules (e.g. adapters), limiting their practicality for compute-intensive applications. In this paper, we propose Faster Parameter-Efficient Tuning (FPET), a novel approach that enhances inference speed and training efficiency while maintaining high storage efficiency. Specifically, we introduce a plug-and-play token redundancy reduction module delicately designed for PET. This module refines tokens from the self-attention layer using an adapter to learn the accurate similarity between tokens and cuts off the tokens through a fully-differentiable token merging strategy, which uses a straight-through estimator for optimal token reduction. Experimental results prove that our FPET achieves faster inference and higher memory efficiency than the pre-trained backbone while keeping competitive performance on par with state-of-the-art PET methods."
+ },
+ {
+  "k": 65,
+  "set": "canon",
+  "q": "CN04",
+  "question": "모델 크기를 키우는 대신 검색을 붙여서 성능을 올린 연구 찾아줘",
+  "p": "2505.08445",
+  "title": "Optimizing Retrieval-Augmented Generation: Analysis of Hyperparameter Impact on Performance and Efficiency",
+  "abstract": "Large language models achieve high task performance yet often hallucinate or rely on outdated knowledge. Retrieval-augmented generation (RAG) addresses these gaps by coupling generation with external search. We analyse how hyperparameters influence speed and quality in RAG systems, covering Chroma and Faiss vector stores, chunking policies, cross-encoder re-ranking, and temperature, and we evaluate six metrics: faithfulness, answer correctness, answer relevancy, context precision, context recall, and answer similarity. Chroma processes queries 13% faster, whereas Faiss yields higher retrieval precision, revealing a clear speed-accuracy trade-off. Naive fixed-length chunking with small windows and minimal overlap outperforms semantic segmentation while remaining the quickest option. Re-ranking provides modest gains in retrieval quality yet increases runtime by roughly a factor of 5, so its usefulness depends on latency constraints. These results help practitioners balance computational cost and accuracy when tuning RAG systems for transparent, up-to-date responses. Finally, we re-evaluate the top configurations with a corrective RAG workflow and show that their advantages persist when the model can iteratively request additional evidence. We obtain a near-perfect context precision (99%), which demonstrates that RAG systems can achieve extremely high retrieval accuracy with the right combination of hyperparameters, with significant implications for applications where retrieval quality directly impacts downstream task performance, such as clinical decision support in healthcare."
+ },
+ {
+  "k": 66,
+  "set": "canon",
+  "q": "CN38",
+  "question": "생성된 문장이 인용한 문서로 정말 뒷받침되는지 자동으로 확인하는 방법 연구 있어?",
+  "p": "2606.26449",
+  "title": "ProvenAI: Provenance-Native Traces of Evidence in Generated Answers",
+  "abstract": "Retrieval-augmented systems routinely present citations alongside generated answers, yet a citation does not confirm that the corresponding source meaningfully shaped the output. This paper introduces ProvenAI, a framework that decomposes transparency in multi-hop question answering into three independently measurable layers: answer correctness, citation fidelity against benchmark supporting evidence, and per-document influence under leave-one-resource-out intervention. Targeting the HotpotQA distractor benchmark through a seven-stage pipeline covering data normalisation, retrieval indexing, citation-aware answer generation, attribution auditing, ablation-based influence estimation, batch evaluation, and interactive inspection, ProvenAI evaluates 7,405 validation examples drawn from a canonical corpus of 509,300 passages. The system achieves 53.53% answer accuracy alongside a mean citation-fidelity score of 71.55%, and a worked example surfaces what we call the citation-influence gap: a clean citation audit co-occurring with a profile in which one cited source registers only weak influence while seven uncited sources demonstrably shift the output. We formalise the relationship between the implemented surface proxy and a token-level KL-divergence target through a stated faithfulness condition, ground the framework in causal-mediation analysis and database-provenance theory, and discuss how the three measurement layers compose with cryptographic provenance architectures emerging in autonomous scientific discovery. ProvenAI establishes that meaningful transparency in retrieval-grounded QA requires traceable links across retrieved, cited, and behaviourally influential evidence as three distinct, independently measured layers."
+ },
+ {
+  "k": 67,
+  "set": "heldout",
+  "q": "H_G06",
+  "question": "LLM 에이전트 평가 연구들을 바탕으로 앞으로 필요한 벤치마크 3가지를 제안해줘",
+  "p": "2411.15594",
+  "title": "A Survey on LLM-as-a-Judge",
+  "abstract": "Accurate and consistent evaluation is crucial for decision-making across numerous fields, yet it remains a challenging task due to inherent subjectivity, variability, and scale. Large Language Models (LLMs) have achieved remarkable success across diverse domains, leading to the emergence of \"LLM-as-a-Judge,\" where LLMs are employed as evaluators for complex tasks. With their ability to process diverse data types and provide scalable, cost-effective, and consistent assessments, LLMs present a compelling alternative to traditional expert-driven evaluations. However, ensuring the reliability of LLM-as-a-Judge systems remains a significant challenge that requires careful design and standardization. This paper provides a comprehensive survey of LLM-as-a-Judge, addressing the core question: How can reliable LLM-as-a-Judge systems be built? We explore strategies to enhance reliability, including improving consistency, mitigating biases, and adapting to diverse assessment scenarios. Additionally, we propose methodologies for evaluating the reliability of LLM-as-a-Judge systems, supported by a novel benchmark designed for this purpose. To advance the development and real-world deployment of LLM-as-a-Judge systems, we also discussed practical applications, challenges, and future directions. This survey serves as a foundational reference for researchers and practitioners in this rapidly evolving field."
+ },
+ {
+  "k": 68,
+  "set": "canon",
+  "q": "CN23",
+  "question": "검색어에 관련 단어를 덧붙여 넓히는 작업을 LLM으로 하는 연구 찾아줘",
+  "p": "2508.05666",
+  "title": "HySemRAG: A Hybrid Semantic Retrieval-Augmented Generation Framework for Automated Literature Synthesis and Methodological Gap Analysis",
+  "abstract": "We present HySemRAG, a framework that combines Extract, Transform, Load (ETL) pipelines with Retrieval-Augmented Generation (RAG) to automate large-scale literature synthesis and identify methodological research gaps. The system addresses limitations in existing RAG architectures through a multi-layered approach: hybrid retrieval combining semantic search, keyword filtering, and knowledge graph traversal; an agentic self-correction framework with iterative quality assurance; and post-hoc citation verification ensuring complete traceability. Our implementation processes scholarly literature through eight integrated stages: multi-source metadata acquisition, asynchronous PDF retrieval, custom document layout analysis using modified Docling architecture, bibliographic management, LLM-based field extraction, topic modeling, semantic unification, and knowledge graph construction. The system creates dual data products - a Neo4j knowledge graph enabling complex relationship queries and Qdrant vector collections supporting semantic search - serving as foundational infrastructure for verifiable information synthesis. Evaluation across 643 observations from 60 testing sessions demonstrates structured field extraction achieving 35.1% higher semantic similarity scores (0.655 $\\pm$ 0.178) compared to PDF chunking approaches (0.485 $\\pm$ 0.204, p < 0.000001). The agentic quality assurance mechanism achieves 68.3% single-pass success rates with 99.0% citation accuracy in validated responses. Applied to geospatial epidemiology literature on ozone exposure and cardiovascular disease, the system identifies methodological trends and research gaps, demonstrating broad applicability across scientific domains for accelerating evidence synthesis and discovery."
+ },
+ {
+  "k": 69,
+  "set": "canon",
+  "q": "CN23",
+  "question": "검색어에 관련 단어를 덧붙여 넓히는 작업을 LLM으로 하는 연구 찾아줘",
+  "p": "2412.12358",
+  "title": "BioRAGent: A Retrieval-Augmented Generation System for Showcasing Generative Query Expansion and Domain-Specific Search for Scientific Q&A",
+  "abstract": "We present BioRAGent, an interactive web-based retrieval-augmented generation (RAG) system for biomedical question answering. The system uses large language models (LLMs) for query expansion, snippet extraction, and answer generation while maintaining transparency through citation links to the source documents and displaying generated queries for further editing. Building on our successful participation in the BioASQ 2024 challenge, we demonstrate how few-shot learning with LLMs can be effectively applied for a professional search setting. The system supports both direct short paragraph style responses and responses with inline citations. Our demo is available online, and the source code is publicly accessible through GitHub."
+ },
+ {
+  "k": 70,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2412.17933",
+  "title": "BenCzechMark : A Czech-centric Multitask and Multimetric Benchmark for Large Language Models with Duel Scoring Mechanism",
+  "abstract": "We present BenCzechMark (BCM), the first comprehensive Czech language benchmark designed for large language models, offering diverse tasks, multiple task formats, and multiple evaluation metrics. Its duel scoring system is grounded in statistical significance theory and uses aggregation across tasks inspired by social preference theory. Our benchmark encompasses 50 challenging tasks, with corresponding test datasets, primarily in native Czech, with 14 newly collected ones. These tasks span 8 categories and cover diverse domains, including historical Czech news, essays from pupils or language learners, and spoken word. Furthermore, we collect and clean BUT-Large Czech Collection, the largest publicly available clean Czech language corpus, and use it for (i) contamination analysis and (ii) continuous pretraining of the first Czech-centric 7B language model with Czech-specific tokenization. We use our model as a baseline for comparison with publicly available multilingual models. Lastly, we release and maintain a leaderboard with existing 50 model submissions, where new model submissions can be made at https://huggingface.co/spaces/CZLC/BenCzechMark."
+ },
+ {
+  "k": 71,
+  "set": "canon",
+  "q": "CN08",
+  "question": "문서를 벡터 하나로 줄이지 않고 단어마다 벡터를 둬서 검색하는 방법 연구 있어?",
+  "p": "2602.16974",
+  "title": "Beyond Chunk-Then-Embed: A Comprehensive Taxonomy and Evaluation of Document Chunking Strategies for Information Retrieval",
+  "abstract": "Document chunking is a critical preprocessing step in dense retrieval systems, yet the design space of chunking strategies remains poorly understood. Recent research has proposed several concurrent approaches, including LLM-guided methods (e.g., DenseX and LumberChunker) and contextualized strategies(e.g., Late Chunking), which generate embeddings before segmentation to preserve contextual information. However, these methods emerged independently and were evaluated on benchmarks with minimal overlap, making direct comparisons difficult.   This paper reproduces prior studies in document chunking and presents a systematic framework that unifies existing strategies along two key dimensions: (1) segmentation methods, including structure-based methods (fixed-size, sentence-based, and paragraph-based) as well as semantically-informed and LLM-guided methods; and (2) embedding paradigms, which determine the timing of chunking relative to embedding (pre-embedding chunking vs. contextualized chunking). Our reproduction evaluates these approaches in two distinct retrieval settings established in previous work: in-document retrieval (needle-in-a-haystack) and in-corpus retrieval (the standard information retrieval task).   Our comprehensive evaluation reveals that optimal chunking strategies are task-dependent: simple structure-based methods outperform LLM-guided alternatives for in-corpus retrieval, while LumberChunker performs best for in-document retrieval. Contextualized chunking improves in-corpus effectiveness but degrades in-document retrieval. We also find that chunk size correlates moderately with in-document but weakly with in-corpus effectiveness, suggesting segmentation method differences are not purely driven by chunk size. Our code and evaluation benchmarks are publicly available at (Anonymoused)."
+ },
+ {
+  "k": 72,
+  "set": "canon",
+  "q": "CN35",
+  "question": "파라미터 효율적 미세조정 방법들을 비교 정리한 연구 찾아줘",
+  "p": "2501.00365",
+  "title": "Low-Rank Adaptation for Foundation Models: A Comprehensive Review",
+  "abstract": "The rapid advancement of foundation modelslarge-scale neural networks trained on diverse, extensive datasetshas revolutionized artificial intelligence, enabling unprecedented advancements across domains such as natural language processing, computer vision, and scientific discovery. However, the substantial parameter count of these models, often reaching billions or trillions, poses significant challenges in adapting them to specific downstream tasks. Low-Rank Adaptation (LoRA) has emerged as a highly promising approach for mitigating these challenges, offering a parameter-efficient mechanism to fine-tune foundation models with minimal computational overhead. This survey provides the first comprehensive review of LoRA techniques beyond large Language Models to general foundation models, including recent techniques foundations, emerging frontiers and applications of low-rank adaptation across multiple domains. Finally, this survey discusses key challenges and future research directions in theoretical understanding, scalability, and robustness. This survey serves as a valuable resource for researchers and practitioners working with efficient foundation model adaptation."
+ },
+ {
+  "k": 73,
+  "set": "heldout",
+  "q": "H_F11",
+  "question": "임베딩 검색에서 질문은 짧고 문서는 길어서 유사도가 낮게 나온다. 문서 확장이나 질문 확장으로 이 길이 차이를 보정하는 방법을 비교한 연구가 있는가.",
+  "p": "2106.11251",
+  "title": "Pseudo-Relevance Feedback for Multiple Representation Dense Retrieval",
+  "abstract": "Pseudo-relevance feedback mechanisms, from Rocchio to the relevance models, have shown the usefulness of expanding and reweighting the users' initial queries using information occurring in an initial set of retrieved documents, known as the pseudo-relevant set. Recently, dense retrieval -- through the use of neural contextual language models such as BERT for analysing the documents' and queries' contents and computing their relevance scores -- has shown a promising performance on several information retrieval tasks still relying on the traditional inverted index for identifying documents relevant to a query. Two different dense retrieval families have emerged: the use of single embedded representations for each passage and query (e.g. using BERT's [CLS] token), or via multiple representations (e.g. using an embedding for each token of the query and document). In this work, we conduct the first study into the potential for multiple representation dense retrieval to be enhanced using pseudo-relevance feedback. In particular, based on the pseudo-relevant set of documents identified using a first-pass dense retrieval, we extract representative feedback embeddings (using KMeans clustering) -- while ensuring that these embeddings discriminate among passages (based on IDF) -- which are then added to the query representation. These additional feedback embeddings are shown to both enhance the effectiveness of a reranking as well as an additional dense retrieval operation. Indeed, experiments on the MSMARCO passage ranking dataset show that MAP can be improved by upto 26% on the TREC 2019 query set and 10% on the TREC 2020 query set by the application of our proposed ColBERT-PRF method on a ColBERT dense retrieval approach."
+ },
+ {
+  "k": 74,
+  "set": "canon",
+  "q": "CN23",
+  "question": "검색어에 관련 단어를 덧붙여 넓히는 작업을 LLM으로 하는 연구 찾아줘",
+  "p": "2312.07796",
+  "title": "Harnessing Retrieval-Augmented Generation (RAG) for Uncovering Knowledge Gaps",
+  "abstract": "The paper presents a methodology for uncovering knowledge gaps on the internet using the Retrieval Augmented Generation (RAG) model. By simulating user search behaviour, the RAG system identifies and addresses gaps in information retrieval systems. The study demonstrates the effectiveness of the RAG system in generating relevant suggestions with a consistent accuracy of 93%. The methodology can be applied in various fields such as scientific discovery, educational enhancement, research development, market analysis, search engine optimisation, and content development. The results highlight the value of identifying and understanding knowledge gaps to guide future endeavours."
+ },
+ {
+  "k": 75,
+  "set": "canon",
+  "q": "CN04",
+  "question": "모델 크기를 키우는 대신 검색을 붙여서 성능을 올린 연구 찾아줘",
+  "p": "2412.15246",
+  "title": "Accelerating Retrieval-Augmented Generation",
+  "abstract": "An evolving solution to address hallucination and enhance accuracy in large language models (LLMs) is Retrieval-Augmented Generation (RAG), which involves augmenting LLMs with information retrieved from an external knowledge source, such as the web. This paper profiles several RAG execution pipelines and demystifies the complex interplay between their retrieval and generation phases. We demonstrate that while exact retrieval schemes are expensive, they can reduce inference time compared to approximate retrieval variants because an exact retrieval model can send a smaller but more accurate list of documents to the generative model while maintaining the same end-to-end accuracy. This observation motivates the acceleration of the exact nearest neighbor search for RAG.   In this work, we design Intelligent Knowledge Store (IKS), a type-2 CXL device that implements a scale-out near-memory acceleration architecture with a novel cache-coherent interface between the host CPU and near-memory accelerators. IKS offers 13.4-27.9x faster exact nearest neighbor search over a 512GB vector database compared with executing the search on Intel Sapphire Rapids CPUs. This higher search performance translates to 1.7-26.3x lower end-to-end inference time for representative RAG applications. IKS is inherently a memory expander; its internal DRAM can be disaggregated and used for other applications running on the server to prevent DRAM, which is the most expensive component in today's servers, from being stranded."
+ },
+ {
+  "k": 76,
+  "set": "canon",
+  "q": "CN07",
+  "question": "정답 라벨 없이 검색 모델을 학습시키는 방법을 다룬 연구 찾아줘",
+  "p": "2510.01600",
+  "title": "A Comparison of Independent and Joint Fine-tuning Strategies for Retrieval-Augmented Generation",
+  "abstract": "A Comparison of Independent and Joint Fine-tuning Strategies for Retrieval-Augmented Generation Download PDF Neal Gregory Lawton, Alfy Samuel, Anoop Kumar, Daben Liu Published: 20 Aug 2025, Retrieval augmented generation (RAG) is a popular framework for question answering that is powered by two large language models (LLMs): an embedding model that retrieves context documents from a database that are relevant to a given question, and a generator model that uses the retrieved context to generate an answer to the question. Both the embedding and generator models can be fine-tuned to increase performance of a RAG pipeline on a new task, but multiple fine-tuning strategies exist with different costs and benefits. In this paper, we evaluate and compare several RAG fine-tuning strategies, including independent, joint, and two-phase fine-tuning. In our experiments, we observe that all of these strategies achieve about equal improvement in EM and F1 generation quality metrics, although they have significantly different computational costs. We conclude the optimal fine-tuning strategy to use depends on whether the training dataset includes context labels and whether a grid search over the learning rates for the embedding and generator models is required."
+ },
+ {
+  "k": 77,
+  "set": "heldout",
+  "q": "H_B09",
+  "question": "RankGPT 논문에서 LLM으로 재순위하는 방법 설명해줘",
+  "p": "2312.02724",
+  "title": "RankZephyr: Effective and Robust Zero-Shot Listwise Reranking is a Breeze!",
+  "abstract": "In information retrieval, proprietary large language models (LLMs) such as GPT-4 and open-source counterparts such as LLaMA and Vicuna have played a vital role in reranking. However, the gap between open-source and closed models persists, with reliance on proprietary, non-transparent models constraining reproducibility. Addressing this gap, we introduce RankZephyr, a state-of-the-art, open-source LLM for listwise zero-shot reranking. RankZephyr not only bridges the effectiveness gap with GPT-4 but in some cases surpasses the proprietary model. Our comprehensive evaluations across several datasets (TREC Deep Learning Tracks; NEWS and COVID from BEIR) showcase this ability. RankZephyr benefits from strategic training choices and is resilient against variations in initial document ordering and the number of documents reranked. Additionally, our model outperforms GPT-4 on the NovelEval test set, comprising queries and passages past its training period, which addresses concerns about data contamination. To foster further research in this rapidly evolving field, we provide all code necessary to reproduce our results at https://github.com/castorini/rank_llm."
+ },
+ {
+  "k": 78,
+  "set": "canon",
+  "q": "CN39",
+  "question": "생성형 검색 엔진 답변이 인용을 얼마나 정확하게 다는지 조사한 연구 찾아줘",
+  "p": "2305.14627",
+  "title": "Enabling Large Language Models to Generate Text with Citations",
+  "abstract": "Large language models (LLMs) have emerged as a widely-used tool for information seeking, but their generated outputs are prone to hallucination. In this work, our aim is to allow LLMs to generate text with citations, improving their factual correctness and verifiability. Existing work mainly relies on commercial search engines and human evaluation, making it challenging to reproduce and compare different modeling approaches. We propose ALCE, the first benchmark for Automatic LLMs' Citation Evaluation. ALCE collects a diverse set of questions and retrieval corpora and requires building end-to-end systems to retrieve supporting evidence and generate answers with citations. We develop automatic metrics along three dimensions -- fluency, correctness, and citation quality -- and demonstrate their strong correlation with human judgements. Our experiments with state-of-the-art LLMs and novel prompting strategies show that current systems have considerable room for improvement -- For example, on the ELI5 dataset, even the best models lack complete citation support 50% of the time. Our analyses further highlight promising future directions, including developing better retrievers, advancing long-context LLMs, and improving the ability to synthesize information from multiple sources."
+ },
+ {
+  "k": 79,
+  "set": "heldout",
+  "q": "H_B09",
+  "question": "RankGPT 논문에서 LLM으로 재순위하는 방법 설명해줘",
+  "p": "2406.15657",
+  "title": "FIRST: Faster Improved Listwise Reranking with Single Token Decoding",
+  "abstract": "Large Language Models (LLMs) have significantly advanced the field of information retrieval, particularly for reranking. Listwise LLM rerankers have showcased superior performance and generalizability compared to existing supervised approaches. However, conventional listwise LLM reranking methods lack efficiency as they provide ranking output in the form of a generated ordered sequence of candidate passage identifiers. Further, they are trained with the typical language modeling objective, which treats all ranking errors uniformly--potentially at the cost of misranking highly relevant passages. Addressing these limitations, we introduce FIRST, a novel listwise LLM reranking approach leveraging the output logits of the first generated identifier to directly obtain a ranked ordering of the candidates. Further, we incorporate a learning-to-rank loss during training, prioritizing ranking accuracy for the more relevant passages. Empirical results demonstrate that FIRST accelerates inference by 50% while maintaining a robust ranking performance with gains across the BEIR benchmark. Finally, to illustrate the practical effectiveness of listwise LLM rerankers, we investigate their application in providing relevance feedback for retrievers during inference. Our results show that LLM rerankers can provide a stronger distillation signal compared to cross-encoders, yielding substantial improvements in retriever recall after relevance feedback."
+ },
+ {
+  "k": 80,
+  "set": "canon",
+  "q": "CN14",
+  "question": "외부 자료 없이 모델 답이 지어낸 것인지 알아내는 방법을 다룬 논문 있어?",
+  "p": "2507.06196",
+  "title": "UQLM: A Python Package for Uncertainty Quantification in Large Language Models",
+  "abstract": "Hallucinations, defined as instances where Large Language Models (LLMs) generate false or misleading content, pose a significant challenge that impacts the safety and trust of downstream applications. We introduce UQLM, a Python package for LLM hallucination detection using state-of-the-art uncertainty quantification (UQ) techniques. This toolkit offers a suite of UQ-based scorers that compute response-level confidence scores ranging from 0 to 1. This library provides an off-the-shelf solution for UQ-based hallucination detection that can be easily integrated to enhance the reliability of LLM outputs."
+ },
+ {
+  "k": 81,
+  "set": "canon",
+  "q": "CN03",
+  "question": "위키피디아 같은 큰 문서 모음에서 찾아서 질문에 답하는 오픈 도메인 질의응답 연구 정리해줘",
+  "p": "2610.13948",
+  "title": "Can Language Models Play the Wikipedia Game?",
+  "abstract": "Language models increasingly support or automate information retrieval from document collections too large to index. This task is difficult when it requires specialist linguistic or scientific knowledge. We used the Wikipedia Game to test language models on an analogous information retrieval task. In the game, players must reach a target article using only article links. We compared sentence embedding models and LLMs across five Wikipedia languages and five academic-literature datasets. We construct very large local graphs of Wikipedia pages and of paper citations using OpenAlex and provide code to build and navigate them. This allows the study of language models' navigation capabilities without relying on third-party APIs. We compared the models with human and TF-IDF benchmarks. The Wikipedia Game format enables robust comparisons across techniques, languages, and domains. No model significantly outperformed humans, although the best models (GPT-o3 mini, GPT-4o, QwQ:32B, and DeepSeek-R1:70B) achieved comparable success. Performance and rankings varied across languages and topics, with implications for practitioners utilising these techniques."
+ },
+ {
+  "k": 82,
+  "set": "canon",
+  "q": "CN37",
+  "question": "언어 모델 답변에 출처 인용을 달게 하고 그 품질을 평가하는 연구 알려줘",
+  "p": "2509.21557",
+  "title": "Generation-Time vs. Post-hoc Citation: A Holistic Evaluation of LLM Attribution",
+  "abstract": "Trustworthy Large Language Models (LLMs) must cite human-verifiable sources in high-stakes domains such as healthcare, law, academia, and finance, where even small errors can have severe consequences. Practitioners and researchers face a choice: let models generate citations during decoding, or let models draft answers first and then attach appropriate citations. To clarify this choice, we introduce two paradigms: Generation-Time Citation (G-Cite), which produces the answer and citations in one pass, and Post-hoc Citation (P-Cite), which adds or verifies citations after drafting. We conduct a comprehensive evaluation from zero-shot to advanced retrieval-augmented methods across four popular attribution datasets and provide evidence-based recommendations that weigh trade-offs across use cases. Our results show a consistent trade-off between coverage and citation correctness, with retrieval as the main driver of attribution quality in both paradigms. P-Cite methods achieve high coverage with competitive correctness and moderate latency, whereas G-Cite methods prioritize precision at the cost of coverage and speed. We recommend a retrieval-centric, P-Cite-first approach for high-stakes applications, reserving G-Cite for precision-critical settings such as strict claim verification. Our codes and human evaluation results are available at https://anonymous.4open.science/r/Citation_Paradigms-BBB5/"
+ },
+ {
+  "k": 83,
+  "set": "canon",
+  "q": "CN21",
+  "question": "사용자 질문을 검색하기 좋게 언어 모델로 다시 써서 검색하는 방법 연구 알려줘",
+  "p": "2310.09716",
+  "title": "Enhancing Conversational Search: Large Language Model-Aided Informative Query Rewriting",
+  "abstract": "Query rewriting plays a vital role in enhancing conversational search by transforming context-dependent user queries into standalone forms. Existing approaches primarily leverage human-rewritten queries as labels to train query rewriting models. However, human rewrites may lack sufficient information for optimal retrieval performance. To overcome this limitation, we propose utilizing large language models (LLMs) as query rewriters, enabling the generation of informative query rewrites through well-designed instructions. We define four essential properties for well-formed rewrites and incorporate all of them into the instruction. In addition, we introduce the role of rewrite editors for LLMs when initial query rewrites are available, forming a \"rewrite-then-edit\" process. Furthermore, we propose distilling the rewriting capabilities of LLMs into smaller models to reduce rewriting latency. Our experimental evaluation on the QReCC dataset demonstrates that informative query rewrites can yield substantially improved retrieval performance compared to human rewrites, especially with sparse retrievers."
+ },
+ {
+  "k": 84,
+  "set": "canon",
+  "q": "CN33",
+  "question": "큰 모델 전체를 학습하지 않고 작은 행렬만 추가로 학습해서 미세조정하는 방법 연구 알려줘",
+  "p": "2504.03719",
+  "title": "Towards Symmetric Low-Rank Adapters",
+  "abstract": "In this paper, we introduce Symmetric Low-Rank Adapters, an optimized variant of LoRA with even fewer weights. This method utilizes Low-Rank Symmetric Weight Matrices to learn downstream tasks more efficiently. Traditional LoRA accumulates fine-tuning weights with the original pre-trained weights via a Singular Value Decomposition (SVD) like approach, i.e., model weights are fine-tuned via updates of the form $BA$ (where $B \\in \\mathbb{R}^{n\\times r}$, $A \\in \\mathbb{R}^{r\\times n}$, and $r$ is the rank of the merged weight matrix). In contrast, our approach, named SymLoRA, represents fine-tuning weights as a Spectral Decomposition, i.e., $Q \\, diag(Λ)\\, Q^T$, where $Q \\in \\mathbb{R}^{n\\times r}$ and $Λ\\in \\mathbb{R}^r$. SymLoRA requires approximately half of the finetuning weights. Here, we show that this approach has negligible losses in downstream efficacy."
+ },
+ {
+  "k": 85,
+  "set": "canon",
+  "q": "CN07",
+  "question": "정답 라벨 없이 검색 모델을 학습시키는 방법을 다룬 연구 찾아줘",
+  "p": "2212.10496",
+  "title": "Precise Zero-Shot Dense Retrieval without Relevance Labels",
+  "abstract": "While dense retrieval has been shown effective and efficient across tasks and languages, it remains difficult to create effective fully zero-shot dense retrieval systems when no relevance label is available. In this paper, we recognize the difficulty of zero-shot learning and encoding relevance. Instead, we propose to pivot through Hypothetical Document Embeddings~(HyDE). Given a query, HyDE first zero-shot instructs an instruction-following language model (e.g. InstructGPT) to generate a hypothetical document. The document captures relevance patterns but is unreal and may contain false details. Then, an unsupervised contrastively learned encoder~(e.g. Contriever) encodes the document into an embedding vector. This vector identifies a neighborhood in the corpus embedding space, where similar real documents are retrieved based on vector similarity. This second step ground the generated document to the actual corpus, with the encoder's dense bottleneck filtering out the incorrect details. Our experiments show that HyDE significantly outperforms the state-of-the-art unsupervised dense retriever Contriever and shows strong performance comparable to fine-tuned retrievers, across various tasks (e.g. web search, QA, fact verification) and languages~(e.g. sw, ko, ja)."
+ },
+ {
+  "k": 86,
+  "set": "canon",
+  "q": "CN24",
+  "question": "복잡한 질문을 작은 질문 여러 개로 쪼개서 검색하는 방법 연구 정리해줘",
+  "p": "2509.04820",
+  "title": "Fishing for Answers: Exploring One-shot vs. Iterative Retrieval Strategies for Retrieval Augmented Generation",
+  "abstract": "Retrieval-Augmented Generation (RAG) based on Large Language Models (LLMs) is a powerful solution to understand and query the industry's closed-source documents. However, basic RAG often struggles with complex QA tasks in legal and regulatory domains, particularly when dealing with numerous government documents. The top-$k$ strategy frequently misses golden chunks, leading to incomplete or inaccurate answers. To address these retrieval bottlenecks, we explore two strategies to improve evidence coverage and answer quality. The first is a One-SHOT retrieval method that adaptively selects chunks based on a token budget, allowing as much relevant content as possible to be included within the model's context window. Additionally, we design modules to further filter and refine the chunks. The second is an iterative retrieval strategy built on a Reasoning Agentic RAG framework, where a reasoning LLM dynamically issues search queries, evaluates retrieved results, and progressively refines the context over multiple turns. We identify query drift and retrieval laziness issues and further design two modules to tackle them. Through extensive experiments on a dataset of government documents, we aim to offer practical insights and guidance for real-world applications in legal and regulatory domains."
+ },
+ {
+  "k": 87,
+  "set": "canon",
+  "q": "CN08",
+  "question": "문서를 벡터 하나로 줄이지 않고 단어마다 벡터를 둬서 검색하는 방법 연구 있어?",
+  "p": "2404.00684",
+  "title": "Generative Retrieval as Multi-Vector Dense Retrieval",
+  "abstract": "Generative retrieval generates identifiers of relevant documents in an end-to-end manner using a sequence-to-sequence architecture for a given query. The relation between generative retrieval and other retrieval methods, especially those based on matching within dense retrieval models, is not yet fully comprehended. Prior work has demonstrated that generative retrieval with atomic identifiers is equivalent to single-vector dense retrieval. Accordingly, generative retrieval exhibits behavior analogous to hierarchical search within a tree index in dense retrieval when using hierarchical semantic identifiers. However, prior work focuses solely on the retrieval stage without considering the deep interactions within the decoder of generative retrieval.   In this paper, we fill this gap by demonstrating that generative retrieval and multi-vector dense retrieval share the same framework for measuring the relevance to a query of a document. Specifically, we examine the attention layer and prediction head of generative retrieval, revealing that generative retrieval can be understood as a special case of multi-vector dense retrieval. Both methods compute relevance as a sum of products of query and document vectors and an alignment matrix. We then explore how generative retrieval applies this framework, employing distinct strategies for computing document token vectors and the alignment matrix. We have conducted experiments to verify our conclusions and show that both paradigms exhibit commonalities of term matching in their alignment matrix."
+ },
+ {
+  "k": 88,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2502.14776",
+  "title": "SurveyX: Academic Survey Automation via Large Language Models",
+  "abstract": "Large Language Models (LLMs) have demonstrated exceptional comprehension capabilities and a vast knowledge base, suggesting that LLMs can serve as efficient tools for automated survey generation. However, recent research related to automated survey generation remains constrained by some critical limitations like finite context window, lack of in-depth content discussion, and absence of systematic evaluation frameworks. Inspired by human writing processes, we propose SurveyX, an efficient and organized system for automated survey generation that decomposes the survey composing process into two phases: the Preparation and Generation phases. By innovatively introducing online reference retrieval, a pre-processing method called AttributeTree, and a re-polishing process, SurveyX significantly enhances the efficacy of survey composition. Experimental evaluation results show that SurveyX outperforms existing automated survey generation systems in content quality (0.259 improvement) and citation quality (1.76 enhancement), approaching human expert performance across multiple evaluation dimensions. Examples of surveys generated by SurveyX are available on www.surveyx.cn"
+ },
+ {
+  "k": 89,
+  "set": "canon",
+  "q": "CN14",
+  "question": "외부 자료 없이 모델 답이 지어낸 것인지 알아내는 방법을 다룬 논문 있어?",
+  "p": "2502.13490",
+  "title": "What are Models Thinking about? Understanding Large Language Model Hallucinations \"Psychology\" through Model Inner State Analysis",
+  "abstract": "Large language model (LLM) systems suffer from the models' unstable ability to generate valid and factual content, resulting in hallucination generation. Current hallucination detection methods heavily rely on out-of-model information sources, such as RAG to assist the detection, thus bringing heavy additional latency. Recently, internal states of LLMs' inference have been widely used in numerous research works, such as prompt injection detection, etc. Considering the interpretability of LLM internal states and the fact that they do not require external information sources, we introduce such states into LLM hallucination detection. In this paper, we systematically analyze different internal states' revealing features during inference forward and comprehensively evaluate their ability in hallucination detection. Specifically, we cut the forward process of a large language model into three stages: understanding, query, generation, and extracting the internal state from these stages. By analyzing these states, we provide a deep understanding of why the hallucinated content is generated and what happened in the internal state of the models. Then, we introduce these internal states into hallucination detection and conduct comprehensive experiments to discuss the advantages and limitations."
+ },
+ {
+  "k": 90,
+  "set": "canon",
+  "q": "CN04",
+  "question": "모델 크기를 키우는 대신 검색을 붙여서 성능을 올린 연구 찾아줘",
+  "p": "2505.03275",
+  "title": "RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via Retrieval-Augmented Generation",
+  "abstract": "Large language models (LLMs) struggle to effectively utilize a growing number of external tools, such as those defined by the Model Context Protocol (MCP)\\cite{IntroducingMCP}, due to prompt bloat and selection complexity. We introduce RAG-MCP, a Retrieval-Augmented Generation framework that overcomes this challenge by offloading tool discovery. RAG-MCP uses semantic retrieval to identify the most relevant MCP(s) for a given query from an external index before engaging the LLM. Only the selected tool descriptions are passed to the model, drastically reducing prompt size and simplifying decision-making. Experiments, including an MCP stress test, demonstrate RAG-MCP significantly cuts prompt tokens (e.g., by over 50%) and more than triples tool selection accuracy (43.13% vs 13.62% baseline) on benchmark tasks. RAG-MCP enables scalable and accurate tool integration for LLMs."
+ },
+ {
+  "k": 91,
+  "set": "heldout",
+  "q": "H_B18",
+  "question": "REPLUG 논문 요약해줘",
+  "p": "2208.03299",
+  "title": "Atlas: Few-shot Learning with Retrieval Augmented Language Models",
+  "abstract": "Large language models have shown impressive few-shot results on a wide range of tasks. However, when knowledge is key for such results, as is the case for tasks such as question answering and fact checking, massive parameter counts to store knowledge seem to be needed. Retrieval augmented models are known to excel at knowledge intensive tasks without the need for as many parameters, but it is unclear whether they work in few-shot settings. In this work we present Atlas, a carefully designed and pre-trained retrieval augmented language model able to learn knowledge intensive tasks with very few training examples. We perform evaluations on a wide range of tasks, including MMLU, KILT and NaturalQuestions, and study the impact of the content of the document index, showing that it can easily be updated. Notably, Atlas reaches over 42% accuracy on Natural Questions using only 64 examples, outperforming a 540B parameters model by 3% despite having 50x fewer parameters."
+ },
+ {
+  "k": 92,
+  "set": "canon",
+  "q": "CN23",
+  "question": "검색어에 관련 단어를 덧붙여 넓히는 작업을 LLM으로 하는 연구 찾아줘",
+  "p": "2405.15374",
+  "title": "Leveraging Large Language Models for Semantic Query Processing in a Scholarly Knowledge Graph",
+  "abstract": "The proposed research aims to develop an innovative semantic query processing system that enables users to obtain comprehensive information about research works produced by Computer Science (CS) researchers at the Australian National University (ANU). The system integrates Large Language Models (LLMs) with the ANU Scholarly Knowledge Graph (ASKG), a structured repository of all research-related artifacts produced at ANU in the CS field. Each artifact and its parts are represented as textual nodes stored in a Knowledge Graph (KG).\n  To address the limitations of traditional scholarly KG construction and utilization methods, which often fail to capture fine-grained details, we propose a novel framework that integrates the Deep Document Model (DDM) for comprehensive document representation and the KG-enhanced Query Processing (KGQP) for optimized complex query handling. DDM enables a fine-grained representation of the hierarchical structure and semantic relationships within academic papers, while KGQP leverages the KG structure to improve query accuracy and efficiency with LLMs.\n  By combining the ASKG with LLMs, our approach enhances knowledge utilization and natural language understanding capabilities. The proposed system employs an automatic LLM-SPARQL fusion to retrieve relevant facts and textual nodes from the ASKG. Initial experiments demonstrate that our framework is superior to baseline methods in terms of accuracy retrieval and query efficiency.\n  We showcase the practical application of our framework in academic research scenarios, highlighting its potential to revolutionize scholarly knowledge management and discovery. This work empowers researchers to acquire and utilize knowledge from documents more effectively and provides a foundation for developing precise and reliable interactions with LLMs."
+ },
+ {
+  "k": 93,
+  "set": "canon",
+  "q": "CN09",
+  "question": "검색으로 뽑은 문서들을 언어 모델로 다시 순위 매기는 방법 연구 알려줘",
+  "p": "2406.15657",
+  "title": "FIRST: Faster Improved Listwise Reranking with Single Token Decoding",
+  "abstract": "Large Language Models (LLMs) have significantly advanced the field of information retrieval, particularly for reranking. Listwise LLM rerankers have showcased superior performance and generalizability compared to existing supervised approaches. However, conventional listwise LLM reranking methods lack efficiency as they provide ranking output in the form of a generated ordered sequence of candidate passage identifiers. Further, they are trained with the typical language modeling objective, which treats all ranking errors uniformly--potentially at the cost of misranking highly relevant passages. Addressing these limitations, we introduce FIRST, a novel listwise LLM reranking approach leveraging the output logits of the first generated identifier to directly obtain a ranked ordering of the candidates. Further, we incorporate a learning-to-rank loss during training, prioritizing ranking accuracy for the more relevant passages. Empirical results demonstrate that FIRST accelerates inference by 50% while maintaining a robust ranking performance with gains across the BEIR benchmark. Finally, to illustrate the practical effectiveness of listwise LLM rerankers, we investigate their application in providing relevance feedback for retrievers during inference. Our results show that LLM rerankers can provide a stronger distillation signal compared to cross-encoders, yielding substantial improvements in retriever recall after relevance feedback."
+ },
+ {
+  "k": 94,
+  "set": "canon",
+  "q": "CN14",
+  "question": "외부 자료 없이 모델 답이 지어낸 것인지 알아내는 방법을 다룬 논문 있어?",
+  "p": "2407.07071",
+  "title": "Lookback Lens: Detecting and Mitigating Contextual Hallucinations in Large Language Models Using Only Attention Maps",
+  "abstract": "When asked to summarize articles or answer questions given a passage, large language models (LLMs) can hallucinate details and respond with unsubstantiated answers that are inaccurate with respect to the input context. This paper describes a simple approach for detecting such contextual hallucinations. We hypothesize that contextual hallucinations are related to the extent to which an LLM attends to information in the provided context versus its own generations. Based on this intuition, we propose a simple hallucination detection model whose input features are given by the ratio of attention weights on the context versus newly generated tokens (for each attention head). We find that a linear classifier based on these lookback ratio features is as effective as a richer detector that utilizes the entire hidden states of an LLM or a text-based entailment model. The lookback ratio-based detector -- Lookback Lens -- is found to transfer across tasks and even models, allowing a detector that is trained on a 7B model to be applied (without retraining) to a larger 13B model. We further apply this detector to mitigate contextual hallucinations, and find that a simple classifier-guided decoding approach is able to reduce the amount of hallucination, for example by 9.6% in the XSum summarization task."
+ },
+ {
+  "k": 95,
+  "set": "canon",
+  "q": "CN21",
+  "question": "사용자 질문을 검색하기 좋게 언어 모델로 다시 써서 검색하는 방법 연구 알려줘",
+  "p": "2305.15645",
+  "title": "ConvGQR: Generative Query Reformulation for Conversational Search",
+  "abstract": "In conversational search, the user's real search intent for the current turn is dependent on the previous conversation history. It is challenging to determine a good search query from the whole conversation context. To avoid the expensive re-training of the query encoder, most existing methods try to learn a rewriting model to de-contextualize the current query by mimicking the manual query rewriting. However, manually rewritten queries are not always the best search queries. Training a rewriting model on them would limit the model's ability to produce good search queries. Another useful hint is the potential answer to the question. In this paper, we propose ConvGQR, a new framework to reformulate conversational queries based on generative pre-trained language models (PLMs), one for query rewriting and another for generating potential answers. By combining both, ConvGQR can produce better search queries. In addition, to relate query reformulation to retrieval performance, we propose a knowledge infusion mechanism to optimize both query reformulation and retrieval. Extensive experiments on four conversational search datasets demonstrate the effectiveness of ConvGQR."
+ },
+ {
+  "k": 96,
+  "set": "canon",
+  "q": "CN07",
+  "question": "정답 라벨 없이 검색 모델을 학습시키는 방법을 다룬 연구 찾아줘",
+  "p": "2502.15690",
+  "title": "Level-Navi Agent: A Framework and benchmark for Chinese Web Search Agents",
+  "abstract": "Large language models (LLMs), adopted to understand human language, drive the development of artificial intelligence (AI) web search agents. Compared to traditional search engines, LLM-powered AI search agents are capable of understanding and responding to complex queries with greater depth, enabling more accurate operations and better context recognition. However, little attention and effort has been paid to the Chinese web search, which results in that the capabilities of open-source models have not been uniformly and fairly evaluated. The difficulty lies in lacking three aspects: an unified agent framework, an accurately labeled dataset, and a suitable evaluation metric. To address these issues, we propose a general-purpose and training-free web search agent by level-aware navigation, Level-Navi Agent, accompanied by a well-annotated dataset (Web24) and a suitable evaluation metric. Level-Navi Agent can think through complex user questions and conduct searches across various levels on the internet to gather information for questions. Meanwhile, we provide a comprehensive evaluation of state-of-the-art LLMs under fair settings. To further facilitate future research, source code is available at Github."
+ },
+ {
+  "k": 97,
+  "set": "canon",
+  "q": "CN36",
+  "question": "어댑터나 프롬프트 튜닝처럼 적은 파라미터만 바꾸는 방법들의 성능 차이를 본 논문 있어?",
+  "p": "2412.18142",
+  "title": "Text-Aware Adapter for Few-Shot Keyword Spotting",
+  "abstract": "Recent advances in flexible keyword spotting (KWS) with text enrollment allow users to personalize keywords without uttering them during enrollment. However, there is still room for improvement in target keyword performance. In this work, we propose a novel few-shot transfer learning method, called text-aware adapter (TA-adapter), designed to enhance a pre-trained flexible KWS model for specific keywords with limited speech samples. To adapt the acoustic encoder, we leverage a jointly pre-trained text encoder to generate a text embedding that acts as a representative vector for the keyword. By fine-tuning only a small portion of the network while keeping the core components' weights intact, the TA-adapter proves highly efficient for few-shot KWS, enabling a seamless return to the original pre-trained model. In our experiments, the TA-adapter demonstrated significant performance improvements across 35 distinct keywords from the Google Speech Commands V2 dataset, with only a 0.14% increase in the total number of parameters."
+ },
+ {
+  "k": 98,
+  "set": "canon",
+  "q": "CN20",
+  "question": "긴 입력을 통째로 넣는 것과 검색해서 일부만 넣는 것 중 뭐가 나은지 비교한 연구 있어?",
+  "p": "2602.21553",
+  "title": "Revisiting RAG Retrievers: An Information Theoretic Benchmark",
+  "abstract": "Retrieval-Augmented Generation (RAG) systems rely critically on the retriever module to surface relevant context for large language models. Although numerous retrievers have recently been proposed, each built on different ranking principles such as lexical matching, dense embeddings, or graph citations, there remains a lack of systematic understanding of how these mechanisms differ and overlap. Existing benchmarks primarily compare entire RAG pipelines or introduce new datasets, providing little guidance on selecting or combining retrievers themselves. Those that do compare retrievers directly use a limited set of evaluation tools which fail to capture complementary and overlapping strengths. This work presents MIGRASCOPE, a Mutual Information based RAG Retriever Analysis Scope. We revisit state-of-the-art retrievers and introduce principled metrics grounded in information and statistical estimation theory to quantify retrieval quality, redundancy, synergy, and marginal contribution. We further show that if chosen carefully, an ensemble of retrievers outperforms any single retriever. We leverage the developed tools over major RAG corpora to provide unique insights on contribution levels of the state-of-the-art retrievers. Our findings provide a fresh perspective on the structure of modern retrieval techniques and actionable guidance for designing robust and efficient RAG systems."
+ },
+ {
+  "k": 99,
+  "set": "canon",
+  "q": "CN35",
+  "question": "파라미터 효율적 미세조정 방법들을 비교 정리한 연구 찾아줘",
+  "p": "2408.13296",
+  "title": "The Ultimate Guide to Fine-Tuning LLMs from Basics to Breakthroughs: An Exhaustive Review of Technologies, Research, Best Practices, Applied Research Challenges and Opportunities",
+  "abstract": "This report examines the fine-tuning of Large Language Models (LLMs), integrating theoretical insights with practical applications. It outlines the historical evolution of LLMs from traditional Natural Language Processing (NLP) models to their pivotal role in AI. A comparison of fine-tuning methodologies, including supervised, unsupervised, and instruction-based approaches, highlights their applicability to different tasks. The report introduces a structured seven-stage pipeline for fine-tuning LLMs, spanning data preparation, model initialization, hyperparameter tuning, and model deployment. Emphasis is placed on managing imbalanced datasets and optimization techniques. Parameter-efficient methods like Low-Rank Adaptation (LoRA) and Half Fine-Tuning are explored for balancing computational efficiency with performance. Advanced techniques such as memory fine-tuning, Mixture of Experts (MoE), and Mixture of Agents (MoA) are discussed for leveraging specialized networks and multi-agent collaboration. The report also examines novel approaches like Proximal Policy Optimization (PPO) and Direct Preference Optimization (DPO), which align LLMs with human preferences, alongside pruning and routing optimizations to improve efficiency. Further sections cover validation frameworks, post-deployment monitoring, and inference optimization, with attention to deploying LLMs on distributed and cloud-based platforms. Emerging areas such as multimodal LLMs, fine-tuning for audio and speech, and challenges related to scalability, privacy, and accountability are also addressed. This report offers actionable insights for researchers and practitioners navigating LLM fine-tuning in an evolving landscape."
+ },
+ {
+  "k": 100,
+  "set": "canon",
+  "q": "CN35",
+  "question": "파라미터 효율적 미세조정 방법들을 비교 정리한 연구 찾아줘",
+  "p": "2504.00254",
+  "title": "ElaLoRA: Elastic & Learnable Low-Rank Adaptation for Efficient Model Fine-Tuning",
+  "abstract": "Low-Rank Adaptation (LoRA) has become a widely adopted technique for fine-tuning large-scale pre-trained models with minimal parameter updates. However, existing methods rely on fixed ranks or focus solely on either rank pruning or expansion, failing to adapt ranks dynamically to match the importance of different layers during training. In this work, we propose ElaLoRA, an adaptive low-rank adaptation framework that dynamically prunes and expands ranks based on gradient-derived importance scores. To the best of our knowledge, ElaLoRA is the first method that enables both rank pruning and expansion during fine-tuning. Experiments across multiple benchmarks demonstrate that ElaLoRA consistently outperforms existing PEFT methods across different parameter budgets. Furthermore, our studies validate that layers receiving higher rank allocations contribute more significantly to model performance, providing theoretical justification for our adaptive strategy. By introducing a principled and adaptive rank allocation mechanism, ElaLoRA offers a scalable and efficient fine-tuning solution, particularly suited for resource-constrained environments."
+ },
+ {
+  "k": 101,
+  "set": "canon",
+  "q": "CN15",
+  "question": "환각을 종류별로 나누고 원인을 분석한 연구 찾아줘",
+  "p": "2507.19024",
+  "title": "A Survey of Multimodal Hallucination Evaluation and Detection",
+  "abstract": "Multi-modal Large Language Models (MLLMs) have emerged as a powerful paradigm for integrating visual and textual information, supporting a wide range of multi-modal tasks. However, these models often suffer from hallucination, producing content that appears plausible but contradicts the input content or established world knowledge. This survey offers an in-depth review of hallucination evaluation benchmarks and detection methods across Image-to-Text (I2T) and Text-to-image (T2I) generation tasks. Specifically, we first propose a taxonomy of hallucination based on faithfulness and factuality, incorporating the common types of hallucinations observed in practice. Then we provide an overview of existing hallucination evaluation benchmarks for both T2I and I2T tasks, highlighting their construction process, evaluation objectives, and employed metrics. Furthermore, we summarize recent advances in hallucination detection methods, which aims to identify hallucinated content at the instance level and serve as a practical complement of benchmark-based evaluation. Finally, we highlight key limitations in current benchmarks and detection methods, and outline potential directions for future research."
+ },
+ {
+  "k": 102,
+  "set": "canon",
+  "q": "CN30",
+  "question": "문제에 관계없는 문장을 끼워 넣으면 모델이 쉽게 헷갈리는지 본 연구 있어?",
+  "p": "2412.15241",
+  "title": "Quantifying Positional Biases in Text Embedding Models",
+  "abstract": "Embedding models are crucial for tasks in Information Retrieval (IR) and semantic similarity measurement, yet their handling of longer texts and associated positional biases remains underexplored. In this study, we investigate the impact of content position and input size on text embeddings. Our experiments reveal that embedding models, irrespective of their positional encoding mechanisms, disproportionately prioritize the beginning of an input. Ablation studies demonstrate that insertion of irrelevant text or removal at the start of a document reduces cosine similarity between altered and original embeddings by up to 12.3% more than ablations at the end. Regression analysis further confirms this bias, with sentence importance declining as position moves further from the start, even with with content-agnosticity. We hypothesize that this effect arises from pre-processing strategies and chosen positional encoding techniques. These findings quantify the sensitivity of retrieval systems and suggest a new lens towards embedding model robustness."
+ },
+ {
+  "k": 103,
+  "set": "canon",
+  "q": "CN33",
+  "question": "큰 모델 전체를 학습하지 않고 작은 행렬만 추가로 학습해서 미세조정하는 방법 연구 알려줘",
+  "p": "2106.09685",
+  "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+  "abstract": "An important paradigm of natural language processing consists of large-scale pre-training on general domain data and adaptation to particular tasks or domains. As we pre-train larger models, full fine-tuning, which retrains all model parameters, becomes less feasible. Using GPT-3 175B as an example -- deploying independent instances of fine-tuned models, each with 175B parameters, is prohibitively expensive. We propose Low-Rank Adaptation, or LoRA, which freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks. Compared to GPT-3 175B fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the GPU memory requirement by 3 times. LoRA performs on-par or better than fine-tuning in model quality on RoBERTa, DeBERTa, GPT-2, and GPT-3, despite having fewer trainable parameters, a higher training throughput, and, unlike adapters, no additional inference latency. We also provide an empirical investigation into rank-deficiency in language model adaptation, which sheds light on the efficacy of LoRA. We release a package that facilitates the integration of LoRA with PyTorch models and provide our implementations and model checkpoints for RoBERTa, DeBERTa, and GPT-2 at https://github.com/microsoft/LoRA."
+ },
+ {
+  "k": 104,
+  "set": "canon",
+  "q": "CN03",
+  "question": "위키피디아 같은 큰 문서 모음에서 찾아서 질문에 답하는 오픈 도메인 질의응답 연구 정리해줘",
+  "p": "2603.16169",
+  "title": "Open-Source Reproduction and Explainability Analysis of Corrective Retrieval Augmented Generation",
+  "abstract": "Corrective Retrieval Augmented Generation (CRAG) improves the robustness of RAG systems by evaluating retrieved document quality and triggering corrective actions. However, the original implementation relies on proprietary components including the Google Search API and closed model weights, limiting reproducibility. In this work, we present a fully open-source reproduction of CRAG, replacing proprietary web search with the Wikipedia API and the original LLaMA-2 generator with Phi-3-mini-4k-instruct. We evaluate on PopQA and ARC-Challenge, demonstrating that our open-source pipeline achieves comparable performance to the original system. Furthermore, we contribute the first explainability analysis of CRAG's T5-based retrieval evaluator using SHAP, revealing that the evaluator primarily relies on named entity alignment rather than semantic similarity. Our analysis identifies key failure modes including domain transfer limitations on science questions. All code and results are available at https://github.com/suryayalavarthi/crag-reproduction."
+ },
+ {
+  "k": 105,
+  "set": "canon",
+  "q": "CN38",
+  "question": "생성된 문장이 인용한 문서로 정말 뒷받침되는지 자동으로 확인하는 방법 연구 있어?",
+  "p": "2510.17853",
+  "title": "CiteGuard: Faithful Citation Attribution for LLMs via Retrieval-Augmented Validation",
+  "abstract": "Large Language Models (LLMs) have emerged as powerful assistants for scientific writing. However, concerns remain about the quality and reliability of the generated text, including citation accuracy and faithfulness. While most recent work relies on methods such as LLM-as-a-Judge, the reliability of LLM-as-a-Judge alone is also in doubt. In this work, we reframe citation evaluation as a problem of citation attribution alignment, which assesses whether LLM-generated citations match those a human author would include for the same text. We propose CiteGuard, a retrieval-aware agent framework designed to provide more faithful grounding for citation validation. CiteGuard improves over the prior baseline by 10 percentage points and achieves up to 68.1% accuracy on the CiteME benchmark, approaching human performance (69.2%). It also identifies alternative valid citations and demonstrates generalization ability for cross-domain citation attribution. Our code is available at https://github.com/KathCYM/CiteGuard."
+ },
+ {
+  "k": 106,
+  "set": "canon",
+  "q": "CN07",
+  "question": "정답 라벨 없이 검색 모델을 학습시키는 방법을 다룬 연구 찾아줘",
+  "p": "2601.07838",
+  "title": "A survey: Information search time optimization based on RAG (Retrieval Augmentation Generation) chatbot",
+  "abstract": "Retrieval-Augmented Generation (RAG) based chatbots are not only useful for information retrieval through questionanswering but also for making complex decisions based on injected private data.we present a survey on how much search time can be saved when retrieving complex information within an organization called \"X Systems\"(a stealth mode company) by using a RAG-based chatbot compared to traditional search methods. We compare the information retrieval time using standard search techniques versus the RAG-based chatbot for the same queries. Our results conclude that RAG-based chatbots not only save time in information retrieval but also optimize the search process effectively. This survey was conducted with a sample of 105 employees across departments, average time spending on information retrieval per query was taken as metric. Comparison shows us, there are average 80-95% improvement on search when use RAG based chatbot than using standard search."
+ },
+ {
+  "k": 107,
+  "set": "canon",
+  "q": "CN35",
+  "question": "파라미터 효율적 미세조정 방법들을 비교 정리한 연구 찾아줘",
+  "p": "2503.20110",
+  "title": "Efficient Model Development through Fine-tuning Transfer",
+  "abstract": "Modern LLMs struggle with efficient updates, as each new pretrained model version requires repeating expensive alignment processes. This challenge also applies to domain- or languagespecific models, where fine-tuning on specialized data must be redone for every new base model release. In this paper, we explore the transfer of fine-tuning updates between model versions. Specifically, we derive the diff vector (representing the weight changes from finetuning) from one source model version and apply it to the base model of a different target version. Through empirical evaluations on various open-weight model versions, we show that transferring diff vectors can significantly improve the performance of the target base model. For example, transferring the fine-tuning updates from Llama 3.0 8B improves Llama 3.1 8B by 46.9% on IFEval and 15.7% on LiveCodeBench without additional training, even surpassing Llama 3.1 8B Instruct. Furthermore, we demonstrate performance gains on multilingual tasks, with 4.7% and 15.5% improvements on Global MMLU for Malagasy and Turkish, respectively. We observe that these merged models provide stronger initializations for further fine-tuning. Lastly, our controlled experiments suggest that fine-tuning transfer is most effective when source and target models lie in a linearly connected region of parameter space, and we provide a theoretical analysis of our method. Taken together, fine-tuning transfer offers a cost-efficient and practical strategy for continuous LLM development. Our code is available at github.com/pjlintw/finetuning-transfer."
+ },
+ {
+  "k": 108,
+  "set": "canon",
+  "q": "CN20",
+  "question": "긴 입력을 통째로 넣는 것과 검색해서 일부만 넣는 것 중 뭐가 나은지 비교한 연구 있어?",
+  "p": "2602.23368",
+  "title": "Keyword search is all you need: Achieving RAG-Level Performance without vector databases using agentic tool use",
+  "abstract": "While Retrieval-Augmented Generation (RAG) has proven effective for generating accurate, context-based responses based on existing knowledge bases, it presents several challenges including retrieval quality dependencies, integration complexity and cost. Recent advances in agentic-RAG and tool-augmented LLM architectures have introduced alternative approaches to information retrieval and processing. We question how much additional value vector databases and semantic search bring to RAG over simple, agentic keyword search in documents for question-answering. In this study, we conducted a systematic comparison between RAG-based systems and tool-augmented LLM agents, specifically evaluating their retrieval mechanisms and response quality when the agent only has access to basic keyword search tools. Our empirical analysis demonstrates that tool-based keyword search implementations within an agentic framework can attain over $90\\%$ of the performance metrics compared to traditional RAG systems without using a standing vector database. Our approach is simple to implement, cost effective, and is particularly useful in scenarios requiring frequent updates to knowledge bases."
+ },
+ {
+  "k": 109,
+  "set": "canon",
+  "q": "CN39",
+  "question": "생성형 검색 엔진 답변이 인용을 얼마나 정확하게 다는지 조사한 연구 찾아줘",
+  "p": "2606.26449",
+  "title": "ProvenAI: Provenance-Native Traces of Evidence in Generated Answers",
+  "abstract": "Retrieval-augmented systems routinely present citations alongside generated answers, yet a citation does not confirm that the corresponding source meaningfully shaped the output. This paper introduces ProvenAI, a framework that decomposes transparency in multi-hop question answering into three independently measurable layers: answer correctness, citation fidelity against benchmark supporting evidence, and per-document influence under leave-one-resource-out intervention. Targeting the HotpotQA distractor benchmark through a seven-stage pipeline covering data normalisation, retrieval indexing, citation-aware answer generation, attribution auditing, ablation-based influence estimation, batch evaluation, and interactive inspection, ProvenAI evaluates 7,405 validation examples drawn from a canonical corpus of 509,300 passages. The system achieves 53.53% answer accuracy alongside a mean citation-fidelity score of 71.55%, and a worked example surfaces what we call the citation-influence gap: a clean citation audit co-occurring with a profile in which one cited source registers only weak influence while seven uncited sources demonstrably shift the output. We formalise the relationship between the implemented surface proxy and a token-level KL-divergence target through a stated faithfulness condition, ground the framework in causal-mediation analysis and database-provenance theory, and discuss how the three measurement layers compose with cryptographic provenance architectures emerging in autonomous scientific discovery. ProvenAI establishes that meaningful transparency in retrieval-grounded QA requires traceable links across retrieved, cited, and behaviourally influential evidence as three distinct, independently measured layers."
+ },
+ {
+  "k": 110,
+  "set": "canon",
+  "q": "CN20",
+  "question": "긴 입력을 통째로 넣는 것과 검색해서 일부만 넣는 것 중 뭐가 나은지 비교한 연구 있어?",
+  "p": "2412.12744",
+  "title": "Your Next State-of-the-Art Could Come from Another Domain: A Cross-Domain Analysis of Hierarchical Text Classification",
+  "abstract": "Text classification with hierarchical labels is a prevalent and challenging task in natural language processing. Examples include assigning ICD codes to patient records, tagging patents into IPC classes, assigning EUROVOC descriptors to European legal texts, and more. Despite its widespread applications, a comprehensive understanding of state-of-the-art methods across different domains has been lacking. In this paper, we provide the first comprehensive cross-domain overview with empirical analysis of state-of-the-art methods. We propose a unified framework that positions each method within a common structure to facilitate research. Our empirical analysis yields key insights and guidelines, confirming the necessity of learning across different research areas to design effective methods. Notably, under our unified evaluation pipeline, we achieved new state-of-the-art results by applying techniques beyond their original domains."
+ },
+ {
+  "k": 111,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2411.10878",
+  "title": "Empowering Meta-Analysis: Leveraging Large Language Models for Scientific Synthesis",
+  "abstract": "This study investigates the automation of meta-analysis in scientific documents using large language models (LLMs). Meta-analysis is a robust statistical method that synthesizes the findings of multiple studies support articles to provide a comprehensive understanding. We know that a meta-article provides a structured analysis of several articles. However, conducting meta-analysis by hand is labor-intensive, time-consuming, and susceptible to human error, highlighting the need for automated pipelines to streamline the process. Our research introduces a novel approach that fine-tunes the LLM on extensive scientific datasets to address challenges in big data handling and structured data extraction. We automate and optimize the meta-analysis process by integrating Retrieval Augmented Generation (RAG). Tailored through prompt engineering and a new loss metric, Inverse Cosine Distance (ICD), designed for fine-tuning on large contextual datasets, LLMs efficiently generate structured meta-analysis content. Human evaluation then assesses relevance and provides information on model performance in key metrics. This research demonstrates that fine-tuned models outperform non-fine-tuned models, with fine-tuned LLMs generating 87.6% relevant meta-analysis abstracts. The relevance of the context, based on human evaluation, shows a reduction in irrelevancy from 4.56% to 1.9%. These experiments were conducted in a low-resource environment, highlighting the study's contribution to enhancing the efficiency and reliability of meta-analysis automation."
+ },
+ {
+  "k": 112,
+  "set": "canon",
+  "q": "CN21",
+  "question": "사용자 질문을 검색하기 좋게 언어 모델로 다시 써서 검색하는 방법 연구 알려줘",
+  "p": "2305.14283",
+  "title": "Query Rewriting for Retrieval-Augmented Large Language Models",
+  "abstract": "Large Language Models (LLMs) play powerful, black-box readers in the retrieve-then-read pipeline, making remarkable progress in knowledge-intensive tasks. This work introduces a new framework, Rewrite-Retrieve-Read instead of the previous retrieve-then-read for the retrieval-augmented LLMs from the perspective of the query rewriting. Unlike prior studies focusing on adapting either the retriever or the reader, our approach pays attention to the adaptation of the search query itself, for there is inevitably a gap between the input text and the needed knowledge in retrieval. We first prompt an LLM to generate the query, then use a web search engine to retrieve contexts. Furthermore, to better align the query to the frozen modules, we propose a trainable scheme for our pipeline. A small language model is adopted as a trainable rewriter to cater to the black-box LLM reader. The rewriter is trained using the feedback of the LLM reader by reinforcement learning. Evaluation is conducted on downstream tasks, open-domain QA and multiple-choice QA. Experiments results show consistent performance improvement, indicating that our framework is proven effective and scalable, and brings a new framework for retrieval-augmented LLM."
+ },
+ {
+  "k": 113,
+  "set": "canon",
+  "q": "CN23",
+  "question": "검색어에 관련 단어를 덧붙여 넓히는 작업을 LLM으로 하는 연구 찾아줘",
+  "p": "2607.00597",
+  "title": "Multi-Turn Agentic Scientific Literature Search via Workflow Induction",
+  "abstract": "Scientific literature search often requires more than retrieving papers from a single query: users' intents are underspecified, preference-dependent, and evolve through interaction. Existing search agents typically rely on fixed pipelines or implicit language-only reasoning, making their search strategies difficult to control, inspect, and refine. We introduce PaperPilot, a multi-turn literature search agent that frames scientific search as workflow induction. Given an anchor paper and a user query, PaperPilot constructs an executable DAG of paper-search operators, including keyword search, citation expansion, filtering, scoring, reranking, and evidence extraction. User feedback is then used to refine both the query and the workflow itself. We train PaperPilot with supervised workflow imitation and preference optimization over controlled workflow corruptions. Experiments show that PaperPilot-9B improves over the base Qwen3.5-9B toolset agent under multi-turn interaction, increasing Hit@5 from 58.0 to 77.0, MRR from 47.5 to 59.4, and nDCG@10 from 26.8 to 32.5, while reducing workflow execution errors from 9.5% to 0%. These results show that explicit, editable search workflows provide an effective and controllable interface for aligning literature search agents with complex scientific intent."
+ },
+ {
+  "k": 114,
+  "set": "heldout",
+  "q": "H_C25",
+  "question": "법률 분야에 LLM을 적용한 연구 찾아줘",
+  "p": "2405.20362",
+  "title": "Hallucination-Free? Assessing the Reliability of Leading AI Legal Research Tools",
+  "abstract": "Legal practice has witnessed a sharp rise in products incorporating artificial intelligence (AI). Such tools are designed to assist with a wide range of core legal tasks, from search and summarization of caselaw to document drafting. But the large language models used in these tools are prone to \"hallucinate,\" or make up false information, making their use risky in high-stakes domains. Recently, certain legal research providers have touted methods such as retrieval-augmented generation (RAG) as \"eliminating\" (Casetext, 2023) or \"avoid[ing]\" hallucinations (Thomson Reuters, 2023), or guaranteeing \"hallucination-free\" legal citations (LexisNexis, 2023). Because of the closed nature of these systems, systematically assessing these claims is challenging. In this article, we design and report on the first preregistered empirical evaluation of AI-driven legal research tools. We demonstrate that the providers' claims are overstated. While hallucinations are reduced relative to general-purpose chatbots (GPT-4), we find that the AI research tools made by LexisNexis (Lexis+ AI) and Thomson Reuters (Westlaw AI-Assisted Research and Ask Practical Law AI) each hallucinate between 17% and 33% of the time. We also document substantial differences between systems in responsiveness and accuracy. Our article makes four key contributions. It is the first to assess and report the performance of RAG-based proprietary legal AI tools. Second, it introduces a comprehensive, preregistered dataset for identifying and understanding vulnerabilities in these systems. Third, it proposes a clear typology for differentiating between hallucinations and accurate legal responses. Last, it provides evidence to inform the responsibilities of legal professionals in supervising and verifying AI outputs, which remains a central open question for the responsible integration of AI into law."
+ },
+ {
+  "k": 115,
+  "set": "canon",
+  "q": "CN20",
+  "question": "긴 입력을 통째로 넣는 것과 검색해서 일부만 넣는 것 중 뭐가 나은지 비교한 연구 있어?",
+  "p": "2511.01386",
+  "title": "RAGSmith: A Framework for Finding the Optimal Composition of Retrieval-Augmented Generation Methods Across Datasets",
+  "abstract": "Retrieval-Augmented Generation (RAG) quality depends on many interacting choices across retrieval, ranking, augmentation, prompting, and generation, so optimizing modules in isolation is brittle. We introduce RAGSmith, a modular framework that treats RAG design as an end-to-end architecture search over nine technique families and 46{,}080 feasible pipeline configurations. A genetic search optimizes a scalar objective that jointly aggregates retrieval metrics (recall@k, mAP, nDCG, MRR) and generation metrics (LLM-Judge and semantic similarity). We evaluate on six Wikipedia-derived domains (Mathematics, Law, Finance, Medicine, Defense Industry, Computer Science), each with 100 questions spanning factual, interpretation, and long-answer types. RAGSmith finds configurations that consistently outperform naive RAG baseline by +3.8\\% on average (range +1.2\\% to +6.9\\% across domains), with gains up to +12.5\\% in retrieval and +7.5\\% in generation. The search typically explores $\\approx 0.2\\%$ of the space ($\\sim 100$ candidates) and discovers a robust backbone -- vector retrieval plus post-generation reflection/revision -- augmented by domain-dependent choices in expansion, reranking, augmentation, and prompt reordering; passage compression is never selected. Improvement magnitude correlates with question type, with larger gains on factual/long-answer mixes than interpretation-heavy sets. These results provide practical, domain-aware guidance for assembling effective RAG systems and demonstrate the utility of evolutionary search for full-pipeline optimization."
+ },
+ {
+  "k": 116,
+  "set": "canon",
+  "q": "CN31",
+  "question": "관련 없는 문서를 무시하도록 RAG 모델을 학습시키는 방법 연구 찾아줘",
+  "p": "2606.07783",
+  "title": "Evaluating RAG Reliability under Clean, Misleading, and Mixed Retrieval",
+  "abstract": "Retrieval-Augmented Generation (RAG) is widely used to improve the factual reliability of large language models (LLMs) by grounding answers in retrieved evidence. In misinformation-rich environments, however, retrieved content may include plausible but incorrect information, raising concerns about the reliability of RAG-based information access systems. In this work, we propose an evaluation protocol to systematically test how the RAG system handles conflicts between parametric knowledge and evidence retrieved from context with varying amounts of misleading information. We target correct answers to factoid questions that the model responds to correctly, even when there is no retrieval, and use this to test the system with clean, poisoned, and mixed evidence. The proposed analytical framework combines parametric override and confidence metrics to assess when and how misleading information affects the generation process of LLMs. This study aims to provide insights into the robustness of RAG systems in information disorder scenarios."
+ },
+ {
+  "k": 117,
+  "set": "canon",
+  "q": "CN37",
+  "question": "언어 모델 답변에 출처 인용을 달게 하고 그 품질을 평가하는 연구 알려줘",
+  "p": "2310.05634",
+  "title": "Towards Verifiable Generation: A Benchmark for Knowledge-aware Language Model Attribution",
+  "abstract": "Although achieving great success, Large Language Models (LLMs) usually suffer from unreliable hallucinations. Although language attribution can be a potential solution, there are no suitable benchmarks and evaluation metrics to attribute LLMs to structured knowledge. In this paper, we define a new task of Knowledge-aware Language Model Attribution (KaLMA) that improves upon three core concerns with conventional attributed LMs. First, we extend attribution source from unstructured texts to Knowledge Graph (KG), whose rich structures benefit both the attribution performance and working scenarios. Second, we propose a new ``Conscious Incompetence\" setting considering the incomplete knowledge repository, where the model identifies the need for supporting knowledge beyond the provided KG. Third, we propose a comprehensive automatic evaluation metric encompassing text quality, citation quality, and text citation alignment. To implement the above innovations, we build a dataset in biography domain BioKaLMA via evolutionary question generation strategy, to control the question complexity and necessary knowledge to the answer. For evaluation, we develop a baseline solution and demonstrate the room for improvement in LLMs' citation generation, emphasizing the importance of incorporating the \"Conscious Incompetence\" setting, and the critical role of retrieval accuracy."
+ },
+ {
+  "k": 118,
+  "set": "canon",
+  "q": "CN11",
+  "question": "큰 언어 모델에게 문서 목록을 주고 순서를 정하게 하면 잘하는지 본 연구 있어?",
+  "p": "2605.22769",
+  "title": "Understanding Data Temporality Impact on Large Language Models Pre-training",
+  "abstract": "Large language models (LLMs) are typically trained on shuffled corpora, yielding models whose knowledge is frozen at train time and whose temporal grounding remains poorly understood. In this work, we study the impact of pre-training dynamics on the acquisition of time-sensitive factual knowledge, focusing specifically on data ordering. Our main contributions are twofold. First, we introduce a comprehensive benchmark of over 7,000 temporally grounded questions and an evaluation protocol that enables analysis of whether models correctly associate facts with their corresponding time periods. Second, we pretrain 6B-parameter models on temporally ordered Common Crawl snapshots and compare them against standard shuffled pre-training. Our results show that sequentially trained models match shuffled baselines on general language understanding and common knowledge while consistently exhibiting more up-to-date and temporally precise knowledge. Temporally ordered pre-training yields improved factual freshness, while shuffled pre-training peaks on older data, possibly due to increased factual repetition. These findings, along with the release of our code at https://github.com/kyutai-labs/kairos , checkpoints, and datasets at https://huggingface.co/collections/kyutai/kairos provide a foundation for future research on continual learning for LLMs."
+ },
+ {
+  "k": 119,
+  "set": "canon",
+  "q": "CN15",
+  "question": "환각을 종류별로 나누고 원인을 분석한 연구 찾아줘",
+  "p": "2508.01781",
+  "title": "A comprehensive taxonomy of hallucinations in Large Language Models",
+  "abstract": "Large language models (LLMs) have revolutionized natural language processing, yet their propensity for hallucination, generating plausible but factually incorrect or fabricated content, remains a critical challenge. This report provides a comprehensive taxonomy of LLM hallucinations, beginning with a formal definition and a theoretical framework that posits its inherent inevitability in computable LLMs, irrespective of architecture or training. It explores core distinctions, differentiating between intrinsic (contradicting input context) and extrinsic (inconsistent with training data or reality), as well as factuality (absolute correctness) and faithfulness (adherence to input). The report then details specific manifestations, including factual errors, contextual and logical inconsistencies, temporal disorientation, ethical violations, and task-specific hallucinations across domains like code generation and multimodal applications. It analyzes the underlying causes, categorizing them into data-related issues, model-related factors, and prompt-related influences. Furthermore, the report examines cognitive and human factors influencing hallucination perception, surveys evaluation benchmarks and metrics for detection, and outlines architectural and systemic mitigation strategies. Finally, it introduces web-based resources for monitoring LLM releases and performance. This report underscores the complex, multifaceted nature of LLM hallucinations and emphasizes that, given their theoretical inevitability, future efforts must focus on robust detection, mitigation, and continuous human oversight for responsible and reliable deployment in critical applications."
+ },
+ {
+  "k": 120,
+  "set": "canon",
+  "q": "CN36",
+  "question": "어댑터나 프롬프트 튜닝처럼 적은 파라미터만 바꾸는 방법들의 성능 차이를 본 논문 있어?",
+  "p": "2311.05903",
+  "title": "Establishing Performance Baselines in Fine-Tuning, Retrieval-Augmented Generation and Soft-Prompting for Non-Specialist LLM Users",
+  "abstract": "Research into methods for improving the performance of large language models (LLMs) through fine-tuning, retrieval-augmented generation (RAG) and soft-prompting has tended to focus on the use of highly technical or high-cost techniques, making many of the newly discovered approaches comparatively inaccessible to non-technical users. In this paper we tested an unmodified version of GPT 3.5, a fine-tuned version, and the same unmodified model when given access to a vectorised RAG database, both in isolation and in combination with a basic, non-algorithmic soft prompt. In each case we tested the model's ability to answer a set of 100 questions relating primarily to events that occurred after September 2021 (the point at which GPT 3.5's training data set ends). We found that if commercial platforms are used and default settings are applied with no iteration in order to establish a baseline set of outputs, a fine-tuned model outperforms GPT 3.5 Turbo, while the RAG approach out-performed both. The application of a soft prompt significantly improved the performance of each approach."
+ },
+ {
+  "k": 121,
+  "set": "canon",
+  "q": "CN03",
+  "question": "위키피디아 같은 큰 문서 모음에서 찾아서 질문에 답하는 오픈 도메인 질의응답 연구 정리해줘",
+  "p": "2402.01767",
+  "title": "HiQA: A Hierarchical Contextual Augmentation RAG for Multi-Documents QA",
+  "abstract": "Retrieval-augmented generation (RAG) has rapidly advanced the language model field, particularly in question-answering (QA) systems. By integrating external documents during the response generation phase, RAG significantly enhances the accuracy and reliability of language models. This method elevates the quality of responses and reduces the frequency of hallucinations, where the model generates incorrect or misleading information. However, these methods exhibit limited retrieval accuracy when faced with numerous indistinguishable documents, presenting notable challenges in their practical application. In response to these emerging challenges, we present HiQA, an advanced multi-document question-answering (MDQA) framework that integrates cascading metadata into content and a multi-route retrieval mechanism. We also release a benchmark called MasQA to evaluate and research in MDQA. Finally, HiQA demonstrates the state-of-the-art performance in multi-document environments."
+ },
+ {
+  "k": 122,
+  "set": "canon",
+  "q": "CN07",
+  "question": "정답 라벨 없이 검색 모델을 학습시키는 방법을 다룬 연구 찾아줘",
+  "p": "2411.04403",
+  "title": "Towards Competitive Search Relevance For Inference-Free Learned Sparse Retrievers",
+  "abstract": "Learned sparse retrieval, which can efficiently perform retrieval through mature inverted-index engines, has garnered growing attention in recent years. Particularly, the inference-free sparse retrievers are attractive as they eliminate online model inference in the retrieval phase thereby avoids huge computational cost, offering reasonable throughput and latency. However, even the state-of-the-art (SOTA) inference-free sparse models lag far behind in terms of search relevance when compared to both sparse and dense siamese models. Towards competitive search relevance for inference-free sparse retrievers, we argue that they deserve dedicated training methods other than using same ones with siamese encoders. In this paper, we propose two different approaches for performance improvement. First, we propose an IDF-aware penalty for the matching function that suppresses the contribution of low-IDF tokens and increases the model's focus on informative terms. Moreover, we propose a heterogeneous ensemble knowledge distillation framework that combines siamese dense and sparse retrievers to generate supervisory signals during the pre-training phase. The ensemble framework of dense and sparse retriever capitalizes on their strengths respectively, providing a strong upper bound for knowledge distillation. To concur the diverse feedback from heterogeneous supervisors, we normalize and then aggregate the outputs of the teacher models to eliminate score scale differences. On the BEIR benchmark, our model outperforms existing SOTA inference-free sparse model by \\textbf{3.3 NDCG@10 score}. It exhibits search relevance comparable to siamese sparse retrievers and client-side latency only \\textbf{1.1x that of BM25}."
+ },
+ {
+  "k": 123,
+  "set": "canon",
+  "q": "CN33",
+  "question": "큰 모델 전체를 학습하지 않고 작은 행렬만 추가로 학습해서 미세조정하는 방법 연구 알려줘",
+  "p": "2402.09353",
+  "title": "DoRA: Weight-Decomposed Low-Rank Adaptation",
+  "abstract": "Among the widely used parameter-efficient fine-tuning (PEFT) methods, LoRA and its variants have gained considerable popularity because of avoiding additional inference costs. However, there still often exists an accuracy gap between these methods and full fine-tuning (FT). In this work, we first introduce a novel weight decomposition analysis to investigate the inherent differences between FT and LoRA. Aiming to resemble the learning capacity of FT from the findings, we propose Weight-Decomposed Low-Rank Adaptation (DoRA). DoRA decomposes the pre-trained weight into two components, magnitude and direction, for fine-tuning, specifically employing LoRA for directional updates to efficiently minimize the number of trainable parameters. By employing \\ours, we enhance both the learning capacity and training stability of LoRA while avoiding any additional inference overhead. \\ours~consistently outperforms LoRA on fine-tuning LLaMA, LLaVA, and VL-BART on various downstream tasks, such as commonsense reasoning, visual instruction tuning, and image/video-text understanding. Code is available at https://github.com/NVlabs/DoRA."
+ },
+ {
+  "k": 124,
+  "set": "canon",
+  "q": "CN33",
+  "question": "큰 모델 전체를 학습하지 않고 작은 행렬만 추가로 학습해서 미세조정하는 방법 연구 알려줘",
+  "p": "2412.14426",
+  "title": "All-in-One Tuning and Structural Pruning for Domain-Specific LLMs",
+  "abstract": "Existing pruning techniques for large language models (LLMs) targeting domain-specific applications typically follow a two-stage process: pruning the pretrained general-purpose LLMs and then fine-tuning the pruned LLMs on specific domains. However, the pruning decisions, derived from the pretrained weights, remain unchanged during fine-tuning, even if the weights have been updated. Therefore, such a combination of the pruning decisions and the finetuned weights may be suboptimal, leading to non-negligible performance degradation. To address these limitations, we propose ATP: All-in-One Tuning and Structural Pruning, a unified one-stage structural pruning and fine-tuning approach that dynamically identifies the current optimal substructure throughout the fine-tuning phase via a trainable pruning decision generator. Moreover, given the limited available data for domain-specific applications, Low-Rank Adaptation (LoRA) becomes a common technique to fine-tune the LLMs. In ATP, we introduce LoRA-aware forward and sparsity regularization to ensure that the substructures corresponding to the learned pruning decisions can be directly removed after the ATP process. ATP outperforms the state-of-the-art two-stage pruning methods on tasks in the legal and healthcare domains. More specifically, ATP recovers up to 88% and 91% performance of the dense model when pruning 40% parameters of LLaMA2-7B and LLaMA3-8B models, respectively."
+ },
+ {
+  "k": 125,
+  "set": "canon",
+  "q": "CN09",
+  "question": "검색으로 뽑은 문서들을 언어 모델로 다시 순위 매기는 방법 연구 알려줘",
+  "p": "2606.22807",
+  "title": "Lychee-Reranker: Fast but Not Late Interaction for Compressed Document Reranking",
+  "abstract": "As retrieval systems scale, effective and efficient reranking becomes increasingly important. However, most existing encoder- and decoder-based rerankers jointly process every query--passage pair, tightly coupling their online computation and limiting deployment efficiency and flexibility. We present Lychee-Reranker, a fast but not late-interaction (FBNL) reranker that decouples query and passage computation while retaining expressive relevance modeling. Built on an encoder--decoder architecture, Lychee-Reranker pre-encodes passages using Matryoshka embedding pooling, while its decoder models system and user instructions together with query intent; cross-attention then captures fine-grained relevance between the resulting query context and passage representations. Together, these designs offer four key advantages: (i) efficiency from offline passage encoding, (ii) expressiveness from cross-attention, (iii) compactness from Matryoshka embedding pooling, and (iv) test-time compute through an adjustable compute budget. We instantiate Lychee-Reranker in three sizes, Nano, Small, and Large, with 0.27B, 1B, and 4B activated parameters, respectively. Extensive experiments on BEIR, MIRACL, and LMEB demonstrate strong reranking performance with superior efficiency. On BEIR and MIRACL, our models achieve competitive performance in multi-domain and multilingual reranking, on par with strong industrial rerankers such as the Qwen3/BGE-Reranker series. On LMEB-Dialogue, a compact embedding model paired with our Nano reranker, which has only 0.27B activated parameters, remains competitive with 7--12B embedding models. Lychee-Reranker was previously known as KaLM-Reranker-V1. Data and models are available at https://huggingface.co/collections/KaLM-Embedding/lychee-kalm-reranker-and-jev."
+ },
+ {
+  "k": 126,
+  "set": "canon",
+  "q": "CN21",
+  "question": "사용자 질문을 검색하기 좋게 언어 모델로 다시 써서 검색하는 방법 연구 알려줘",
+  "p": "2411.13154",
+  "title": "DMQR-RAG: Diverse Multi-Query Rewriting for RAG",
+  "abstract": "Large language models often encounter challenges with static knowledge and hallucinations, which undermine their reliability. Retrieval-augmented generation (RAG) mitigates these issues by incorporating external information. However, user queries frequently contain noise and intent deviations, necessitating query rewriting to improve the relevance of retrieved documents. In this paper, we introduce DMQR-RAG, a Diverse Multi-Query Rewriting framework designed to improve the performance of both document retrieval and final responses in RAG. Specifically, we investigate how queries with varying information quantities can retrieve a diverse array of documents, presenting four rewriting strategies that operate at different levels of information to enhance the performance of baseline approaches. Additionally, we propose an adaptive strategy selection method that minimizes the number of rewrites while optimizing overall performance. Our methods have been rigorously validated through extensive experiments conducted in both academic and industry settings."
+ }
+]
