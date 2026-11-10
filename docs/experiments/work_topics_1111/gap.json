@@ -1,0 +1,1617 @@
+{
+ "topics": [
+  {
+   "tid": "W01",
+   "name": "판정자 편향",
+   "query": "LLM-as-a-judge bias",
+   "top": [
+    {
+     "id": "2306.05685",
+     "year": 2023,
+     "cited": 5234,
+     "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+     "in_db": true
+    },
+    {
+     "id": "2411.15594",
+     "year": 2026,
+     "cited": 1829,
+     "title": "A survey on LLM-as-a-judge",
+     "in_db": true
+    },
+    {
+     "id": "2404.18796",
+     "year": 2024,
+     "cited": 444,
+     "title": "Replacing Judges with Juries: Evaluating LLM Generations with a Panel of Diverse Models",
+     "in_db": false
+    },
+    {
+     "id": "2406.19314",
+     "year": 2024,
+     "cited": 436,
+     "title": "LiveBench: A Challenging, Contamination-Limited LLM Benchmark",
+     "in_db": true
+    },
+    {
+     "id": "2410.02736",
+     "year": 2024,
+     "cited": 349,
+     "title": "Justice or Prejudice? Quantifying Biases in LLM-as-a-Judge",
+     "in_db": true
+    },
+    {
+     "id": "2402.10669",
+     "year": 2024,
+     "cited": 337,
+     "title": "Humans or LLMs as the Judge? A Study on Judgement Bias",
+     "in_db": true
+    },
+    {
+     "id": "2310.17631",
+     "year": 2023,
+     "cited": 327,
+     "title": "JudgeLM: Fine-tuned Large Language Models are Scalable Judges",
+     "in_db": false
+    },
+    {
+     "id": "2410.21819",
+     "year": 2024,
+     "cited": 296,
+     "title": "Self-Preference Bias in LLM-as-a-Judge",
+     "in_db": true
+    },
+    {
+     "id": "2406.07791",
+     "year": 2024,
+     "cited": 232,
+     "title": "Judging the Judges: A Systematic Study of Position Bias in LLM-as-a-Judge",
+     "in_db": false
+    },
+    {
+     "id": "2406.12624",
+     "year": 2024,
+     "cited": 189,
+     "title": "Judging the Judges: Evaluating Alignment and Vulnerabilities in LLMs-as-Judges",
+     "in_db": true
+    }
+   ]
+  },
+  {
+   "tid": "W02",
+   "name": "판정과 사람 평가 일치",
+   "query": "LLM evaluators human agreement",
+   "top": [
+    {
+     "id": "2306.05685",
+     "year": 2023,
+     "cited": 5234,
+     "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+     "in_db": true
+    },
+    {
+     "id": "2403.04132",
+     "year": 2024,
+     "cited": 1009,
+     "title": "Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference",
+     "in_db": false
+    },
+    {
+     "id": "2305.03514",
+     "year": 2023,
+     "cited": 861,
+     "title": "Can Large Language Models Transform Computational Social Science?",
+     "in_db": false
+    },
+    {
+     "id": "2310.17526",
+     "year": 2024,
+     "cited": 348,
+     "title": "Can large language models replace humans in systematic reviews? Evaluating GPT ‐4's efficacy in screening and extracting data from peer‐reviewed and grey literature in multiple languages",
+     "in_db": false
+    },
+    {
+     "id": "2305.14387",
+     "year": 2023,
+     "cited": 334,
+     "title": "AlpacaFarm: A Simulation Framework for Methods that Learn from Human Feedback",
+     "in_db": false
+    },
+    {
+     "id": "2310.17631",
+     "year": 2023,
+     "cited": 327,
+     "title": "JudgeLM: Fine-tuned Large Language Models are Scalable Judges",
+     "in_db": false
+    },
+    {
+     "id": "2405.01724",
+     "year": 2024,
+     "cited": 236,
+     "title": "Large Language Models are Inconsistent and Biased Evaluators",
+     "in_db": true
+    },
+    {
+     "id": "2406.07791",
+     "year": 2024,
+     "cited": 232,
+     "title": "Judging the Judges: A Systematic Study of Position Bias in LLM-as-a-Judge",
+     "in_db": false
+    },
+    {
+     "id": "2401.02843",
+     "year": 2025,
+     "cited": 214,
+     "title": "Thousands of AI Authors on the Future of AI",
+     "in_db": false
+    },
+    {
+     "id": "2303.15621",
+     "year": 2023,
+     "cited": 210,
+     "title": "ChatGPT as a Factual Inconsistency Evaluator for Text Summarization",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W03",
+   "name": "RAG 근거 충실도",
+   "query": "faithfulness retrieval-augmented generation",
+   "top": [
+    {
+     "id": "2307.02694",
+     "year": 2025,
+     "cited": 685,
+     "title": "A comprehensive survey of loss functions and metrics in deep learning",
+     "in_db": false
+    },
+    {
+     "id": "2309.15217",
+     "year": 2023,
+     "cited": 676,
+     "title": "Ragas: Automated Evaluation of Retrieval Augmented Generation",
+     "in_db": true
+    },
+    {
+     "id": "2405.07437",
+     "year": 2025,
+     "cited": 374,
+     "title": "Evaluation of Retrieval-Augmented Generation: A Survey",
+     "in_db": true
+    },
+    {
+     "id": "2209.14491",
+     "year": 2022,
+     "cited": 209,
+     "title": "Re-Imagen: Retrieval-Augmented Text-to-Image Generator",
+     "in_db": false
+    },
+    {
+     "id": "2211.12561",
+     "year": 2022,
+     "cited": 144,
+     "title": "Retrieval-Augmented Multimodal Language Modeling",
+     "in_db": false
+    },
+    {
+     "id": "2506.00054",
+     "year": 2025,
+     "cited": 115,
+     "title": "Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers",
+     "in_db": false
+    },
+    {
+     "id": "2407.10805",
+     "year": 2024,
+     "cited": 110,
+     "title": "Think-on-Graph 2.0: Deep and Faithful Large Language Model Reasoning with Knowledge-guided Retrieval Augmented Generation",
+     "in_db": true
+    },
+    {
+     "id": "2412.18004",
+     "year": 2025,
+     "cited": 70,
+     "title": "Correctness is not Faithfulness in Retrieval Augmented Generation Attributions",
+     "in_db": true
+    },
+    {
+     "id": "2410.03727",
+     "year": 2024,
+     "cited": 61,
+     "title": "FaithEval: Can Your Language Model Stay Faithful to Context, Even If \"The Moon is Made of Marshmallows\"",
+     "in_db": false
+    },
+    {
+     "id": "2407.12873",
+     "year": 2024,
+     "cited": 45,
+     "title": "Evaluation of RAG Metrics for Question Answering in the Telecom Domain",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W04",
+   "name": "RAG 환각 탐지",
+   "query": "hallucination detection retrieval-augmented",
+   "top": [
+    {
+     "id": "2311.05232",
+     "year": 2024,
+     "cited": 4781,
+     "title": "A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions",
+     "in_db": true
+    },
+    {
+     "id": "2503.05777",
+     "year": 2025,
+     "cited": 377,
+     "title": "Medical Hallucination in Foundation Models and Their Impact on Healthcare",
+     "in_db": false
+    },
+    {
+     "id": "2401.06855",
+     "year": 2024,
+     "cited": 119,
+     "title": "Fine-grained Hallucination Detection and Editing for Language Models",
+     "in_db": false
+    },
+    {
+     "id": "2412.07724",
+     "year": 2024,
+     "cited": 86,
+     "title": "Granite Guardian",
+     "in_db": false
+    },
+    {
+     "id": "2407.08488",
+     "year": 2024,
+     "cited": 81,
+     "title": "Lynx: An Open Source Hallucination Evaluation Model",
+     "in_db": false
+    },
+    {
+     "id": "2402.10612",
+     "year": 2025,
+     "cited": 80,
+     "title": "Rowen: Adaptive Retrieval-Augmented Generation for Hallucination Mitigation in LLMs",
+     "in_db": false
+    },
+    {
+     "id": "2310.18344",
+     "year": 2023,
+     "cited": 76,
+     "title": "Chainpoll: A high efficacy method for LLM hallucination detection",
+     "in_db": true
+    },
+    {
+     "id": "2410.11414",
+     "year": 2024,
+     "cited": 74,
+     "title": "ReDeEP: Detecting Hallucination in Retrieval-Augmented Generation via Mechanistic Interpretability",
+     "in_db": false
+    },
+    {
+     "id": "2402.16063",
+     "year": 2024,
+     "cited": 44,
+     "title": "Citation-Enhanced Generation for LLM-based Chatbots",
+     "in_db": false
+    },
+    {
+     "id": "2502.17125",
+     "year": 2025,
+     "cited": 43,
+     "title": "LettuceDetect: A Hallucination Detection Framework for RAG Applications",
+     "in_db": true
+    }
+   ]
+  },
+  {
+   "tid": "W05",
+   "name": "지식 충돌",
+   "query": "knowledge conflicts retrieval-augmented",
+   "top": [
+    {
+     "id": "2305.13300",
+     "year": 2023,
+     "cited": 143,
+     "title": "Adaptive Chameleon or Stubborn Sloth: Revealing the Behavior of Large Language Models in Knowledge Conflicts",
+     "in_db": false
+    },
+    {
+     "id": "2410.07176",
+     "year": 2025,
+     "cited": 140,
+     "title": "Astute RAG: Overcoming Imperfect Retrieval Augmentation and Knowledge Conflicts for Large Language Models",
+     "in_db": true
+    },
+    {
+     "id": "2404.10198",
+     "year": 2024,
+     "cited": 133,
+     "title": "ClashEval: Quantifying the tug-of-war between an LLM’s internal prior and external evidence",
+     "in_db": false
+    },
+    {
+     "id": "2410.11414",
+     "year": 2024,
+     "cited": 74,
+     "title": "ReDeEP: Detecting Hallucination in Retrieval-Augmented Generation via Mechanistic Interpretability",
+     "in_db": false
+    },
+    {
+     "id": "2402.14409",
+     "year": 2024,
+     "cited": 72,
+     "title": "Tug-of-War between Knowledge: Exploring and Resolving Knowledge Conflicts in Retrieval-Augmented Language Models",
+     "in_db": false
+    },
+    {
+     "id": "2505.14069",
+     "year": 2025,
+     "cited": 70,
+     "title": "Process vs. Outcome Reward: Which is Better for Agentic RAG Reinforcement Learning",
+     "in_db": false
+    },
+    {
+     "id": "2401.11911",
+     "year": 2024,
+     "cited": 46,
+     "title": "Blinded by Generated Contexts: How Language Models Merge Generated and Retrieved Contexts When Knowledge Conflicts?",
+     "in_db": false
+    },
+    {
+     "id": "2503.15888",
+     "year": 2025,
+     "cited": 42,
+     "title": "Parameters vs. Context: Fine-Grained Control of Knowledge Reliance in Language Models",
+     "in_db": false
+    },
+    {
+     "id": "2506.08938",
+     "year": 2025,
+     "cited": 38,
+     "title": "FaithfulRAG: Fact-Level Conflict Modeling for Context-Faithful Retrieval-Augmented Generation",
+     "in_db": false
+    },
+    {
+     "id": "2305.01579",
+     "year": 2024,
+     "cited": 37,
+     "title": "Why So Gullible? Enhancing the Robustness of Retrieval-Augmented Models against Counterfactual Noise",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W06",
+   "name": "엔티티 모호성",
+   "query": "entity ambiguity retrieval-augmented generation",
+   "top": [
+    {
+     "id": "2504.13079",
+     "year": 2025,
+     "cited": 74,
+     "title": "Retrieval-Augmented Generation with Conflicting Evidence",
+     "in_db": true
+    },
+    {
+     "id": "2507.13396",
+     "year": 2025,
+     "cited": 15,
+     "title": "DyG-RAG: Dynamic Graph Retrieval-Augmented Generation with Event-Centric Reasoning",
+     "in_db": false
+    },
+    {
+     "id": "2602.11499",
+     "year": 2026,
+     "cited": 10,
+     "title": "ImagineAgent: What if Agents Could Imagine? Reinforcing Open-Vocabulary HOI Comprehension through Generation",
+     "in_db": false
+    },
+    {
+     "id": "2505.14528",
+     "year": 2026,
+     "cited": 5,
+     "title": "BugRepro: enhancing android bug reproduction with domain-specific knowledge integration",
+     "in_db": false
+    },
+    {
+     "id": "2512.05967",
+     "year": 2026,
+     "cited": 4,
+     "title": "Enhancing Retrieval-Augmented Generation with Entity Linking for Educational Platforms",
+     "in_db": true
+    },
+    {
+     "id": "2508.09323",
+     "year": 2026,
+     "cited": 3,
+     "title": "Leveraging large language models for rare disease named entity recognition",
+     "in_db": false
+    },
+    {
+     "id": "2512.15363",
+     "year": 2026,
+     "cited": 3,
+     "title": "Revisiting Task-Oriented Dataset Search in the Era of Large Language Models: Challenges, Benchmark, and Solution",
+     "in_db": false
+    },
+    {
+     "id": "2503.08323",
+     "year": 2025,
+     "cited": 3,
+     "title": "Towards scalable and cross-lingual specialist language models for oncology",
+     "in_db": false
+    },
+    {
+     "id": "2604.17405",
+     "year": 2026,
+     "cited": 2,
+     "title": "STRIDE: Strategic Iterative Decision-Making for Retrieval-Augmented Multi-Hop Question Answering",
+     "in_db": false
+    },
+    {
+     "id": "2509.01238",
+     "year": 2026,
+     "cited": 2,
+     "title": "Towards Open-World Retrieval-Augmented Generation on Knowledge Graph: A Multi-Agent Collaboration Framework",
+     "in_db": true
+    }
+   ]
+  },
+  {
+   "tid": "W07",
+   "name": "법률 · 규제 문서 질의응답",
+   "query": "legal question answering retrieval-augmented",
+   "top": [
+    {
+     "id": "2404.04302",
+     "year": 2024,
+     "cited": 164,
+     "title": "CBR-RAG: Case-Based Reasoning for Retrieval Augmented Generation in LLMs for Legal Question Answering",
+     "in_db": true
+    },
+    {
+     "id": "2309.17050",
+     "year": 2024,
+     "cited": 132,
+     "title": "Interpretable Long-Form Legal Question Answering with Retrieval-Augmented Large Language Models",
+     "in_db": false
+    },
+    {
+     "id": "2412.15235",
+     "year": 2025,
+     "cited": 66,
+     "title": "OG-RAG: Ontology-grounded retrieval-augmented generation for large language models",
+     "in_db": true
+    },
+    {
+     "id": "2505.03970",
+     "year": 2025,
+     "cited": 59,
+     "title": "A Reasoning-Focused Legal Retrieval Benchmark",
+     "in_db": false
+    },
+    {
+     "id": "2407.12216",
+     "year": 2024,
+     "cited": 42,
+     "title": "Mindful-RAG: A Study of Points of Failure in Retrieval Augmented Generation",
+     "in_db": false
+    },
+    {
+     "id": "2502.16573",
+     "year": 2025,
+     "cited": 23,
+     "title": "LawPal : A Retrieval Augmented Generation Based System for Enhanced Legal Accessibility in India",
+     "in_db": true
+    },
+    {
+     "id": "2504.16121",
+     "year": 2025,
+     "cited": 17,
+     "title": "LegalRAG: A Hybrid RAG System for Multilingual Legal Information Retrieval",
+     "in_db": false
+    },
+    {
+     "id": "2410.08764",
+     "year": 2024,
+     "cited": 14,
+     "title": "Measuring the Groundedness of Legal Question-Answering Systems",
+     "in_db": false
+    },
+    {
+     "id": "2502.10868",
+     "year": 2025,
+     "cited": 11,
+     "title": "NitiBench: A Comprehensive Study of LLM Framework Capabilities for Thai Legal Question Answering",
+     "in_db": false
+    },
+    {
+     "id": "2409.07713",
+     "year": 2024,
+     "cited": 10,
+     "title": "Experimenting with Legal AI Solutions: The Case of Question-Answering for Access to Justice",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W08",
+   "name": "표 질의응답",
+   "query": "table question answering large language models",
+   "top": [
+    {
+     "id": "2412.10302",
+     "year": 2024,
+     "cited": 786,
+     "title": "DeepSeek-VL2: Mixture-of-Experts Vision-Language Models for Advanced Multimodal Understanding",
+     "in_db": true
+    },
+    {
+     "id": "2101.06804",
+     "year": 2021,
+     "cited": 713,
+     "title": "What Makes Good In-Context Examples for GPT-$3$?",
+     "in_db": false
+    },
+    {
+     "id": "2309.13007",
+     "year": 2024,
+     "cited": 265,
+     "title": "ReConcile: Round-Table Conference Improves Reasoning via Consensus among Diverse LLMs",
+     "in_db": false
+    },
+    {
+     "id": "2308.11730",
+     "year": 2024,
+     "cited": 242,
+     "title": "Knowledge Graph Prompting for Multi-Document Question Answering",
+     "in_db": false
+    },
+    {
+     "id": "2402.17944",
+     "year": 2024,
+     "cited": 197,
+     "title": "Large Language Models(LLMs) on Tabular Data: Prediction, Generation, and Understanding -- A Survey",
+     "in_db": false
+    },
+    {
+     "id": "2301.13808",
+     "year": 2023,
+     "cited": 176,
+     "title": "Large Language Models are Versatile Decomposers: Decomposing Evidence and Questions for Table-based Reasoning",
+     "in_db": false
+    },
+    {
+     "id": "2401.04398",
+     "year": 2024,
+     "cited": 165,
+     "title": "Chain-of-Table: Evolving Tables in the Reasoning Chain for Table Understanding",
+     "in_db": false
+    },
+    {
+     "id": "2009.11564",
+     "year": 2021,
+     "cited": 161,
+     "title": "Machine Knowledge: Creation and Curation of Comprehensive Knowledge Bases",
+     "in_db": false
+    },
+    {
+     "id": "2305.13269",
+     "year": 2023,
+     "cited": 156,
+     "title": "Chain-of-Knowledge: Grounding Large Language Models via Dynamic Knowledge Adapting over Heterogeneous Sources",
+     "in_db": false
+    },
+    {
+     "id": "2407.01523",
+     "year": 2024,
+     "cited": 143,
+     "title": "MMLONGBENCH-DOC: Benchmarking Long-context Document Understanding with Visualizations",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W09",
+   "name": "스키마 매칭",
+   "query": "schema matching large language models",
+   "top": [
+    {
+     "id": "2304.02711",
+     "year": 2024,
+     "cited": 182,
+     "title": "Structured Prompt Interrogation and Recursive Extraction of Semantics (SPIRES): a method for populating knowledge bases using zero-shot learning",
+     "in_db": false
+    },
+    {
+     "id": "2308.06212",
+     "year": 2023,
+     "cited": 89,
+     "title": "A Large Language Model Enhanced Conversational Recommender System",
+     "in_db": false
+    },
+    {
+     "id": "2308.16361",
+     "year": 2023,
+     "cited": 71,
+     "title": "Large Language Models as Data Preprocessors",
+     "in_db": false
+    },
+    {
+     "id": "2405.14696",
+     "year": 2024,
+     "cited": 67,
+     "title": "A Declarative System for Optimizing AI Workloads",
+     "in_db": false
+    },
+    {
+     "id": "2412.08194",
+     "year": 2025,
+     "cited": 62,
+     "title": "Magneto: Combining Small and Large Language Models for Schema Matching",
+     "in_db": false
+    },
+    {
+     "id": "2403.01567",
+     "year": 2024,
+     "cited": 47,
+     "title": "ReMatch: Retrieval Enhanced Schema Matching with LLMs",
+     "in_db": true
+    },
+    {
+     "id": "2407.11852",
+     "year": 2024,
+     "cited": 41,
+     "title": "Schema Matching with Large Language Models: an Experimental Study",
+     "in_db": true
+    },
+    {
+     "id": "2501.08686",
+     "year": 2026,
+     "cited": 19,
+     "title": "Knowledge Graph-based Retrieval-Augmented Generation for Schema Matching",
+     "in_db": false
+    },
+    {
+     "id": "2410.24105",
+     "year": 2024,
+     "cited": 16,
+     "title": "Matchmaker: Self-Improving Large Language Model Programs for Schema Matching",
+     "in_db": false
+    },
+    {
+     "id": "2406.01876",
+     "year": 2024,
+     "cited": 15,
+     "title": "GRAM: Generative Retrieval Augmented Matching of Data Schemas in the Context of Data Security",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W10",
+   "name": "온톨로지 매칭",
+   "query": "ontology matching large language models",
+   "top": [
+    {
+     "id": "2304.02711",
+     "year": 2024,
+     "cited": 182,
+     "title": "Structured Prompt Interrogation and Recursive Extraction of Semantics (SPIRES): a method for populating knowledge bases using zero-shot learning",
+     "in_db": false
+    },
+    {
+     "id": "2311.03837",
+     "year": 2023,
+     "cited": 109,
+     "title": "OLaLa: Ontology Matching with Large Language Models",
+     "in_db": false
+    },
+    {
+     "id": "2306.11892",
+     "year": 2024,
+     "cited": 65,
+     "title": "Exploring New Frontiers in Agricultural NLP: Investigating the Potential of Large Language Models for Food Applications",
+     "in_db": false
+    },
+    {
+     "id": "2404.10317",
+     "year": 2025,
+     "cited": 62,
+     "title": "LLMs4OM: Matching Ontologies with Large Language Models",
+     "in_db": false
+    },
+    {
+     "id": "2312.00326",
+     "year": 2024,
+     "cited": 60,
+     "title": "Agent-OM: Leveraging LLM Agents for Ontology Matching",
+     "in_db": false
+    },
+    {
+     "id": "2309.07172",
+     "year": 2023,
+     "cited": 54,
+     "title": "Exploring Large Language Models for Ontology Alignment",
+     "in_db": false
+    },
+    {
+     "id": "2501.11441",
+     "year": 2025,
+     "cited": 38,
+     "title": "Ontology matching with Large Language Models and prioritized depth-first search",
+     "in_db": false
+    },
+    {
+     "id": "2405.20526",
+     "year": 2024,
+     "cited": 24,
+     "title": "Automated Generation and Tagging of Knowledge Components from Multiple-Choice Questions",
+     "in_db": false
+    },
+    {
+     "id": "2308.09217",
+     "year": 2023,
+     "cited": 18,
+     "title": "Conversational Ontology Alignment with ChatGPT",
+     "in_db": false
+    },
+    {
+     "id": "2411.02730",
+     "year": 2025,
+     "cited": 11,
+     "title": "A natural language processing approach to support biomedical data harmonization: Leveraging large language models",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W11",
+   "name": "엔티티 매칭",
+   "query": "entity resolution large language models",
+   "top": [
+    {
+     "id": "2103.14030",
+     "year": 2021,
+     "cited": 38556,
+     "title": "Swin Transformer: Hierarchical Vision Transformer using Shifted Windows",
+     "in_db": false
+    },
+    {
+     "id": "1511.03745",
+     "year": 2016,
+     "cited": 463,
+     "title": "Grounding of Textual Phrases in Images by Reconstruction",
+     "in_db": false
+    },
+    {
+     "id": "2505.07176",
+     "year": 2025,
+     "cited": 99,
+     "title": "Internet of Agents: Fundamentals, Applications, and Challenges",
+     "in_db": false
+    },
+    {
+     "id": "2406.12775",
+     "year": 2024,
+     "cited": 75,
+     "title": "Hopping Too Late: Exploring the Limitations of Large Language Models on Multi-Hop Queries",
+     "in_db": false
+    },
+    {
+     "id": "2312.03987",
+     "year": 2024,
+     "cited": 58,
+     "title": "Cost-Effective In-Context Learning for Entity Resolution: A Design Space Exploration",
+     "in_db": false
+    },
+    {
+     "id": "2310.18345",
+     "year": 2023,
+     "cited": 56,
+     "title": "A survey on semantic processing techniques",
+     "in_db": false
+    },
+    {
+     "id": "2502.06472",
+     "year": 2025,
+     "cited": 49,
+     "title": "KARMA: Leveraging Multi-Agent LLMs for Automated Knowledge Graph Enrichment",
+     "in_db": false
+    },
+    {
+     "id": "1911.02557",
+     "year": 2021,
+     "cited": 42,
+     "title": "Feedback-Based Self-Learning in Large-Scale Conversational AI Agents",
+     "in_db": false
+    },
+    {
+     "id": "2310.06174",
+     "year": 2024,
+     "cited": 39,
+     "title": "Cost-efficient prompt engineering for unsupervised entity resolution in the product matching domain",
+     "in_db": false
+    },
+    {
+     "id": "2104.03986",
+     "year": 2021,
+     "cited": 39,
+     "title": "Deep indexed active learning for matching heterogeneous entity representations",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W12",
+   "name": "지속가능 보고서",
+   "query": "sustainability reports large language models",
+   "top": [
+    {
+     "id": "2205.03824",
+     "year": 2023,
+     "cited": 90,
+     "title": "Survey on AI Sustainability: Emerging Trends on Learning Algorithms and Research Challenges [Review Article]",
+     "in_db": false
+    },
+    {
+     "id": "2310.05628",
+     "year": 2024,
+     "cited": 77,
+     "title": "Glitter or gold? Deriving structured insights from sustainability reports via large language models",
+     "in_db": false
+    },
+    {
+     "id": "2606.17846",
+     "year": 2026,
+     "cited": 75,
+     "title": "Qwen-RobotManip Technical Report: Alignment Unlocks Scale for Robotic Manipulation Foundation Models",
+     "in_db": true
+    },
+    {
+     "id": "2404.06711",
+     "year": 2024,
+     "cited": 68,
+     "title": "MathVC: An LLM-Simulated Multi-Character Virtual Classroom for Mathematics Education",
+     "in_db": false
+    },
+    {
+     "id": "2501.03265",
+     "year": 2025,
+     "cited": 61,
+     "title": "Cognitive Edge Computing: A Comprehensive Survey on Optimizing Large Models and AI Agents for Pervasive Deployment",
+     "in_db": false
+    },
+    {
+     "id": "2502.18505",
+     "year": 2025,
+     "cited": 53,
+     "title": "Comprehensive Analysis of Transparency and Accessibility of ChatGPT, DeepSeek, And other SoTA Large Language Models",
+     "in_db": false
+    },
+    {
+     "id": "2507.22879",
+     "year": 2025,
+     "cited": 45,
+     "title": "RecGPT Technical Report",
+     "in_db": false
+    },
+    {
+     "id": "2502.08650",
+     "year": 2025,
+     "cited": 45,
+     "title": "Who is Responsible? The Data, Models, Users or Regulations? A Comprehensive Survey on Responsible Generative AI for a Sustainable Future",
+     "in_db": false
+    },
+    {
+     "id": "2510.24797",
+     "year": 2025,
+     "cited": 38,
+     "title": "Large Language Models Report Subjective Experience Under Self-Referential Processing",
+     "in_db": false
+    },
+    {
+     "id": "2401.06831",
+     "year": 2023,
+     "cited": 32,
+     "title": "A Survey on the Applications of Frontier AI, Foundation Models, and Large Language Models to Intelligent Transportation Systems",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W13",
+   "name": "ESG 텍스트 분석",
+   "query": "ESG natural language processing",
+   "top": [
+    {
+     "id": "2011.08073",
+     "year": 2020,
+     "cited": 75,
+     "title": "Analyzing Sustainability Reports Using Natural Language Processing",
+     "in_db": false
+    },
+    {
+     "id": "2203.16788",
+     "year": 2022,
+     "cited": 54,
+     "title": "ESGBERT: Language Model to Help with Classification Tasks Related to Companies’ Environmental, Social, and Governance Practices",
+     "in_db": false
+    },
+    {
+     "id": "2010.08319",
+     "year": 2021,
+     "cited": 36,
+     "title": "Detecting Environmental, Social and Governance (ESG) Topics Using Domain-Specific Language Models and Data Augmentation",
+     "in_db": false
+    },
+    {
+     "id": "2502.21112",
+     "year": 2025,
+     "cited": 27,
+     "title": "Optimizing Large Language Models for ESG Activity Detection in Financial Texts",
+     "in_db": false
+    },
+    {
+     "id": "2506.01646",
+     "year": 2025,
+     "cited": 25,
+     "title": "ESGenius: Benchmarking LLMs on Environmental, Social, and Governance (ESG) and Sustainability Knowledge",
+     "in_db": false
+    },
+    {
+     "id": "2308.12420",
+     "year": 2025,
+     "cited": 8,
+     "title": "Evolution of ESG-focused DLT research: An NLP analysis of the literature",
+     "in_db": false
+    },
+    {
+     "id": "2406.19102",
+     "year": 2024,
+     "cited": 8,
+     "title": "Statements: Universal Information Extraction from Tables with Large Language Models for ESG KPIs",
+     "in_db": true
+    },
+    {
+     "id": "2311.18481",
+     "year": 2024,
+     "cited": 6,
+     "title": "ESG Accountability Made Easy: DocQA at Your Service",
+     "in_db": false
+    },
+    {
+     "id": "2407.20377",
+     "year": 2024,
+     "cited": 5,
+     "title": "Leveraging Natural Language and Item Response Theory Models for ESG Scoring",
+     "in_db": false
+    },
+    {
+     "id": "2410.00207",
+     "year": 2024,
+     "cited": 4,
+     "title": "Evaluating the performance of state-of-the-art esg domain-specific pre-trained large language models in text classification against existing models and traditional machine learning techniques",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W14",
+   "name": "기후 공시",
+   "query": "climate disclosure language models",
+   "top": [
+    {
+     "id": "2412.03716",
+     "year": 2025,
+     "cited": 17,
+     "title": "A Water Efficiency Dataset for African Data Centers",
+     "in_db": false
+    },
+    {
+     "id": "2306.15518",
+     "year": 2023,
+     "cited": 10,
+     "title": "Paradigm Shift in Sustainability Disclosure Analysis: Empowering Stakeholders with CHATREPORT, a Language Model-Based Tool",
+     "in_db": false
+    },
+    {
+     "id": "2505.22752",
+     "year": 2025,
+     "cited": 6,
+     "title": "Climate Finance Bench",
+     "in_db": false
+    },
+    {
+     "id": "2502.15094",
+     "year": 2025,
+     "cited": 5,
+     "title": "Judging It, Washing It: Scoring and Greenwashing Corporate Climate Disclosures using Large Language Models",
+     "in_db": false
+    },
+    {
+     "id": "2503.10674",
+     "year": 2025,
+     "cited": 4,
+     "title": "Enhancing Retrieval for ESGLLM via ESG-CID -- A Disclosure Content Index Finetuning Dataset for Mapping GRI and ESRS",
+     "in_db": false
+    },
+    {
+     "id": "2411.03402",
+     "year": 2024,
+     "cited": 3,
+     "title": "Climate AI for Corporate Decarbonization Metrics Extraction",
+     "in_db": false
+    },
+    {
+     "id": "2510.01222",
+     "year": 2025,
+     "cited": 2,
+     "title": "Discourse Vs Emissions: Analysis of Corporate Narratives, Symbolic Practices, and Mimicry through LLMs",
+     "in_db": false
+    },
+    {
+     "id": "2605.10804",
+     "year": 2026,
+     "cited": 1,
+     "title": "New AI-driven tools for enhancing campus well-being : a prevention and intervention approach",
+     "in_db": false
+    },
+    {
+     "id": "2609.07798",
+     "year": 2026,
+     "cited": 0,
+     "title": "Climate-ModernBERT: Revisiting Corpus Composition for Domain-Adaptive Continued Pretraining",
+     "in_db": false
+    },
+    {
+     "id": "2607.22006",
+     "year": 2026,
+     "cited": 0,
+     "title": "Printed but not benchmarkable: most building-decarbonisation disclosure cannot be matched to the pathways that stranding regulation assumes",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W15",
+   "name": "한국어 평가",
+   "query": "Korean language model benchmark",
+   "top": [
+    {
+     "id": "2407.10671",
+     "year": 2024,
+     "cited": 4564,
+     "title": "Qwen2 Technical Report",
+     "in_db": false
+    },
+    {
+     "id": "2105.09680",
+     "year": 2021,
+     "cited": 193,
+     "title": "KLUE: Korean Language Understanding Evaluation",
+     "in_db": false
+    },
+    {
+     "id": "2404.01954",
+     "year": 2024,
+     "cited": 86,
+     "title": "HyperCLOVA X Technical Report",
+     "in_db": false
+    },
+    {
+     "id": "2005.12503",
+     "year": 2020,
+     "cited": 86,
+     "title": "BEEP! Korean Corpus of Online News Comments for Toxic Speech Detection",
+     "in_db": false
+    },
+    {
+     "id": "2402.11548",
+     "year": 2024,
+     "cited": 74,
+     "title": "KMMLU: Measuring Massive Multitask Language Understanding in Korean",
+     "in_db": false
+    },
+    {
+     "id": "2303.17807",
+     "year": 2023,
+     "cited": 63,
+     "title": "GPT-4 can pass the Korean National Licensing Examination for Korean Medicine Doctors",
+     "in_db": false
+    },
+    {
+     "id": "2307.16778",
+     "year": 2024,
+     "cited": 42,
+     "title": "KoBBQ: Korean Bias Benchmark for Question Answering",
+     "in_db": false
+    },
+    {
+     "id": "2501.02448",
+     "year": 2025,
+     "cited": 40,
+     "title": "Understand, Solve and Translate: Bridging the Multilingual Mathematical Reasoning Gap",
+     "in_db": false
+    },
+    {
+     "id": "2206.05224",
+     "year": 2022,
+     "cited": 34,
+     "title": "A Multi-Task Benchmark for Korean Legal Language Understanding and Judgement Prediction",
+     "in_db": false
+    },
+    {
+     "id": "2403.01469",
+     "year": 2024,
+     "cited": 33,
+     "title": "KorMedMCQA: Multi-Choice Question Answering Benchmark for Korean Healthcare Professional Licensing Examinations",
+     "in_db": false
+    }
+   ]
+  },
+  {
+   "tid": "W16",
+   "name": "장문 생성 사실성",
+   "query": "long-form generation factuality",
+   "top": [
+    {
+     "id": "2305.14251",
+     "year": 2023,
+     "cited": 1133,
+     "title": "FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation",
+     "in_db": true
+    },
+    {
+     "id": "2310.11511",
+     "year": 2023,
+     "cited": 1081,
+     "title": "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection",
+     "in_db": true
+    },
+    {
+     "id": "2512.13564",
+     "year": 2025,
+     "cited": 392,
+     "title": "Memory in the Age of AI Agents",
+     "in_db": false
+    },
+    {
+     "id": "2306.01693",
+     "year": 2023,
+     "cited": 183,
+     "title": "Fine-Grained Human Feedback Gives Better Rewards for Language Model Training",
+     "in_db": false
+    },
+    {
+     "id": "2305.18201",
+     "year": 2023,
+     "cited": 87,
+     "title": "A Critical Evaluation of Evaluations for Long-form Question Answering",
+     "in_db": false
+    },
+    {
+     "id": "2511.07685",
+     "year": 2025,
+     "cited": 83,
+     "title": "ResearchRubrics: A Benchmark of Prompts and Rubrics For Evaluating Deep Research Agents",
+     "in_db": false
+    },
+    {
+     "id": "2406.19276",
+     "year": 2024,
+     "cited": 81,
+     "title": "VeriScore: Evaluating the factuality of verifiable claims in long-form text generation",
+     "in_db": false
+    },
+    {
+     "id": "2404.00474",
+     "year": 2024,
+     "cited": 35,
+     "title": "Linguistic Calibration of Long-Form Generations",
+     "in_db": true
+    },
+    {
+     "id": "2406.13439",
+     "year": 2024,
+     "cited": 35,
+     "title": "Finding Blind Spots in Evaluator LLMs with Interpretable Checklists",
+     "in_db": false
+    },
+    {
+     "id": "2012.14919",
+     "year": 2021,
+     "cited": 30,
+     "title": "WikiTableT: A Large-Scale Data-to-Text Dataset for Generating Wikipedia Article Sections",
+     "in_db": false
+    }
+   ]
+  }
+ ],
+ "missing": {
+  "2404.18796": [
+   "W01"
+  ],
+  "2310.17631": [
+   "W01",
+   "W02"
+  ],
+  "2406.07791": [
+   "W01",
+   "W02"
+  ],
+  "2403.04132": [
+   "W02"
+  ],
+  "2305.03514": [
+   "W02"
+  ],
+  "2310.17526": [
+   "W02"
+  ],
+  "2305.14387": [
+   "W02"
+  ],
+  "2401.02843": [
+   "W02"
+  ],
+  "2303.15621": [
+   "W02"
+  ],
+  "2307.02694": [
+   "W03"
+  ],
+  "2209.14491": [
+   "W03"
+  ],
+  "2211.12561": [
+   "W03"
+  ],
+  "2506.00054": [
+   "W03"
+  ],
+  "2410.03727": [
+   "W03"
+  ],
+  "2407.12873": [
+   "W03"
+  ],
+  "2503.05777": [
+   "W04"
+  ],
+  "2401.06855": [
+   "W04"
+  ],
+  "2412.07724": [
+   "W04"
+  ],
+  "2407.08488": [
+   "W04"
+  ],
+  "2402.10612": [
+   "W04"
+  ],
+  "2410.11414": [
+   "W04",
+   "W05"
+  ],
+  "2402.16063": [
+   "W04"
+  ],
+  "2305.13300": [
+   "W05"
+  ],
+  "2404.10198": [
+   "W05"
+  ],
+  "2402.14409": [
+   "W05"
+  ],
+  "2505.14069": [
+   "W05"
+  ],
+  "2401.11911": [
+   "W05"
+  ],
+  "2503.15888": [
+   "W05"
+  ],
+  "2506.08938": [
+   "W05"
+  ],
+  "2305.01579": [
+   "W05"
+  ],
+  "2507.13396": [
+   "W06"
+  ],
+  "2602.11499": [
+   "W06"
+  ],
+  "2505.14528": [
+   "W06"
+  ],
+  "2508.09323": [
+   "W06"
+  ],
+  "2512.15363": [
+   "W06"
+  ],
+  "2503.08323": [
+   "W06"
+  ],
+  "2604.17405": [
+   "W06"
+  ],
+  "2309.17050": [
+   "W07"
+  ],
+  "2505.03970": [
+   "W07"
+  ],
+  "2407.12216": [
+   "W07"
+  ],
+  "2504.16121": [
+   "W07"
+  ],
+  "2410.08764": [
+   "W07"
+  ],
+  "2502.10868": [
+   "W07"
+  ],
+  "2409.07713": [
+   "W07"
+  ],
+  "2101.06804": [
+   "W08"
+  ],
+  "2309.13007": [
+   "W08"
+  ],
+  "2308.11730": [
+   "W08"
+  ],
+  "2402.17944": [
+   "W08"
+  ],
+  "2301.13808": [
+   "W08"
+  ],
+  "2401.04398": [
+   "W08"
+  ],
+  "2009.11564": [
+   "W08"
+  ],
+  "2305.13269": [
+   "W08"
+  ],
+  "2407.01523": [
+   "W08"
+  ],
+  "2304.02711": [
+   "W09",
+   "W10"
+  ],
+  "2308.06212": [
+   "W09"
+  ],
+  "2308.16361": [
+   "W09"
+  ],
+  "2405.14696": [
+   "W09"
+  ],
+  "2412.08194": [
+   "W09"
+  ],
+  "2501.08686": [
+   "W09"
+  ],
+  "2410.24105": [
+   "W09"
+  ],
+  "2406.01876": [
+   "W09"
+  ],
+  "2311.03837": [
+   "W10"
+  ],
+  "2306.11892": [
+   "W10"
+  ],
+  "2404.10317": [
+   "W10"
+  ],
+  "2312.00326": [
+   "W10"
+  ],
+  "2309.07172": [
+   "W10"
+  ],
+  "2501.11441": [
+   "W10"
+  ],
+  "2405.20526": [
+   "W10"
+  ],
+  "2308.09217": [
+   "W10"
+  ],
+  "2411.02730": [
+   "W10"
+  ],
+  "2103.14030": [
+   "W11"
+  ],
+  "1511.03745": [
+   "W11"
+  ],
+  "2505.07176": [
+   "W11"
+  ],
+  "2406.12775": [
+   "W11"
+  ],
+  "2312.03987": [
+   "W11"
+  ],
+  "2310.18345": [
+   "W11"
+  ],
+  "2502.06472": [
+   "W11"
+  ],
+  "1911.02557": [
+   "W11"
+  ],
+  "2310.06174": [
+   "W11"
+  ],
+  "2104.03986": [
+   "W11"
+  ],
+  "2205.03824": [
+   "W12"
+  ],
+  "2310.05628": [
+   "W12"
+  ],
+  "2404.06711": [
+   "W12"
+  ],
+  "2501.03265": [
+   "W12"
+  ],
+  "2502.18505": [
+   "W12"
+  ],
+  "2507.22879": [
+   "W12"
+  ],
+  "2502.08650": [
+   "W12"
+  ],
+  "2510.24797": [
+   "W12"
+  ],
+  "2401.06831": [
+   "W12"
+  ],
+  "2011.08073": [
+   "W13"
+  ],
+  "2203.16788": [
+   "W13"
+  ],
+  "2010.08319": [
+   "W13"
+  ],
+  "2502.21112": [
+   "W13"
+  ],
+  "2506.01646": [
+   "W13"
+  ],
+  "2308.12420": [
+   "W13"
+  ],
+  "2311.18481": [
+   "W13"
+  ],
+  "2407.20377": [
+   "W13"
+  ],
+  "2410.00207": [
+   "W13"
+  ],
+  "2412.03716": [
+   "W14"
+  ],
+  "2306.15518": [
+   "W14"
+  ],
+  "2505.22752": [
+   "W14"
+  ],
+  "2502.15094": [
+   "W14"
+  ],
+  "2503.10674": [
+   "W14"
+  ],
+  "2411.03402": [
+   "W14"
+  ],
+  "2510.01222": [
+   "W14"
+  ],
+  "2605.10804": [
+   "W14"
+  ],
+  "2609.07798": [
+   "W14"
+  ],
+  "2607.22006": [
+   "W14"
+  ],
+  "2407.10671": [
+   "W15"
+  ],
+  "2105.09680": [
+   "W15"
+  ],
+  "2404.01954": [
+   "W15"
+  ],
+  "2005.12503": [
+   "W15"
+  ],
+  "2402.11548": [
+   "W15"
+  ],
+  "2303.17807": [
+   "W15"
+  ],
+  "2307.16778": [
+   "W15"
+  ],
+  "2501.02448": [
+   "W15"
+  ],
+  "2206.05224": [
+   "W15"
+  ],
+  "2403.01469": [
+   "W15"
+  ],
+  "2512.13564": [
+   "W16"
+  ],
+  "2306.01693": [
+   "W16"
+  ],
+  "2305.18201": [
+   "W16"
+  ],
+  "2511.07685": [
+   "W16"
+  ],
+  "2406.19276": [
+   "W16"
+  ],
+  "2406.13439": [
+   "W16"
+  ],
+  "2012.14919": [
+   "W16"
+  ]
+ }
+}

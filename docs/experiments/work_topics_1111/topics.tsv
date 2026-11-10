@@ -1,0 +1,16 @@
+W01	판정자 편향	LLM-as-a-judge bias
+W02	판정과 사람 평가 일치	LLM evaluators human agreement
+W03	RAG 근거 충실도	faithfulness retrieval-augmented generation
+W04	RAG 환각 탐지	hallucination detection retrieval-augmented
+W05	지식 충돌	knowledge conflicts retrieval-augmented
+W06	엔티티 모호성	entity ambiguity retrieval-augmented generation
+W07	법률 · 규제 문서 질의응답	legal question answering retrieval-augmented
+W08	표 질의응답	table question answering large language models
+W09	스키마 매칭	schema matching large language models
+W10	온톨로지 매칭	ontology matching large language models
+W11	엔티티 매칭	entity resolution large language models
+W12	지속가능 보고서	sustainability reports large language models
+W13	ESG 텍스트 분석	ESG natural language processing
+W14	기후 공시	climate disclosure language models
+W15	한국어 평가	Korean language model benchmark
+W16	장문 생성 사실성	long-form generation factuality

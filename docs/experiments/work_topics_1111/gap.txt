@@ -1,0 +1,177 @@
+W01 판정자 편향: 상위 10 중 DB 에 있음 7
+    DB 2306.05685 2023  5234 Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena
+    DB 2411.15594 2026  1829 A survey on LLM-as-a-judge
+       2404.18796 2024   444 Replacing Judges with Juries: Evaluating LLM Generations with a Panel of Diver
+    DB 2406.19314 2024   436 LiveBench: A Challenging, Contamination-Limited LLM Benchmark
+    DB 2410.02736 2024   349 Justice or Prejudice? Quantifying Biases in LLM-as-a-Judge
+    DB 2402.10669 2024   337 Humans or LLMs as the Judge? A Study on Judgement Bias
+       2310.17631 2023   327 JudgeLM: Fine-tuned Large Language Models are Scalable Judges
+    DB 2410.21819 2024   296 Self-Preference Bias in LLM-as-a-Judge
+       2406.07791 2024   232 Judging the Judges: A Systematic Study of Position Bias in LLM-as-a-Judge
+    DB 2406.12624 2024   189 Judging the Judges: Evaluating Alignment and Vulnerabilities in LLMs-as-Judges
+W02 판정과 사람 평가 일치: 상위 10 중 DB 에 있음 2
+    DB 2306.05685 2023  5234 Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena
+       2403.04132 2024  1009 Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference
+       2305.03514 2023   861 Can Large Language Models Transform Computational Social Science?
+       2310.17526 2024   348 Can large language models replace humans in systematic reviews? Evaluating GPT
+       2305.14387 2023   334 AlpacaFarm: A Simulation Framework for Methods that Learn from Human Feedback
+       2310.17631 2023   327 JudgeLM: Fine-tuned Large Language Models are Scalable Judges
+    DB 2405.01724 2024   236 Large Language Models are Inconsistent and Biased Evaluators
+       2406.07791 2024   232 Judging the Judges: A Systematic Study of Position Bias in LLM-as-a-Judge
+       2401.02843 2025   214 Thousands of AI Authors on the Future of AI
+       2303.15621 2023   210 ChatGPT as a Factual Inconsistency Evaluator for Text Summarization
+W03 RAG 근거 충실도: 상위 10 중 DB 에 있음 4
+       2307.02694 2025   685 A comprehensive survey of loss functions and metrics in deep learning
+    DB 2309.15217 2023   676 Ragas: Automated Evaluation of Retrieval Augmented Generation
+    DB 2405.07437 2025   374 Evaluation of Retrieval-Augmented Generation: A Survey
+       2209.14491 2022   209 Re-Imagen: Retrieval-Augmented Text-to-Image Generator
+       2211.12561 2022   144 Retrieval-Augmented Multimodal Language Modeling
+       2506.00054 2025   115 Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhan
+    DB 2407.10805 2024   110 Think-on-Graph 2.0: Deep and Faithful Large Language Model Reasoning with Know
+    DB 2412.18004 2025    70 Correctness is not Faithfulness in Retrieval Augmented Generation Attributions
+       2410.03727 2024    61 FaithEval: Can Your Language Model Stay Faithful to Context, Even If "The Moon
+       2407.12873 2024    45 Evaluation of RAG Metrics for Question Answering in the Telecom Domain
+W04 RAG 환각 탐지: 상위 10 중 DB 에 있음 3
+    DB 2311.05232 2024  4781 A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Chal
+       2503.05777 2025   377 Medical Hallucination in Foundation Models and Their Impact on Healthcare
+       2401.06855 2024   119 Fine-grained Hallucination Detection and Editing for Language Models
+       2412.07724 2024    86 Granite Guardian
+       2407.08488 2024    81 Lynx: An Open Source Hallucination Evaluation Model
+       2402.10612 2025    80 Rowen: Adaptive Retrieval-Augmented Generation for Hallucination Mitigation in
+    DB 2310.18344 2023    76 Chainpoll: A high efficacy method for LLM hallucination detection
+       2410.11414 2024    74 ReDeEP: Detecting Hallucination in Retrieval-Augmented Generation via Mechanis
+       2402.16063 2024    44 Citation-Enhanced Generation for LLM-based Chatbots
+    DB 2502.17125 2025    43 LettuceDetect: A Hallucination Detection Framework for RAG Applications
+W05 지식 충돌: 상위 10 중 DB 에 있음 1
+       2305.13300 2023   143 Adaptive Chameleon or Stubborn Sloth: Revealing the Behavior of Large Language
+    DB 2410.07176 2025   140 Astute RAG: Overcoming Imperfect Retrieval Augmentation and Knowledge Conflict
+       2404.10198 2024   133 ClashEval: Quantifying the tug-of-war between an LLM’s internal prior and exte
+       2410.11414 2024    74 ReDeEP: Detecting Hallucination in Retrieval-Augmented Generation via Mechanis
+       2402.14409 2024    72 Tug-of-War between Knowledge: Exploring and Resolving Knowledge Conflicts in R
+       2505.14069 2025    70 Process vs. Outcome Reward: Which is Better for Agentic RAG Reinforcement Lear
+       2401.11911 2024    46 Blinded by Generated Contexts: How Language Models Merge Generated and Retriev
+       2503.15888 2025    42 Parameters vs. Context: Fine-Grained Control of Knowledge Reliance in Language
+       2506.08938 2025    38 FaithfulRAG: Fact-Level Conflict Modeling for Context-Faithful Retrieval-Augme
+       2305.01579 2024    37 Why So Gullible? Enhancing the Robustness of Retrieval-Augmented Models agains
+W06 엔티티 모호성: 상위 10 중 DB 에 있음 3
+    DB 2504.13079 2025    74 Retrieval-Augmented Generation with Conflicting Evidence
+       2507.13396 2025    15 DyG-RAG: Dynamic Graph Retrieval-Augmented Generation with Event-Centric Reaso
+       2602.11499 2026    10 ImagineAgent: What if Agents Could Imagine? Reinforcing Open-Vocabulary HOI Co
+       2505.14528 2026     5 BugRepro: enhancing android bug reproduction with domain-specific knowledge in
+    DB 2512.05967 2026     4 Enhancing Retrieval-Augmented Generation with Entity Linking for Educational P
+       2508.09323 2026     3 Leveraging large language models for rare disease named entity recognition
+       2512.15363 2026     3 Revisiting Task-Oriented Dataset Search in the Era of Large Language Models: C
+       2503.08323 2025     3 Towards scalable and cross-lingual specialist language models for oncology
+       2604.17405 2026     2 STRIDE: Strategic Iterative Decision-Making for Retrieval-Augmented Multi-Hop 
+    DB 2509.01238 2026     2 Towards Open-World Retrieval-Augmented Generation on Knowledge Graph: A Multi-
+W07 법률 · 규제 문서 질의응답: 상위 10 중 DB 에 있음 3
+    DB 2404.04302 2024   164 CBR-RAG: Case-Based Reasoning for Retrieval Augmented Generation in LLMs for L
+       2309.17050 2024   132 Interpretable Long-Form Legal Question Answering with Retrieval-Augmented Larg
+    DB 2412.15235 2025    66 OG-RAG: Ontology-grounded retrieval-augmented generation for large language mo
+       2505.03970 2025    59 A Reasoning-Focused Legal Retrieval Benchmark
+       2407.12216 2024    42 Mindful-RAG: A Study of Points of Failure in Retrieval Augmented Generation
+    DB 2502.16573 2025    23 LawPal : A Retrieval Augmented Generation Based System for Enhanced Legal Acce
+       2504.16121 2025    17 LegalRAG: A Hybrid RAG System for Multilingual Legal Information Retrieval
+       2410.08764 2024    14 Measuring the Groundedness of Legal Question-Answering Systems
+       2502.10868 2025    11 NitiBench: A Comprehensive Study of LLM Framework Capabilities for Thai Legal 
+       2409.07713 2024    10 Experimenting with Legal AI Solutions: The Case of Question-Answering for Acce
+W08 표 질의응답: 상위 10 중 DB 에 있음 1
+    DB 2412.10302 2024   786 DeepSeek-VL2: Mixture-of-Experts Vision-Language Models for Advanced Multimoda
+       2101.06804 2021   713 What Makes Good In-Context Examples for GPT-$3$?
+       2309.13007 2024   265 ReConcile: Round-Table Conference Improves Reasoning via Consensus among Diver
+       2308.11730 2024   242 Knowledge Graph Prompting for Multi-Document Question Answering
+       2402.17944 2024   197 Large Language Models(LLMs) on Tabular Data: Prediction, Generation, and Under
+       2301.13808 2023   176 Large Language Models are Versatile Decomposers: Decomposing Evidence and Ques
+       2401.04398 2024   165 Chain-of-Table: Evolving Tables in the Reasoning Chain for Table Understanding
+       2009.11564 2021   161 Machine Knowledge: Creation and Curation of Comprehensive Knowledge Bases
+       2305.13269 2023   156 Chain-of-Knowledge: Grounding Large Language Models via Dynamic Knowledge Adap
+       2407.01523 2024   143 MMLONGBENCH-DOC: Benchmarking Long-context Document Understanding with Visuali
+W09 스키마 매칭: 상위 10 중 DB 에 있음 2
+       2304.02711 2024   182 Structured Prompt Interrogation and Recursive Extraction of Semantics (SPIRES)
+       2308.06212 2023    89 A Large Language Model Enhanced Conversational Recommender System
+       2308.16361 2023    71 Large Language Models as Data Preprocessors
+       2405.14696 2024    67 A Declarative System for Optimizing AI Workloads
+       2412.08194 2025    62 Magneto: Combining Small and Large Language Models for Schema Matching
+    DB 2403.01567 2024    47 ReMatch: Retrieval Enhanced Schema Matching with LLMs
+    DB 2407.11852 2024    41 Schema Matching with Large Language Models: an Experimental Study
+       2501.08686 2026    19 Knowledge Graph-based Retrieval-Augmented Generation for Schema Matching
+       2410.24105 2024    16 Matchmaker: Self-Improving Large Language Model Programs for Schema Matching
+       2406.01876 2024    15 GRAM: Generative Retrieval Augmented Matching of Data Schemas in the Context o
+W10 온톨로지 매칭: 상위 10 중 DB 에 있음 0
+       2304.02711 2024   182 Structured Prompt Interrogation and Recursive Extraction of Semantics (SPIRES)
+       2311.03837 2023   109 OLaLa: Ontology Matching with Large Language Models
+       2306.11892 2024    65 Exploring New Frontiers in Agricultural NLP: Investigating the Potential of La
+       2404.10317 2025    62 LLMs4OM: Matching Ontologies with Large Language Models
+       2312.00326 2024    60 Agent-OM: Leveraging LLM Agents for Ontology Matching
+       2309.07172 2023    54 Exploring Large Language Models for Ontology Alignment
+       2501.11441 2025    38 Ontology matching with Large Language Models and prioritized depth-first searc
+       2405.20526 2024    24 Automated Generation and Tagging of Knowledge Components from Multiple-Choice 
+       2308.09217 2023    18 Conversational Ontology Alignment with ChatGPT
+       2411.02730 2025    11 A natural language processing approach to support biomedical data harmonizatio
+W11 엔티티 매칭: 상위 10 중 DB 에 있음 0
+       2103.14030 2021 38556 Swin Transformer: Hierarchical Vision Transformer using Shifted Windows
+       1511.03745 2016   463 Grounding of Textual Phrases in Images by Reconstruction
+       2505.07176 2025    99 Internet of Agents: Fundamentals, Applications, and Challenges
+       2406.12775 2024    75 Hopping Too Late: Exploring the Limitations of Large Language Models on Multi-
+       2312.03987 2024    58 Cost-Effective In-Context Learning for Entity Resolution: A Design Space Explo
+       2310.18345 2023    56 A survey on semantic processing techniques
+       2502.06472 2025    49 KARMA: Leveraging Multi-Agent LLMs for Automated Knowledge Graph Enrichment
+       1911.02557 2021    42 Feedback-Based Self-Learning in Large-Scale Conversational AI Agents
+       2310.06174 2024    39 Cost-efficient prompt engineering for unsupervised entity resolution in the pr
+       2104.03986 2021    39 Deep indexed active learning for matching heterogeneous entity representations
+W12 지속가능 보고서: 상위 10 중 DB 에 있음 1
+       2205.03824 2023    90 Survey on AI Sustainability: Emerging Trends on Learning Algorithms and Resear
+       2310.05628 2024    77 Glitter or gold? Deriving structured insights from sustainability reports via 
+    DB 2606.17846 2026    75 Qwen-RobotManip Technical Report: Alignment Unlocks Scale for Robotic Manipula
+       2404.06711 2024    68 MathVC: An LLM-Simulated Multi-Character Virtual Classroom for Mathematics Edu
+       2501.03265 2025    61 Cognitive Edge Computing: A Comprehensive Survey on Optimizing Large Models an
+       2502.18505 2025    53 Comprehensive Analysis of Transparency and Accessibility of ChatGPT, DeepSeek,
+       2507.22879 2025    45 RecGPT Technical Report
+       2502.08650 2025    45 Who is Responsible? The Data, Models, Users or Regulations? A Comprehensive Su
+       2510.24797 2025    38 Large Language Models Report Subjective Experience Under Self-Referential Proc
+       2401.06831 2023    32 A Survey on the Applications of Frontier AI, Foundation Models, and Large Lang
+W13 ESG 텍스트 분석: 상위 10 중 DB 에 있음 1
+       2011.08073 2020    75 Analyzing Sustainability Reports Using Natural Language Processing
+       2203.16788 2022    54 ESGBERT: Language Model to Help with Classification Tasks Related to Companies
+       2010.08319 2021    36 Detecting Environmental, Social and Governance (ESG) Topics Using Domain-Speci
+       2502.21112 2025    27 Optimizing Large Language Models for ESG Activity Detection in Financial Texts
+       2506.01646 2025    25 ESGenius: Benchmarking LLMs on Environmental, Social, and Governance (ESG) and
+       2308.12420 2025     8 Evolution of ESG-focused DLT research: An NLP analysis of the literature
+    DB 2406.19102 2024     8 Statements: Universal Information Extraction from Tables with Large Language M
+       2311.18481 2024     6 ESG Accountability Made Easy: DocQA at Your Service
+       2407.20377 2024     5 Leveraging Natural Language and Item Response Theory Models for ESG Scoring
+       2410.00207 2024     4 Evaluating the performance of state-of-the-art esg domain-specific pre-trained
+W14 기후 공시: 상위 10 중 DB 에 있음 0
+       2412.03716 2025    17 A Water Efficiency Dataset for African Data Centers
+       2306.15518 2023    10 Paradigm Shift in Sustainability Disclosure Analysis: Empowering Stakeholders 
+       2505.22752 2025     6 Climate Finance Bench
+       2502.15094 2025     5 Judging It, Washing It: Scoring and Greenwashing Corporate Climate Disclosures
+       2503.10674 2025     4 Enhancing Retrieval for ESGLLM via ESG-CID -- A Disclosure Content Index Finet
+       2411.03402 2024     3 Climate AI for Corporate Decarbonization Metrics Extraction
+       2510.01222 2025     2 Discourse Vs Emissions: Analysis of Corporate Narratives, Symbolic Practices, 
+       2605.10804 2026     1 New AI-driven tools for enhancing campus well-being : a prevention and interve
+       2609.07798 2026     0 Climate-ModernBERT: Revisiting Corpus Composition for Domain-Adaptive Continue
+       2607.22006 2026     0 Printed but not benchmarkable: most building-decarbonisation disclosure cannot
+W15 한국어 평가: 상위 10 중 DB 에 있음 0
+       2407.10671 2024  4564 Qwen2 Technical Report
+       2105.09680 2021   193 KLUE: Korean Language Understanding Evaluation
+       2404.01954 2024    86 HyperCLOVA X Technical Report
+       2005.12503 2020    86 BEEP! Korean Corpus of Online News Comments for Toxic Speech Detection
+       2402.11548 2024    74 KMMLU: Measuring Massive Multitask Language Understanding in Korean
+       2303.17807 2023    63 GPT-4 can pass the Korean National Licensing Examination for Korean Medicine D
+       2307.16778 2024    42 KoBBQ: Korean Bias Benchmark for Question Answering
+       2501.02448 2025    40 Understand, Solve and Translate: Bridging the Multilingual Mathematical Reason
+       2206.05224 2022    34 A Multi-Task Benchmark for Korean Legal Language Understanding and Judgement P
+       2403.01469 2024    33 KorMedMCQA: Multi-Choice Question Answering Benchmark for Korean Healthcare Pr
+W16 장문 생성 사실성: 상위 10 중 DB 에 있음 3
+    DB 2305.14251 2023  1133 FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Te
+    DB 2310.11511 2023  1081 Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection
+       2512.13564 2025   392 Memory in the Age of AI Agents
+       2306.01693 2023   183 Fine-Grained Human Feedback Gives Better Rewards for Language Model Training
+       2305.18201 2023    87 A Critical Evaluation of Evaluations for Long-form Question Answering
+       2511.07685 2025    83 ResearchRubrics: A Benchmark of Prompts and Rubrics For Evaluating Deep Resear
+       2406.19276 2024    81 VeriScore: Evaluating the factuality of verifiable claims in long-form text ge
+    DB 2404.00474 2024    35 Linguistic Calibration of Long-Form Generations
+       2406.13439 2024    35 Finding Blind Spots in Evaluator LLMs with Interpretable Checklists
+       2012.14919 2021    30 WikiTableT: A Large-Scale Data-to-Text Dataset for Generating Wikipedia Articl
+합: 상위 160편 중 DB 에 있음 31 · 없는 논문(겹침 뺌) 125
