@@ -48,6 +48,25 @@ CHROMA_DIR = CHROMA_DB_DIR
 ATOM_NS = "http://www.w3.org/2005/Atom"
 ARXIV_API = "http://export.arxiv.org/api/query"
 DELAY_SEC = 5
+# 429 · 5xx · 연결 오류 · 시간 초과 때 기다릴 초. 11-10 canon_1110 에서 arXiv 429 로 38편이 조용히 빠졌다.
+RETRY_WAITS = (10, 30, 60)
+
+
+def _get(url: str, **kwargs) -> requests.Response:
+    """GET. 429 · 5xx · 연결 오류 · 시간 초과는 RETRY_WAITS 만큼 기다렸다 다시 시도하고, 끝내 실패하면 예외를 올린다."""
+    for wait in (*RETRY_WAITS, None):
+        try:
+            resp = requests.get(url, **kwargs)
+            if resp.status_code != 429 and resp.status_code < 500:
+                resp.raise_for_status()  # 그 밖의 4xx 는 다시 시도하지 않는다
+                return resp
+            err: Exception = requests.HTTPError(f"{resp.status_code} for url: {url}", response=resp)
+        except (requests.ConnectionError, requests.Timeout) as e:
+            err = e
+        if wait is None:
+            raise err
+        print(f"  ↻ {err} — {wait}초 뒤 다시 시도")
+        time.sleep(wait)
 
 
 @dataclass
@@ -89,8 +108,7 @@ def _fetch_arxiv_meta(arxiv_id: str) -> PaperMetadata | None:
     """arXiv Atom API로 단일 논문 메타데이터 조회."""
     url = f"{ARXIV_API}?id_list={arxiv_id}&max_results=1"
     try:
-        resp = requests.get(url, timeout=30)
-        resp.raise_for_status()
+        resp = _get(url, timeout=30)
     except requests.RequestException as e:
         print(f"  ❌ arXiv API 실패: {e}")
         return None
@@ -143,8 +161,7 @@ def _fetch_arxiv_meta(arxiv_id: str) -> PaperMetadata | None:
 
 def _download_pdf(url: str, dest: Path) -> bool:
     try:
-        resp = requests.get(url, timeout=120, stream=True)
-        resp.raise_for_status()
+        resp = _get(url, timeout=120, stream=True)
         with dest.open("wb") as f:
             for chunk in resp.iter_content(chunk_size=8192):
                 f.write(chunk)
@@ -158,11 +175,12 @@ def run(
     yaml_path: Path = CLASSICS_YAML,
     filter_ids: list[str] | None = None,
     dry_run: bool = False,
-) -> None:
+) -> int:
+    """실패한 편수를 돌려준다(main 은 1 이상이면 종료 코드 1)."""
     entries = _load_classics(yaml_path, filter_ids)
     if not entries:
         print("⚠️  등록할 논문이 없습니다.")
-        return
+        return 0
 
     os.makedirs(RAW_DATA_DIR, exist_ok=True)
     os.makedirs(CHROMA_DIR, exist_ok=True)
@@ -179,6 +197,7 @@ def run(
 
     success = 0
     skipped = 0
+    failed: list[str] = []
 
     for idx, entry in enumerate(entries, 1):
         print(f"\n{'─' * 50}")
@@ -210,6 +229,7 @@ def run(
             meta = _fetch_arxiv_meta(entry.arxiv_id)
             if not meta:
                 print("  ⏭️  건너뜀 (메타데이터 조회 실패)")
+                failed.append(entry.arxiv_id)
                 continue
             print(f"  ✓ {meta.title[:60]}")
 
@@ -220,6 +240,7 @@ def run(
             time.sleep(DELAY_SEC)
             if not _download_pdf(meta.pdf_url, pdf_path):
                 print("  ⏭️  건너뜀 (다운로드 실패)")
+                failed.append(entry.arxiv_id)
                 continue
             print(f"  ✓ 다운로드 완료 ({pdf_path.stat().st_size / 1024:.0f} KB)")
 
@@ -228,10 +249,12 @@ def run(
                 markdown = parser.to_markdown(pdf_path)
                 if not markdown:
                     print("  ⏭️  건너뜀 (파싱 결과 없음)")
+                    failed.append(entry.arxiv_id)
                     continue
                 print(f"  ✓ 파싱 완료 ({len(markdown):,}자)")
             except Exception as e:
                 print(f"  ❌ 파싱 실패: {e}")
+                failed.append(entry.arxiv_id)
                 continue
 
             record = storage.build_paper_record(
@@ -245,6 +268,7 @@ def run(
             )
             if not storage.save_paper(record):
                 print("  ⏭️  건너뜀 (JSONL 저장 실패/중복)")
+                failed.append(entry.arxiv_id)
                 continue
             print("  💾 JSONL 저장 완료")
 
@@ -262,13 +286,18 @@ def run(
                 print(f"  ✓ Chroma 적재 완료 ({chunk_count}개 청크)")
                 success += 1
             except Exception as e:
-                print(f"  ❌ RAG 적재 실패: {e}")
+                # JSONL 에는 이미 저장돼 다시 돌려도 '이미 등록됨' 으로 건너뛴다 — Chroma 는 따로 채워야 한다.
+                print(f"  ❌ RAG 적재 실패(JSONL 에는 저장됨): {e}")
+                failed.append(entry.arxiv_id)
 
         gc.collect()
 
     print(f"\n{'=' * 60}")
-    print(f"🎉 완료: 성공 {success} / 스킵 {skipped} / 전체 {len(entries)}")
+    print(f"🎉 완료: 성공 {success} / 스킵 {skipped} / 실패 {len(failed)} / 전체 {len(entries)}")
+    if failed:
+        print(f"❌ 실패 ID: {' '.join(failed)}")
     print("=" * 60)
+    return len(failed)
 
 
 def main() -> None:
@@ -291,7 +320,7 @@ def main() -> None:
         help="큐레이션 YAML 파일 경로",
     )
     args = ap.parse_args()
-    run(yaml_path=args.yaml, filter_ids=args.ids, dry_run=args.dry_run)
+    sys.exit(1 if run(yaml_path=args.yaml, filter_ids=args.ids, dry_run=args.dry_run) else 0)
 
 
 if __name__ == "__main__":
