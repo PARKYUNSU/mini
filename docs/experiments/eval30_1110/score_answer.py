@@ -109,7 +109,7 @@ def packet(label):
                 for b in blocks:
                     m = re.search(r"\[(\d{4}\.\d{4,5})", b)
                     if m and m.group(1) in a:
-                        w.write("  > " + re.sub(r"\s+", " ", b)[:1600] + "\n\n")
+                        w.write("  > " + re.sub(r"\s+", " ", b) + "\n\n")
     print("묶음 씀 · 표본", sorted(sample))
 
 
@@ -136,8 +136,10 @@ def labels(label):
     for t, c in sorted(by_type.items()):
         s = sum(c.values())
         print(f"  {t}: O {c['O']}/{s} · △ {c['△']} · X {c['X']}")
-    print(f"결론이 본론을 앞섬(D) {d}/{len(lab)} · 빈약(F) {f}/{len(lab)} · MS '모름' 잘함 {ms}/4")
-    print("근거 없는 주장(표본):", unsup)
+    sd = sum("strictD=Y" in " ".join(row[7:]) for row in lab)
+    sn = sum("strictD=" in " ".join(row[7:]) for row in lab)
+    print(f"결론 문제(D, README §6.1 좁힌 정의) {d}/{len(lab)} · 사전 등록 정의 strictD {sd}/{sn} · 빈약(F) {f}/{len(lab)} · MS '모름' 잘함 {ms}/4")
+    print(f"근거 없는 주장(표본 {len(unsup)}): 합 {sum(int(u) for _, u in unsup)} · 0 인 답 {sum(u == '0' for _, u in unsup)}", unsup)
 
 
 if __name__ == "__main__":

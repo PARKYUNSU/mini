@@ -1,0 +1,31 @@
+# id	유형	요소(O 다룸 · △ 언급만 · X 빠짐, gold 순서)	D(결론의 모순 · 잘못된 귀속 · 근거 없는 넓은 단정)	F(빈약)	MS('모름')	근거 없는 주장 수(표본 10, 본론 문장)	메모 — README §6. label_packet_answer.md 를 읽고 달았다. D 는 §6.1 의 좁힌 정의, strictD 는 사전 등록 정의(결론에 본론에 없는 주장). 첫 묶음이 인용 블록을 1600자에서 잘라 표본 · 오귀속 판단은 잘리지 않은 블록으로 다시 봤다('재확인').
+NM1	NM	O,O	N	N	-	0	strictD=Y(성능 향상은 본론에 없고 초록에는 있음)
+NM2	NM	O,O	N	N	-	-	strictD=Y
+NM3	NM	O,△	N	N	-	-	strictD=Y · 본론 1 이 Lost in the Middle 현상을 LongPiBench(2410.14641)로 2차 인용 — 그 논문이 현상을 소개하지만 '모든 경우에 나타난다'는 그 논문의 '대부분 모델은 강건'과 반대(재확인) · 결론이 해결책(Found in the Middle) 쪽으로 벗어남
+NM4	NM	△	Y	N	-	-	strictD=N · 결론 '세 가지 능력'이 문서 초록의 4 fundamental abilities 와 반대(반사실 강건성 빠짐, 재확인) · 본론의 능력 설명도 원 정의와 다름
+T07	SV	O,O	N	N	-	-	strictD=Y · 처음 단 '잘못된 귀속 의심'은 틀림 — 본론 1 의 충실성 · 사실성 분류 체계는 인용한 다중모달 서베이 블록에 있음(재확인)
+T01	SV	O,O	N	N	-	-	strictD=N · speculative 를 '추상적 예측'으로 옮김
+T05	SV	O,△	N	N	-	-	strictD=N · 한자 섞임(数据集)
+T04	SV	O,O	N	N	-	-	strictD=N
+HU17	MU	△,△,X	Y	Y	-	-	strictD=Y · 컨텍스트의 문맥 압축 논문 3편(2511.08128 · 2604.15153 · 2510.20535)을 안 쓰고 BoundlessBPE 를 문맥 압축으로 연결 · 결론 '서브워드 비교는 없다'는 본론 두 편(T-FREE · BoundlessBPE)과 어긋남(재확인)
+HU27	MU	O,O,O	Y	N	-	2	strictD=Y · 결론이 Statutory AI 결과(52~59%p)를 헌법 AI 에 붙임 · 근거 없음 2 = 본론 4 에 레드팀 로드맵 논문(2506.05376)을 같이 인용(오귀속) · 본론 4 '거부 과잉 분석'은 문서에 없음 · 재확인: 오탐률 1.74% · 개선 분류기 거부율 감소는 블록 뒤쪽에 있음 → 요소 3 △→O, 근거 없음 3→2
+HU39	MU	O,O,△	N	N	-	-	strictD=Y · 본론 2 의 Gecko 주장에 ML-Embed(2605.15081)를 같이 인용 — 그 블록에 Gecko 없음(오귀속, 재확인)
+MU1	MU	△,O,X	Y	N	-	1	strictD=Y · 판정 '없음' 서론 · 결론 '찾을 수 없다'가 본론(방해 문서 관련 3편)과 모순 · 근거 없음 1 = gold evidence 를 '금전 증거'로 옮김(재확인)
+C02	CP	O,O	N	N	-	-	strictD=Y(수치는 초록)
+C01	CP	O,△	N	N	-	0	strictD=Y · 차이는 일반론
+C07	CP	O,O	N	N	-	-	strictD=Y(수치는 초록)
+C05	CP	O,O	N	N	-	-	strictD=Y · '오스트라이버전'(out-of-distribution) 깨진 표기
+N08	NU	O	N	N	-	0	strictD=N
+N04	NU	O	N	N	-	-	strictD=N
+N11	NU	O	N	N	-	-	strictD=N · 본론 '회복탄력성 5% · 윤리 8%'는 문서에 없음(문서는 둘 중 하나면 5–10%, 재확인) · 결론 5~10% 는 맞음
+N10	NU	O	N	N	-	-	strictD=N
+MS1	MS	O	N	N	O	-	없다고 밝히고 가까운 논문만 소개
+MS2	MS	X	Y	N	X	2	원 논문(HyDE)이 DB 에 없다고 밝히지 않고 RAGSmith(2511.01386) 관련 연구 단락의 HyDE(Gao et al., 2022) 소개로 답함 — 방법 설명은 그 단락에 있음 · 근거 없음 2 = '추가 텍스트 생성 없이' · '추가 검색 비용 없이 정밀도 향상' · 결론 '효율성'은 근거 없고 비용 서술이 본론과 모순 · 재확인: 처음엔 HyDE 단락이 묶음에서 잘려 통째로 지어냈다고 봄(4→2)
+MS3	MS	O	N	N	O	-	없다고 밝힘
+MS4	MS	O	N	N	O	-	없다고 밝힘
+NM1E	NM	O,O	N	N	-	0	strictD=N
+NM3E	NM	O,O	N	N	-	0	strictD=N
+T01E	SV	O,O	N	N	-	0	strictD=N
+C02E	CP	O,O	N	N	-	0	strictD=N
+N10E	NU	X	N	Y	-	-	라우터가 planner/C 로 보내 답 없음(검색 기준선과 같은 실패)
+MU1E	MU	O,O,X	Y	N	-	-	strictD=Y · 결론이 문서 모두가 '다른 엔티티' 정보 오인을 다룬다고 단정 — 블록에 그런 내용 없음(PrismRAG 은 '혼란스러운 반관련 문단', 재확인) · gold evidence 를 '금전 증거'로 옮김
