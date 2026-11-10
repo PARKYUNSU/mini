@@ -9,16 +9,23 @@ from core.config.agent_config import CODE_TIMEOUT_SEC, ERROR_LOG_MAX_CHARS
 
 
 def _e2b_sandbox_envs() -> dict[str, str]:
-    """Sandbox.run_code(..., envs=) 용. E2B_API_KEY는 클라이언트 SDK가 쓰므로 넣지 않음."""
+    """Sandbox.run_code(..., envs=) 용. E2B_API_KEY는 클라이언트 SDK가 쓰므로 넣지 않음.
+
+    기본은 minimal 이다: LLM 이 쓴 코드가 도는 외부 샌드박스에 `.env` 전체(키 70여 개)를 넘기지 않는다
+    (ops_audit_1111 — 전에는 기본이 full 이었다). 생성 코드가 쓸 키만 `E2B_SANDBOX_EXTRA_KEYS` 에 적는다.
+    이 값을 안 적으면 날씨 키 하나만 넘긴다. 예전 동작은 `E2B_SANDBOX_ENV_MODE=full`.
+    """
     load_dotenv(override=True)
-    mode = (os.getenv("E2B_SANDBOX_ENV_MODE") or "full").strip().lower()
-    if mode == "minimal":
+    mode = (os.getenv("E2B_SANDBOX_ENV_MODE") or "minimal").strip().lower()
+    if mode != "full":
         env_dict: dict[str, str] = {
             "LANG": os.environ.get("LANG") or "C.UTF-8",
             "PYTHONUTF8": "1",
             "PYTHONIOENCODING": os.environ.get("PYTHONIOENCODING") or "utf-8",
         }
-        extra_raw = (os.getenv("E2B_SANDBOX_EXTRA_KEYS") or "").strip()
+        extra_raw = os.getenv("E2B_SANDBOX_EXTRA_KEYS")
+        if extra_raw is None:
+            extra_raw = "OPENWEATHERMAP_API_KEY"
         for key in (k.strip() for k in extra_raw.split(",") if k.strip()):
             if key == "E2B_API_KEY":
                 continue
