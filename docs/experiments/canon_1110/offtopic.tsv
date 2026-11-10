@@ -1,0 +1,30 @@
+tid	id	판정	title
+T01	2504.19413	경계	Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory
+T03	2003.13624	경계	TREC CAsT 2019: The Conversational Assistance Track Overview
+T03	2106.11251	경계	Pseudo-Relevance Feedback for Multiple Representation Dense Retrieval
+T03	2210.06774	밖	Re3: Generating Longer Stories With Recursive Reprompting and Revision
+T03	2411.02571	경계	MM-Embed: Universal Multimodal Retrieval with Multimodal LLMs
+T04	2306.13549	밖	A survey on multimodal large language models
+T04	2308.00352	밖	MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework
+T04	2310.03744	밖	Improved Baselines with Visual Instruction Tuning
+T04	2412.05271	밖	Expanding Performance Boundaries of Open-Source Multimodal Models with Model, Data, and Test-Time Scaling
+T05	1506.00019	밖	A Critical Review of Recurrent Neural Networks for Sequence Learning
+T05	1609.07843	밖	Pointer Sentinel Mixture Models
+T05	2305.16291	밖	Voyager: An Open-Ended Embodied Agent with Large Language Models
+T05	2310.06770	밖	SWE-bench: Can Language Models Resolve Real-World GitHub Issues?
+T05	2404.14219	밖	Phi-3 Technical Report: A Highly Capable Language Model Locally on Your Phone
+T05	2406.12793	밖	ChatGLM: A Family of Large Language Models from GLM-130B to GLM-4 All Tools
+T05	2511.21631	밖	Qwen3-VL Technical Report
+T06	2505.22019	경계	VRAG-RL: Empower Vision-Perception-Based RAG for Visually Rich Information Understanding via Iterative Reasoning with Reinforcement Learning
+T07	2301.13848	밖	Benchmarking Large Language Models for News Summarization
+T07	2305.19118	밖	Encouraging Divergent Thinking in Large Language Models through Multi-Agent Debate
+T07	2504.19413	밖	Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory
+T07	2506.08872	밖	Your Brain on ChatGPT: Accumulation of Cognitive Debt when Using an AI Assistant for Essay Writing Task
+T08	2410.18251	밖	Context-Augmented Code Generation Using Programming Knowledge Graphs
+T08	2411.10878	밖	Empowering Meta-Analysis: Leveraging Large Language Models for Scientific Synthesis
+T08	2507.02424	밖	CyberRAG: An agentic RAG cyber attack classification and reporting tool
+T09	2307.10485	밖	FinGPT: Democratizing Internet-scale Data for Financial Large Language Models
+T09	2406.09246	밖	OpenVLA: An Open-Source Vision-Language-Action Model
+T10	2405.16506	밖	GRAG: Graph Retrieval-Augmented Generation
+T10	2405.20362	경계	Hallucination‐Free? Assessing the Reliability of Leading AI Legal Research Tools
+T10	2502.14776	경계	SurveyX: Academic Survey Automation via Large Language Models
