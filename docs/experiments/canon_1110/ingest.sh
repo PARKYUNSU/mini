@@ -4,8 +4,11 @@ cd "/Volumes/T7 Shield/mini" || exit 1
 export PATH=/opt/homebrew/bin:$PATH
 D=docs/experiments/canon_1110; L=.cron/canon_1110.log
 while pgrep -f "canon_1110/run[.]sh" > /dev/null; do sleep 60; done
-for s in canon 162 real40 real2 ev30; do
-  [ -s docs/experiments/e2e_ko_1008/results/cn0_$s.jsonl ] || { echo "수집 전 측정 cn0_$s 없음 — 멈춤 $(date)" >> $L; exit 1; }
+# 끊긴 측정도 막는다: 행 수가 문항 수와 같고 lock 이 남지 않아야 한다.
+for sn in canon:40 162:162 real40:40 real2:34 ev30:30; do
+  s=${sn%%:*}; n=${sn##*:}; R=docs/experiments/e2e_ko_1008/results/cn0_$s
+  [ -s $R.jsonl ] && [ "$(wc -l < $R.jsonl | tr -d ' ')" = "$n" ] && [ ! -e $R.lock ] \
+    || { echo "수집 전 측정 cn0_$s 미완(행 $(wc -l < $R.jsonl 2>/dev/null) / $n) — 멈춤 $(date)" >> $L; exit 1; }
 done
 echo "수집 시작 $(date)" >> $L
 .venv/bin/python -u -m apps.backfill.ingest_classics --yaml $D/candidates.yaml > .cron/canon_1110_ingest.log 2>&1 \
