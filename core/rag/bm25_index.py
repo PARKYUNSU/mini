@@ -49,6 +49,28 @@ def _normalize_pid(pid: str) -> str:
     return s
 
 
+def _jsonl_files() -> list[Path]:
+    """색인 재료: processed/ 의 crawled_papers*.jsonl + 받는 중인 crawled_papers.jsonl."""
+    processed_dir = PROJECT_ROOT / "raw_data_queue" / "processed"
+    main_jsonl = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
+    files = sorted(processed_dir.glob("crawled_papers*.jsonl")) if processed_dir.exists() else []
+    if main_jsonl.exists():
+        files.append(main_jsonl)
+    return files
+
+
+def _jsonl_signature() -> tuple:
+    """(이름, 크기, 수정 시각) 묶음 — 색인을 지은 뒤 재료가 바뀌었는지 본다."""
+    out = []
+    for p in _jsonl_files():
+        try:
+            st = p.stat()
+        except OSError:
+            continue
+        out.append((p.name, st.st_size, st.st_mtime_ns))
+    return tuple(out)
+
+
 class BM25Searcher:
     """JSONL 기반 BM25 검색기. title + abstract를 인덱싱."""
 
@@ -58,6 +80,7 @@ class BM25Searcher:
         self._bm25: Any = None  # rank_bm25.BM25Okapi (lazy import in _load)
         self._pid_to_idx: dict[str, int] = {}  # paper_id → index
         self._loaded = False
+        self._sig: tuple = ()  # 색인을 지을 때의 JSONL 모습 (_jsonl_signature)
         self._lock = threading.Lock()
 
     def _load(self) -> None:
@@ -66,19 +89,10 @@ class BM25Searcher:
             return
 
         t0 = time.time()
-        processed_dir = PROJECT_ROOT / "raw_data_queue" / "processed"
-        main_jsonl = PROJECT_ROOT / "raw_data_queue" / "crawled_papers.jsonl"
-
+        self._sig = _jsonl_signature()  # 읽기 전에 잡는다 — 읽는 동안 바뀌면 다음 점검에서 다시 짓는다
         papers_by_pid: dict[str, dict] = {}
 
-        # processed/ 디렉토리의 모든 JSONL 파일 로드
-        jsonl_files: list[Path] = []
-        if processed_dir.exists():
-            jsonl_files = sorted(processed_dir.glob("crawled_papers*.jsonl"))
-        if main_jsonl.exists():
-            jsonl_files.append(main_jsonl)
-
-        for fpath in jsonl_files:
+        for fpath in _jsonl_files():
             try:
                 with fpath.open(encoding="utf-8", errors="replace") as f:
                     for line in f:
@@ -254,17 +268,32 @@ class BM25Searcher:
 # ── Singleton ──
 _bm25_searcher: BM25Searcher | None = None
 _bm25_lock = threading.Lock()
+_STALE_CHECK_SEC = 300  # JSONL 이 바뀌었는지 보는 주기 (임베딩 캐시 다시 읽기와 같다)
+_QUIET_SEC = 120  # 마지막 쓰기 뒤 이만큼 지나야 다시 짓는다 (수집 도중 여러 번 짓지 않게)
+_stale_checked_at = 0.0
 
 
 def get_bm25_searcher() -> BM25Searcher:
-    """BM25Searcher 싱글톤 반환."""
-    global _bm25_searcher
-    if _bm25_searcher is not None:
-        return _bm25_searcher
+    """BM25Searcher 싱글톤 반환.
+
+    색인을 지은 뒤 JSONL 이 바뀌었으면(매일 수집) 비워서 다음 검색 때 새로 짓게 한다(약 9초).
+    전에는 봇을 재시작해야 새 논문이 BM25 · 이름 찾기에 들어왔다 — 밀집 검색은 캐시를 5분마다
+    다시 읽어 새 논문을 보는데 BM25 만 못 봤다(ops_audit_1111).
+    """
+    global _bm25_searcher, _stale_checked_at
     with _bm25_lock:
-        if _bm25_searcher is None:
-            _bm25_searcher = BM25Searcher()
-        return _bm25_searcher
+        s = _bm25_searcher
+        now = time.time()
+        if s is not None and s._loaded and now - _stale_checked_at >= _STALE_CHECK_SEC:
+            _stale_checked_at = now
+            sig = _jsonl_signature()
+            last_write = max((m for _, _, m in sig), default=0) / 1e9
+            if sig != s._sig and now - last_write >= _QUIET_SEC:
+                print("[BM25] JSONL 이 바뀜 → 다음 검색 때 색인을 다시 짓는다", flush=True)
+                s = None
+        if s is None:
+            s = _bm25_searcher = BM25Searcher()
+        return s
 
 
 def invalidate_bm25_searcher() -> None:
