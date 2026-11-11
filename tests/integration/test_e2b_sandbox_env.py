@@ -28,6 +28,7 @@ def test_e2b_sandbox_envs_default_is_minimal(monkeypatch):
     monkeypatch.setattr(m, "load_dotenv", lambda **kw: None)
     monkeypatch.delenv("E2B_SANDBOX_ENV_MODE", raising=False)
     monkeypatch.delenv("E2B_SANDBOX_EXTRA_KEYS", raising=False)
+    monkeypatch.delenv("WEATHER_API_KEY", raising=False)  # 실제 .env 값이 프로세스에 남아 있을 수 있다
     monkeypatch.setenv("TELEGRAM_TOKEN", "t")
     monkeypatch.setenv("ZZZ_UNIQUE_ROUTING_TEST_MARK", "1")
     monkeypatch.setenv("OPENWEATHERMAP_API_KEY", "w")
