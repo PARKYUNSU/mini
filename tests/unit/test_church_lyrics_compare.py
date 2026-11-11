@@ -111,3 +111,14 @@ def test_slides_writes_repeated_stanza_once():
     out = slides(f"{chorus}\n\n절 가사 한 줄\n\n{chorus}")
     assert out == f"{chorus}\n절 가사 한 줄" and slides(out) == out
     assert slides("같은 줄\n\n같은 줄") == "같은 줄\n같은 줄"   # 한 줄짜리 반복은 남김
+
+
+def test_slides_never_leaves_blank_lines_from_double_spaces():
+    out = slides("내 그물 버리고 내  사랑들 뒤로 하고  나를 부르신 주님과 동행하는 일\n다음 줄")
+    assert "" not in out.splitlines()
+    assert all(len(ln) <= 18 for ln in out.splitlines())
+
+
+def test_slides_breaks_after_linking_ending_not_after_modifier():
+    assert slides("내 그물 버리고 내 사랑들 뒤로 하고") == "내 그물 버리고\n내 사랑들 뒤로 하고"
+    assert slides("우리 보좌 앞에 모였네 함께 주를 찬양하며") == "우리 보좌 앞에 모였네\n함께 주를 찬양하며"

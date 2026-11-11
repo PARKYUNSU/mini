@@ -24,12 +24,25 @@ _PUNCT = re.compile(r"[,.!?;:…~\"“”、。，．！？；：]+|(?<![A-Za-z]
 MAX_SLIDE = 18  # 슬라이드 한 줄 최대 글자 수(공백 포함). 완성본 예시의 가장 긴 줄이 17자
 
 
+# 이어지는 어미(버리고·하며·와서…) 뒤에서 끊는 게 자연스럽고, 꾸미는 말(내 사랑·그 이름) 뒤에서 끊으면 어색합니다
+_LINKING = tuple("고며서면니데게도지")
+_MODIFIER = {"내", "네", "그", "이", "저", "나의", "주의", "우리", "온", "새", "모든", "저의", "너의", "참", "큰", "더"}
+
+
+def _break_cost(word: str) -> int:
+    """이 낱말 뒤에서 줄을 끊는 비용: 0 이어지는 어미, 1 보통, 2 꾸미는 말."""
+    if word in _MODIFIER:
+        return 2
+    return 0 if word.endswith(_LINKING) else 1
+
+
 def _cut(line: str) -> list[str]:
     """긴 줄을 가운데에 가장 가까운 공백에서 나눕니다. 공백이 없으면 그대로 둡니다."""
+    line = " ".join(line.split())  # 겹친 공백에서 나누면 빈 줄이 생깁니다(11-08 '베드로의 고백')
     if len(line) <= MAX_SLIDE or " " not in line:
         return [line]
     spaces = [i for i, ch in enumerate(line) if ch == " "]
-    at = min(spaces, key=lambda i: abs(i - len(line) / 2))
+    at = min(spaces, key=lambda i: (_break_cost(line[:i].split()[-1]), abs(i - len(line) / 2)))
     return _cut(line[:at]) + _cut(line[at + 1:])
 
 
