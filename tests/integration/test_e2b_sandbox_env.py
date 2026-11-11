@@ -38,6 +38,21 @@ def test_e2b_sandbox_envs_default_is_minimal(monkeypatch):
     assert "E2B_API_KEY" not in d
 
 
+def test_e2b_sandbox_envs_default_passes_weather_key_by_either_name(monkeypatch):
+    """운영 .env 는 WEATHER_API_KEY 라는 이름을 쓴다 — 기본 허용 목록에 두 이름이 다 있어야 한다."""
+    import core.execution.agent_sandbox as m
+
+    monkeypatch.setattr(m, "load_dotenv", lambda **kw: None)
+    monkeypatch.delenv("E2B_SANDBOX_ENV_MODE", raising=False)
+    monkeypatch.delenv("E2B_SANDBOX_EXTRA_KEYS", raising=False)
+    monkeypatch.delenv("OPENWEATHERMAP_API_KEY", raising=False)
+    monkeypatch.setenv("WEATHER_API_KEY", "w")
+    monkeypatch.setenv("TELEGRAM_TOKEN", "t")
+
+    d = m._e2b_sandbox_envs()
+    assert d["WEATHER_API_KEY"] == "w" and "TELEGRAM_TOKEN" not in d
+
+
 def test_e2b_sandbox_envs_empty_extra_passes_nothing(monkeypatch):
     import core.execution.agent_sandbox as m
 

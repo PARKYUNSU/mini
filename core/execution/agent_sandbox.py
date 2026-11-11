@@ -13,7 +13,7 @@ def _e2b_sandbox_envs() -> dict[str, str]:
 
     기본은 minimal 이다: LLM 이 쓴 코드가 도는 외부 샌드박스에 `.env` 전체(키 70여 개)를 넘기지 않는다
     (ops_audit_1111 — 전에는 기본이 full 이었다). 생성 코드가 쓸 키만 `E2B_SANDBOX_EXTRA_KEYS` 에 적는다.
-    이 값을 안 적으면 날씨 키 하나만 넘긴다. 예전 동작은 `E2B_SANDBOX_ENV_MODE=full`.
+    이 값을 안 적으면 날씨 키만 넘긴다(`.env` 에서 쓰는 두 이름 모두). 예전 동작은 `E2B_SANDBOX_ENV_MODE=full`.
     """
     load_dotenv(override=True)
     mode = (os.getenv("E2B_SANDBOX_ENV_MODE") or "minimal").strip().lower()
@@ -25,7 +25,8 @@ def _e2b_sandbox_envs() -> dict[str, str]:
         }
         extra_raw = os.getenv("E2B_SANDBOX_EXTRA_KEYS")
         if extra_raw is None:
-            extra_raw = "OPENWEATHERMAP_API_KEY"
+            # 운영 .env 는 WEATHER_API_KEY 라는 이름을 쓴다 — 하나만 허용했다가 날씨 키가 빠졌다(11-11).
+            extra_raw = "OPENWEATHERMAP_API_KEY,WEATHER_API_KEY"
         for key in (k.strip() for k in extra_raw.split(",") if k.strip()):
             if key == "E2B_API_KEY":
                 continue
