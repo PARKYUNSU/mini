@@ -31,6 +31,7 @@ from core.config.agent_config import (
     ollama_kwargs,
     ollama_planner_reasoning_enabled,
     RAG_ANSWER_MODEL,
+    RAG_ANSWER_ONLY_MODEL,
 )
 from core.llm.agent_gemini import RotatingGeminiChat
 
@@ -120,10 +121,10 @@ def get_planner_llm():
 
 
 def get_rag_answer_llm():
-    """RAG 답변(B) 전용: ``RAG_ANSWER_MODEL`` (기본 OLLAMA_MODEL). 샘플링은 get_planner_llm 과 동일."""
+    """RAG 답변(B) 전용: ``RAG_ANSWER_MODEL`` (기본 OLLAMA_MODEL). ``RAG_ANSWER_ONLY_MODEL`` 이 있으면 이 호출만 그 모델. 샘플링은 get_planner_llm 과 동일."""
     return ChatOllama(
         **ollama_kwargs(
-            model=RAG_ANSWER_MODEL,
+            model=RAG_ANSWER_ONLY_MODEL,
             temperature=0.2,
             top_p=0.8,
             repeat_penalty=1.18,
