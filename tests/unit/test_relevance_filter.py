@@ -41,3 +41,12 @@ def test_protected_names():
     blocks = ["[2606.21775v1] Variable-length Latent World Models\n…", "[2509.19080v2] World4RL: Diffusion World Models\n…"]
     assert protected(q, blocks) == {2}
     assert _names("SLMQuant랑 Block-Sphere Vector Quantization 차이") == {"slmquant", "block-sphere"}
+
+
+def test_parse_graded():
+    from core.llm.relevance_filter import parse_graded
+
+    assert parse_graded("1: 핵심\n2: 무관\n3: 관련", 3) == {1: "핵심", 2: "무관", 3: "관련"}
+    assert parse_graded("[1] 핵심\n2. **관련**\n3) 무관", 3) == {1: "핵심", 2: "관련", 3: "무관"}
+    assert parse_graded("1: 핵심\n2: 무관", 3) is None  # 하나 빠지면 못 읽음
+    assert parse_graded("관련: 1, 3", 3) is None

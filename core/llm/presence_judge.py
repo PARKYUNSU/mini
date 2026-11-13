@@ -14,7 +14,8 @@ import re
 
 __all__ = ["PROMPT", "gate_types", "should_judge", "NO_DOC_HINT", "parse_pick", "judge_presence",
            "SHARED_TAIL", "shared_prefix_active", "shared_judge_messages", "judge_presence_shared",
-           "ITEM_TAIL", "parse_item_docs", "item_docs_note", "judge_items"]
+           "ITEM_TAIL", "parse_item_docs", "item_docs_note", "judge_items",
+           "SHARED_TAIL_V2", "parse_pick_v2", "judge_presence_shared_v2"]
 
 PROMPT = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 **특정한 연구 하나**를 찾고 있다.
 
@@ -210,3 +211,50 @@ def judge_items(system_prompt: str, answer_prompt: str, items: list[str], model:
         print(f"[DEBUG] presence_judge(items) 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return None
     return parse_item_docs(raw, len(items))
+
+
+# 3단계 판정 (docs/experiments/graded_1113). 운영 꼬리는 "특정한 연구 하나" 로 못박아 추천형 질문에서 큰 모델이 '없음' 으로
+# 쏠렸다(judge_filter_diag_1113 §2). 질문 꼴을 먼저 가리고 '부분' 을 둔다. 운영 연결 전(기본 꺼짐).
+SHARED_TAIL_V2 = """
+[판정 요청 — 답변을 쓰지 말고 판정 한 줄만]
+위 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다.
+
+먼저 질문이 (가) 특정한 연구 하나를 묘사하는지(방법 · 대상 · 결과 · 이름을 구체적으로 말함), (나) 주제를 주고 논문을 추천 · 정리받으려는지 가린다.
+- (가)이면: 질문이 묘사하는 바로 그 연구가 있으면 `있음`, 주제는 같지만 묘사한 방법 · 대상 · 결과와 다른 연구만 있으면 `부분`, 주제부터 다르면 `없음`.
+- (나)이면: 질문 주제를 주된 내용으로 다루는 문서가 있으면 `있음`, 가까운 주제만 있으면 `부분`, 낱말이나 분야만 겹치면 `없음`. 주제가 없는 요청(아무 논문 · 재밌는 논문)은 `있음` 에 첫 문서.
+`있음` · `부분` 이면 가장 맞는 문서 번호 하나를 함께 적는다.
+
+출력은 정확히 한 줄: `답: 있음 문서 N` 또는 `답: 부분 문서 N` 또는 `답: 없음`
+
+[질문]
+{question}"""
+
+_ANS_V2 = re.compile(r"답\s*[:：]\s*(?:(있음|부분)\s*,?\s*\[?\s*문서\s*(\d{1,2})|(없음))")
+
+
+def parse_pick_v2(raw: str) -> tuple[str, int] | str | None:
+    """``'답: 있음 문서 3'`` → ('있음', 3), ``'답: 부분 문서 2'`` → ('부분', 2), ``'답: 없음'`` → '없음', 형식 밖 → None."""
+    m = _ANS_V2.search(raw or "")
+    if not m:
+        return None
+    return "없음" if m.group(3) else (m.group(1), int(m.group(2)))
+
+
+def judge_presence_shared_v2(system_prompt: str, answer_prompt: str, question: str, model: str) -> tuple[str, int] | str | None:
+    """`judge_presence_shared` 와 같은 앞부분 · 설정에 v2 꼬리."""
+    from langchain_core.messages import HumanMessage, SystemMessage
+    from langchain_ollama import ChatOllama
+
+    from core.config.agent_config import ollama_kwargs
+
+    cut = answer_prompt.rfind(_USER_MARK)
+    if cut < 0:
+        return None
+    msgs = [SystemMessage(content=system_prompt), HumanMessage(content=answer_prompt[:cut] + "\n" + SHARED_TAIL_V2.format(question=question))]
+    llm = ChatOllama(**ollama_kwargs(model=model, temperature=0.0, seed=0, reasoning=False, num_predict=64))
+    try:
+        raw = str(llm.invoke(msgs).content or "")
+    except Exception as exc:
+        print(f"[DEBUG] presence_judge(v2) 실패: {type(exc).__name__}: {str(exc)[:120]}")
+        return None
+    return parse_pick_v2(raw)

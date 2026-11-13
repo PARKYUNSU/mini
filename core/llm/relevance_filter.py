@@ -13,7 +13,7 @@ import re
 from core.llm.citation_fix import RAG_HIT_SEP
 from core.llm.conclusion_rewrite import brief_findings
 
-__all__ = ["PROMPT", "parse_relevant", "protected", "filter_relevant"]
+__all__ = ["PROMPT", "parse_relevant", "protected", "filter_relevant", "PROMPT_V2", "parse_graded", "filter_graded"]
 
 PROMPT = """아래는 사용자의 질문으로 검색한 논문 목록이다.
 
@@ -98,3 +98,55 @@ def filter_relevant(question: str, context: str, model: str) -> tuple[str, str]:
         return context, "없음"
     keep |= protected(question, blocks)
     return RAG_HIT_SEP.join(b for i, b in enumerate(blocks, 1) if i in keep), f"{len(blocks)}→{len(keep)}"
+
+
+# 3단계 거르기 (docs/experiments/graded_1113) — 남김/뺌 대신 문서마다 핵심 · 관련 · 무관. 운영 연결 전(기본 꺼짐).
+PROMPT_V2 = """아래는 사용자의 질문으로 검색한 논문 목록이다.
+
+[질문]
+{question}
+
+[논문 목록]
+{docs}
+
+논문마다 질문과의 관계를 하나로 판정하라.
+- 핵심: 질문이 묻는 주제(질문에 여러 항목이 있으면 그중 하나)가 이 논문의 주된 내용이다.
+- 관련: 질문 주제를 일부 다루거나 가까운 문제를 다룬다(같은 문제의 다른 측면, 그 기법을 한 단계로 쓰는 연구).
+- 무관: 낱말이나 넓은 분야만 겹치고 주된 내용이 다른 문제다. 질문 주제가 중심이 아닌 넓은 개관 · 서베이도 무관이다.
+
+출력은 논문마다 한 줄, 다른 말 없이:
+1: 핵심
+2: 무관"""
+
+_GRADE = re.compile(r"^\s*\[?(\d{1,2})\]?\s*[:：.)]?\s*\**\s*(핵심|관련|무관)", re.M)
+
+
+def parse_graded(raw: str, n: int) -> dict[int, str] | None:
+    """``{번호: 핵심|관련|무관}``. 번호 하나라도 못 읽으면 None — 호출 쪽은 거르지 않는다."""
+    got = {int(i): g for i, g in _GRADE.findall(raw or "") if 1 <= int(i) <= n}
+    return got if len(got) == n else None
+
+
+def filter_graded(question: str, context: str, model: str, keep: tuple[str, ...] = ("핵심", "관련")) -> tuple[str, str, dict[int, str] | None]:
+    """``(걸러진 컨텍스트, 상태, 등급)``. 상태는 ``filter_relevant`` 와 같다. 남는 게 없으면 그대로 둔다."""
+    blocks = [b for b in (context or "").split(RAG_HIT_SEP) if b.strip()]
+    if len(blocks) < 2:
+        return context, "대상 아님", None
+    from langchain_ollama import ChatOllama
+
+    from core.config.agent_config import ollama_kwargs
+
+    prompt = PROMPT_V2.format(question=question, docs="\n\n".join(_brief(i, b) for i, b in enumerate(blocks, 1)))
+    llm = ChatOllama(**ollama_kwargs(model=model, temperature=0.0, seed=0, reasoning=False, num_predict=16 * len(blocks) + 16))
+    try:
+        raw = str(llm.invoke(prompt).content or "")
+    except Exception as exc:  # 거르지 못해도 답은 낸다
+        print(f"[DEBUG] relevance_filter(v2) 실패: {type(exc).__name__}: {str(exc)[:120]}")
+        return context, "호출 실패", None
+    grades = parse_graded(raw, len(blocks))
+    if grades is None:
+        return context, "못 읽음", None
+    kept = {i for i, g in grades.items() if g in keep} | protected(question, blocks)
+    if not kept:
+        return context, "없음", grades
+    return RAG_HIT_SEP.join(b for i, b in enumerate(blocks, 1) if i in kept), f"{len(blocks)}→{len(kept)}", grades

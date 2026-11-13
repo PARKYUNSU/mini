@@ -27,3 +27,12 @@ def test_hint_matches_v13_nogold_format():
 
 def test_prompt_placeholders():
     assert "{question}" in PROMPT and "{context}" in PROMPT
+
+
+def test_parse_pick_v2():
+    from core.llm.presence_judge import parse_pick_v2
+
+    assert parse_pick_v2("답: 있음 문서 3") == ("있음", 3)
+    assert parse_pick_v2("답: 부분, [문서 2]") == ("부분", 2)
+    assert parse_pick_v2("판정\n답: 없음") == "없음"
+    assert parse_pick_v2("답: 문서 1") is None  # v1 형식은 v2 에서 못 읽음
