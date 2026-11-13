@@ -55,7 +55,8 @@ from core.llm.relevance_filter import filter_relevant
 from core.llm.query_reform import fill_slots
 from core.llm.question_conditions import count_notice, filter_by_year, year_condition
 from core.llm.body_numbers import check_body_numbers
-from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
+from core.llm.answer_fix import (align_conclusion_numbers, clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items,
+                                  normalize_fullwidth_punct, renumber_body_items)
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
 from core.graph import rag_trace
 from core.llm.presence_judge import (
@@ -1587,6 +1588,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     answer = answer.rstrip() + format_section(_ext_items)
                     record_candidates(user_request, _ext_items, years=_ext_years)
                 rag_trace.mark(chat_id, "external", n=len(_ext_items), wait=round(_ext_wait, 1))
+            # 결론 수치를 같은 논문의 본론 값에 맞추고 · 전각 문장부호를 반각으로 (cross_metric_1113)
+            answer, _al = align_conclusion_numbers(answer)
+            answer, _fw = normalize_fullwidth_punct(answer)
+            if _al or _fw:
+                print(f"[DEBUG] DirectAnswer: 결론 수치 맞춤 {_al} · 전각 부호 {_fw}")
             rag_trace.mark(chat_id, "final", answer=answer[:4000])
             # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_MULTI_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남
         if router_choice == "B" and get_paper_mode(chat_id):

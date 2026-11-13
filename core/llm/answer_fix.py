@@ -17,7 +17,8 @@ from __future__ import annotations
 
 import re
 
-__all__ = ["clean_internal_refs", "drop_contradicted_no_doc", "merge_same_paper_items", "renumber_body_items"]
+__all__ = ["align_conclusion_numbers", "clean_internal_refs", "drop_contradicted_no_doc", "merge_same_paper_items",
+           "normalize_fullwidth_punct", "renumber_body_items"]
 
 # 서론의 '문서에 없다' 문장 (v12 가 쓰는 변형들). 문장 끝 마침표까지 지운다.
 _NO_DOC_SENT = re.compile(
@@ -121,3 +122,68 @@ def clean_internal_refs(answer: str, doc_ids: dict[int, str]) -> tuple[str, bool
     out = _DOC_BARE.sub(_bare, out)
     out = _DUP_CITE.sub(r"\1", out)
     return out, out != answer
+
+
+# 9B 가 한국어 문장 끝에 중국어 전각 문장부호를 섞는다(cross_metric_1113 텔레그램 "…결과이다 [2509.25085v4]。").
+_FULLWIDTH = {"。": ". ", "，": ", ", "：": ": ", "；": "; ", "！": "! ", "？": "? "}
+
+
+def normalize_fullwidth_punct(answer: str) -> tuple[str, bool]:
+    """``(고친 답, 바꿨는가)``. 전각 문장부호를 반각 + 공백으로 바꾸고 겹친 공백을 하나로."""
+    if not any(ch in answer for ch in _FULLWIDTH):
+        return answer, False
+    out = answer
+    for k, v in _FULLWIDTH.items():
+        out = out.replace(k, v)
+    return re.sub(r"[ \t]+(\n)", r"\1", re.sub(r"(?<=\S) {2,}", " ", out)), True
+
+
+_CITE = re.compile(r"\[(\d{4}\.\d{4,5})(?:v\d+)?\]")
+_DEC = re.compile(r"(?<![\d.])(\d+\.\d+)(?![\d.])")
+_ARXIV_ID = re.compile(r"^\d{4}\.\d{4,5}$")  # 인용 ID(2412.13050) 는 소수가 아니다
+
+
+def align_conclusion_numbers(answer: str) -> tuple[str, int]:
+    """``(고친 답, 바꾼 수)``. 결론의 소수가 같은 논문의 본론 항목 소수와 정수부가 같고 1% 안으로만 다르면
+    본론 값으로 맞춘다 — 한 논문이 초록 61.94 · 본문 61.85 로 다르게 적어, 답의 본론과 결론이 어긋났다
+    (cross_metric_1113 텔레그램 jina-reranker-v3). 크게 다른 수는 다른 지표일 수 있어 건드리지 않는다."""
+    m_b, m_c = _find("본론", answer), _find("결론", answer)
+    if not (m_b and m_c) or m_c.start() < m_b.end():
+        return answer, 0
+    body = answer[m_b.end():m_c.start()]
+    per: dict[str, list[str]] = {}
+    for item in re.split(r"\n(?=\s*(?:<b>)?\d+\.\s)", body):
+        for pid in set(_CITE.findall(item)):
+            per.setdefault(pid, []).extend(v for v in _DEC.findall(item) if not _ARXIV_ID.match(v))
+    tail = answer[m_c.end():]
+    cut = tail.find("\n\n📎")
+    concl, rest = (tail[:cut], tail[cut:]) if cut >= 0 else (tail, "")
+    n = 0
+
+    def fix_sent(sent: str) -> str:
+        nonlocal n
+        pids = set(_CITE.findall(sent))
+        cands = [v for p in pids for v in per.get(p, [])]
+        if not cands:
+            return sent
+
+        def rep(m: re.Match[str]) -> str:
+            nonlocal n
+            x = m.group(1)
+            if _ARXIV_ID.match(x) or x in cands:
+                return x
+            # 본론 값이 이미 같은 문장에 있으면 x 는 다른 조건의 수(LOOKAT 64배 95.7% · 32배 95.0%),
+            # 본론 값이 자릿수가 적으면 반올림한 것(2.9 ↔ 2.92) — 둘 다 건드리지 않는다 (회귀 확인 5,677 답)
+            near = [v for v in cands if v.split(".")[0] == x.split(".")[0]
+                    and abs(float(v) - float(x)) <= 0.01 * max(float(x), 1e-9)
+                    and v not in sent and len(v.split(".")[1]) >= len(x.split(".")[1])]
+            if len(set(near)) == 1:
+                n += 1
+                return near[0]
+            return x
+        return _DEC.sub(rep, sent)
+
+    # 문장 단위(인용이 문장 끝에 붙는 꼴) — 마침표 뒤 공백 · 줄바꿈으로 자른다
+    parts = re.split(r"(?<=[.!?。])(\s+)", concl)
+    concl2 = "".join(fix_sent(p) if i % 2 == 0 else p for i, p in enumerate(parts))
+    return (answer[:m_c.end()] + concl2 + rest, n) if n else (answer, 0)

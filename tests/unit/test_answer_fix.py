@@ -106,3 +106,31 @@ def test_clean_internal_refs_noop():
 def test_clean_internal_refs_bare_list():
     out, ch = clean_internal_refs("문서 1·2는 같은 결과다. 문서 3·9는 모른다.", IDS)
     assert out == "[2503.09579v3][2607.02980v1]는 같은 결과다. 문서 3·9는 모른다."
+
+
+def test_normalize_fullwidth_punct():
+    from core.llm.answer_fix import normalize_fullwidth_punct as f
+    out, ch = f("향상된 결과이다 [2509.25085v4]。RankZephyr은 강인하다[2312.02724v1]。\n다음")
+    assert ch and out == "향상된 결과이다 [2509.25085v4]. RankZephyr은 강인하다[2312.02724v1].\n다음"
+    assert f("보통 문장. 끝") == ("보통 문장. 끝", False)
+
+
+def test_align_conclusion_numbers():
+    # 논문이 초록 61.94 · 본문 61.85 로 달라 본론 · 결론이 어긋났다 (cross_metric_1113)
+    from core.llm.answer_fix import align_conclusion_numbers as f
+    ans = ("<b>서론</b>\n…\n<b>본론</b>\n1. <b>jina</b>: BEIR 61.85 nDCG@10, 4.79% 향상. [2509.25085v4]\n"
+           "2. <b>RZ</b>: 정확도 0.72. [2312.02724v1]\n\n<b>결론</b>\njina 는 61.94 nDCG@10 · 4.79% 향상이다 [2509.25085v4]. "
+           "RZ 는 0.88 이다[2312.02724v1].\n\n📎 <b>DB 밖</b>\n• X 61.94")
+    out, n = f(ans)
+    concl = out.split("<b>결론</b>")[1]
+    assert n == 1 and "61.85 nDCG@10" in concl and "61.94 nDCG" not in concl.split("📎")[0]
+    assert "0.88" in concl  # 크게 다르면(다른 지표일 수 있음) 그대로
+    assert "• X 61.94" in out  # DB 밖 목록은 손대지 않는다
+    assert f("머리 없는 답 61.94") == ("머리 없는 답 61.94", 0)
+    # 인용 ID 의 숫자는 소수로 보지 않는다(회귀 확인에서 [2412.13050v1] 을 바꾼 버그)
+    a2 = ("<b>본론</b>\n1. <b>A</b>: x [2412.17188v1][2412.13050v1]\n<b>결론</b>\nA 다[2412.13050v1][2412.17188v1].")
+    assert f(a2) == (a2, 0)
+    # 같은 문장에 본론 값이 있으면 다른 조건의 수 · 본론이 반올림 값이면 그대로 (회귀 확인 O_16 · T05)
+    a3 = ("<b>본론</b>\n1. <b>L</b>: 64배 압축 95.7% [2601.10155v1]\n2. <b>R</b>: 평균 2.9% [2606.15441v1]\n"
+          "<b>결론</b>\nL 은 64배 95.7%, 32배 95.0% 다[2601.10155v1]. R 은 2.92% 다[2606.15441v1].")
+    assert f(a3) == (a3, 0)
