@@ -81,3 +81,4 @@
 - 회귀(저장된 질문 2,637 개, LLM 없이): 어휘 규칙이 아니라고 한 1,305 개 중 이름 일치로 새로 열릴 수 있는 것 25 개 — 모두 논문 이름을 묻는 학술 질문(ReXTrust · MXNorm · JetSpec/DSpark · Reasoning-SQL · SLMQuant · World4RL · TradingAgents · FinMCP-Bench · DynaFlow/OmniNova · MinHash 등). topic_gate_1009 의 잡담 · 계획 음성 예시는 0 개. 단위 테스트 787 통과.
 - 한계: 라우터 LLM 이 처음부터 계획(C) · 일반(A)으로 고르면 이 고침은 닿지 않는다(오버라이드는 B 를 고른 경우만 본다).
 - **운영 반영 (11-13 20:29, 사용자 승인):** e91df49 기준 `restart.sh` 봇 재시작(receiver 24577 · worker 24578), 시작 뒤 로그 오류 0. 운영 `.env` 로 `names_in_db("DynaFlow랑 OmniNova 성능 수치 비교해줘") == ["DynaFlow", "OmniNova"]` 확인.
+- **텔레그램 확인 (11-13 20:3x):** 같은 질문이 `direct_answer/B` 로 갔고 이름 찾기가 DynaFlow(2610.34467) · OmniNova(2503.20028) 를 넣어 두 편으로 답했다. 수치(88.08% · +10.90%p · 87% vs 62% · 토큰 41% 감소)는 DB 청크 원문과 맞다. 남은 문제(dev): 결론이 서로 다른 지표(정확도 88.08% 대 작업 완료율 87%)를 맞대어 "DynaFlow 가 약간 더 높다" 고 단정 — ② 근거 없는 비교 사례. 서론 "성능 수치만 포함" 도 어색.
