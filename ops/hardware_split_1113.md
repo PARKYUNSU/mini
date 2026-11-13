@@ -66,3 +66,9 @@
 - 9B 는 기준(35b − 0.03 = 0.270)에 크게 못 미친다(−0.129). 슬롯은 더 많이 뽑지만 정답지와 덜 맞는다 → **M2 9B 로 옮기지 않는다.**
 - 남은 길: (가) Flash 로 돌리기 — 낮 측정 0.391 로 가장 높지만 클라우드 비용 · 대화가 밖으로 나감, (나) 35b 를 메인에 두고 시간 재는 실험 때만 기억 추출 멈추기(지금 방식), (다) M2 에 더 나은 작은 모델을 찾아 다시 재기. 사용자 결정.
 - 측정 뒤 맥북 경유 터널을 닫았고, 메인에 올라온 35b 는 `ollama stop` 으로 내렸다(collect_1113 01:05 시작 전).
+
+## 6. 실행 기록 — 0 단계 · 백업 (11-13 23:4x, 사용자 승인)
+- **0 단계:** M2 의 `com.mini.runscheduler` · `com.mini.telegrambot` · `com.mini.chroma` 를 `launchctl bootout` 으로 내리고 plist 를 `~/backups/launchagents_1113/` 로 옮겼다(되돌리기: 다시 `~/Library/LaunchAgents/` 로 옮기고 `launchctl bootstrap gui/$(id -u) <plist>`). 뒤에 `com.mini*` 서비스 · 프로세스 없음 확인. Ollama 는 그대로.
+- **백업:** 메인에서 `ops/backup.sh`(git 번들 · 코퍼스 JSONL · 브리지 DB · untracked 등, 391MB) → 맥북을 거쳐 M2 `~/backups/from_main/2026-11-13/`(폴더 700) 로 복사, SHA256 7/7 일치.
+  - **`env.backup`(비밀 값)은 M2 로 복사하지 않았다** — "운영 키는 필요한 기계에만" 규칙. 메인 내장 디스크에만 있다. M2 에도 둘지는 사용자 결정.
+  - 맥북 경유 속도 ~2.2MB/s(391MB 3 분). **Chroma(16GB) · 임베딩 캐시(4.3GB) 는 이 속도로 2–3 시간**이라 이번에 안 했다. collect_1113 이 오늘 밤 메인 내장 디스크에 만드는 Chroma 스냅샷(`~/backups/mini/chroma_1113`)을 수집 끝난 뒤 옮기는 것이 깔끔하다 — 빠른 길(두 맥미니 직접 연결 또는 T7 · 외장 디스크로 옮기기)은 사용자 결정.
