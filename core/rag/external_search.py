@@ -38,7 +38,10 @@ _GENERIC = frozenset(
 
 # 일반어가 들어 있어도 한 덩어리인 분야 이름 — "deep research" 에서 research 를 빼면 "deep" 만 남아
 # OpenAlex 가 딥러닝 리뷰를 돌려줬다(answer_issues_1113 텔레그램 18:3x, 기간 필터 뒤 0 편).
-_PHRASES = ("deep research", "research agent", "research agents", "literature review", "systematic review")
+# 목록은 손으로 관리한다 — 새 분야 이름이 같은 식으로 깨지면 여기에 더하고 test_clean_query 에 예를 넣는다.
+# "literature review" · "systematic review" · "research agent" 는 넣지 않는다: 검색어 생성기가 붙이는 군말과 겹쳐
+# 따옴표로 묶으면 리뷰 논문만 찾게 된다(회귀 확인 125 문항, answer_issues_1113).
+_PHRASES = ("deep research",)
 _YEARS = re.compile(r"^(?:19|20)\d\d$")
 
 

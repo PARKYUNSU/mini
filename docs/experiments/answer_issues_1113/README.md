@@ -64,6 +64,12 @@
 - DB 밖 0 편 원인: `clean_query` 가 일반어 `research` 를 빼 "deep research" 가 "deep" 만 남았고, OpenAlex 가 딥러닝 리뷰를 돌려줘 2025 필터 · 유사도 문턱 뒤 0 편. 검색어 속 연도 `2025` 도 그대로 들어갔다.
 - 고침(사용자 요청):
   - `count_notice(..., list_q=)`: 목록 · 조사형(`list_mode_active` 또는 판정 게이트 `list`) 이고 기간 거르기 결과가 `a→b` 에서 b ≤ 2 면 맨 앞에 `※ DB 에서 이 기간(2025년) 논문은 N편뿐입니다.` (`FEW_IN_PERIOD = 2`).
-  - `clean_query`: 분야 이름(`deep research` · `research agent(s)` · `literature review` · `systematic review`)은 지키고 따옴표로 묶어 OpenAlex 구문 검색, 연도 토큰은 뺀다(기간은 필터로).
+  - `clean_query`: 분야 이름 `deep research` 는 지키고 따옴표로 묶어 OpenAlex 구문 검색, 연도 토큰은 뺀다(기간은 필터로).
 - 확인(같은 질문 재생 `fewperiod_1113`): 고지가 붙고, DB 밖 목록 4 편이 모두 2025 년 딥 리서치 관련(예: Deep Research: A Systematic Survey [2512.02038]), 후보 기록에 `years [2025, 2025]`. 단위 테스트 786 통과.
 - 영향 범위: `clean_query` 변경은 모든 DB 밖 검색어에 적용된다(분야 이름 · 연도 토큰이 있을 때만 결과가 달라짐). 고지는 기간 조건 + 목록 · 조사형 + 기간 안 2 편 이하일 때만.
+
+### T01 회귀 확인과 기록 (재시작 전)
+- 저장된 평가 검색어 3,076 개로 `clean_query` 전 · 후 비교(네트워크 없음): 처음 넣은 분야 이름 5 개로는 125 개가 바뀌었고, 그중 `literature review` · `systematic review` · `research agent` 는 검색어 생성기가 붙이는 군말과 겹쳐 따옴표로 묶으면 리뷰 논문만 찾게 돼 **뺐다**. 최종 `_PHRASES = ("deep research",)` 로 바뀐 검색어 43 개 = `deep research` 6 + 연도 토큰만 37, 그 밖 0.
+- 표본 5 개를 OpenAlex 에 실제로 검색: 연도만 뺀 3 개는 결과가 비슷(연도 맞추기는 기간 질문이면 필터가 한다), `deep research` 2 개는 0 편/딥러닝 일반 → 딥 리서치 논문으로 좋아짐.
+- **분야 이름 목록 관리:** `core/rag/external_search.py` 의 `_PHRASES`. 일반어(`_GENERIC`)가 들어간 분야 이름이 같은 식으로 깨지면 여기에 더하고, `tests/unit/test_external_search.py::test_clean_query` 에 예를 넣고, 위처럼 저장된 검색어로 전 · 후를 비교한다(군말과 겹치는 이름은 넣지 않는다).
+- **남은 문제(거르기 dev 사례):** 기간 안 1 편 2506.23139 는 기업 데이터용 "Deep Search" 벤치마크라 딥 리서치(검색 에이전트) 질문과 주제가 다르다 — '목록형 질문 거르기 기준 좁히기' 작업의 dev 사례로 둔다.
