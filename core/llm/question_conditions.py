@@ -80,7 +80,8 @@ def _period(cond: tuple[int | None, int | None]) -> str:
     return f"{hi}년까지" if lo is None else f"{lo}~{hi}년"
 
 
-_SENT = re.compile(r"[^.!?\n]*(?:[.!?](?=\s|$)|\n|$)")
+# 문장 끝 = 뒤에 공백이 오는 . ! ? 또는 줄 끝 — "[2512.24044v1]" 의 점에서 자르지 않는다
+_SENT = re.compile(r"[^\n]*?(?:[.!?](?=\s|$)|\n|$)")
 
 
 def _drop_year_claims(section: str, years: set[str]) -> str:
@@ -101,13 +102,20 @@ def fix_out_of_period(question: str, answer: str) -> str:
     m_i, m_b, m_c = _find("서론", answer), _find("본론", answer), _find("결론", answer)
     if not (m_i and m_b) or m_b.start() < m_i.end():
         return "※ " + lead + "\n\n" + answer
-    intro = _drop_year_claims(answer[m_i.end():m_b.start()], years).strip()
+    if lead in answer:  # 이미 고친 답(두 번 불려도 같게)
+        return answer
+    raw_intro = answer[m_i.end():m_b.start()]
+    intro = _drop_year_claims(raw_intro, years)
+    # 한 문장이라도 뺐으면 서론의 모델 문장은 모두 버린다 — 남은 "이러한 흐름은 …" 이 빠진 문장을 가리키게 된다
+    intro = "" if intro != raw_intro else intro.strip()
     out = answer[:m_i.end()] + "\n" + lead + (" " + intro if intro else "") + "\n\n" + answer[m_b.start():m_c.start() if m_c and m_c.start() > m_b.start() else len(answer)]
     if m_c and m_c.start() > m_b.start():
         tail = answer[m_c.end():]
         cut = tail.find("\n\n📎")
         body, rest = (tail[:cut], tail[cut:]) if cut >= 0 else (tail, "")
         concl = _drop_year_claims(body, years)
+        if concl != body:  # 앞 문장을 뺐으면 남은 첫 문장의 이음말("또한 …")을 뗀다
+            concl = re.sub(r"^(\s*)(?:또한|이와 함께|이에 더해),?\s*", r"\1", concl)
         out += answer[m_c.start():m_c.end()] + (concl if concl.strip() else body) + rest
     return out
 

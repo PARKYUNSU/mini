@@ -46,10 +46,16 @@ def test_fix_out_of_period():
     out = fix_out_of_period("2025년에 나온 딥 리서치 연구들 정리해줘", ans)
     intro = out.split("<b>본론</b>")[0]
     assert "요청한 기간(2025년)에 나온 논문은 DB 에서 찾지 못했습니다. 아래는 그 기간 밖의 논문입니다." in intro
-    assert "발표된 딥 리서치 연구들은" not in intro and "에이전트 평가가 중요하다." in intro
+    assert "발표된 딥 리서치 연구들은" not in intro and "에이전트 평가가 중요하다." not in intro  # 뺀 문장이 있으면 서론 모델 문장 전부 버림
     concl = out.split("<b>결론</b>")[1]
     assert "두 흐름" not in concl and "A 는 평가를 다룬다." in concl and "• X (2025)" in concl
     assert "2026년 논문이다" in out  # 본론은 손대지 않는다
+    assert fix_out_of_period("2025년에 나온 딥 리서치 연구들 정리해줘", out) == out  # 두 번 불려도 같다
+    keep = ans.replace("2025년 이후 발표된 딥 리서치 연구들은 다양하다. ", "")
+    assert "에이전트 평가가 중요하다." in fix_out_of_period("2025년 논문", keep).split("<b>본론</b>")[0]  # 연도 문장 없으면 서론 유지
+    # 인용 ID 의 점에서 문장을 자르지 않는다(answer_issues_1113 P35)
+    a2 = ans.replace("따라서 2025년 이후 연구는 두 흐름이다.", "2025년 연구들은 높은 성공률을 보고한다[2512.24044v1][2412.15623v1].")
+    assert "높은 성공률" not in fix_out_of_period("2025년 논문", a2).split("<b>결론</b>")[1]
     assert fix_out_of_period("요즘 RAG 연구", ans) == ans
     assert fix_out_of_period("2025년 논문", "머리 없는 답").startswith("※ 요청한 기간(2025년)")
 
