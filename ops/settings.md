@@ -4,7 +4,7 @@
 
 **`.env` 를 잃으면:** `RAG_*` 는 코드 기본값으로 돌아간다. 기본값은 대부분 꺼짐(`0`)이고 나머지는 옛 값(초록 800자, 결론 v1, 답 모델은 기본 모델)이라 오류 없이 품질만 떨어진다. 복원은 이 표의 값을 다시 넣고, §3 의 키는 각 서비스에서 다시 받는다. `.env` 백업은 내장 디스크 `~/backups/mini/` 에 있다: 바꾸기 전 복사본은 `env_history/`(11-11 에 `.cron/env.bak*` 24개를 옮김 — 암호화 안 된 T7 에 비밀 값 복사본이 644 로 쌓여 있었다), 전체 백업은 [`ops/backup.sh`](backup.sh) 가 만드는 `YYYY-MM-DD/env.backup`. **앞으로 `.env` 를 바꾸기 전 복사본은 `~/backups/mini/env_history/` 에 600 으로 둔다(T7 · `.cron` 에 두지 않는다).**
 
-## 1. RAG 기능 (31개, 켠 순서)
+## 1. RAG 기능 (32개, 켠 순서)
 
 켠 때는 라운드 문서와 `.env` 복사본(`env.bak*`, 지금은 `~/backups/mini/env_history/`) 시각으로 맞췄다. 날짜만 적은 앞쪽 4개(10-11 · 10-12)는 백업이 없던 때라 라운드 문서 기준이다. 측정 수치는 그 라운드의 dev · held-out 결과이고, 지금 다시 잰 값이 아니다.
 
@@ -41,6 +41,7 @@
 | `RAG_NODOC_KEEP_CONCLUSION` | `1` | 10-29 08:22 | 판정 '없음'이면 결론 다시 쓰기를 건너뛴다 | [`nodoc_conclusion_1029`](../docs/experiments/nodoc_conclusion_1029/README.md): 모순 답 6→0 (p .031), −20초 |
 | `RAG_NAME_LOOKUP` | `1` | 11-01 08:14 | 질문 속 고유 이름으로 논문을 찾아 앞에 둔다 | [`name_lookup_1101`](../docs/experiments/name_lookup_1101/README.md): held-out 이름 정답 상위 5 안 2/4→4/4 |
 | `RAG_FIX_PDF_DECIMAL` | `1` | 11-07 09:18 | PDF 본문의 깨진 소수점 `87 _._ 5%` 를 컨텍스트에서 `87.5%` 로 고친다. 재색인 없음 | [`pdf_decimal_1107`](../docs/experiments/pdf_decimal_1107/README.md): 깨진 소수점 15곳→0곳, 보호 통과. 조각 오류는 양쪽 0 이라 효과는 재현 안 됨. 버그 수정 |
+| `RAG_ANSWER_REPEAT_PENALTY` | `1.0` | 11-13 17:29 | 답 호출의 반복 억제(코드 기본 1.18). 다른 호출은 1.18 그대로. 되돌리기: 이 줄을 지우고 봇 재시작 | [`penalty_1113`](../docs/experiments/penalty_1113/README.md): 깨진 음차 용어 7/40→0/40 (p .016), 120 held-out 깨진 답 4→2 · 보호 P1–P6 통과(P7 시간은 35b 끼어듦으로 무효, 참고 +0.7초). 11-20 까지 운영 로그로 시간 · 깨짐 · 되풀이 확인 |
 
 ## 2. 그 밖 설정 (값 공개 가능)
 
