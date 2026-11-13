@@ -41,3 +41,22 @@ def test_daily_request_still_not_rag():
     from core.session.agent_session import is_rag_allowed
 
     assert not is_rag_allowed("gate_unit_test_chat", "장마철에 빨래 말리는 요령을 알려줘. '입니다' 라는 말은 빼고.")
+
+
+def test_names_in_db_opens_rag(monkeypatch):
+    # answer_issues_1113 B22: 분야 용어 없이 DB 논문 이름만 있는 질문이 일반 대화로 갔다
+    import core.rag.bm25_index as B
+    import core.rag.topic_gate as G
+
+    class _BM:
+        def named_paper(self, n):
+            return {"DynaFlow": "2610.34467", "OmniNova": "2503.20028"}.get(n)
+
+    monkeypatch.setattr(B, "get_bm25_searcher", lambda: _BM())
+    monkeypatch.setattr(G, "is_academic_query_llm", lambda t: False)
+    monkeypatch.setenv("RAG_NAME_LOOKUP", "1")
+    q = "DynaFlow랑 OmniNova 성능 수치 비교해줘"
+    assert G.names_in_db(q) == ["DynaFlow", "OmniNova"] and G.is_academic_query_full(q)
+    assert G.names_in_db("iPhone 배터리 오래 쓰는 법") == [] and not G.is_academic_query_full("iPhone 배터리 오래 쓰는 법")
+    monkeypatch.setenv("RAG_NAME_LOOKUP", "0")
+    assert G.names_in_db(q) == []

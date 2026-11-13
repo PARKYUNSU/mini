@@ -74,3 +74,9 @@
 - **분야 이름 목록 관리:** `core/rag/external_search.py` 의 `_PHRASES`. 일반어(`_GENERIC`)가 들어간 분야 이름이 같은 식으로 깨지면 여기에 더하고, `tests/unit/test_external_search.py::test_clean_query` 에 예를 넣고, 위처럼 저장된 검색어로 전 · 후를 비교한다(군말과 겹치는 이름은 넣지 않는다).
 - **남은 문제(거르기 dev 사례):** 기간 안 1 편 2506.23139 는 기업 데이터용 "Deep Search" 벤치마크라 딥 리서치(검색 에이전트) 질문과 주제가 다르다 — '목록형 질문 거르기 기준 좁히기' 작업의 dev 사례로 둔다.
 - **운영 반영 (11-13 19:24, 사용자 승인):** 208ec7d 기준 `restart.sh` 봇 재시작(receiver 24227 · worker 24228), 시작 뒤 로그 오류 0. 기간 안 2 편 이하 고지 · DB 밖 검색어 고침 적용. `.env` 변경 없음.
+
+## B22 — DB 논문 이름만 있는 질문이 일반 대화로 감 (11-13 19:3x, 텔레그램)
+- "DynaFlow랑 OmniNova 성능 수치 비교해줘": 라우터 3단계 LLM 은 논문 답변(D→B)으로 골랐지만 `_maybe_override_rag_route` 가 `is_rag_allowed` 거짓(‘논문’ 말 없음 · 분야 용어 없음 · LLM 판정 NO)이라 일반 대화(A)로 바꿨다 → 문서 없이 qwen3.5:9b 가 301 자로 답(원문은 로그에 없음, 수치를 지어냈을 수 있음). 검색 자체는 DynaFlow(2610.34467)를 거리 0.378 로 찾았다. 평가 재생(bc_1113)에서는 같은 질문이 계획 경로(C)로 갔다 — 라우터 LLM 분류가 흔들린다.
+- 고침: `topic_gate.names_in_db` — 질문 속 고유 이름(`relevance_filter.names`)이 DB 논문 제목에 하나로 맞으면(BM25 `named_paper`, `RAG_NAME_LOOKUP` 과 같은 규칙 · 같은 플래그) 학술 질문으로 본다. 순서: 어휘 규칙 → DB 이름 → LLM.
+- 회귀(저장된 질문 2,637 개, LLM 없이): 어휘 규칙이 아니라고 한 1,305 개 중 이름 일치로 새로 열릴 수 있는 것 25 개 — 모두 논문 이름을 묻는 학술 질문(ReXTrust · MXNorm · JetSpec/DSpark · Reasoning-SQL · SLMQuant · World4RL · TradingAgents · FinMCP-Bench · DynaFlow/OmniNova · MinHash 등). topic_gate_1009 의 잡담 · 계획 음성 예시는 0 개. 단위 테스트 787 통과.
+- 한계: 라우터 LLM 이 처음부터 계획(C) · 일반(A)으로 고르면 이 고침은 닿지 않는다(오버라이드는 B 를 고른 경우만 본다).

@@ -92,6 +92,26 @@ def is_academic_query_llm(text: str) -> bool:
     return out.startswith("YES")
 
 
+def names_in_db(text: str) -> list[str]:
+    """질문 속 고유 이름 중 DB 논문 제목에 하나로 맞는 것 (RAG_NAME_LOOKUP 과 같은 규칙).
+
+    "DynaFlow랑 OmniNova 성능 수치 비교해줘" 는 분야 용어가 없어 어휘 규칙 · LLM 둘 다 학술이 아니라고 봐
+    일반 대화로 갔다 — 두 이름 모두 DB 논문 제목이다 (answer_issues_1113 B22). 실패하면 [].
+    """
+    import os
+
+    if os.getenv("RAG_NAME_LOOKUP", "0").strip() != "1":
+        return []
+    try:
+        from core.llm.relevance_filter import names
+        from core.rag.bm25_index import get_bm25_searcher
+
+        bm = get_bm25_searcher()
+        return [n for n in names(text or "") if bm.named_paper(n)]
+    except Exception:
+        return []
+
+
 def is_academic_query_full(text: str) -> bool:
-    """어휘 규칙 → (아니면) LLM. 운영 진입점."""
-    return is_academic_query(text) or is_academic_query_llm(text)
+    """어휘 규칙 → DB 논문 이름 → (아니면) LLM. 운영 진입점."""
+    return is_academic_query(text) or bool(names_in_db(text)) or is_academic_query_llm(text)
