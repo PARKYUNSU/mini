@@ -1,0 +1,20 @@
+N01	OpenSeeker-v2랑 SearchSwarm 성능 수치 비교해줘
+N02	OpenSeeker-v2랑 VeriTrace 중 어느 쪽 성능이 더 좋아?
+N03	HalluMat이랑 ReXTrust 성능 수치로 비교하면 어때?
+N04	LLMLingua-2랑 Prompt-SAW 압축 성능 비교해줘
+N05	jina-reranker-v3랑 RankZephyr 중에 어느 게 재순위를 더 잘해?
+N06	H2OVL-Mississippi랑 JaWildText 결과 수치 비교해줘
+N07	F2LLM-v2랑 ML-Embed 중 성능이 더 높은 건?
+N08	Gecko랑 F2LLM-v2 임베딩 성능 수치 비교해줘
+N09	SQuat이랑 QJL은 KV 캐시 압축 성능이 어떻게 달라? 수치로 알려줘
+N10	QJL이랑 CommVQ 중 어느 쪽이 메모리를 더 많이 줄여?
+N11	RAGChecker랑 Ragas 성능 수치 비교해줘
+N12	FinMCP-Bench랑 LoCoBench-Agent에서 모델 성능 수치 비교해줘
+N13	HiMu랑 VideoJev 중 어느 쪽 성능이 더 좋아?
+N14	AskChart랑 Chart-RL 성능 수치 비교해줘
+N15	CtrlA랑 DMQR-RAG 중 어느 쪽이 RAG 성능을 더 많이 올려?
+N16	HyperGraphRAG랑 PISCO 성능 수치 비교해줘
+N17	AgentHER랑 PR-OPD 중 에이전트 성능을 더 많이 올린 건?
+N18	SPARC랑 AgentHER 결과 수치 비교해줘
+N19	VersionRAG랑 HyperGraphRAG 중 정확도가 더 높은 건?
+N20	Sticky Routing이랑 STAR는 MoE 라우팅 성능이 수치로 얼마나 달라?
