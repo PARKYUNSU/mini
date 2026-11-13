@@ -69,3 +69,11 @@ def test_requested_count_needs_request():
     for q, n in (("연구 3개만 알려줘", 3), ("논문 5개를 찾아주세요", 5), ("5개 논문 추천해줘", 5),
                  ("그래프 RAG 논문 4편 정리해줘", 4), ("3편의 논문을 골라줘", 3)):
         assert requested_count(q) == n, q
+
+
+def test_fix_out_of_period_conclusion_connective():
+    # 결론에서 앞 연도 문장을 뺀 뒤 남은 첫 문장의 "또한" 을 뗀다 (answer_issues_1113 P35)
+    ans = ("<b>서론</b>\n소개.\n\n<b>본론</b>\n1. <b>A</b>: x [2412.15623v1]\n\n"
+           "<b>결론</b>\n2024년 이전 연구들은 성공률이 높다[2512.24044v1]. 또한 다중 턴은 비용이 크다[2503.04856v3].")
+    concl = fix_out_of_period("2024년 이전 탈옥 연구", ans).split("<b>결론</b>")[1]
+    assert concl.startswith("\n다중 턴은 비용이 크다") and "2024년" not in concl

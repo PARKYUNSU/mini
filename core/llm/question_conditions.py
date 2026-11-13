@@ -115,7 +115,7 @@ def fix_out_of_period(question: str, answer: str) -> str:
         body, rest = (tail[:cut], tail[cut:]) if cut >= 0 else (tail, "")
         concl = _drop_year_claims(body, years)
         if concl != body:  # 앞 문장을 뺐으면 남은 첫 문장의 이음말("또한 …")을 뗀다
-            concl = re.sub(r"^(\s*)(?:또한|이와 함께|이에 더해),?\s*", r"\1", concl)
+            concl = "\n" + re.sub(r"^(?:또한|이와 함께|이에 더해),?\s*", "", concl.lstrip())
         out += answer[m_c.start():m_c.end()] + (concl if concl.strip() else body) + rest
     return out
 
