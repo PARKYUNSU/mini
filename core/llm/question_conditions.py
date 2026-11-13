@@ -13,7 +13,7 @@ from datetime import date
 from core.llm.answer_fix import _find
 from core.llm.citation_fix import RAG_HIT_SEP
 
-__all__ = ["year_condition", "filter_by_year", "requested_count", "count_notice"]
+__all__ = ["year_condition", "filter_by_year", "requested_count", "count_notice", "fix_out_of_period"]
 
 _RANGE = re.compile(r"(20\d\d)\s*년?\s*(?:~|-|–|부터)\s*(20\d\d)\s*년")
 _YEAR = re.compile(r"(20\d\d)\s*년\s*(이후|부터|이전|전에|전|까지)?")
@@ -80,11 +80,45 @@ def _period(cond: tuple[int | None, int | None]) -> str:
     return f"{hi}년까지" if lo is None else f"{lo}~{hi}년"
 
 
+_SENT = re.compile(r"[^.!?\n]*(?:[.!?](?=\s|$)|\n|$)")
+
+
+def _drop_year_claims(section: str, years: set[str]) -> str:
+    """요청 연도를 말하는 문장을 뺀다 — 기간 밖 문서로 답하면서 "2025년 연구들은 …" 이라 단정하지 않게."""
+    sents = [s for s in _SENT.findall(section) if s.strip()]
+    kept = [s for s in sents if not any(y in s for y in years)]
+    return "".join(kept) if kept != sents else section
+
+
+def fix_out_of_period(question: str, answer: str) -> str:
+    """기간에 맞는 문서가 없어 기간 밖 문서로 답할 때(answer_issues_1113 H_C14): 서론 첫 문장을 코드가 고정하고,
+    서론 · 결론에서 요청 연도를 말하는 모델 문장을 뺀다. 섹션 머리를 못 찾으면 맨 앞에 한 줄만 붙인다."""
+    cond = year_condition(question)
+    if not cond:
+        return answer
+    lead = f"요청한 기간({_period(cond)})에 나온 논문은 DB 에서 찾지 못했습니다. 아래는 그 기간 밖의 논문입니다."
+    years = {str(y) for y in cond if y} | set(re.findall(r"20\d\d", question))
+    m_i, m_b, m_c = _find("서론", answer), _find("본론", answer), _find("결론", answer)
+    if not (m_i and m_b) or m_b.start() < m_i.end():
+        return "※ " + lead + "\n\n" + answer
+    intro = _drop_year_claims(answer[m_i.end():m_b.start()], years).strip()
+    out = answer[:m_i.end()] + "\n" + lead + (" " + intro if intro else "") + "\n\n" + answer[m_b.start():m_c.start() if m_c and m_c.start() > m_b.start() else len(answer)]
+    if m_c and m_c.start() > m_b.start():
+        tail = answer[m_c.end():]
+        cut = tail.find("\n\n📎")
+        body, rest = (tail[:cut], tail[cut:]) if cut >= 0 else (tail, "")
+        concl = _drop_year_claims(body, years)
+        out += answer[m_c.start():m_c.end()] + (concl if concl.strip() else body) + rest
+    return out
+
+
 def count_notice(question: str, answer: str, year_status: str = "") -> tuple[str, str]:
-    """``(답, 붙인 고지)``. 본론 항목이 요청 편수보다 적거나, 기간에 맞는 문서가 없었으면 답 맨 앞에 한 줄 붙인다."""
+    """``(답, 붙인 고지)``. 본론 항목이 요청 편수보다 적으면 답 맨 앞에 한 줄 붙인다.
+    기간에 맞는 문서가 없었으면 서론 첫 문장을 코드로 고정한다(``fix_out_of_period``)."""
     notes = []
-    if year_status == "맞는 문서 없음" and (cond := year_condition(question)):
-        notes.append(f"요청한 기간({_period(cond)})에 나온 논문은 찾지 못해, 기간 밖 논문으로 답했습니다.")
+    period = year_status == "맞는 문서 없음" and bool(year_condition(question))
+    if period:
+        answer = fix_out_of_period(question, answer)
     n = requested_count(question)
     b, c = _find("본론", answer), _find("결론", answer)
     if n and b:
@@ -92,6 +126,6 @@ def count_notice(question: str, answer: str, year_status: str = "") -> tuple[str
         if 0 < m < n:
             notes.append(f"요청한 {n}편 중 {m}편만 찾았습니다.")
     if not notes:
-        return answer, ""
+        return answer, ("서론 기간 밖 고정" if period else "")
     note = "※ " + " ".join(notes)
-    return note + "\n\n" + answer, note
+    return note + "\n\n" + answer, note + (" · 서론 기간 밖 고정" if period else "")

@@ -1,7 +1,7 @@
 """질문 기간 · 편수 조건 규칙 (docs/experiments/qcond_rule_1025)."""
 
 from core.llm.citation_fix import RAG_HIT_SEP
-from core.llm.question_conditions import count_notice, filter_by_year, requested_count, year_condition
+from core.llm.question_conditions import count_notice, filter_by_year, fix_out_of_period, requested_count, year_condition
 
 
 def test_year_condition():
@@ -32,10 +32,26 @@ def test_count_notice():
     out, note = count_notice("탈옥 방어 논문 6개 찾아줘", ans)
     assert note == "※ 요청한 6편 중 2편만 찾았습니다." and out.startswith(note)
     assert count_notice("논문 2개", ans) == (ans, "")
-    _, note = count_notice("2023년에 나온 논문 정리", ans, "맞는 문서 없음")
-    assert "2023년" in note
-    _, note = count_notice("최신 연구(2023~2026년) 찾아줘", ans, "맞는 문서 없음")
-    assert "(2023~2026년)" in note
+    out, note = count_notice("2023년에 나온 논문 정리", ans, "맞는 문서 없음")
+    assert note == "서론 기간 밖 고정" and "요청한 기간(2023년)에 나온 논문은 DB 에서 찾지 못했습니다" in out
+    out, _ = count_notice("최신 연구(2023~2026년) 찾아줘", ans, "맞는 문서 없음")
+    assert "(2023~2026년)" in out
+
+
+def test_fix_out_of_period():
+    # answer_issues_1113 H_C14: 기간 밖 문서로 답하면서 서론 · 결론이 "2025년 이후 발표된 연구들은" 이라 단정
+    ans = ("<b>서론</b>\n2025년 이후 발표된 딥 리서치 연구들은 다양하다. 에이전트 평가가 중요하다.\n\n"
+           "<b>본론</b>\n1. <b>A</b>: 2026년 논문이다 [2604.07720v1]\n\n"
+           "<b>결론</b>\n따라서 2025년 이후 연구는 두 흐름이다. A 는 평가를 다룬다.\n\n📎 <b>DB 밖</b>\n• X (2025)")
+    out = fix_out_of_period("2025년에 나온 딥 리서치 연구들 정리해줘", ans)
+    intro = out.split("<b>본론</b>")[0]
+    assert "요청한 기간(2025년)에 나온 논문은 DB 에서 찾지 못했습니다. 아래는 그 기간 밖의 논문입니다." in intro
+    assert "발표된 딥 리서치 연구들은" not in intro and "에이전트 평가가 중요하다." in intro
+    concl = out.split("<b>결론</b>")[1]
+    assert "두 흐름" not in concl and "A 는 평가를 다룬다." in concl and "• X (2025)" in concl
+    assert "2026년 논문이다" in out  # 본론은 손대지 않는다
+    assert fix_out_of_period("요즘 RAG 연구", ans) == ans
+    assert fix_out_of_period("2025년 논문", "머리 없는 답").startswith("※ 요청한 기간(2025년)")
 
 
 def test_requested_count_needs_request():

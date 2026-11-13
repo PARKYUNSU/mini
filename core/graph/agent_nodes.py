@@ -53,7 +53,7 @@ from core.llm.conclusion_rewrite import brief_findings, rewrite_conclusion
 from core.llm.conclusion_swap import swap_conclusion
 from core.llm.relevance_filter import filter_relevant
 from core.llm.query_reform import fill_slots
-from core.llm.question_conditions import count_notice, filter_by_year
+from core.llm.question_conditions import count_notice, filter_by_year, year_condition
 from core.llm.body_numbers import check_body_numbers
 from core.llm.answer_fix import clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items, renumber_body_items
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
@@ -1165,6 +1165,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
     _da_timeout = DIRECT_ANSWER_TIMEOUT_SEC if DIRECT_ANSWER_TIMEOUT_SEC > 0 else None
     _ext = None  # DB 밖 외부 검색 (RAG_EXTERNAL_SEARCH, docs/experiments/external_search_1020)
+    _ext_years = None
     try:
         answer = ""
         if router_choice == "A":
@@ -1487,7 +1488,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             ):
                 # 학회판(arXiv ID 없음)은 제목으로 거른다 — job 129 · 130 에서 본론 2406.01549 의 ACL 판이 다시 실렸다
                 _titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context))
-                _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles)  # _doc_ids 는 {번호: 논문 ID}
+                # 기간 질문이면 DB 밖 목록도 그 기간만 (RAG_COND_CHECK, answer_issues_1113)
+                _ext_years = year_condition(user_request) if os.getenv("RAG_COND_CHECK", "0").strip() == "1" else None
+                _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles, years=_ext_years)  # _doc_ids 는 {번호: 논문 ID}
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
             if _da_timeout is None:
@@ -1576,7 +1579,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 print(f"[DEBUG] DirectAnswer: 외부 검색 {len(_ext_items)}편 (답변 뒤 대기 {_ext_wait:.1f}s)")
                 if _ext_items:
                     answer = answer.rstrip() + format_section(_ext_items)
-                    record_candidates(user_request, _ext_items)
+                    record_candidates(user_request, _ext_items, years=_ext_years)
                 rag_trace.mark(chat_id, "external", n=len(_ext_items), wait=round(_ext_wait, 1))
             rag_trace.mark(chat_id, "final", answer=answer[:4000])
             # RAG는 agent_prompts.RAG_OUTPUT_TEMPLATE_MULTI_STRICT로 형식 고정; 후처리 재구성 시 제목 누락·섹션 중복이 남

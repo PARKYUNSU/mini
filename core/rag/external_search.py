@@ -96,11 +96,14 @@ def _known(title: str, keys: set[str]) -> bool:
 
 def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout: float = TIMEOUT_SEC,
                     limit: int = MAX_ITEMS, per_page: int = PER_PAGE, min_sim: float | None = MIN_SIM,
-                    dedupe: bool = True, clean: bool = True, exclude_titles: set[str] | None = None) -> list[dict]:
+                    dedupe: bool = True, clean: bool = True, exclude_titles: set[str] | None = None,
+                    years: tuple[int | None, int | None] | None = None) -> list[dict]:
     """OpenAlex 검색 → 컨텍스트에 없는 최근(2017~) 논문 최대 ``limit`` 편. 실패하면 [].
 
     ``min_sim`` 이 있으면 검색어와 "제목. 초록" 의 유사도가 그 이상인 것만, 높은 순으로 고른다.
     v1 동작은 ``per_page=8, min_sim=None, dedupe=False, clean=False``, v2 는 ``clean=False``.
+    ``years`` = 질문의 발행 연도 범위 ``(처음, 끝)``(question_conditions.year_condition) — 있으면 그 기간 논문만
+    (OpenAlex 필터 + 받은 뒤 한 번 더). DB 에 기간 논문이 없을 때 밖 목록까지 기간 밖이면 안 된다(answer_issues_1113).
     """
     q = clean_query(query) if clean else (query or "").strip()
     if not q:
@@ -108,10 +111,13 @@ def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout:
     try:
         # 키가 있으면 헤더로(무료 일일 예산은 IP 공용이라 쉽게 바닥난다 — 2026-10-20). 키는 URL 에 넣지 않는다.
         key = os.getenv("OPENALEX_API_KEY", "").strip()
-        r = requests.get(OPENALEX_URL, params={
-            "search": q[:300], "per-page": per_page,
-            "select": "id,title,ids,doi,publication_year,locations,abstract_inverted_index",
-        }, headers={"Authorization": f"Bearer {key}"} if key else None, timeout=timeout)
+        params = {"search": q[:300], "per-page": per_page,
+                  "select": "id,title,ids,doi,publication_year,locations,abstract_inverted_index"}
+        if years and (years[0] or years[1]):
+            lo, hi = years
+            params["filter"] = (f"publication_year:{lo}" if lo == hi else f"publication_year:{lo}-{hi}" if lo and hi
+                                else f"publication_year:>{lo - 1}" if lo else f"publication_year:<{hi + 1}")
+        r = requests.get(OPENALEX_URL, params=params, headers={"Authorization": f"Bearer {key}"} if key else None, timeout=timeout)
         r.raise_for_status()
         works = r.json().get("results") or []
     except Exception as exc:  # 외부 장애는 답변을 막지 않는다
@@ -126,6 +132,8 @@ def search_openalex(query: str, exclude_ids: set[str] | None = None, *, timeout:
         year = w.get("publication_year") or 0
         ax = _arxiv_id(w)
         if not title or year < MIN_YEAR or (ax and ax in ex) or _known(title, ex_titles):
+            continue
+        if years and ((years[0] and year < years[0]) or (years[1] and year > years[1])):
             continue
         if dedupe:
             k = _title_key(title)
@@ -158,8 +166,9 @@ def format_section(items: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def record_candidates(question: str, items: list[dict], path: Path | None = None) -> None:
-    """나중 수집 후보로 arXiv ID 를 남긴다 (자동 수집은 하지 않는다)."""
+def record_candidates(question: str, items: list[dict], path: Path | None = None,
+                      years: tuple[int | None, int | None] | None = None) -> None:
+    """나중 수집 후보로 arXiv ID 를 남긴다 (자동 수집은 하지 않는다). 기간 질문이면 ``years`` 도 적는다 — 수집 보강 후보."""
     ids = [it["arxiv"] for it in items if it.get("arxiv")]
     if not ids:
         return
@@ -167,7 +176,11 @@ def record_candidates(question: str, items: list[dict], path: Path | None = None
     try:
         p.parent.mkdir(parents=True, exist_ok=True)
         with p.open("a", encoding="utf-8") as f:
-            f.write(json.dumps({"ts": time.strftime("%Y-%m-%d %H:%M:%S"), "question": question[:300], "arxiv": ids}, ensure_ascii=False) + "\n")
+            row = {"ts": time.strftime("%Y-%m-%d %H:%M:%S"), "question": question[:300], "arxiv": ids}
+            if years:
+                row["years"] = list(years)
+                row["year_of"] = {it["arxiv"]: it.get("year") for it in items if it.get("arxiv")}
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
     except OSError:
         pass
 
@@ -176,14 +189,14 @@ class ExternalSearch:
     """답변 생성과 동시에 OpenAlex 를 부르고, 답변이 끝나면 남은 시간만 기다린다."""
 
     def __init__(self, query: str, exclude_ids: set[str], timeout: float = TIMEOUT_SEC,
-                 exclude_titles: set[str] | None = None):
+                 exclude_titles: set[str] | None = None, years: tuple[int | None, int | None] | None = None):
         self._items: list[dict] = []
         self._deadline = time.time() + timeout
-        self._t = threading.Thread(target=self._run, args=(query, exclude_ids, timeout, exclude_titles), daemon=True)
+        self._t = threading.Thread(target=self._run, args=(query, exclude_ids, timeout, exclude_titles, years), daemon=True)
         self._t.start()
 
-    def _run(self, query, exclude_ids, timeout, exclude_titles):
-        self._items = search_openalex(query, exclude_ids, timeout=timeout, exclude_titles=exclude_titles)
+    def _run(self, query, exclude_ids, timeout, exclude_titles, years):
+        self._items = search_openalex(query, exclude_ids, timeout=timeout, exclude_titles=exclude_titles, years=years)
 
     def result(self) -> tuple[list[dict], float]:
         """(결과, 답변 뒤 더 기다린 초)."""

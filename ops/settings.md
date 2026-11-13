@@ -32,7 +32,7 @@
 | `RAG_CITE_CLEANUP` | `1` | 10-22 10:57 | 인용 중복과 문서 번호 노출을 정리한다 | [`cite_cleanup_1022`](../docs/experiments/cite_cleanup_1022/README.md): 인용 중복 답 11→0 (real40) |
 | `RAG_RELEVANCE_FILTER` | `1` | 10-22 14:32 | 관련 없는 문서를 답 전에 뺀다. 제목에 고유 이름이 든 문서는 지킨다 | [`relevance_filter_1022`](../docs/experiments/relevance_filter_1022/README.md): 정답 아닌 인용 98→77 (19:3, p .0009) |
 | `RAG_PAPER_BLOCKS` | `1` | 10-22 22:38 | 논문당 한 블록, 라우터 5편 | [`paper_blocks_1022`](../docs/experiments/paper_blocks_1022/README.md): 효과 없음 (7:6), 중복 정리용 |
-| `RAG_COND_CHECK` | `1` | 10-26 07:37 | 질문의 기간 조건으로 거르고 편수를 알린다 | [`qcond_rule_1025`](../docs/experiments/qcond_rule_1025/README.md): 조건 문제 있는 질문 18→2/38 (16:0, p < .0001) |
+| `RAG_COND_CHECK` | `1` | 10-26 07:37 | 질문의 기간 조건으로 거르고 편수를 알린다. 기간에 맞는 문서가 없으면 기간 밖 문서로 답하되 서론 첫 문장을 코드가 고정하고 서론 · 결론의 요청 연도 단정 문장을 뺀다, DB 밖(OpenAlex) 목록도 요청 기간만(코드 변경 11-13, `.env` 그대로 — [`answer_issues_1113`](../docs/experiments/answer_issues_1113/README.md)) | [`qcond_rule_1025`](../docs/experiments/qcond_rule_1025/README.md): 조건 문제 있는 질문 18→2/38 (16:0, p < .0001) |
 | `RAG_LIST_FINDINGS` | `1` | 10-26 10:55 | 목록 항목에 결과 문장을 넣는다 | [`list_findings_v2_1026`](../docs/experiments/list_findings_v2_1026/README.md): 배경만 쓴 항목 16→1 |
 | `RAG_LIST_ABS_CHARS` | `400` | 10-26 10:55 | 목록 항목의 초록 상한 (코드 기본 500) | [`list_findings_v2_1026`](../docs/experiments/list_findings_v2_1026/README.md) |
 | `RAG_BODY_NUM_CHECK` | `1` | 10-26 10:55 | 본문 숫자를 출처 블록과 대조한다 | [`list_findings_v2_1026`](../docs/experiments/list_findings_v2_1026/README.md) |

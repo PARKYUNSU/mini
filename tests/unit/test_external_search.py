@@ -113,3 +113,27 @@ def test_excludes_context_titles(monkeypatch):
     out = X.search_openalex("q", set(), per_page=8, min_sim=None, dedupe=False, clean=False,
                             exclude_titles={"Journal Only", "Enabling LLMs to Generate Text with Citations and More"})
     assert [o["title"] for o in out] == ["In Context Already"]
+
+
+def test_years_filter_and_record(monkeypatch, tmp_path):
+    # answer_issues_1113: 기간 질문이면 DB 밖 목록도 그 기간만, 후보 기록에 기간을 남긴다
+    seen = {}
+    def fake_get(url, params=None, headers=None, timeout=None):
+        seen["params"] = params
+        return _R(WORKS)
+    monkeypatch.setattr(X.requests, "get", fake_get)
+    out = X.search_openalex("q", set(), per_page=8, min_sim=None, dedupe=False, clean=False, years=(2025, 2025))
+    assert seen["params"]["filter"] == "publication_year:2025" and [o["title"] for o in out] == ["Journal Only"]
+    X.search_openalex("q", min_sim=None, years=(2024, None))
+    assert seen["params"]["filter"] == "publication_year:>2023"
+    X.search_openalex("q", min_sim=None, years=(None, 2023))
+    assert seen["params"]["filter"] == "publication_year:<2024"
+    X.search_openalex("q", min_sim=None, years=(2023, 2026))
+    assert seen["params"]["filter"] == "publication_year:2023-2026"
+    X.search_openalex("q", min_sim=None)
+    assert "filter" not in seen["params"]
+    log = tmp_path / "c.jsonl"
+    X.record_candidates("2025년 딥 리서치", [{"arxiv": "2501.00001", "year": 2025}], path=log, years=(2025, 2025))
+    import json
+    row = json.loads(log.read_text())
+    assert row["years"] == [2025, 2025] and row["year_of"] == {"2501.00001": 2025}
