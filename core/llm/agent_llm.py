@@ -127,7 +127,8 @@ def get_rag_answer_llm():
             model=RAG_ANSWER_ONLY_MODEL,
             temperature=0.2,
             top_p=0.8,
-            repeat_penalty=1.18,
+            # 1.18 은 반복 용어 음차를 깨뜨린다(홉→홠 등, docs/experiments/penalty_1113) — 1.0 확인 중
+            repeat_penalty=float(os.getenv("RAG_ANSWER_REPEAT_PENALTY", "1.18")),
             reasoning=False,
             num_predict=OLLAMA_DIRECT_NUM_PREDICT,
         )
