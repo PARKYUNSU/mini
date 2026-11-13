@@ -1,0 +1,1202 @@
+[
+{
+"id": "H_A01",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A02",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A03",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A10",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A14",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A19",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A21",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A22",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A25",
+"grp": "힌트",
+"n_items": 4,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A26",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A27",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A28",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A29",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A30",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": 1,
+"count_bad": false
+},
+{
+"id": "H_A31",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A32",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A33",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A34",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A35",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A36",
+"grp": "비힌트",
+"n_items": 4,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A37",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A38",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A39",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_A40",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B01",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B04",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B06",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B07",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B08",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B09",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B10",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B11",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B12",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B13",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B15",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B16",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B17",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_B18",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C06",
+"grp": "비힌트",
+"n_items": 7,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C07",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C09",
+"grp": "비힌트",
+"n_items": 8,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C14",
+"grp": "비힌트",
+"n_items": 10,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C16",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C19",
+"grp": "비힌트",
+"n_items": 9,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C20",
+"grp": "비힌트",
+"n_items": 5,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C21",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": 4,
+"count_bad": true
+},
+{
+"id": "H_C22",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C23",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C24",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C25",
+"grp": "비힌트",
+"n_items": 4,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C26",
+"grp": "비힌트",
+"n_items": 7,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C27",
+"grp": "비힌트",
+"n_items": 6,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C28",
+"grp": "비힌트",
+"n_items": 5,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": 5,
+"count_bad": false
+},
+{
+"id": "H_C29",
+"grp": "비힌트",
+"n_items": 4,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C30",
+"grp": "비힌트",
+"n_items": 8,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_C31",
+"grp": "비힌트",
+"n_items": 4,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_D09",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_D10",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_D11",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_D12",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_D13",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_D14",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_D15",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_D16",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_E09",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_E10",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_E11",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_E12",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_E13",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_E14",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_E15",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_E16",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_F01",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_F07",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_F09",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_F10",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_F11",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_F12",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_F13",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_F14",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_F15",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_G05",
+"grp": "힌트",
+"n_items": 4,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_G06",
+"grp": "비힌트",
+"n_items": 7,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": 3,
+"count_bad": true
+},
+{
+"id": "H_G07",
+"grp": "비힌트",
+"n_items": 8,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_G08",
+"grp": "비힌트",
+"n_items": 5,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_G09",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_H03",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_H05",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_H06",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "H_H07",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G01",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G02",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": 2,
+"count_bad": true
+},
+{
+"id": "G03",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G04",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G05",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G06",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": 3,
+"count_bad": false
+},
+{
+"id": "G07",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G08",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": 2,
+"count_bad": true
+},
+{
+"id": "G09",
+"grp": "비힌트",
+"n_items": 4,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G10",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G11",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G12",
+"grp": "비힌트",
+"n_items": 4,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G13",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": 2,
+"count_bad": false
+},
+{
+"id": "G14",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G15",
+"grp": "비힌트",
+"n_items": 4,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G16",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G17",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": 2,
+"count_bad": false
+},
+{
+"id": "G18",
+"grp": "비힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G19",
+"grp": "힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G20",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G21",
+"grp": "힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": 3,
+"count_bad": false
+},
+{
+"id": "G22",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G23",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G24",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G25",
+"grp": "비힌트",
+"n_items": 3,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G26",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": true,
+"want": 2,
+"count_bad": false
+},
+{
+"id": "G27",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G28",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G29",
+"grp": "비힌트",
+"n_items": 1,
+"marked": 0,
+"concl_none": false,
+"intro_none": false,
+"want": null,
+"count_bad": false
+},
+{
+"id": "G30",
+"grp": "힌트",
+"n_items": 2,
+"marked": 0,
+"concl_none": true,
+"intro_none": false,
+"want": null,
+"count_bad": false
+}
+]

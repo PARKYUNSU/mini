@@ -1,0 +1,2017 @@
+[
+{
+"t": "K001",
+"q": "추론 모델을 강화학습으로 학습시키는 좋은 논문 추천해줘",
+"docs": [
+[
+"2503.20139",
+"Look Before Leap: Look-Ahead Planning with Uncertainty in Reinforcement Learning"
+],
+[
+"2603.08706",
+"Agentic Critical Training"
+]
+]
+},
+{
+"t": "K002",
+"q": "로컬 9B 모델로 답을 만들고 큰 모델로 검증만 할 때, 검증 모델이 틀린 답을 통과시키는 비율을 잰 연구가 있는가. 검증 프롬프트 형식에 따른 차이도 알려줘.",
+"docs": [
+[
+"2610.12083",
+"All Verdicts are Not Equal: Rethinking LLM Judge Reliability"
+]
+]
+},
+{
+"t": "K003",
+"q": "문서 페이지 이미지를 OCR 없이 그대로 임베딩해서 검색하는 멀티모달 RAG 연구 알려줘",
+"docs": [
+[
+"2601.03262",
+"Roles of MLLMs in Visually Rich Document Retrieval for RAG: A Survey"
+],
+[
+"2412.10704",
+"VisDoM: Multi-Document QA with Visually Rich Elements Using Multimodal Retrieval-Augmented Generation"
+]
+]
+},
+{
+"t": "K004",
+"q": "에이전트가 작업 계획을 먼저 세운 뒤 단계별로 실행하는 방식을 다룬 연구 핵심 내용 알려줘",
+"docs": [
+[
+"2610.34467",
+"DynaFlow: Learning Free-Form Multi-Agent Orchestration"
+],
+[
+"2503.20028",
+"OmniNova:A General Multimodal Agent Framework"
+],
+[
+"2412.14212",
+"Tree-of-Code: A Hybrid Approach for Robust Complex Task Planning and Execution"
+]
+]
+},
+{
+"t": "K005",
+"q": "미술 작품 위작 판별 AI 연구 추천해줘",
+"docs": [
+[
+"2503.23226",
+"Synthetic Art Generation and DeepFake Detection A Study on Jamini Roy Inspired Dataset"
+]
+]
+},
+{
+"t": "K006",
+"q": "KV 캐시를 압축하면 긴 문서 질의응답에서 앞부분 정보부터 잃는가, 중간 정보부터 잃는가. 위치별 손실을 측정한 연구가 있는가.",
+"docs": [
+[
+"2602.08005",
+"DeltaKV: Residual-Based KV Cache Compression via Long-Range Similarity"
+]
+]
+},
+{
+"t": "K007",
+"q": "RankGPT 논문에서 LLM으로 재순위하는 방법 설명해줘",
+"docs": [
+[
+"2406.14449",
+"APEER: Automatic Prompt Engineering Enhances Large Language Model Reranking"
+],
+[
+"2602.13571",
+"LLM-Confidence Reranker: A Training-Free Approach for Enhancing Retrieval-Augmented Generation Systems"
+]
+]
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"docs": [
+[
+"2412.14063",
+"Rango: Adaptive Retrieval-Augmented Proving for Automated Software Verification"
+],
+[
+"2605.22763",
+"Advancing Mathematics Research with AI-Driven Formal Proof Search"
+],
+[
+"2607.11849",
+"AdvancedMathBench: A Benchmark Suite for Advanced Mathematical Proof Generation and Verification"
+],
+[
+"2501.00059",
+"Large Language Models for Mathematical Analysis"
+],
+[
+"2412.16075",
+"Formal Mathematical Reasoning: A New Frontier in AI"
+]
+]
+},
+{
+"t": "K009",
+"q": "차트나 그래프 이미지를 보고 질문에 답하는 모델 연구 핵심 내용 설명해줘",
+"docs": [
+[
+"2412.19146",
+"AskChart: Universal Chart Understanding through Textual Enhancement"
+],
+[
+"2604.03157",
+"Chart-RL: Policy Optimization Reinforcement Learning for Enhanced Visual Reasoning in Chart Question Answering with Vision Language Models"
+],
+[
+"2603.28902",
+"ChartDiff: A Large-Scale Benchmark for Comprehending Pairs of Charts"
+]
+]
+},
+{
+"t": "K010",
+"q": "RAG 평가 방법 다룬 논문 읽을 만한 거 알려줘",
+"docs": [
+[
+"2408.08067",
+"RAGChecker: A Fine-grained Framework for Diagnosing Retrieval-Augmented Generation"
+],
+[
+"2405.07437",
+"Evaluation of Retrieval-Augmented Generation: A Survey"
+],
+[
+"2412.12322",
+"RAG Playground: A Framework for Systematic Evaluation of Retrieval Strategies and Prompt Engineering in RAG Systems"
+]
+]
+},
+{
+"t": "K011",
+"q": "LLM 에이전트 평가 연구들을 바탕으로 앞으로 필요한 벤치마크 3가지를 제안해줘",
+"docs": [
+[
+"2607.13705",
+"AgentCompass: A Unified Evaluation Infrastructure for Agent Capabilities"
+],
+[
+"2606.22678",
+"RigorBench: Benchmarking Engineering Process Discipline in Autonomous AI Coding Agents"
+],
+[
+"2411.15594",
+"A Survey on LLM-as-a-Judge"
+],
+[
+"2503.24047",
+"Towards Scientific Intelligence: A Survey of LLM-based Scientific Agents"
+],
+[
+"2603.11337",
+"RewardHackingAgents: Benchmarking Evaluation Integrity for LLM ML-Engineering Agents"
+],
+[
+"2604.01532",
+"PHMForge: A Scenario-Driven Agentic Benchmark for Industrial Asset Lifecycle Maintenance"
+],
+[
+"2412.13501",
+"GUI Agents: A Survey"
+]
+]
+},
+{
+"t": "K012",
+"q": "긴 문서 요약에 LLM을 쓴 연구 추천해줘",
+"docs": [
+[
+"2409.18454",
+"Leveraging Long-Context Large Language Models for Multi-Document Understanding and Summarization in Enterprise Applications"
+],
+[
+"2410.11001",
+"Graph of Records: Boosting Retrieval Augmented Generation for Long-context Summarization with Graphs"
+],
+[
+"2403.19889",
+"Towards a Robust Retrieval-Based Summarization System"
+]
+]
+},
+{
+"t": "K013",
+"q": "농작물 병해충 드론 탐지 논문 두 편 추천해줘",
+"docs": [
+[
+"2501.00669",
+"Leaf diseases detection using deep learning methods"
+],
+[
+"2412.18635",
+"Edge-AI for Agriculture: Lightweight Vision Models for Disease Detection in Resource-Limited Settings"
+]
+]
+},
+{
+"t": "K014",
+"q": "사내 문서 검색 챗봇 만들 때 참고할 만한 논문 세 편 추천해줘",
+"docs": [
+[
+"2601.07838",
+"A survey: Information search time optimization based on RAG (Retrieval Augmentation Generation) chatbot"
+],
+[
+"2602.17856",
+"Enhancing Scientific Literature Chatbots with Retrieval-Augmented Generation: A Performance Evaluation of Vector and Graph-Based Systems"
+],
+[
+"2408.08925",
+"Retail-GPT: leveraging Retrieval Augmented Generation (RAG) for building E-commerce Chat Assistants"
+]
+]
+},
+{
+"t": "K015",
+"q": "결론 문장이 여러 논문의 결과를 한 문장에 섞으면 출처가 잘못 붙는다. 여러 문서를 요약할 때 출처 혼동을 측정하거나 줄인 연구가 있는가.",
+"docs": [
+[
+"2510.17853",
+"CiteGuard: Faithful Citation Attribution for LLMs via Retrieval-Augmented Validation"
+],
+[
+"2606.26449",
+"ProvenAI: Provenance-Native Traces of Evidence in Generated Answers"
+],
+[
+"2509.21557",
+"Generation-Time vs. Post-hoc Citation: A Holistic Evaluation of LLM Attribution"
+]
+]
+},
+{
+"t": "K016",
+"q": "BGE M3 임베딩 논문 핵심 내용 알려줘",
+"docs": [
+[
+"2512.16425",
+"Introducing ORKG ASK: an AI-driven Scholarly Literature Search and Exploration System Taking a Neuro-Symbolic Approach"
+],
+[
+"2502.15692",
+"ACL-rlg: A Dataset for Reading List Generation"
+],
+[
+"2411.08438",
+"Towards Optimizing a Retrieval Augmented Generation using Large Language Model on Academic Data"
+]
+]
+},
+{
+"t": "K017",
+"q": "언어별로 LLM 성능이 얼마나 차이 나는지 다룬 다국어 연구들 조사해줘",
+"docs": [
+[
+"2412.14304",
+"Multi-OphthaLingua: A Multilingual Benchmark for Assessing and Debiasing LLM Ophthalmological QA in LMICs"
+],
+[
+"2412.08392",
+"The Roles of English in Evaluating Multilingual Language Models"
+],
+[
+"2412.12500",
+"Beyond Data Quantity: Key Factors Driving Performance in Multilingual Language Models"
+],
+[
+"2501.08335",
+"MERaLiON-TextLLM: Cross-Lingual Understanding of Large Language Models in Chinese, Indonesian, Malay, and Singlish"
+],
+[
+"2412.12417",
+"Bridging the Gap: Enhancing LLM Performance for Low-Resource African Languages with New Benchmarks, Fine-Tuning, and Cultural Adjustments"
+],
+[
+"2412.17933",
+"BenCzechMark : A Czech-centric Multitask and Multimetric Benchmark for Large Language Models with Duel Scoring Mechanism"
+]
+]
+},
+{
+"t": "K018",
+"q": "리랭커를 cross-encoder로 바꿨더니 top-5 정밀도는 올랐지만 지연이 3배가 됐다. 이 트레이드오프를 정량적으로 다룬 논문이 있는가, 있다면 어떤 조건에서 리랭킹을 생략해도 되는가.",
+"docs": [
+[
+"2509.25085",
+"jina-reranker-v3: Last but Not Late Interaction for Listwise Document Reranking"
+]
+]
+},
+{
+"t": "K019",
+"q": "답이 없는 질문에 모른다고 답하게 파인튜닝하면 답이 있는 질문에서도 거절이 늘어나는 부작용이 있는가. 이 균형을 다룬 연구를 찾아라.",
+"docs": [
+[
+"2510.01782",
+"Can LLMs Refuse Questions They Do Not Know? Measuring Knowledge-Aware Refusal in Factual Tasks"
+],
+[
+"2406.19552",
+"Rethinking harmless refusals when fine-tuning foundation models"
+],
+[
+"2605.15000",
+"Quantifying and Mitigating Premature Closure in Frontier LLMs"
+]
+]
+},
+{
+"t": "K020",
+"q": "공시 기준 문서를 보고서 목차에 자동으로 연결하는 연구 추천 좀",
+"docs": [
+[
+"2504.08763",
+"WebMap -- Large Language Model-assisted Semantic Link Induction in the Web"
+],
+[
+"2504.08762",
+"InteractiveSurvey: An LLM-based Personalized and Interactive Survey Paper Generation System"
+]
+]
+},
+{
+"t": "K021",
+"q": "코드 생성 LLM 연구 중에 재밌는 논문 하나 골라줘",
+"docs": [
+[
+"2404.00599",
+"EvoCodeBench: An Evolving Code Generation Benchmark Aligned with Real-World Code Repositories"
+],
+[
+"2308.12950",
+"Code Llama: Open Foundation Models for Code"
+]
+]
+},
+{
+"t": "K022",
+"q": "그래프 신경망 연구 중 재밌는 거 하나 알려줘",
+"docs": [
+[
+"2412.19419",
+"Introduction to Graph Neural Networks: A Starting Point for Machine Learning Engineers"
+],
+[
+"2206.13170",
+"Measuring and Improving the Use of Graph Information in Graph Neural Networks"
+],
+[
+"2406.15575",
+"Sketch-GNN: Scalable Graph Neural Networks with Sublinear Training Complexity"
+],
+[
+"2407.01635",
+"Commute Graph Neural Networks"
+]
+]
+},
+{
+"t": "K023",
+"q": "고정 길이로 자르는 청킹이랑 의미 단위 청킹은 RAG 성능이 어떻게 달라?",
+"docs": [
+[
+"2505.21700",
+"Rethinking Chunk Size For Long-Document Retrieval: A Multi-Dataset Analysis"
+],
+[
+"2601.14123",
+"A Systematic Analysis of Chunking Strategies for Reliable Question Answering"
+]
+]
+},
+{
+"t": "K024",
+"q": "LLM을 심판으로 쓰는 평가 연구 볼 만한 거 추천해줘",
+"docs": [
+[
+"2406.12624",
+"Judging the Judges: Evaluating Alignment and Vulnerabilities in LLMs-as-Judges"
+],
+[
+"2411.16594",
+"From Generation to Judgment: Opportunities and Challenges of LLM-as-a-judge"
+],
+[
+"2510.18196",
+"Contrastive Decoding Mitigates Score Range Bias in LLM-as-a-Judge"
+],
+[
+"2409.16788",
+"Mitigating the Bias of Large Language Model Evaluation"
+]
+]
+},
+{
+"t": "K025",
+"q": "지식 증류로 작은 모델 만드는 최신 논문 추천해줘",
+"docs": [
+[
+"2412.09388",
+"All You Need in Knowledge Distillation Is a Tailored Coordinate System"
+],
+[
+"2209.07521",
+"On-Device Domain Generalization"
+],
+[
+"2607.22629",
+"Masked Self-Distillation: Internalizing the Chain-of-Thought in Language Models"
+],
+[
+"2412.13943",
+"On Explaining Knowledge Distillation: Measuring and Visualising the Knowledge Transfer Process"
+]
+]
+},
+{
+"t": "K026",
+"q": "DPR(Dense Passage Retrieval) 논문 요약해줘",
+"docs": [
+[
+"2004.04906",
+"Dense Passage Retrieval for Open-Domain Question Answering"
+]
+]
+},
+{
+"t": "K027",
+"q": "임베딩 모델 연구들을 비교해서 한국어 검색 서비스에 어떤 걸 쓰면 좋을지 추천해줘",
+"docs": [
+[
+"2412.09165",
+"When Text Embedding Meets Large Language Model: A Comprehensive Survey"
+],
+[
+"2412.19312",
+"From Interests to Insights: An LLM Approach to Course Recommendations Using Natural Language Queries"
+]
+]
+},
+{
+"t": "K028",
+"q": "프롬프트 압축 연구 중 괜찮은 논문 있으면 알려줘",
+"docs": [
+[
+"2403.12968",
+"LLMLingua-2: Data Distillation for Efficient and Faithful Task-Agnostic Prompt Compression"
+],
+[
+"2404.00489",
+"Prompt-SAW: Leveraging Relation-Aware Graphs for Textual Prompt Compression"
+],
+[
+"2508.15813",
+"SCOPE: A Generative Approach for LLM Prompt Compression"
+]
+]
+},
+{
+"t": "K029",
+"q": "LLM을 추천 시스템에 붙여서 추천 품질을 높인 연구 있어?",
+"docs": [
+[
+"2412.18713",
+"Enhanced Recommendation Combining Collaborative Filtering and Large Language Models"
+],
+[
+"2412.13432",
+"Large Language Model Enhanced Recommender Systems: A Survey"
+],
+[
+"2412.16933",
+"Towards a Unified Paradigm: Integrating Recommendation Systems as a New Language in Large Models"
+],
+[
+"2601.08148",
+"Enriching Semantic Profiles into Knowledge Graph for Recommender Systems Using Large Language Models"
+]
+]
+},
+{
+"t": "K030",
+"q": "해양 쓰레기 위성 탐지 연구 볼 만한 거 있으면 알려줘",
+"docs": [
+[
+"2412.16375",
+"Iterative Encoding-Decoding VAEs Anomaly Detection in NOAA's DART Time Series: A Machine Learning Approach for Enhancing Data Integrity for NASA's GRACE-FO Verification and Validation"
+],
+[
+"2606.20976",
+"Detecting Satellites in Radio-Frequency Data via Semi-Supervised Learning"
+]
+]
+},
+{
+"t": "K031",
+"q": "RAGAS 논문 요약해줘",
+"docs": [
+[
+"2309.15217",
+"Ragas: Automated Evaluation of Retrieval Augmented Generation"
+]
+]
+},
+{
+"t": "K032",
+"q": "멀티모달 문서 이해(차트·표·그림) 논문 두 편 뽑아줘",
+"docs": [
+[
+"2601.03262",
+"Roles of MLLMs in Visually Rich Document Retrieval for RAG: A Survey"
+],
+[
+"2506.16035",
+"Vision-Guided Chunking Is All You Need: Enhancing RAG with Multimodal Document Understanding"
+],
+[
+"2507.23217",
+"Zero-Shot Document Understanding using Pseudo Table of Contents-Guided Retrieval-Augmented Generation"
+]
+]
+},
+{
+"t": "K033",
+"q": "표 형식 문서에서 정보 뽑는 LLM 연구 추천해줘",
+"docs": [
+[
+"2412.20072",
+"Extract Information from Hybrid Long Documents Leveraging LLMs: A Framework and Dataset"
+],
+[
+"2406.19102",
+"Statements: Universal Information Extraction from Tables with Large Language Models for ESG KPIs"
+],
+[
+"2504.01346",
+"RAG over Tables: Hierarchical Memory Index, Multi-Stage Retrieval, and Benchmarking"
+]
+]
+},
+{
+"t": "K034",
+"q": "LLM이 답에 다는 인용이 실제로 근거가 되는 비율은 보통 몇 % 정도야?",
+"docs": [
+[
+"2510.17853",
+"CiteGuard: Faithful Citation Attribution for LLMs via Retrieval-Augmented Validation"
+],
+[
+"2606.26449",
+"ProvenAI: Provenance-Native Traces of Evidence in Generated Answers"
+]
+]
+},
+{
+"t": "K035",
+"q": "GraphRAG(From Local to Global) 논문 핵심 내용 설명해줘",
+"docs": [
+[
+"2501.14892",
+"Causal Graphs Meet Thoughts: Enhancing Complex Reasoning in Graph-Augmented LLMs"
+],
+[
+"2602.05143",
+"HugRAG: Hierarchical Causal Knowledge Graph Design for RAG"
+]
+]
+},
+{
+"t": "K036",
+"q": "임베딩 모델 학습 최신 연구 두 편 골라줘",
+"docs": [
+[
+"2603.19223",
+"F2LLM-v2: Inclusive, Performant, and Efficient Embeddings for a Multilingual World"
+],
+[
+"2605.15081",
+"ML-Embed: Inclusive and Efficient Embeddings for a Multilingual World"
+]
+]
+},
+{
+"t": "K037",
+"q": "지식 증류로 만든 작은 모델은 원래 큰 모델 성능의 몇 %까지 따라가?",
+"docs": [
+[
+"2412.09388",
+"All You Need in Knowledge Distillation Is a Tailored Coordinate System"
+],
+[
+"2607.28639",
+"The Asymmetric Effects of Knowledge Distillation on Bias in Small Language Models"
+]
+]
+},
+{
+"t": "K038",
+"q": "합성 데이터로만 학습한 검색기는 사람 라벨로 학습한 것과 성능 차이가 몇 % 나?",
+"docs": [
+[
+"2604.01195",
+"ORBIT: Scalable and Verifiable Data Generation for Search Agents on a Tight Budget"
+]
+]
+},
+{
+"t": "K039",
+"q": "긴 문맥 처리하는 트랜스포머 개선 연구 중 볼 만한 거 두 편",
+"docs": [
+[
+"2412.13626",
+"LIFT: Improving Long Context Understanding Through Long Input Fine-Tuning"
+],
+[
+"2410.13846",
+"LightTransfer: Your Long-Context LLM is Secretly a Hybrid Model with Effortless Adaptation"
+],
+[
+"2412.12486",
+"Boosting Long-Context Management via Query-Guided Activation Refilling"
+]
+]
+},
+{
+"t": "K040",
+"q": "2025년에 나온 딥 리서치(검색 에이전트) 연구들 정리해줘",
+"docs": [
+[
+"2604.07720",
+"Towards Knowledgeable Deep Research: Framework and Benchmark"
+],
+[
+"2603.22376",
+"AI Co-Scientist for Ranking: Discovering Novel Search Ranking Models alongside LLM-based AI Agents with Cloud Computing Access"
+],
+[
+"2605.26081",
+"VeriTrace: Evolving Mental Models for Deep Research Agents"
+],
+[
+"2607.22375",
+"IDEAgent: Agentic Quality-Diversity Search for Research Idea Generation"
+],
+[
+"2610.30181",
+"Deep Search in Real-World Web Environments"
+],
+[
+"2605.04036",
+"OpenSeeker-v2: Pushing the Limits of Search Agents with Informative and High-Difficulty Trajectories"
+],
+[
+"2606.02060",
+"Where Do Deep-Research Agents Go Wrong? Span-Level Error Localization in Agent Trajectories"
+],
+[
+"2606.15345",
+"Beyond Monolingual Deep Research: Evaluating Agents and Retrievers with Cross-Lingual BrowseComp-Plus"
+],
+[
+"2607.13705",
+"AgentCompass: A Unified Evaluation Infrastructure for Agent Capabilities"
+],
+[
+"2606.09730",
+"SearchSwarm: Towards Delegation Intelligence in Agentic LLMs for Long-Horizon Deep Research"
+]
+]
+},
+{
+"t": "K041",
+"q": "REPLUG 논문 요약해줘",
+"docs": [
+[
+"2005.14165",
+"Language Models are Few-Shot Learners"
+],
+[
+"2210.10723",
+"TabLLM: Few-shot Classification of Tabular Data with Large Language Models"
+],
+[
+"2208.03299",
+"Atlas: Few-shot Learning with Retrieval Augmented Language Models"
+]
+]
+},
+{
+"t": "K042",
+"q": "양자화할 때 중요한 가중치만 지켜서 성능 손실을 줄이는 연구 있어?",
+"docs": [
+[
+"2607.07964",
+"KronQ: LLM Quantization via Kronecker-Factored Hessian"
+],
+[
+"2607.01127",
+"$\\text{Log}_\\text{b}$Quant: Quantizing Language Models in Logarithmic Space"
+],
+[
+"2412.17387",
+"Singular Value Scaling: Efficient Generative Model Compression via Pruned Weights Refinement"
+]
+]
+},
+{
+"t": "K043",
+"q": "소형 언어 모델 성능 끌어올리는 연구 추천 좀",
+"docs": [
+[
+"2412.09990",
+"Small Language Model as Data Prospector for Large Language Model"
+],
+[
+"2409.15790",
+"Small Language Models: Survey, Measurements, and Insights"
+],
+[
+"2203.15556",
+"Training Compute-Optimal Large Language Models"
+]
+]
+},
+{
+"t": "K044",
+"q": "Toolformer 논문 요약해줘",
+"docs": [
+[
+"2404.00450",
+"Planning and Editing What You Retrieve for Enhanced Tool Learning"
+]
+]
+},
+{
+"t": "K045",
+"q": "법률 분야에 LLM을 적용한 연구 찾아줘",
+"docs": [
+[
+"2412.18697",
+"Agents on the Bench: Large Language Model Based Multi Agent Framework for Trustworthy Digital Justice"
+],
+[
+"2412.08385",
+"NyayaAnumana & INLegalLlama: The Largest Indian Legal Judgment Prediction Dataset and Specialized Language Model for Enhanced Decision Analysis"
+],
+[
+"2405.20362",
+"Hallucination-Free? Assessing the Reliability of Leading AI Legal Research Tools"
+],
+[
+"2502.20364",
+"Bridging Legal Knowledge and AI: Retrieval-Augmented Generation with Vector Stores, Knowledge Graphs, and Hierarchical Non-negative Matrix Factorization"
+]
+]
+},
+{
+"t": "K046",
+"q": "전문가 혼합(MoE) 모델에서 토큰을 어느 전문가에게 보낼지 정하는 라우팅을 개선한 연구 알려줘",
+"docs": [
+[
+"2610.22353",
+"Rethinking Routing Exploration in Modern Mixture-of-Experts"
+],
+[
+"2607.08780",
+"Sticky Routing: Training MoE Models for Memory-Efficient Inference"
+],
+[
+"2606.08814",
+"STAR: Rethinking MoE Routing as Structure-Aware Subspace Learning"
+]
+]
+},
+{
+"t": "K047",
+"q": "Mamba 같은 상태공간 모델이랑 트랜스포머는 긴 시퀀스에서 성능이 어떻게 달라?",
+"docs": [
+[
+"2503.11224",
+"Technologies on Effectiveness and Efficiency: A Survey of State Spaces Models"
+],
+[
+"2401.04081",
+"MoE-Mamba: Efficient Selective State Space Models with Mixture of Experts"
+],
+[
+"2507.06204",
+"Differential Mamba"
+]
+]
+},
+{
+"t": "K048",
+"q": "학생이 쓴 서술형 답안을 LLM으로 자동 채점하는 연구 알려줘",
+"docs": [
+[
+"2407.12818",
+"\"I understand why I got this grade\": Automatic Short Answer Grading with Feedback"
+],
+[
+"2412.19755",
+"Can MLLMs generate human-like feedback in grading multimodal short answers?"
+],
+[
+"2606.11477",
+"Towards Fully Automated Exam Grading: Fairness-Aware Recognition of Handwritten Answers with Foundation Models"
+]
+]
+},
+{
+"t": "K049",
+"q": "Self-RAG 논문 요약해줘",
+"docs": [
+[
+"2310.11511",
+"Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection"
+]
+]
+},
+{
+"t": "K050",
+"q": "LLM 안에 있는 잘못된 사실 하나만 골라서 고치는 지식 편집 연구 알려줘",
+"docs": [
+[
+"2503.17229",
+"FactSelfCheck: Fact-Level Black-Box Hallucination Detection for LLMs"
+]
+]
+},
+{
+"t": "K051",
+"q": "Medusa 논문 요약해줘",
+"docs": [
+[
+"2412.09856",
+"LinGen: Towards High-Resolution Minute-Length Text-to-Video Generation with Linear Computational Complexity"
+],
+[
+"2412.18688",
+"Video Is Worth a Thousand Images: Exploring the Latest Trends in Long Video Generation"
+]
+]
+},
+{
+"t": "K052",
+"q": "고대 문자 해독하는 AI 연구 읽을 만한 거",
+"docs": [
+[
+"2407.12013",
+"Dating ancient manuscripts using radiocarbon and AI-based writing style analysis"
+],
+[
+"2607.06374",
+"VaseMuseum: Digital Intelligent Museum for Ancient Greek Pottery"
+],
+[
+"2503.21074",
+"Rerouting Connection: Hybrid Computer Vision Analysis Reveals Visual Similarity Between Indus and Tibetan-Yi Corridor Writing Systems"
+]
+]
+},
+{
+"t": "K053",
+"q": "로봇 팔이 물건을 집는 동작을 강화학습으로 배우는 연구 핵심 내용 알려줘",
+"docs": [
+[
+"2503.20208",
+"Learning Adaptive Dexterous Grasping from Single Demonstrations"
+],
+[
+"2607.00033",
+"Learning Dexterous Manipulation Using Contact Wrench Guidance From Human Demonstration"
+],
+[
+"2611.09864",
+"Grasp-TAGS: Task-Aware Grasp Selection via Critic Distillation for Prehensile Loco-Manipulation"
+]
+]
+},
+{
+"t": "K054",
+"q": "LLMLingua-2 논문 요약해줘",
+"docs": [
+[
+"2403.12968",
+"LLMLingua-2: Data Distillation for Efficient and Faithful Task-Agnostic Prompt Compression"
+]
+]
+},
+{
+"t": "K055",
+"q": "LLM이 만든 글인지 사람이 쓴 글인지 구분할 수 있게 워터마크를 넣는 연구 있어?",
+"docs": [
+[
+"2412.18274",
+"GenAI Content Detection Task 2: AI vs. Human -- Academic Essay Authenticity Challenge"
+],
+[
+"2403.20127",
+"The Impact of Prompts on Zero-Shot Detection of AI-Generated Text"
+]
+]
+},
+{
+"t": "K056",
+"q": "LLM 출력 형식을 JSON으로 강제하는 연구 볼 만한 거 있어?",
+"docs": [
+[
+"2404.08189",
+"Reducing hallucination in structured outputs via Retrieval-Augmented Generation"
+]
+]
+},
+{
+"t": "K057",
+"q": "LLM 사전학습 데이터를 고르거나 정제하는 연구들 정리해줘",
+"docs": [
+[
+"2605.30288",
+"MIRA: Mid-training Rubric Anchoring for Source-Aware Data Selection"
+],
+[
+"2309.04564",
+"When Less is More: Investigating Data Pruning for Pretraining LLMs at Scale"
+],
+[
+"2503.07879",
+"Datasets, Documents, and Repetitions: The Practicalities of Unequal Data Quality"
+],
+[
+"2503.00808",
+"Predictive Data Selection: The Data That Predicts Is the Data That Teaches"
+],
+[
+"2412.15285",
+"Maximize Your Data's Potential: Enhancing LLM Accuracy with Two-Phase Pretraining"
+],
+[
+"2604.28075",
+"Repetition over Diversity: High-Signal Data Filtering for Sample-Efficient German Language Modeling"
+],
+[
+"2606.28551",
+"DataComp-VLM: Improved Open Datasets for Vision-Language Models"
+],
+[
+"2412.17069",
+"Optimizing Data Curation through Spectral Analysis and Joint Batch Selection (SALN)"
+]
+]
+},
+{
+"t": "K058",
+"q": "꿀벌 개체수 예측 연구 추천해줘",
+"docs": [
+[
+"2412.16196",
+"AgroXAI: Explainable AI-Driven Crop Recommendation System for Agriculture 4.0"
+],
+[
+"2507.10156",
+"Introducing the Swiss Food Knowledge Graph: AI for Context-Aware Nutrition Recommendation"
+]
+]
+},
+{
+"t": "K059",
+"q": "LLM 에이전트가 위험한 행동을 하지 않게 막는 안전성 연구들 정리해줘",
+"docs": [
+[
+"2412.17686",
+"Large Language Model Safety: A Holistic Survey"
+],
+[
+"2608.14590",
+"Toward Safe LLM Agents: A Survey of Specification, Verification, and Enforcement"
+],
+[
+"2604.00249",
+"A Safety-Aware Role-Orchestrated Multi-Agent LLM Framework for Behavioral Health Communication Simulation"
+],
+[
+"2502.10486",
+"VLM-Guard: Safeguarding Vision-Language Models via Fulfilling Safety Alignment Gap"
+],
+[
+"2603.20320",
+"The Causal Impact of Tool Affordance on Safety Alignment in LLM Agents"
+],
+[
+"2606.22673",
+"Agent MechSuits: Mechanistic Subspace Safety Steering for Multi-Turn CLI Agents"
+],
+[
+"2603.16734",
+"Differential Harm Propensity in Personalized LLM Agents: The Curious Case of Mental Health Disclosure"
+],
+[
+"2610.40516",
+"How I Aligned Your Model: Scaling Up Multilingual Safety Training with Templates"
+],
+[
+"2412.16339",
+"Deliberative Alignment: Reasoning Enables Safer Language Models"
+]
+]
+},
+{
+"t": "K060",
+"q": "LLM이 영어 초록을 한국어로 요약할 때 숫자나 부정 표현이 바뀌는 오류가 얼마나 생기는지, 번역·요약 충실도를 잰 연구가 있는가.",
+"docs": [
+[
+"2604.27920",
+"Beyond Semantics: Measuring Fine-Grained Emotion Preservation in Small Language Model-Based Machine Translation"
+],
+[
+"2503.21393",
+"An evaluation of LLMs and Google Translate for translation of selected Indian languages via sentiment and semantic analyses"
+],
+[
+"2402.13249",
+"TofuEval: Evaluating Hallucinations of LLMs on Topic-Focused Dialogue Summarization"
+]
+]
+},
+{
+"t": "K061",
+"q": "LLM으로 소프트웨어 버그를 찾는 연구들 정리해줘",
+"docs": [
+[
+"2606.29088",
+"Diff-Based Code Corruption using LLMs for Large-Scale Bugfix Benchmarking"
+],
+[
+"2412.14137",
+"Design choices made by LLM-based test generators prevent them from finding bugs"
+],
+[
+"2601.00254",
+"An Empirical Evaluation of LLM-Based Approaches for Code Vulnerability Detection: RAG, SFT, and Dual-Agent Systems"
+],
+[
+"2412.18750",
+"Order Matters! An Empirical Study on Large Language Models' Input Order Bias in Software Fault Localization"
+],
+[
+"2508.02611",
+"Meta-RAG on Large Codebases Using Code Summarization"
+]
+]
+},
+{
+"t": "K062",
+"q": "LLM이 만든 코드를 실행해 보고 오류 메시지를 보고 스스로 고치는 방법 다룬 논문 있어?",
+"docs": [
+[
+"2604.04324",
+"RESCORE: LLM-Driven Simulation Recovery in Control Systems Research Papers"
+],
+[
+"2412.11014",
+"CoopetitiveV: Leveraging LLM-powered Coopetitive Multi-Agent Prompting for High-quality Verilog Generation"
+]
+]
+},
+{
+"t": "K063",
+"q": "2025년 이후에 나온 LLM 기반 기계 번역 연구들 정리해줘",
+"docs": [
+[
+"2606.22269",
+"Evaluating Large Language Models for Hausa and Fongbe Machine Translation: Benchmarks, Failures, and Metric Reliability"
+],
+[
+"2604.27920",
+"Beyond Semantics: Measuring Fine-Grained Emotion Preservation in Small Language Model-Based Machine Translation"
+]
+]
+},
+{
+"t": "K064",
+"q": "검색할 때 질문을 가상의 답변 문서로 먼저 바꾼 뒤 그걸로 검색하는 방법을 다룬 논문 있어?",
+"docs": [
+[
+"2509.11552",
+"HiChunk: Evaluating and Enhancing Retrieval-Augmented Generation with Hierarchical Chunking"
+],
+[
+"2406.15187",
+"UDA: A Benchmark Suite for Retrieval Augmented Generation in Real-world Document Analysis"
+]
+]
+},
+{
+"t": "K065",
+"q": "RAG에서 쿼리 재작성하는 연구 아무거나 하나",
+"docs": [
+[
+"2411.13154",
+"DMQR-RAG: Diverse Multi-Query Rewriting for RAG"
+]
+]
+},
+{
+"t": "K066",
+"q": "QLoRA 논문 핵심 내용이랑 실험 결과 알려줘",
+"docs": [
+[
+"2305.14314",
+"QLoRA: Efficient Finetuning of Quantized LLMs"
+]
+]
+},
+{
+"t": "K067",
+"q": "긴 컨텍스트 연구들을 근거로 문서 QA 서비스에서 컨텍스트 길이를 얼마나 쓰는 게 좋을지 정리해줘",
+"docs": [
+[
+"2406.17419",
+"Leave No Document Behind: Benchmarking Long-Context LLMs with Extended Multi-Doc QA"
+],
+[
+"2502.09977",
+"LaRA: Benchmarking Retrieval-Augmented Generation and Long-Context LLMs -- No Silver Bullet for LC or RAG Routing"
+],
+[
+"2505.06569",
+"MacRAG: Compress, Slice, and Scale-up for Multi-Scale Adaptive Context RAG"
+],
+[
+"2409.18454",
+"Leveraging Long-Context Large Language Models for Multi-Document Understanding and Summarization in Enterprise Applications"
+],
+[
+"2404.06480",
+"Ada-LEval: Evaluating long-context LLMs with length-adaptable benchmarks"
+]
+]
+},
+{
+"t": "K068",
+"q": "ESG 보고서 작성을 LLM으로 돕는 연구 있으면 추천해줘",
+"docs": [
+[
+"2512.01289",
+"OntoMetric: An Ontology-Driven LLM-Assisted Framework for Automated ESG Metric Knowledge Graph Generation"
+]
+]
+},
+{
+"t": "K069",
+"q": "파인튜닝으로 지식을 넣는 거랑 RAG로 넣는 거는 결과가 어떻게 달라?",
+"docs": [
+[
+"2603.23047",
+"Parametric Knowledge and Retrieval Behavior in RAG Fine-Tuning for Electronic Design Automation"
+],
+[
+"2510.01600",
+"A Comparison of Independent and Joint Fine-tuning Strategies for Retrieval-Augmented Generation"
+]
+]
+},
+{
+"t": "K070",
+"q": "작은 모델에 시스템 프롬프트를 길게 주면 오히려 지시를 덜 따르는가. 프롬프트 길이에 따른 지시 준수율을 모델 크기별로 잰 연구가 있는가.",
+"docs": [
+[
+"2412.19450",
+"Find the Intention of Instruction: Comprehensive Evaluation of Instruction Understanding for Large Language Models"
+]
+]
+},
+{
+"t": "K071",
+"q": "임베딩 모델 벤치마크(MTEB 같은) 관련 연구들 알려줘",
+"docs": [
+[
+"2407.15831",
+"NV-Retriever: Improving text embedding models with effective hard-negative mining"
+],
+[
+"2409.15763",
+"IRSC: A Zero-shot Evaluation Benchmark for Information Retrieval through Semantic Comprehension in Retrieval-Augmented Generation Scenarios"
+],
+[
+"2403.20327",
+"Gecko: Versatile Text Embeddings Distilled from Large Language Models"
+],
+[
+"2603.19223",
+"F2LLM-v2: Inclusive, Performant, and Efficient Embeddings for a Multilingual World"
+]
+]
+},
+{
+"t": "K072",
+"q": "Self-Consistency랑 한 번만 생성하는 CoT는 정확도랑 비용이 어떻게 달라?",
+"docs": [
+[
+"2611.08403",
+"StepBack: Step-Level Error-Localized Resampling for Efficient Test-Time Reasoning"
+]
+]
+},
+{
+"t": "K073",
+"q": "임베딩 벡터를 양자화하면 검색 성능이 얼마나 떨어져?",
+"docs": [
+[
+"2503.19868",
+"GENIUS: A Generative Framework for Universal Multimodal Search"
+],
+[
+"1612.03651",
+"FastText.zip: Compressing text classification models"
+],
+[
+"2605.19972",
+"Block-Sphere Vector Quantization"
+]
+]
+},
+{
+"t": "K074",
+"q": "요즘 핫한 에이전트 논문 머있어",
+"docs": [
+[
+"2610.19159",
+"Into the Unknown: Benchmarking AI agents on open scientific research problems"
+],
+[
+"2606.24530",
+"NatureBench: Can Coding Agents Match the Published SOTA of Nature-Family Papers?"
+],
+[
+"2512.23880",
+"CASCADE: Cumulative Agentic Skill Creation through Autonomous Development and Evolution"
+]
+]
+},
+{
+"t": "K075",
+"q": "코딩 에이전트가 실제 깃허브 이슈를 몇 % 정도 해결해? 최신 결과 알려줘",
+"docs": [
+[
+"2606.12344",
+"Claw-SWE-Bench: A Benchmark for Evaluating OpenClaw-style Agent Harnesses on Coding Tasks"
+]
+]
+},
+{
+"t": "K076",
+"q": "모바일이나 엣지 기기에서 LLM을 돌리기 위한 경량화 연구들 정리해줘",
+"docs": [
+[
+"2504.13938",
+"Never Start from Scratch: Expediting On-Device LLM Personalization via Explainable Model Selection"
+],
+[
+"2409.15790",
+"Small Language Models: Survey, Measurements, and Insights"
+],
+[
+"2605.27358",
+"MobileMoE: Scaling On-Device Mixture of Experts"
+],
+[
+"2411.05046",
+"PhoneLM:an Efficient and Capable Small Language Model Family through Principled Pre-training"
+],
+[
+"2501.00042",
+"Resource-Efficient Transformer Architecture: Optimizing Memory and Execution Time for Real-Time Applications"
+],
+[
+"2412.12178",
+"Activation Sparsity Opportunities for Compressing General Large Language Models"
+],
+[
+"2503.22982",
+"PartialLoading: User Scheduling and Bandwidth Allocation for Parameter-sharing Edge Inference"
+],
+[
+"2605.17653",
+"LLMForge: Multi-Backend Hardware-Aware Neural Architecture Search with Infinite-Head Attention for Edge Language Models"
+]
+]
+},
+{
+"t": "K077",
+"q": "BM25와 밀집 검색을 합친 뒤 cross-encoder로 재순위할 때 첫 단계 후보 수를 늘리면 재순위 성능이 계속 오르는지 포화되는지 다룬 논문이 있는가.",
+"docs": [
+[
+"2610.31606",
+"How Ground Truth Shapes Retrieval Scores: Evidence-Aware Evaluation of a Retrieval-Augmented Generation System for Breast Lesions"
+]
+]
+},
+{
+"t": "K078",
+"q": "RETRO 논문 핵심 내용 알려줘",
+"docs": [
+[
+"2412.11472",
+"Leveraging Foundation Language Models (FLMs) for Automated Cohort Extraction from Large EHR Databases"
+]
+]
+},
+{
+"t": "K079",
+"q": "LLM 에이전트 도구 사용 관련 좋은 논문 세 편 추천해줘",
+"docs": [
+[
+"2603.24943",
+"FinMCP-Bench: Benchmarking LLM Agents for Real-World Financial Tool Use under the Model Context Protocol"
+],
+[
+"2511.13998",
+"LoCoBench-Agent: An Interactive Benchmark for LLM Agents in Long-Context Software Engineering"
+],
+[
+"2503.23037",
+"Agentic Large Language Models, a survey"
+]
+]
+},
+{
+"t": "K080",
+"q": "few-shot 프롬프팅이랑 파인튜닝은 데이터가 적을 때 성능이 어떻게 달라?",
+"docs": [
+[
+"2503.24307",
+"A Systematic Evaluation of LLM Strategies for Mental Health Text Analysis: Fine-tuning vs. Prompt Engineering vs. RAG"
+],
+[
+"2210.10723",
+"TabLLM: Few-shot Classification of Tabular Data with Large Language Models"
+]
+]
+},
+{
+"t": "K081",
+"q": "검색 시스템에서 사용자 클릭 기록을 활용한 연구 4개만 찾아줘",
+"docs": [
+[
+"2504.08762",
+"InteractiveSurvey: An LLM-based Personalized and Interactive Survey Paper Generation System"
+],
+[
+"2405.08120",
+"From Questions to Insightful Answers: Building an Informed Chatbot for University Resources"
+]
+]
+},
+{
+"t": "K082",
+"q": "긴 동영상에서 필요한 장면을 찾아서 질문에 답하는 연구 알려줘",
+"docs": [
+[
+"2603.18558",
+"HiMu: Hierarchical Multimodal Frame Selection for Long Video Question Answering"
+],
+[
+"2606.14702",
+"OmniVideo-100K: A Dataset for Audio-Visual Reasoning through Structured Scripts and Evidence Chains"
+],
+[
+"2610.18615",
+"VideoJev: System One Model for Video Understanding and Interaction"
+]
+]
+},
+{
+"t": "K083",
+"q": "LLM이 숫자 계산이나 단위 변환을 틀리지 않도록 외부 계산기를 쓰게 한 연구 있어?",
+"docs": [
+[
+"2406.19228",
+"Tools Fail: Detecting Silent Errors in Faulty Tools"
+],
+[
+"2407.00121",
+"Granite-Function Calling Model: Introducing Function Calling Abilities via Multi-task Learning of Granular Tasks"
+]
+]
+},
+{
+"t": "K084",
+"q": "LLM 답변에 성별이나 인종 편향이 있는지 측정하는 벤치마크 연구 알려줘",
+"docs": [
+[
+"2503.24310",
+"BEATS: Bias Evaluation and Assessment Test Suite for Large Language Models"
+],
+[
+"2402.10669",
+"Humans or LLMs as the Judge? A Study on Judgement Biases"
+]
+]
+},
+{
+"t": "K085",
+"q": "Chain-of-Thought 프롬프팅 논문 자세히 설명해줘",
+"docs": [
+[
+"2201.11903",
+"Chain-of-Thought Prompting Elicits Reasoning in Large Language Models"
+]
+]
+},
+{
+"t": "K086",
+"q": "요즘 재밌는 RAG 논문 추천해줘",
+"docs": [
+[
+"2411.08438",
+"Towards Optimizing a Retrieval Augmented Generation using Large Language Model on Academic Data"
+],
+[
+"2405.07437",
+"Evaluation of Retrieval-Augmented Generation: A Survey"
+]
+]
+},
+{
+"t": "K087",
+"q": "요리 레시피 생성 AI 논문 아무거나 하나 골라줘",
+"docs": [
+[
+"2507.21934",
+"Culinary Crossroads: A RAG Framework for Enhancing Diversity in Cross-Cultural Recipe Adaptation"
+]
+]
+},
+{
+"t": "K088",
+"q": "BERT 같은 인코더 임베딩이랑 디코더 LLM 임베딩은 검색 성능이 어떻게 달라?",
+"docs": [
+[
+"2611.00172",
+"From Fragmentation to Fusion: A Survey and Roadmap for Omnimodal Embeddings"
+]
+]
+},
+{
+"t": "K089",
+"q": "개인정보 보호하면서 LLM 학습하는 연구 추천해줘",
+"docs": [
+[
+"2412.16504",
+"Privacy in Fine-tuning Large Language Models: Attacks, Defenses, and Future Directions"
+]
+]
+},
+{
+"t": "K090",
+"q": "FlashAttention 논문 자세히 설명해줘",
+"docs": [
+[
+"2611.03344",
+"FLAMIA: FLAsh MIcroscaling Attention for Fast and Causally Safe Training on Blackwell"
+]
+]
+},
+{
+"t": "K091",
+"q": "요즘 나온 LLM 에이전트 논문 중에 볼만한 거 추천해줘",
+"docs": [
+[
+"2503.23037",
+"Agentic Large Language Models, a survey"
+],
+[
+"2412.14222",
+"A Survey on Large Language Model-based Agents for Statistics and Data Science"
+],
+[
+"2503.24047",
+"Towards Scientific Intelligence: A Survey of LLM-based Scientific Agents"
+],
+[
+"2312.07559",
+"PaperQA: Retrieval-Augmented Generative Agent for Scientific Research"
+]
+]
+},
+{
+"t": "K092",
+"q": "벡터 db 검색 빠르게 하는 연구 잇나",
+"docs": [
+[
+"2602.07297",
+"Progressive Searching for Retrieval in RAG"
+],
+[
+"2504.20018",
+"MINT: Multi-Vector Search Index Tuning"
+],
+[
+"2603.16360",
+"Fast Approximate Vector Joins via Offline-Online Co-Design"
+]
+]
+},
+{
+"t": "K093",
+"q": "LLM 판정자 여러 개를 모아 다수결하면 사람 평가와 일치도가 얼마나 올라가?",
+"docs": [
+[
+"2609.31215",
+"DIAL: Position-Debiased LLM Judges with Adaptive Human Preference Calibration"
+],
+[
+"2306.05685",
+"Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"
+]
+]
+},
+{
+"t": "K094",
+"q": "LLM 양자화 연구 입문용으로 읽을 만한 거",
+"docs": [
+[
+"2504.03717",
+"RaanA: A Fast, Flexible, and Data-Efficient Post-Training Quantization Algorithm"
+],
+[
+"2511.13023",
+"SLMQuant:Benchmarking Small Language Model Quantization for Practical Deployment"
+],
+[
+"2403.20137",
+"Accurate Block Quantization in LLMs with Outliers"
+]
+]
+},
+{
+"t": "K095",
+"q": "llm 할루시네이숀 줄이는 법 논문",
+"docs": [
+[
+"2310.18344",
+"Chainpoll: A high efficacy method for LLM hallucination detection"
+],
+[
+"2512.22396",
+"HalluMat: Detecting Hallucinations in LLM-Generated Materials Science Content Through Multi-Stage Verification"
+],
+[
+"2503.17229",
+"FactSelfCheck: Fact-Level Black-Box Hallucination Detection for LLMs"
+]
+]
+},
+{
+"t": "K096",
+"q": "논문 아무거나 재밌는거 하나 알려줘",
+"docs": []
+},
+{
+"t": "K097",
+"q": "RAG 환각을 줄이는 방법들을 논문 근거로 비용이 싼 순서대로 정리해줘",
+"docs": [
+[
+"2510.24476",
+"Mitigating Hallucination in Large Language Models (LLMs): An Application-Oriented Survey on RAG, Reasoning, and Agentic Systems"
+],
+[
+"2408.15533",
+"LRP4RAG: Detecting Hallucinations in Retrieval-Augmented Generation via Layer-wise Relevance Propagation"
+],
+[
+"2310.18344",
+"Chainpoll: A high efficacy method for LLM hallucination detection"
+],
+[
+"2502.17125",
+"LettuceDetect: A Hallucination Detection Framework for RAG Applications"
+],
+[
+"2311.05232",
+"A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions"
+],
+[
+"2407.10793",
+"GraphEval: A Knowledge-Graph Based LLM Hallucination Evaluation Framework"
+],
+[
+"2312.10997",
+"Retrieval-Augmented Generation for Large Language Models: A Survey"
+],
+[
+"2601.05264",
+"Engineering the RAG Stack: A Comprehensive Review of the Architecture and Trust Frameworks for Retrieval-Augmented Generation Systems"
+]
+]
+},
+{
+"t": "K098",
+"q": "축구 경기 전술 분석 AI 논문 재밌는 거 하나",
+"docs": [
+[
+"2503.23326",
+"Exploring Explainable Multi-agent MCTS-minimax Hybrids in Board Game Using Process Mining"
+],
+[
+"2412.17948",
+"Study of the Proper NNUE Dataset"
+]
+]
+},
+{
+"t": "K099",
+"q": "오픈소스 LLM이랑 상용 LLM은 RAG 답변 품질이 얼마나 차이 나? 비교한 연구 알려줘",
+"docs": [
+[
+"2412.12322",
+"RAG Playground: A Framework for Systematic Evaluation of Retrieval Strategies and Prompt Engineering in RAG Systems"
+]
+]
+},
+{
+"t": "K100",
+"q": "RAG 시스템 평가 지표를 제안한 연구들 정리해줘",
+"docs": [
+[
+"2408.08067",
+"RAGChecker: A Fine-grained Framework for Diagnosing Retrieval-Augmented Generation"
+],
+[
+"2504.07803",
+"A System for Comprehensive Assessment of RAG Frameworks"
+],
+[
+"2508.05650",
+"OmniBench-RAG: A Multi-Domain Evaluation Platform for Retrieval-Augmented Generation Tools"
+],
+[
+"2412.12322",
+"RAG Playground: A Framework for Systematic Evaluation of Retrieval Strategies and Prompt Engineering in RAG Systems"
+],
+[
+"2407.11005",
+"RAGBench: Explainable Benchmark for Retrieval-Augmented Generation Systems"
+],
+[
+"2602.20379",
+"Case-Aware LLM-as-a-Judge Evaluation for Enterprise-Scale RAG Systems"
+],
+[
+"2602.21553",
+"Revisiting RAG Retrievers: An Information Theoretic Benchmark"
+]
+]
+},
+{
+"t": "K101",
+"q": "KV 캐시를 페이지 단위로 관리해서 LLM 서빙 처리량을 올린 연구 설명해줘",
+"docs": [
+[
+"2607.22648",
+"PTStore (Prefix Tensor Store): Distributed Prefix Caching and Replication for High Throughput Inference Serving"
+]
+]
+},
+{
+"t": "K102",
+"q": "작은 언어 모델로 추론 능력을 끌어올린 연구 추천해줘",
+"docs": [
+[
+"2506.10408",
+"Reasoning RAG via System 1 or System 2: A Survey on Reasoning Agentic Retrieval-Augmented Generation for Industry Challenges"
+],
+[
+"2410.13293",
+"SBI-RAG: Enhancing Math Word Problem Solving for Students through Schema-Based Instruction and Retrieval-Augmented Generation"
+]
+]
+},
+{
+"t": "K103",
+"q": "임베딩 검색에서 질문은 짧고 문서는 길어서 유사도가 낮게 나온다. 문서 확장이나 질문 확장으로 이 길이 차이를 보정하는 방법을 비교한 연구가 있는가.",
+"docs": [
+[
+"2106.11251",
+"Pseudo-Relevance Feedback for Multiple Representation Dense Retrieval"
+],
+[
+"2505.21700",
+"Rethinking Chunk Size For Long-Document Retrieval: A Multi-Dataset Analysis"
+],
+[
+"2606.28367",
+"Beyond the Reranker: Do RAG Retrieval Enhancements Help Once a Strong Reranker Is Present?"
+]
+]
+},
+{
+"t": "K104",
+"q": "학습할 때보다 긴 입력을 처리하도록 위치 인코딩(RoPE)을 늘리는 방법 연구 있어?",
+"docs": [
+[
+"2602.05258",
+"CoPE: Clipped RoPE as A Scalable Free Lunch for Long Context LLMs"
+],
+[
+"2309.00071",
+"YaRN: Efficient Context Window Extension of Large Language Models"
+],
+[
+"2412.17739",
+"Fourier Position Embedding: Enhancing Attention's Periodic Extension for Length Generalization"
+]
+]
+},
+{
+"t": "K105",
+"q": "음성 인식 모델에 LLM을 붙이면 단어 오류율이 몇 % 줄어?",
+"docs": [
+[
+"2501.08421",
+"SEAL: Speaker Error Correction using Acoustic-conditioned Large Language Models"
+],
+[
+"2509.23630",
+"Game-Oriented ASR Error Correction via RAG-Enhanced LLM"
+],
+[
+"2501.10734",
+"GEC-RAG: Improving Generative Error Correction via Retrieval-Augmented Generation for Automatic Speech Recognition Systems"
+]
+]
+},
+{
+"t": "K106",
+"q": "의료 분야 LLM 연구 괜찮은 논문 하나 골라줘",
+"docs": [
+[
+"2412.19260",
+"MEDEC: A Benchmark for Medical Error Detection and Correction in Clinical Notes"
+],
+[
+"2412.10849",
+"Superhuman performance of a large language model on the reasoning tasks of a physician"
+]
+]
+},
+{
+"t": "K107",
+"q": "교육 분야에서 LLM을 튜터로 쓴 연구들 정리해줘",
+"docs": [
+[
+"2412.11995",
+"Combining Large Language Models with Tutoring System Intelligence: A Case Study in Caregiver Homework Support"
+],
+[
+"2412.11255",
+"Do Tutors Learn from Equity Training and Can Generative AI Assess It?"
+],
+[
+"2412.08430",
+"Assessing Personalized AI Mentoring with Large Language Models in the Computing Field"
+],
+[
+"2410.13293",
+"SBI-RAG: Enhancing Math Word Problem Solving for Students through Schema-Based Instruction and Retrieval-Augmented Generation"
+],
+[
+"2610.40563",
+"Comparing Human Role-Players and LLM-Simulated Clients in Online Counselling Training: An Analysis of Counselling Patterns"
+],
+[
+"2405.06681",
+"Leveraging Lecture Content for Improved Feedback: Explorations with GPT-4 and Retrieval Augmented Generation"
+],
+[
+"2406.07796",
+"Battling Botpoop using GenAI for Higher Education: A Study of a Retrieval Augmented Generation Chatbots Impact on Learning"
+]
+]
+},
+{
+"t": "K108",
+"q": "코드 생성 모델이 저장소 전체 파일을 참고하도록 검색을 붙인 연구 있어?",
+"docs": [
+[
+"2503.22424",
+"Issue Localization via LLM-Driven Iterative Code Graph Searching"
+]
+]
+},
+{
+"t": "K109",
+"q": "여러 추론 경로를 트리처럼 펼쳐서 탐색하면서 답을 찾는 방법 다룬 논문 설명해줘",
+"docs": [
+[
+"2407.00320",
+"LiteSearch: Efficacious Tree Search for LLM"
+],
+[
+"2412.18319",
+"Mulberry: Empowering MLLM with o1-like Reasoning and Reflection via Collective Monte Carlo Tree Search"
+],
+[
+"2412.12881",
+"RAG-Star: Enhancing Deliberative Reasoning with Retrieval Augmented Verification and Refinement"
+]
+]
+},
+{
+"t": "K110",
+"q": "지진 조기 경보 딥러닝 연구 괜찮은 논문 알려줘",
+"docs": [
+[
+"2412.18099",
+"An Attention-based Framework with Multistation Information for Earthquake Early Warnings"
+]
+]
+},
+{
+"t": "K111",
+"q": "KV 캐시를 양자화하면 메모리를 몇 배 줄일 수 있어?",
+"docs": [
+[
+"2503.24358",
+"SQuat: Subspace-orthogonal KV Cache Quantization"
+],
+[
+"2406.03482",
+"QJL: 1-Bit Quantized JL Transform for KV Cache Quantization with Zero Overhead"
+],
+[
+"2506.18879",
+"CommVQ: Commutative Vector Quantization for KV Cache Compression"
+]
+]
+},
+{
+"t": "K112",
+"q": "LLM이 긴 대화에서 앞에서 한 말과 모순되는 답을 하는지 검사하는 연구 있어?",
+"docs": [
+[
+"2504.00180",
+"Contradiction Detection in RAG Systems: Evaluating LLMs as Context Validators for Improved Information Consistency"
+],
+[
+"2402.13249",
+"TofuEval: Evaluating Hallucinations of LLMs on Topic-Focused Dialogue Summarization"
+],
+[
+"2606.06748",
+"Evidence Graph Consistency in Retrieval-Augmented Generation: A Model-Dependent Analysis of Hallucination Detection"
+],
+[
+"2601.06519",
+"MedRAGChecker: Claim-Level Verification for Biomedical Retrieval-Augmented Generation"
+]
+]
+},
+{
+"t": "K113",
+"q": "GraphRAG랑 일반 벡터 검색 RAG는 어떤 질문에서 성능이 갈려?",
+"docs": [
+[
+"2601.08773",
+"Reliable Graph-RAG for Codebases: AST-Derived Graphs vs LLM-Extracted Knowledge Graphs"
+],
+[
+"2503.21322",
+"HyperGraphRAG: Retrieval-Augmented Generation via Hypergraph-Structured Knowledge Representation"
+],
+[
+"2602.03578",
+"Use Graph When It Needs: Efficiently and Adaptively Integrating Retrieval-Augmented Generation with Graphs"
+]
+]
+},
+{
+"t": "K114",
+"q": "LLM이 답을 생성하는 도중에 확신이 낮아지면 그때 검색을 다시 하는 연구 알려줘",
+"docs": [
+[
+"2405.18727",
+"CtrlA: Adaptive Retrieval-Augmented Generation via Inherent Control"
+],
+[
+"2602.13571",
+"LLM-Confidence Reranker: A Training-Free Approach for Enhancing Retrieval-Augmented Generation Systems"
+],
+[
+"2511.10621",
+"SSR: Socratic Self-Refine for Large Language Model Reasoning"
+]
+]
+},
+{
+"t": "K115",
+"q": "작은 모델로 RAG 답변 품질을 높이는 방법들을 논문 근거로 우선순위 매겨줘",
+"docs": [
+[
+"2404.13781",
+"Evaluating Retrieval Quality in Retrieval-Augmented Generation"
+],
+[
+"2411.08438",
+"Towards Optimizing a Retrieval Augmented Generation using Large Language Model on Academic Data"
+],
+[
+"2511.01386",
+"RAGSmith: A Framework for Finding the Optimal Composition of Retrieval-Augmented Generation Methods Across Datasets"
+],
+[
+"2402.02764",
+"List-aware Reranking-Truncation Joint Model for Search and Retrieval-augmented Generation"
+]
+]
+},
+{
+"t": "K116",
+"q": "멀티모달 LLM이 이미지 속 글자를 읽는 능력을 평가한 연구들 조사해줘",
+"docs": [
+[
+"2501.00321",
+"OCRBench v2: An Improved Benchmark for Evaluating Large Multimodal Models on Visual Text Localization and Reasoning"
+],
+[
+"2410.13611",
+"H2OVL-Mississippi Vision Language Models Technical Report"
+],
+[
+"2603.27942",
+"JaWildText: A Benchmark for Vision-Language Models on Japanese Scene Text Understanding"
+]
+]
+},
+{
+"t": "K117",
+"q": "LLM이 학습 데이터에 있던 개인정보를 그대로 외워서 내뱉는 문제를 다룬 연구 있어?",
+"docs": [
+[
+"2606.21710",
+"PrivacyAlign: Contextual Privacy Alignment for LLM Agents"
+],
+[
+"2409.20163",
+"MemSim: A Bayesian Simulator for Evaluating Memory of LLM-based Personal Assistants"
+]
+]
+},
+{
+"t": "K118",
+"q": "음성 인식 모델 논문 읽을 만한 거 두 편",
+"docs": [
+[
+"2407.00463",
+"Open-Source Conversational AI with SpeechBrain 1.0"
+],
+[
+"2604.02043",
+"Tracking the emergence of linguistic structure in self-supervised models learning from speech"
+]
+]
+},
+{
+"t": "K119",
+"q": "RAG에서 검색 결과가 별로면 웹 검색으로 보충하고 문서를 걸러내는 방법 다룬 논문 있어?",
+"docs": [
+[
+"2409.15364",
+"VERA: Validation and Enhancement for Retrieval Augmented systems"
+]
+]
+},
+{
+"t": "K120",
+"q": "날씨 예보에 트랜스포머를 쓴 연구 있어?",
+"docs": [
+[
+"2503.22235",
+"WeatherMesh-3: Fast and accurate operational global weather forecasting"
+],
+[
+"2412.10450",
+"Regional Weather Variable Predictions by Machine Learning with Near-Surface Observational and Atmospheric Numerical Data"
+],
+[
+"2412.18097",
+"LangYa: Revolutionizing Cross-Spatiotemporal Ocean Forecasting"
+]
+]
+}
+]

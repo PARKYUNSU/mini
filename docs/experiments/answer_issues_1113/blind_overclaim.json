@@ -1,0 +1,431 @@
+[
+{
+"t": "K001",
+"q": "추론 모델을 강화학습으로 학습시키는 좋은 논문 추천해줘",
+"s": "따라서 두 논문 모두 강화학습 기반 추론 모델의 성능 향상에 초점을 맞추지만, [2503.20139v1]은 모델 정확도 확보의 어려움을 지적하고, [2603.08706v1]은 구체적인 점수 향상과 일반화 능력을 통해 실제 적용 가능성을 입증한다.",
+"miss": [],
+"src": [
+[
+"2503.20139",
+" [초록] Model-based reinforcement learning (MBRL) has demonstrated superior sample efficiency compared to model-free reinforcement learning (MFRL). However, the presence of inaccurate models can introduce biases during policy learning, resulting in misleading trajectories. The challenge lies in obtaining accurate models due to limited diverse training data, particularly in regions with limited visits (uncertain regions). Existing approaches passively quantify uncertainty after sample generation, failing to actively collect uncertain samples that could enhance state coverage and improve model accuracy. Moreover, MBRL often faces difficulties in making accurate multi-step predictions, thereby im"
+],
+[
+"2603.08706",
+" [초록] Training large language models (LLMs) as autonomous agents often begins with imitation learning, but it only teaches agents what to do without understanding why: agents never contrast successful actions against suboptimal alternatives and thus lack awareness of action quality. Recent approaches attempt to address this by introducing self-reflection supervision derived from contrasts between expert and alternative actions. However, the training paradigm fundamentally remains imitation learning: the model imitates pre-constructed reflection text rather than learning to reason autonomously. We propose Agentic Critical Training (ACT), a reinforcement learning paradigm that trains agents to"
+]
+]
+},
+{
+"t": "K004",
+"q": "에이전트가 작업 계획을 먼저 세운 뒤 단계별로 실행하는 방식을 다룬 연구 핵심 내용 알려줘",
+"s": "훈련된 메인 에이전트만 학습하며, 모든 하위 에이전트는 고정되어 오케스트레이션과 실행 능력을 분리한다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"s": "서론\nLLM을 활용한 수학 증명 자동화 연구는 대규모 수학 데이터셋 학습, 증명 생성·검증 벤치마크 구축, 그리고 AI‑지원 형식적 증명 검색 등 다양한 접근법을 포함하고 있습니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"s": "Rango: Coq용 자동 증명 합성 도구로, 현재 프로젝트에서 관련 전제와 유사 증명을 식별·활용하여 증명 컨텍스트에 관련 증명을 추가하면 증명한 정리 수가 47% 증가합니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"s": "AI‑Driven Formal Proof Search: AI가 보조하는 형식적 증명 검색의 효과와 이를 가능하게 하는 에이전트 설계에 대한 통찰을 제공합니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"s": "AdvancedMathBench: 고급 수학 증명 생성·검증을 평가하기 위한 벤치마크套件으로, GPT‑5.5‑xhigh가 UG 및 QE 분할에서 각각 64.5와 48.9의 점수를 기록하고, 모델 간 증명 생성과 검증 능력 사이에 큰 불일치가 존재함을 보여줍니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"s": "DEMI‑MathAnalysis: 수열·극한, 무한급수, 볼록함수 등 분석학 주제에 대한 증명 기반 문제를 포함한 데이터셋을 구축하고, 이를 통해 LLM을 파인튜닝하여 논리적·완전한·우아한 증명을 생성하는 능력을 크게 향상시켰습니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"s": "[2412.16075v1]\n\n결론\n제공된 문서들은 LLM 기반 수학 증명 자동화 연구에서 모델 성능과 한계를 평가한 결과를 제시하고 있습니다.",
+"miss": [],
+"src": [
+[
+"2412.16075",
+" [초록] Extensive efforts on AI4Math have mirrored techniques in NLP, in particular, training large language models on carefully curated math datasets in text form. However, significant challenges remain to be solved for AI to truly master mathematics and achieve broader impact. --- "
+]
+]
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"s": "먼저, Rango는 관련 증명을 컨텍스트에 추가함으로써 정리된 정리의 수를 47% 증가시켰으며[2412.14063v3], DEMI-MathAnalysis 데이터셋을 이용한 파인튜닝은 논리적이며 완전하고 우아한 증명 생성 능력에서 유의미한 향상을 보였습니다[2501.00059v1].",
+"miss": [],
+"src": [
+[
+"2412.14063",
+" [초록] We present Rango, a fully automated proof synthesis tool for Coq that automatically identifies relevant premises and also similar proofs from the current project and uses them during synthesis. Our evaluation also shows that Rango adding relevant proofs to its context leads to a 47% increase in the number of theorems proven. --- "
+],
+[
+"2501.00059",
+" [초록] We developed the DEMI-MathAnalysis dataset, comprising proof-based problems from mathematical analysis topics such as Sequences and Limits, Infinite Series, and Convex Functions. Through fine-tuning LLMs on this dataset and employing our framework, we observed significant improvements in their capability to generate logical, complete, and elegant proofs. --- "
+]
+]
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"s": "반면, AdvancedMathBench 벤치마크에서는 GPT-5.5-xhigh 모델이 UG와 QE 서브셋에서 각각 64.5와 48.9의 점수만을 달성했을 뿐이며, 이는 증명 생성과 검증 능력 사이에 큰 불일치가 있음을 보여줍니다[2607.11849v2].",
+"miss": [],
+"src": [
+[
+"2607.11849",
+" [초록] To bridge this gap, we introduce AdvancedMathBench, a benchmark suite designed to evaluate the reasoning capabilities of LLMs on advanced mathematical proofs. On proof generation, the best-performing model, GPT-5.5-xhigh, achieves only 64.5 and 48.9 on the UG and QE splits, respectiv… Further analysis reveals a notable mismatch between proof generation and verification capabilities across models. --- "
+]
+]
+},
+{
+"t": "K008",
+"q": "LLM으로 수학 증명을 자동으로 하는 연구 5개 찾아줘",
+"s": "이러한 결과들은 데이터 구성과 평가 기준에 따라 LLM의 수학 증명 능력이 크게 달라진다는 점을 시사합니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K010",
+"q": "RAG 평가 방법 다룬 논문 읽을 만한 거 알려줘",
+"s": "크게 향상됨을 입증했습니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K017",
+"q": "언어별로 LLM 성능이 얼마나 차이 나는지 다룬 다국어 연구들 조사해줘",
+"s": "Multi-OphthaLingua: 첫 번째 다국어 안과 질문‑답변 벤치마크를 소개하고, 모든 언어에서 성능을 향상시키며 다국어 편향 격차를 크게 감소시켰습니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K017",
+"q": "언어별로 LLM 성능이 얼마나 차이 나는지 다룬 다국어 연구들 조사해줘",
+"s": "먼저 [2412.14304v1]은 다국어 의학적 QA 벤치마크를 통해 모든 언어에서 성능을 향상시키고 다국어 편차 격차를 크게 줄였다고 보고합니다[2412.14304v1].",
+"miss": [],
+"src": [
+[
+"2412.14304",
+" [초록] This study introduces the first multilingual ophthalmological question-answering benchmark with manually curated questions parallel across languages, allowing for direct cross-lingual comparisons. Our approach not only improves performance across all languages but also significantly reduces the multilingual bias gap, facilitating equitable LLM application across the globe. --- "
+],
+[
+"2412.14304",
+" [초록] This study introduces the first multilingual ophthalmological question-answering benchmark with manually curated questions parallel across languages, allowing for direct cross-lingual comparisons. Our approach not only improves performance across all languages but also significantly reduces the multilingual bias gap, facilitating equitable LLM application across the globe. --- "
+]
+]
+},
+{
+"t": "K018",
+"q": "리랭커를 cross-encoder로 바꿨더니 top-5 정밀도는 올랐지만 지연이 3배가 됐다. 이 트레이드오프를 정량적으로 다룬 논문이 있는가, 있다면 어떤 조건에서 리랭킹을 생략해도 되는가.",
+"s": "jina-reranker-v3: 0.6B 파라미터 다국어 리스트위즈 리랭커로, “last but not late” 상호작용을 도입해 쿼리와 모든 후보 문서를 동일한 컨텍스트 윈도우에서 인과적 주의로 연결하고, 최종 토큰에서 컨텍스트 임베딩을 추출한다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K018",
+"q": "리랭커를 cross-encoder로 바꿨더니 top-5 정밀도는 올랐지만 지연이 3배가 됐다. 이 트레이드오프를 정량적으로 다룬 논문이 있는가, 있다면 어떤 조건에서 리랭킹을 생략해도 되는가.",
+"s": "[2509.25085v4] BEIR 평가에서 모든 리랭커 중 가장 높은 점수인 61.85를 기록해 영어 검색에 대한 새로운 상태‑of‑the‑art 성능을 수립한다.",
+"miss": [],
+"src": [
+[
+"2509.25085",
+" [초록] jina-reranker-v3 is a 0.6B-parameter multilingual listwise reranker that introduces a novel \"last but not late\" interaction. Unlike late interaction models like ColBERT that encode documents separately before multi-vector matching, our approach applies causal attention between the query and all candidate documents in the same context window, enabling rich interactions before extracting contextual embeddings from each document's final token. The new model achieves state-of-the-art BEIR performance with 61.94 nDCG@10 while being significantly smaller than other models with comparable performance. ## **5.2 Overall Performance Across Benchmarks** Table 2 demonstrates `jina-reranker-v3` ’s "
+]
+]
+},
+{
+"t": "K021",
+"q": "코드 생성 LLM 연구 중에 재밌는 논문 하나 골라줘",
+"s": "HumanEval와 MBPP에서 각각 최대 67%·65%의 점수를 기록하고, MultiPL‑E에서도 모든 공개 모델보다",
+"miss": [],
+"src": []
+},
+{
+"t": "K022",
+"q": "그래프 신경망 연구 중 재밌는 거 하나 알려줘",
+"s": "세 번째로, [2406.15575v1]은 대규모 그래프 벤치마크에서 Sketch-GNN이 전산 복잡도가 선형 미만이며, 풀사이즈 GNN 대비 확장성과 경쟁력 있는 성능을 입증했습니다.",
+"miss": [],
+"src": [
+[
+"2406.15575",
+" [초록] Graph Neural Networks (GNNs) are widely applied to graph learning problems such as node classification. When scaling up the underlying graphs of GNNs to a larger size, we are forced to either train on the complete graph and keep the full graph adjacency and node embeddings in memory (which is often infeasible) or mini-batch sample the graph (which results in exponentially growing computational complexities with respect to the number of GNN layers). Various sampling-based and historical-embedding-based methods are proposed to avoid this exponential growth of complexities. However, none of these solutions eliminates the linear dependence on graph size. This paper proposes a sketch-based "
+]
+]
+},
+{
+"t": "K024",
+"q": "LLM을 심판으로 쓰는 평가 연구 볼 만한 거 추천해줘",
+"s": "[2406.12624v6]은 가장 크고 성능이 좋은 모델조차 인간과의 정렬이 완벽하지 않으며, 점수 차이가 최대 5점에 달할 수 있다고 보고한다.",
+"miss": [],
+"src": [
+[
+"2406.12624",
+" [초록] Offering a promising solution to the scalability challenges associated with human evaluation, the LLM-as-a-judge paradigm is rapidly gaining traction as an approach to evaluating large language models (LLMs). However, there are still many open questions about the strengths and weaknesses of this paradigm, and what potential biases it may hold. In this paper, we present a comprehensive study of the performance of various LLMs acting as judges, focusing on a clean scenario in which inter-human agreement is high. Investigating thirteen judge models of different model sizes and families, judging answers of nine different 'examtaker models' - both base and instruction-tuned - we find that o"
+]
+]
+},
+{
+"t": "K028",
+"q": "프롬프트 압축 연구 중 괜찮은 논문 있으면 알려줘",
+"s": "SCOPE는 질문‑응답 및 요약 과제와 다양한 도메인 데이터를 활용해 높은 압축 비율에서도 우수한 품질과 안정성을 입증한다[2508.15813v1].",
+"miss": [],
+"src": [
+[
+"2508.15813",
+" [초록] Prompt compression methods enhance the efficiency of Large Language Models (LLMs) and minimize the cost by reducing the length of input context. The goal of prompt compression is to shorten the LLM prompt while maintaining a high generation quality. However, existing solutions, mainly based on token removal, face challenges such as information loss and structural incoherence, like missing grammar elements in a sentence, or incomplete word phrases after token removal. Such challenges limit the final generation quality of LLM. To overcome these limitations, we present a novel generative prompt compression method. Unlike the existing token removal methods, our method centers at a chunking"
+]
+]
+},
+{
+"t": "K029",
+"q": "LLM을 추천 시스템에 붙여서 추천 품질을 높인 연구 있어?",
+"s": "실세계 설정에서 일관되게 우수한 성능을 보였다는 실험 결과가 제시된다[2601.08148v1].",
+"miss": [],
+"src": [
+[
+"2601.08148",
+" [초록] Rich and informative profiling to capture user preferences is essential for improving recommendation quality. However, there is still no consensus on how best to construct and utilize such profiles. To address this, we revisit recent profiling-based approaches in recommender systems along four dimensions: 1) knowledge base, 2) preference indicator, 3) impact range, and 4) subject. We argue that large language models (LLMs) are effective at extracting compressed rationales from diverse knowledge sources, while knowledge graphs (KGs) are better suited for propagating these profiles to extend their reach. Building on this insight, we propose a new recommendation model, called SPiKE. SPiKE"
+]
+]
+},
+{
+"t": "K029",
+"q": "LLM을 추천 시스템에 붙여서 추천 품질을 높인 연구 있어?",
+"s": "이러한 연구들은 각각 협업 필터링과 결합하거나, 지식 그래프를 활용하는 등 다양한 접근법을 통해 LLM이 추천 품질 향상에 기여함을 입증하고 있다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K036",
+"q": "임베딩 모델 학습 최신 연구 두 편 골라줘",
+"s": "두 연구 모두 다국어 임베딩 분야에서 기존 모델을 능가하는 성능을 입증했지만, 평가 대상 벤치마크 수와 강조된 언어 범주에 차이가 있다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K037",
+"q": "지식 증류로 만든 작은 모델은 원래 큰 모델 성능의 몇 %까지 따라가?",
+"s": "Per-Condition Calibration Diagnosis (PCCD): 거부 패턴 보존, 커밋된 답변의 컨텍스트 추종, 능력 보존을 평가하는 세 단계 프로토콜을 제안하고, 현재 그리드에서 모든 단계를 통과하는 구성이 없다고 보고합니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K037",
+"q": "지식 증류로 만든 작은 모델은 원래 큰 모델 성능의 몇 %까지 따라가?",
+"s": "이러한 결과는 지식 증류가 항상 큰 모델 성능을 그대로 따라가지 않으며, 특정 조건에서는 오히려 성능이 저하될 수 있음을 보여준다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K040",
+"q": "2025년에 나온 딥 리서치(검색 에이전트) 연구들 정리해줘",
+"s": "※ 요청한 기간(2025년)에 나온 논문은 찾지 못해, 기간 밖 논문으로 답했습니다.",
+"miss": [
+"2025"
+],
+"src": []
+},
+{
+"t": "K040",
+"q": "2025년에 나온 딥 리서치(검색 에이전트) 연구들 정리해줘",
+"s": "서론\n2025년 이후에 발표된 딥 리서치(검색 에이전트) 연구들은 다중 에이전트 협업, 지식 분석 프레임워크, 아이디어 진화 관리, 오류 국소화, 다국어 평가 등 다양한 측면에서 에이전트의 성능을 향상시키고 평가 인프라를 구축하고 있다.",
+"miss": [
+"2025"
+],
+"src": []
+},
+{
+"t": "K041",
+"q": "REPLUG 논문 요약해줘",
+"s": "Language Models are Few-Shot Learners: 대규모 사전 학습 언어 모델을 사용하여 태스크에 무관한 퓨샷 성능을 크게 향상시키고, GPT‑3와 같은 1750억 파라미터 규모의 모델은 그래디언트 업데이트 없이도 텍스트 상호작용만으로 다양한 NLP 작업에서 강력한 성능을 보인다는 결과를 제시한다.",
+"miss": [
+"1750"
+],
+"src": []
+},
+{
+"t": "K045",
+"q": "법률 분야에 LLM을 적용한 연구 찾아줘",
+"s": "두 번째로, 다중 에이전트 프레임워크와 INLegalLlama는 각각 법적 판단 예측 과제에서 기존 LLM 기반 방법을 능가하는 성능과 결정 품질을 달성했으며, 이는 다양한 법률 시나리오에 대한 모델의 능력을 입증합니다",
+"miss": [],
+"src": []
+},
+{
+"t": "K046",
+"q": "전문가 혼합(MoE) 모델에서 토큰을 어느 전문가에게 보낼지 정하는 라우팅을 개선한 연구 알려줘",
+"s": "일관되게 라우팅 품질과 하류 성능을 향상시킨다",
+"miss": [],
+"src": []
+},
+{
+"t": "K048",
+"q": "학생이 쓴 서술형 답안을 LLM으로 자동 채점하는 연구 알려줘",
+"s": "Engineering Short Answer Feedback (EngSAF): 다양한 공학 분야에 걸친 약 5,800개의 질문·답안 데이터를 수집하고, 최신 대형 언어 모델(LLM)을 활용해 라벨‑인지형 합성 피드백 생성(LASFG) 전략으로 자동 채점 및 피드백을 제공합니다.",
+"miss": [
+"800"
+],
+"src": []
+},
+{
+"t": "K059",
+"q": "LLM 에이전트가 위험한 행동을 하지 않게 막는 안전성 연구들 정리해줘",
+"s": "VLM-Guard: VLM의 LLM 구성 요소를 감독으로 활용해 안전 정렬 간극을 메우고, 악성 지시 설정에서 VLM 보호 효과를 입증한다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K059",
+"q": "LLM 에이전트가 위험한 행동을 하지 않게 막는 안전성 연구들 정리해줘",
+"s": "Tool Affordance Impact on Safety Alignment: 도구 접근이 도입되면 텍스트‑만 평가에서는 완벽한 준수를 유지하지만, 실제 위험 위반률이 최대 85%까지 급증한다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K063",
+"q": "2025년 이후에 나온 LLM 기반 기계 번역 연구들 정리해줘",
+"s": "서론\n2025년 이후 발표된 LLM 기반 기계 번역 연구들은 다양한 언어와 모델에 대한 성능 평가 및 감정 보존 능력을 탐구한다.",
+"miss": [
+"2025"
+],
+"src": []
+},
+{
+"t": "K063",
+"q": "2025년 이후에 나온 LLM 기반 기계 번역 연구들 정리해줘",
+"s": "Hausa는 인간 점수 4.0‑4.5/5로 수용 가능한 품질을 보였으나 Fongbe는 1.0‑2.2/5로 낮은 품질을 나타냈으며, 모든 시스템에서 일관된 3배 BLEU 격차가 관찰되었다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K063",
+"q": "2025년 이후에 나온 LLM 기반 기계 번역 연구들 정리해줘",
+"s": "따라서 2025년 이후 LLM 기반 기계 번역 연구는 언어별 성능 차이와 감정 유지라는 두 가지 주요 흐름으로 구분된다.",
+"miss": [
+"2025"
+],
+"src": []
+},
+{
+"t": "K066",
+"q": "QLoRA 논문 핵심 내용이랑 실험 결과 알려줘",
+"s": "이러한 결과는 작은 고품질 데이터셋으로도 이전 SOTA를 능가하는 성능을 달성한다는 점을 입증합니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K067",
+"q": "긴 컨텍스트 연구들을 근거로 문서 QA 서비스에서 컨텍스트 길이를 얼마나 쓰는 게 좋을지 정리해줘",
+"s": "일관되게 우수한 성능을 보인다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K069",
+"q": "파인튜닝으로 지식을 넣는 거랑 RAG로 넣는 거는 결과가 어떻게 달라?",
+"s": "RAG (검색 증강 생성): 독립·공동·두 단계 파인튜닝 전략을 비교한 연구에서 모든 전략이 EM·F1 점수에서 비슷한 향상을 보였으며, 데이터셋에 컨텍스트 레이블이 포함되는지와 학습률 그리드 검색 필요성에 따라 최적 전략이 달라진다고 결론냈습니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K071",
+"q": "임베딩 모델 벤치마크(MTEB 같은) 관련 연구들 알려줘",
+"s": "Gecko: MTEB에서 256 차원 모델이 기존 모든 항목보다",
+"miss": [],
+"src": []
+},
+{
+"t": "K073",
+"q": "임베딩 벡터를 양자화하면 검색 성능이 얼마나 떨어져?",
+"s": "우수함을 증명하고, 실제 임베딩 데이터셋과 긴 컨텍스트 LLM 추론 작업에서도 실용적인 이득을 보였다고 보고합니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K074",
+"q": "요즘 핫한 에이전트 논문 머있어",
+"s": "이러한 작업은 에이전트가 복잡한 과학적 맥락을 이해하고, 실험 설계·결과 해석·논문 작성까지 일관되게 수행해야 하므로 매우 어렵습니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K074",
+"q": "요즘 핫한 에이전트 논문 머있어",
+"s": "9개의 프론티어 에이전트가 각 15편씩 총 135편의 후속 논문을 생성했으나, 모든 조건을 만족하는 사례는 없으며 대부분 무작위 주장이나 증거와 모순되는 수치를 포함했습니다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K078",
+"q": "RETRO 논문 핵심 내용 알려줘",
+"s": "Guided Multi‑Dataset Cohort Extraction: 자연어 기반 선택 기준을 쿼리로 변환하고, FLM을 이용해 관심 컬럼을 자동으로 매칭한 뒤 모든 데이터베이스에 걸쳐 쿼리를 실행하여 코호트를 추출하는 알고리즘을 제안·평가하였다.",
+"miss": [],
+"src": []
+},
+{
+"t": "K082",
+"q": "긴 동영상에서 필요한 장면을 찾아서 질문에 답하는 연구 알려줘",
+"s": "이 방식은 16 프레임에서 Qwen3‑VL 8B가 모든 경쟁 선택기를 능회하며, GPT‑4o와 결합하면 32‑512 프레임의 에이전트 시스템보다",
+"miss": [],
+"src": []
+},
+{
+"t": "K082",
+"q": "긴 동영상에서 필요한 장면을 찾아서 질문에 답하는 연구 알려줘",
+"s": "[2610.18615v1]\n\n결론\nHiMu는 Video-MME, LongVideoBench, HERBench-Lite에서 16 프레임으로 Qwen3-VL 8B를 사용해 모든 경쟁 선택기를 능가하고, GPT-4o와 함께 32~512 프레임을 사용하는 에이전트 시스템보다",
+"miss": [],
+"src": [
+[
+"2610.18615",
+" [초록] Visual agents must turn video observations into timely decisions to track progress and choose what to do next. Building on the emerging System One paradigm, we introduce VideoJev, a family of models that cast video understanding and interaction as structured decision tasks. We adapt pretrained multimodal large language models (MLLMs) by replacing autoregressive answer decoding with a shared head that scores temporal intervals and textual options against video evidence. These scores yield event spans or answer choices, unifying temporal grounding and multiple-choice video question answering. This combines the semantic flexibility of MLLMs with efficient decisions that agents can use dir"
+]
+]
+},
+{
+"t": "K108",
+"q": "코드 생성 모델이 저장소 전체 파일을 참고하도록 검색을 붙인 연구 있어?",
+"s": "[2503.22424v3] 저장소 내 모든 의존 관계를 파싱하여 대형 그래프 인덱스를 구축하고, LLM이 검색 도구를 활용해 멀티‑홉 추론으로 관련 엔티티를 찾도록 합니다.",
+"miss": [],
+"src": [
+[
+"2503.22424",
+" [초록] Issue solving aims to generate patches to fix reported issues in real-world code repositories according to issue descriptions. Issue localization forms the basis for accurate issue solving. Recently, LLM-based issue localization methods have demonstrated state-of-the-art performance. However, these methods either search from files mentioned in issue descriptions or in the whole repository and struggle to balance the breadth and depth of the search space to converge on the target efficiently. Moreover, they allow LLM to explore whole repositories freely, making it challenging to control the search direction to prevent the LLM from searching for incorrect targets. This paper introduces C"
+]
+]
+},
+{
+"t": "K112",
+"q": "LLM이 긴 대화에서 앞에서 한 말과 모순되는 답을 하는지 검사하는 연구 있어?",
+"s": "분석 결과, 모든 모델 크기를 막론하고 LLM은 대화 도메인에서 상당량의 사실 오류를 발생시키며, GPT‑4와 같은 대형 모델조차 전문적인 사실성 평가 메트릭보다",
+"miss": [],
+"src": []
+},
+{
+"t": "K116",
+"q": "멀티모달 LLM이 이미지 속 글자를 읽는 능력을 평가한 연구들 조사해줘",
+"s": "H2OVL-Mississippi: 3700만 개의 이미지‑텍스트 쌍으로 학습된 두 개의 소형 VLM이며, OCRBench의 텍스트 인식 부분에서 최상위 성능을 달성하고 기존 대형 모델보다",
+"miss": [
+"3700"
+],
+"src": []
+}
+]
