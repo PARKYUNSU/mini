@@ -77,3 +77,13 @@ def test_fix_out_of_period_conclusion_connective():
            "<b>결론</b>\n2024년 이전 연구들은 성공률이 높다[2512.24044v1]. 또한 다중 턴은 비용이 크다[2503.04856v3].")
     concl = fix_out_of_period("2024년 이전 탈옥 연구", ans).split("<b>결론</b>")[1]
     assert concl.startswith("\n다중 턴은 비용이 크다") and "2024년" not in concl
+
+
+def test_few_in_period_notice():
+    # answer_issues_1113 텔레그램: "2025년에 나온 딥 리서치 연구 정리해줘" 에 기간 안 문서 1 편만 쓰고 알리지 않음
+    ans = "<b>서론</b>\n…\n<b>본론</b>\n1. <b>A</b>: …\n<b>결론</b>\n…"
+    out, note = count_notice("2025년에 나온 딥 리서치 연구 정리해줘", ans, "6→1", list_q=True)
+    assert note == "※ DB 에서 이 기간(2025년) 논문은 1편뿐입니다." and out.startswith(note)
+    assert count_notice("2025년에 나온 딥 리서치 연구 정리해줘", ans, "6→3", list_q=True) == (ans, "")
+    assert count_notice("2025년에 나온 딥 리서치 연구 정리해줘", ans, "6→1") == (ans, "")  # 목록 · 조사형 아니면 그대로
+    assert count_notice("요즘 딥 리서치 연구 정리해줘", ans, "대상 아님", list_q=True) == (ans, "")

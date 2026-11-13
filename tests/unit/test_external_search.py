@@ -99,6 +99,9 @@ def test_clean_query():
     assert X.clean_query("table-to-chart generation llm research paper table visualization chart creation from text large") == \
         "table-to-chart generation llm table visualization chart creation from text"
     assert X.clean_query("academic research papers") == "academic research papers"  # 3단어 미만이면 원래대로
+    # answer_issues_1113: 분야 이름은 지키고 연도는 뺀다
+    assert X.clean_query("deep research 2025 academic papers review summary latest findings analysis trends challenges") == \
+        '"deep research" review findings analysis challenges'
 
 
 def test_exclude_ids_tolerates_non_str(monkeypatch):

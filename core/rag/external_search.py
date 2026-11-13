@@ -36,10 +36,21 @@ _GENERIC = frozenset(
 )
 
 
+# 일반어가 들어 있어도 한 덩어리인 분야 이름 — "deep research" 에서 research 를 빼면 "deep" 만 남아
+# OpenAlex 가 딥러닝 리뷰를 돌려줬다(answer_issues_1113 텔레그램 18:3x, 기간 필터 뒤 0 편).
+_PHRASES = ("deep research", "research agent", "research agents", "literature review", "systematic review")
+_YEARS = re.compile(r"^(?:19|20)\d\d$")
+
+
 def clean_query(query: str) -> str:
-    """일반어를 뺀 검색어. 3단어 미만이 되면 원래 검색어."""
-    toks = [t for t in re.split(r"[\s,]+", query or "") if t]
-    kept = [t for t in toks if t.lower() not in _GENERIC]
+    """일반어 · 연도(기간은 OpenAlex 필터로)를 뺀 검색어. 3단어 미만이 되면 원래 검색어."""
+    q = query or ""
+    for ph in _PHRASES:
+        q = re.sub(re.escape(ph), ph.replace(" ", "\x00"), q, flags=re.I)
+    toks = [t for t in re.split(r"[\s,]+", q) if t]
+    # 분야 이름은 따옴표로 묶어 OpenAlex 구문 검색 — 묶지 않으면 deep · research 가 따로 맞아 딥러닝 논문이 끼었다
+    kept = [f'"{t.replace(chr(0), " ")}"' if "\x00" in t else t for t in toks
+            if "\x00" in t or (t.lower() not in _GENERIC and not _YEARS.match(t))]
     while kept and kept[-1].lower() == "large":
         kept.pop()
     return " ".join(kept) if len(kept) >= 3 else (query or "").strip()

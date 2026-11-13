@@ -1564,7 +1564,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 if _cc:
                     print("[DEBUG] DirectAnswer: 내부 문서 번호 · 중복 인용 정리")
             if os.getenv("RAG_COND_CHECK", "0").strip() == "1":
-                answer, _cn = count_notice(user_request, answer, _yf)
+                answer, _cn = count_notice(user_request, answer, _yf, list_q=_list_on or "list" in gate_types(user_request))
                 if _cn:
                     print(f"[DEBUG] DirectAnswer: 조건 고지 = {_cn}")
             if _missing and _pick != "없음":  # 위 RAG_TOPIC_ANSWER — 결론 다시 쓰기가 지우지 못하게 코드가 붙인다

@@ -120,13 +120,20 @@ def fix_out_of_period(question: str, answer: str) -> str:
     return out
 
 
-def count_notice(question: str, answer: str, year_status: str = "") -> tuple[str, str]:
+FEW_IN_PERIOD = 2  # 목록 · 조사형에서 기간 안 문서가 이 편수 이하면 알린다 (answer_issues_1113)
+
+
+def count_notice(question: str, answer: str, year_status: str = "", list_q: bool = False) -> tuple[str, str]:
     """``(답, 붙인 고지)``. 본론 항목이 요청 편수보다 적으면 답 맨 앞에 한 줄 붙인다.
     기간에 맞는 문서가 없었으면 서론 첫 문장을 코드로 고정한다(``fix_out_of_period``)."""
     notes = []
     period = year_status == "맞는 문서 없음" and bool(year_condition(question))
     if period:
         answer = fix_out_of_period(question, answer)
+    m_yf = re.fullmatch(r"(\d+)→(\d+)", year_status or "")
+    cond = year_condition(question)
+    if list_q and cond and m_yf and int(m_yf.group(2)) <= FEW_IN_PERIOD:
+        notes.append(f"DB 에서 이 기간({_period(cond)}) 논문은 {m_yf.group(2)}편뿐입니다.")
     n = requested_count(question)
     b, c = _find("본론", answer), _find("결론", answer)
     if n and b:
