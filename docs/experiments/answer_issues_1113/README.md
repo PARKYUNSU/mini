@@ -80,3 +80,4 @@
 - 고침: `topic_gate.names_in_db` — 질문 속 고유 이름(`relevance_filter.names`)이 DB 논문 제목에 하나로 맞으면(BM25 `named_paper`, `RAG_NAME_LOOKUP` 과 같은 규칙 · 같은 플래그) 학술 질문으로 본다. 순서: 어휘 규칙 → DB 이름 → LLM.
 - 회귀(저장된 질문 2,637 개, LLM 없이): 어휘 규칙이 아니라고 한 1,305 개 중 이름 일치로 새로 열릴 수 있는 것 25 개 — 모두 논문 이름을 묻는 학술 질문(ReXTrust · MXNorm · JetSpec/DSpark · Reasoning-SQL · SLMQuant · World4RL · TradingAgents · FinMCP-Bench · DynaFlow/OmniNova · MinHash 등). topic_gate_1009 의 잡담 · 계획 음성 예시는 0 개. 단위 테스트 787 통과.
 - 한계: 라우터 LLM 이 처음부터 계획(C) · 일반(A)으로 고르면 이 고침은 닿지 않는다(오버라이드는 B 를 고른 경우만 본다).
+- **운영 반영 (11-13 20:29, 사용자 승인):** e91df49 기준 `restart.sh` 봇 재시작(receiver 24577 · worker 24578), 시작 뒤 로그 오류 0. 운영 `.env` 로 `names_in_db("DynaFlow랑 OmniNova 성능 수치 비교해줘") == ["DynaFlow", "OmniNova"]` 확인.
