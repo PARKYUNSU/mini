@@ -89,6 +89,8 @@ OLLAMA_MODEL = os.getenv("LOCAL_LLM_MODEL", "qwen3.5:9b")
 RAG_ANSWER_MODEL = (os.getenv("RAG_ANSWER_MODEL") or "").strip() or OLLAMA_MODEL
 # 답 생성 호출만 다른 모델로 (거르기 · 판정 · 결론은 RAG_ANSWER_MODEL 그대로). docs/experiments/model_cmp_1112 §4
 RAG_ANSWER_ONLY_MODEL = (os.getenv("RAG_ANSWER_ONLY_MODEL") or "").strip() or RAG_ANSWER_MODEL
+# 정답 유무 판정 호출만 다른 모델로 (RAG_JUDGE_V2 일 때만 쓴다). docs/experiments/judge_v2_1113
+RAG_JUDGE_MODEL = (os.getenv("RAG_JUDGE_MODEL") or "").strip() or RAG_ANSWER_MODEL
 OLLAMA_TIMEOUT = 120
 OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "-1s")  # -1은 invalid, -1s 등 단위 필요
 # Google AI Gemini API 모델 ID. `gemini-3-flash` 단독은 v1beta에서 404 — preview 접미사 필요.

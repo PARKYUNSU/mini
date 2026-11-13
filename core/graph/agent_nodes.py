@@ -21,6 +21,7 @@ from langgraph.types import interrupt
 from core.rag.agent_chroma_rag import context_abstract_chars, get_chroma_rag_tool
 from core.config.agent_config import (
     RAG_ANSWER_MODEL,
+    RAG_JUDGE_MODEL,
     AGENT_TOOLS_DIR,
     CODE_TIMEOUT_SEC,
     DIRECT_ANSWER_TIMEOUT_SEC,
@@ -59,7 +60,9 @@ from core.rag.external_search import ExternalSearch, external_search_active, for
 from core.graph import rag_trace
 from core.llm.presence_judge import (
     NO_DOC_HINT,
+    PARTIAL_HINT,
     item_docs_note,
+    judge_presence_shared_v2,
     judge_items,
     gate_types,
     judge_presence,
@@ -1415,6 +1418,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 list_mode=_list_on,
             )
             _pick = None
+            _v2 = None  # 판정 v2 결과 (RAG_JUDGE_V2)
             # 여러 주제 질문은 한 편을 찾는 판정이 '없음'으로 기운다 — 항목마다 문서를 묻고, 없는 항목은 답 앞에 밝힌다
             # (RAG_TOPIC_ANSWER, docs/experiments/topic_answer_1104). 항목을 못 읽거나 판정이 실패하면 기존 판정으로 간다.
             _items = (
@@ -1444,13 +1448,19 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     _rewrite_q = f"{user_request}\n(문서에 없는 항목: {', '.join(_missing)} — 결론에서 다루지 마라)"
             if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request) and not _topics and not _item_docs:
                 # 답변과 같은 앞부분으로 판정하면 답변 호출이 컨텍스트를 다시 읽지 않는다 (docs/experiments/judge_cache_1017)
-                if shared_prefix_active() and not image_base64:
+                if os.getenv("RAG_JUDGE_V2", "0").strip() == "1" and not image_base64:
+                    # 질문 꼴(특정 연구 · 주제 추천)을 먼저 가리고 있음 · 부분 · 없음 (docs/experiments/judge_v2_1113)
+                    _v2 = judge_presence_shared_v2(system_prompt, prompt, user_request, RAG_JUDGE_MODEL)
+                    _pick = _v2 if _v2 is None or _v2 == "없음" else _v2[1]
+                elif shared_prefix_active() and not image_base64:
                     _pick = judge_presence_shared(system_prompt, prompt, user_request, RAG_ANSWER_MODEL)
                 else:
                     _pick = judge_presence(user_request, rag_context, RAG_ANSWER_MODEL)
-                print(f"[DEBUG] DirectAnswer: 정답 유무 판정 = {_pick}")
+                print(f"[DEBUG] DirectAnswer: 정답 유무 판정 = {_v2 if _v2 is not None else _pick}")
                 if _pick == "없음":
                     system_prompt = system_prompt + NO_DOC_HINT
+                elif _v2 is not None and _v2 != "없음" and _v2[0] == "부분":
+                    system_prompt = system_prompt + PARTIAL_HINT
             # 일반 질문도 문서마다 한 칸 (RAG_DOC_SLOTS, docs/experiments/doc_slots_1111) — v13 은 일반 템플릿에서 거의 늘 2개만 채운다.
             # 판정 뒤에 바꾼다: 판정 호출의 프롬프트는 그대로이고, '없음' 판정은 v13 의 정답 없음 형식(최대 2개)을 그대로 둔다.
             _doc_slots = (
@@ -1468,6 +1478,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     doc_count=len(_doc_ids),
                 )
             rag_trace.mark(chat_id, "judge", gates=gate_types(user_request), pick=_pick,
+                           **({"v2": list(_v2) if isinstance(_v2, tuple) else _v2, "judge_model": RAG_JUDGE_MODEL} if os.getenv("RAG_JUDGE_V2", "0").strip() == "1" else {}),
                            **({"items": _items, "item_docs": _item_docs} if _items else {}),
                            **({"doc_slots": True} if _doc_slots else {}))
             # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다

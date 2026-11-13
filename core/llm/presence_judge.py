@@ -15,7 +15,7 @@ import re
 __all__ = ["PROMPT", "gate_types", "should_judge", "NO_DOC_HINT", "parse_pick", "judge_presence",
            "SHARED_TAIL", "shared_prefix_active", "shared_judge_messages", "judge_presence_shared",
            "ITEM_TAIL", "parse_item_docs", "item_docs_note", "judge_items",
-           "SHARED_TAIL_V2", "parse_pick_v2", "judge_presence_shared_v2"]
+           "SHARED_TAIL_V2", "parse_pick_v2", "judge_presence_shared_v2", "PARTIAL_HINT"]
 
 PROMPT = """아래 [참고 문서]는 사용자의 질문으로 검색한 논문 발췌다. 사용자는 **특정한 연구 하나**를 찾고 있다.
 
@@ -258,3 +258,12 @@ def judge_presence_shared_v2(system_prompt: str, answer_prompt: str, question: s
         print(f"[DEBUG] presence_judge(v2) 실패: {type(exc).__name__}: {str(exc)[:120]}")
         return None
     return parse_pick_v2(raw)
+
+
+# 판정 v2 가 '부분' 일 때 (docs/experiments/judge_v2_1113). 딱 맞는 연구는 없고 가까운 연구만 있다는 것을 밝힌다.
+PARTIAL_HINT = """
+
+[사전 판정] 참고 문서에 질문이 찾는 바로 그 연구는 없고 가까운 연구만 있다. 다음을 지킨다:
+- 서론 첫 문장: `질문과 정확히 같은 연구는 없지만, 가까운 연구가 있습니다.`
+- 본론: 항목마다 그 문서가 질문과 어떻게 다른지(방법 · 대상 · 결과)를 한 구절로 밝힌다.
+- 문서가 질문을 그대로 다룬 것처럼 쓰지 않는다."""
