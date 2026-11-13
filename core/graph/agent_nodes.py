@@ -209,8 +209,14 @@ def _prefer_single_hit_rag_context(user_request: str, *, wants_depth: bool) -> b
     )
     if any(k in u for k in vague_markers):
         return True
-    multi_markers = ("비교", "차이", "여러", "두 편", "두편", "세 편", "목록", "서베이", "survey")
+    multi_markers = ("비교", "차이", "여러", "두 편", "두편", "세 편", "목록", "서베이", "survey",
+                     "어느 쪽", "어느 게", "어느게", "어느 것", "중 어느", "중에 어느")
     if any(x in u for x in multi_markers):
+        return False
+    # 고유 이름이 둘 이상이면 두 논문을 함께 봐야 한다 — "A랑 B 중 더 좋은 건?" 의 "더" 가 깊이 키워드로 잡혀
+    # 한 편만 남겼다 (cross_metric_1113 N02 · N05 · N07 · N13 · N15 · N17)
+    from core.llm.relevance_filter import names as _q_names
+    if len(_q_names(u)) >= 2 or re.search(r"\S(?:랑|이랑|하고|와|과)\s+\S+\s+중(?:에)?\s", u):  # "A랑 B 중 …"
         return False
     if wants_depth:
         return True

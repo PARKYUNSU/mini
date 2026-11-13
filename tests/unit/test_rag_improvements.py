@@ -129,6 +129,16 @@ def test_prefer_single_depth_false_multi_keywords():
     assert _prefer_single_hit_rag_context("서베이 해줘", wants_depth=True) is False
 
 
+def test_prefer_single_two_names_or_which_one():
+    # cross_metric_1113: "A랑 B 중 더 좋은 건?" 의 "더" 가 깊이로 잡혀 한 편만 남았다
+    from core.graph.agent_nodes import _prefer_single_hit_rag_context as f
+
+    assert f("jina-reranker-v3랑 RankZephyr 중에 어느 게 재순위를 더 잘해?", wants_depth=True) is False
+    assert f("F2LLM-v2랑 ML-Embed 중 성능이 더 높은 건?", wants_depth=True) is False
+    assert f("AgentHER랑 PR-OPD 중 에이전트 성능을 더 많이 올린 건?", wants_depth=True) is False  # PR-OPD 는 이름 규칙 밖
+    assert f("QLoRA 논문 더 자세히 알려줘", wants_depth=True) is True  # 이름 하나 · 깊이 요청은 그대로
+
+
 def test_prefer_single_no_depth_short(monkeypatch):
     from core.graph import agent_nodes
     from core.graph.agent_nodes import _prefer_single_hit_rag_context
