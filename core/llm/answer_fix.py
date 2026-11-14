@@ -17,8 +17,8 @@ from __future__ import annotations
 
 import re
 
-__all__ = ["align_conclusion_numbers", "clean_internal_refs", "drop_contradicted_no_doc", "merge_same_paper_items",
-           "normalize_fullwidth_punct", "renumber_body_items"]
+__all__ = ["align_conclusion_numbers", "clean_internal_refs", "drop_contradicted_no_doc", "mark_related_items",
+           "merge_same_paper_items", "normalize_fullwidth_punct", "renumber_body_items"]
 
 # 서론의 '문서에 없다' 문장 (v12 가 쓰는 변형들). 문장 끝 마침표까지 지운다.
 _NO_DOC_SENT = re.compile(
@@ -187,3 +187,42 @@ def align_conclusion_numbers(answer: str) -> tuple[str, int]:
     parts = re.split(r"(?<=[.!?。])(\s+)", concl)
     concl2 = "".join(fix_sent(p) if i % 2 == 0 else p for i, p in enumerate(parts))
     return (answer[:m_c.end()] + concl2 + rest, n) if n else (answer, 0)
+
+
+# '없음' 힌트 답의 본론 표시 (answer_issues_1113 ①): 힌트는 본론 항목 이름 뒤에 `(관련 연구)` 를 붙이라고 하지만
+# v13 은 0/37 붙였다 — 가까운 문서를 정답처럼 나열한 뒤 결론만 '없음' 이라 모순으로 읽혔다(27/37).
+# 모델이 결론에서 스스로 '없음' 이라고 쓴 답만 고친다. 힌트를 무시하고 찾았다고 답한 경우(판정이 틀릴 때가 있다)는 둔다.
+_NONE = re.compile(r"찾는 연구(는|가)?[^.\n]{0,30}(없|찾을 수 없)|찾을 수 없습니다|다루(지 않|는 연구는 없)|포함되어 있지 않|포함되지 않")
+_RELATED = "(관련 연구)"
+_LEAD = "제공된 문서에는 질문이 찾는 연구가 없습니다."
+_ITEM_NAME = re.compile(r"^(\s*\d{1,2}\.\s+)(\*\*[^*\n]+\*\*|<b>[^<\n]+</b>)?")
+_CONCL_END = re.compile(r"\n[ \t]*(?:📎|<b>📎|---)")
+
+
+def mark_related_items(answer: str) -> tuple[str, int]:
+    """``(고친 답, 표시를 붙인 항목 수)``. 결론이 '없음' 이 아니거나 섹션 머리를 못 찾으면 손대지 않는다."""
+    m_intro, m_body, m_concl = _find("서론", answer), _find("본론", answer), _find("결론", answer)
+    if not (m_body and m_concl) or m_body.end() > m_concl.start():
+        return answer, 0
+    rest = answer[m_concl.end():]
+    e = _CONCL_END.search(rest)
+    if not _NONE.search(rest[:e.start()] if e else rest):
+        return answer, 0
+    lines, n = answer[m_body.end():m_concl.start()].split("\n"), 0
+    for k, line in enumerate(lines):
+        m = _ITEM_NAME.match(line)
+        if not m or "관련 연구" in line:
+            continue
+        if m.group(2):  # "1. **X**" → "1. **X** (관련 연구)"
+            lines[k] = line[:m.end()] + " " + _RELATED + line[m.end():]
+        else:  # 이름 강조가 없으면 번호 뒤에
+            lines[k] = m.group(1) + _RELATED + " " + line[m.end(1):]
+        n += 1
+    if not n:
+        return answer, 0
+    out = answer[:m_body.end()] + "\n".join(lines) + answer[m_concl.start():]
+    if m_intro and m_intro.end() <= m_body.start():
+        intro = out[m_intro.end():m_body.start()]
+        if not _NONE.search(intro):
+            out = out[:m_intro.end()] + "\n" + _LEAD + " " + intro.lstrip("\n") + out[m_body.start():]
+    return out, n

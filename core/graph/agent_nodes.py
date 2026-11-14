@@ -55,8 +55,8 @@ from core.llm.relevance_filter import filter_relevant
 from core.llm.query_reform import fill_slots
 from core.llm.question_conditions import count_notice, filter_by_year, year_condition
 from core.llm.body_numbers import check_body_numbers
-from core.llm.answer_fix import (align_conclusion_numbers, clean_internal_refs, drop_contradicted_no_doc, merge_same_paper_items,
-                                  normalize_fullwidth_punct, renumber_body_items)
+from core.llm.answer_fix import (align_conclusion_numbers, clean_internal_refs, drop_contradicted_no_doc, mark_related_items,
+                                  merge_same_paper_items, normalize_fullwidth_punct, renumber_body_items)
 from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
 from core.graph import rag_trace
 from core.llm.presence_judge import (
@@ -1590,6 +1590,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     answer = answer.rstrip() + format_section(_ext_items)
                     record_candidates(user_request, _ext_items, years=_ext_years)
                 rag_trace.mark(chat_id, "external", n=len(_ext_items), wait=round(_ext_wait, 1))
+            # '없음' 판정 답에서 모델이 결론을 '없음' 으로 썼으면 본론 항목에 (관련 연구) 표시 (answer_issues_1113 ①)
+            if _pick == "없음":
+                answer, _rm = mark_related_items(answer)
+                if _rm:
+                    print(f"[DEBUG] DirectAnswer: 관련 연구 표시 {_rm}항목")
             # 결론 수치를 같은 논문의 본론 값에 맞추고 · 전각 문장부호를 반각으로 (cross_metric_1113)
             answer, _al = align_conclusion_numbers(answer)
             answer, _fw = normalize_fullwidth_punct(answer)

@@ -134,3 +134,20 @@ def test_align_conclusion_numbers():
     a3 = ("<b>본론</b>\n1. <b>L</b>: 64배 압축 95.7% [2601.10155v1]\n2. <b>R</b>: 평균 2.9% [2606.15441v1]\n"
           "<b>결론</b>\nL 은 64배 95.7%, 32배 95.0% 다[2601.10155v1]. R 은 2.92% 다[2606.15441v1].")
     assert f(a3) == (a3, 0)
+
+
+def test_mark_related_items():
+    from core.llm.answer_fix import mark_related_items
+
+    a = ("### 서론\nKV 캐시는 중요하다.\n\n### 본론\n1. **HiCBench**: 벤치마크. [문서 1]\n2. 그냥 설명 [문서 3]\n\n"
+         "### 결론\n따라서 질문이 찾는 연구는 제공된 문서에서 찾을 수 없습니다.")
+    out, n = mark_related_items(a)
+    assert n == 2
+    assert "1. **HiCBench** (관련 연구): 벤치마크." in out and "2. (관련 연구) 그냥 설명" in out
+    assert "### 서론\n제공된 문서에는 질문이 찾는 연구가 없습니다. KV 캐시는 중요하다." in out
+    assert mark_related_items(out) == (out, 0)  # 두 번 적용해도 같다
+    found = a.replace("따라서 질문이 찾는 연구는 제공된 문서에서 찾을 수 없습니다.", "HiCBench 가 답이다.")
+    assert mark_related_items(found) == (found, 0)  # 결론이 찾았다고 하면 두다
+    html = "<b>서론</b>\n제공된 문서에는 질문이 찾는 연구가 없습니다.\n<b>본론</b>\n1. <b>UDA</b>: 설명\n<b>결론</b>\n찾을 수 없습니다."
+    out, n = mark_related_items(html)
+    assert n == 1 and "1. <b>UDA</b> (관련 연구): 설명" in out and out.count("찾는 연구가 없습니다") == 1
