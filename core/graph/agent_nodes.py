@@ -344,6 +344,12 @@ def body_item_ids(answer: str) -> list[str | None]:
     return [(_CITE_RE.findall(it) or [None])[0] for it in items]
 
 
+def followup_v2_active() -> bool:
+    """이어지는 질문 v2 (docs/experiments/followup_v2_1115): 검색어 기록 1턴 · 재사용이면 판정 · 외부 검색 건너뛰기 ·
+    서수 없는 재사용은 직전 답 인용 논문만."""
+    return os.getenv("RAG_FOLLOWUP_V2", "0").strip() == "1"
+
+
 def followup_reuse_context(session, user_request: str) -> str:
     """직전 답의 컨텍스트(서수가 있으면 그 번째 항목 논문 블록만). 다시 쓰지 않으면 ""."""
     if os.getenv("RAG_FOLLOWUP_REUSE", "0").strip() != "1" or not getattr(session, "last_rag", None):
@@ -360,10 +366,12 @@ def followup_reuse_context(session, user_request: str) -> str:
     if len(re.sub(r"\s", "", user_request)) > _REUSE_MAX_CHARS:
         return ""
     m = _ORDINAL_RE.search(user_request)
-    if not m:
-        return ctx
-    n = _ORDINALS[m.group(1)] if m.group(1) else int(m.group(2))
     blocks = [b for b in ctx.split(_RAG_HIT_SEP) if b.strip()]
+    if not m:
+        # 직전 답이 인용한 논문 블록만 — 거르기에서 빠진 문서까지 넘기면 그 문서로 답했다 (followup_v2_1115 F07)
+        cited = [b for b in blocks if any(p and p in b for p in item_ids)] if followup_v2_active() else []
+        return _RAG_HIT_SEP.join(cited) if cited else ctx
+    n = _ORDINALS[m.group(1)] if m.group(1) else int(m.group(2))
     pid = item_ids[n - 1] if 0 < n <= len(item_ids) else None
     hit = [b for b in blocks if pid and pid in b]
     if hit:
@@ -1250,7 +1258,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             # 단일은 Top-1, 다중은 Top-5로 LLM 컨텍스트를 제한하기 때문에
             # Chroma query는 넉넉히 가져와도 되고, 최종 전달은 뒤에서 잘라냄
             _hist_ok = rag_history_allowed(user_request)
-            _recent_ctx = session.get_recent_context(max_turns=2) if _hist_ok else ""
+            # v2: 직전 1턴만 — 2턴을 주면 9B 가 두 턴 전 주제로 검색어를 만들었다 (followup_v2_1115: 5/5)
+            _recent_ctx = session.get_recent_context(max_turns=1 if followup_v2_active() else 2) if _hist_ok else ""
             rag_query = _extract_english_rag_query(user_request, session_context=_recent_ctx)
             rag_trace.mark(chat_id, "query", query=rag_query, history=bool(_recent_ctx))
             if prefer_single_hit:
@@ -1272,6 +1281,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             _rf_pre = ""
             _rf = ""
             _src = "search"
+            _reuse = ""
             _topics: list[str] = []
             _list_on = list_mode_active(user_request, prefer_single_hit=prefer_single_hit)
 
@@ -1458,7 +1468,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 )
                 if _missing:
                     _rewrite_q = f"{user_request}\n(문서에 없는 항목: {', '.join(_missing)} — 결론에서 다루지 마라)"
-            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request) and not _topics and not _item_docs:
+            # v2: 직전 답 컨텍스트를 다시 쓰면 판정하지 않는다 — 한계 · 데이터셋은 초록에 없어 '없음'이 나와
+            # "찾는 연구가 없습니다" 로 답했다 (followup_v2_1115: F03 · F07 · F08)
+            _skip_judge = bool(_reuse) and followup_v2_active()
+            if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request) and not _topics and not _item_docs and not _skip_judge:
                 # 답변과 같은 앞부분으로 판정하면 답변 호출이 컨텍스트를 다시 읽지 않는다 (docs/experiments/judge_cache_1017)
                 if os.getenv("RAG_JUDGE_V2", "0").strip() == "1" and not image_base64:
                     # 질문 꼴(특정 연구 · 주제 추천)을 먼저 가리고 있음 · 부분 · 없음 (docs/experiments/judge_v2_1113)
@@ -1494,7 +1507,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                            **({"items": _items, "item_docs": _item_docs} if _items else {}),
                            **({"doc_slots": True} if _doc_slots else {}))
             # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다
-            if external_search_active() and (
+            if external_search_active() and not _skip_judge and (
                 _pick == "없음" or _list_on or _item_docs
             ):
                 # 학회판(arXiv ID 없음)은 제목으로 거른다 — job 129 · 130 에서 본론 2406.01549 의 ACL 판이 다시 실렸다
