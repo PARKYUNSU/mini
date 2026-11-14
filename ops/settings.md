@@ -37,6 +37,7 @@
 | `RAG_LIST_ABS_CHARS` | `400` | 10-26 10:55 | 목록 항목의 초록 상한 (코드 기본 500) | [`list_findings_v2_1026`](../docs/experiments/list_findings_v2_1026/README.md) |
 | `RAG_BODY_NUM_CHECK` | `1` | 10-26 10:55 | 본문 숫자를 출처 블록과 대조한다 | [`list_findings_v2_1026`](../docs/experiments/list_findings_v2_1026/README.md) |
 | `RAG_FILTER_BEFORE_CUT` | `1` | 10-28 20:10 | 15→5 자르기 전에 거른다 | [`filter_before_cut_1028`](../docs/experiments/filter_before_cut_1028/README.md): '2' 199→218 (13:2, p .0074) |
+| `RAG_FILTER_NONE_KEEP` | `1` | 11-14 09:33 | 거르기가 '관련: 없음' 이면 다 남기지 않고 검색 1 위(+ 이름 보호 문서)만 | [`filter_none_1114`](../docs/experiments/filter_none_1114/README.md): held-out '없음' 10 문항, 빠지는 문서 29/32 무관 · 관련 다 잃음 1 · 정답 잃음 0 |
 | `RAG_ROUTER_RESEARCH` | `1` | 10-29 07:00 | 라우터 경로도 15편을 다시 검색한다 | [`router_research_1028`](../docs/experiments/router_research_1028/README.md): '2' 219→247 (27:2, p 1.6e-6), +7.7초 |
 | `RAG_NODOC_KEEP_CONCLUSION` | `1` | 10-29 08:22 | 판정 '없음'이면 결론 다시 쓰기를 건너뛴다 | [`nodoc_conclusion_1029`](../docs/experiments/nodoc_conclusion_1029/README.md): 모순 답 6→0 (p .031), −20초 |
 | `RAG_NAME_LOOKUP` | `1` | 11-01 08:14 | 질문 속 고유 이름으로 논문을 찾아 앞에 둔다 | [`name_lookup_1101`](../docs/experiments/name_lookup_1101/README.md): held-out 이름 정답 상위 5 안 2/4→4/4 |
