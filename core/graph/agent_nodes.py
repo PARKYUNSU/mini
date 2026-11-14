@@ -76,7 +76,6 @@ from core.llm.agent_prompts import (
     DIRECT_ANSWER_DAILY_CHAT_SYSTEM,
     DIRECT_ANSWER_PYTHON_EXAMPLE_SYSTEM,
     DIRECT_ANSWER_RAG_SYSTEM_BASE,
-    RAG_OUTPUT_TEMPLATE_DEPTH,
     RAG_OUTPUT_TEMPLATE_MULTI_STRICT,
     doc_slots_template,
     list_slots_template,
@@ -1393,8 +1392,6 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             # (docs/experiments/template_collapse_1006/07_single_path/). 문서 수에 따른
             # 항목 수 상한은 direct_answer_rag_user(doc_count=…) 가 넣는다.
             output_template = RAG_OUTPUT_TEMPLATE_MULTI_STRICT
-            if os.getenv("RAG_DEPTH_TEMPLATE", "0").strip() == "1":  # docs/experiments/depth_1114
-                output_template = RAG_OUTPUT_TEMPLATE_DEPTH
             rag_max_chars = 8000 if (prefer_single_hit and wants_depth) else (5000 if prefer_single_hit else 8000)
             # 초록을 800자보다 길게 붙이면 그만큼 상한도 늘린다 — 다른 논문 내용이 밀려 잘리지 않게
             # (논문 5편 기준, docs/experiments/abstract_full_1016).

@@ -151,11 +151,3 @@ def test_mark_related_items():
     html = "<b>서론</b>\n제공된 문서에는 질문이 찾는 연구가 없습니다.\n<b>본론</b>\n1. <b>UDA</b>: 설명\n<b>결론</b>\n찾을 수 없습니다."
     out, n = mark_related_items(html)
     assert n == 1 and "1. <b>UDA</b> (관련 연구): 설명" in out and out.count("찾는 연구가 없습니다") == 1
-
-
-def test_depth_template_keeps_item_shape():
-    # depth_1114: 항목 꼴(번호 · 굵은 이름 · 끝 [문서 N])을 바꾸면 후처리(인용 고침 · 항목 합치기 · 관련 연구 표시)가 깨진다
-    from core.llm.agent_prompts import RAG_OUTPUT_TEMPLATE_DEPTH as T
-
-    assert "### 서론" in T and "### 본론" in T and "### 결론" in T
-    assert "1. **{핵심 접근·시스템 이름}**:" in T and "[문서 1]\n2." in T
