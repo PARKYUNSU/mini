@@ -69,6 +69,7 @@
 
 ## 6. 실행 기록 — 0 단계 · 백업 (11-13 23:4x, 사용자 승인)
 - **0 단계:** M2 의 `com.mini.runscheduler` · `com.mini.telegrambot` · `com.mini.chroma` 를 `launchctl bootout` 으로 내리고 plist 를 `~/backups/launchagents_1113/` 로 옮겼다(되돌리기: 다시 `~/Library/LaunchAgents/` 로 옮기고 `launchctl bootstrap gui/$(id -u) <plist>`). 뒤에 `com.mini*` 서비스 · 프로세스 없음 확인. Ollama 는 그대로.
+  - **0 단계 빠뜨린 것 보충(11-14, 사용자 승인):** 이름이 다른 `com.mini.run-scheduler.plist`(하이픈)와 `com.yunsupark.chatbot.plist` 가 M2 `~/Library/LaunchAgents/` 에 남아 있었다(로드는 안 됨, 둘 다 RunAtLoad · KeepAlive — 다음 로그인 때 다시 뜸; M2 에 T7 이 없어 무한 재시작). 챗봇 세션이 짚음. `launchctl bootout` 뒤 `~/backups/launchagents_1113/` 로 옮김, `launchctl list` 에 남은 등록 없음.
 - **백업:** 메인에서 `ops/backup.sh`(git 번들 · 코퍼스 JSONL · 브리지 DB · untracked 등, 391MB) → 맥북을 거쳐 M2 `~/backups/from_main/2026-11-13/`(폴더 700) 로 복사, SHA256 7/7 일치.
   - **`env.backup`(비밀 값)은 M2 로 복사하지 않았다** — "운영 키는 필요한 기계에만" 규칙. 메인 내장 디스크에만 있다. M2 에도 둘지는 사용자 결정.
   - 맥북 경유 속도 ~2.2MB/s(391MB 3 분). **Chroma(16GB) · 임베딩 캐시(4.3GB) 는 이 속도로 2–3 시간**이라 이번에 안 했다. collect_1113 이 오늘 밤 메인 내장 디스크에 만드는 Chroma 스냅샷(`~/backups/mini/chroma_1113`)을 수집 끝난 뒤 옮기는 것이 깔끔하다 — 빠른 길(두 맥미니 직접 연결 또는 T7 · 외장 디스크로 옮기기)은 사용자 결정.
