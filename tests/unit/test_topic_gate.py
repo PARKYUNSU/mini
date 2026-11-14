@@ -60,3 +60,25 @@ def test_names_in_db_opens_rag(monkeypatch):
     assert G.names_in_db("iPhone 배터리 오래 쓰는 법") == [] and not G.is_academic_query_full("iPhone 배터리 오래 쓰는 법")
     monkeypatch.setenv("RAG_NAME_LOOKUP", "0")
     assert G.names_in_db(q) == []
+
+
+def test_router_reverts_planner_for_db_names(monkeypatch):
+    # cross_metric_1113: 이름만 있는 비교 질문을 3단계 LLM 이 계획(C)으로 보냈고 되돌림이 어휘만 봐 못 막았다
+    import core.rag.bm25_index as B
+    from core.graph.agent_nodes import _revert_academic_misroute
+
+    class _BM:
+        def named_paper(self, n):
+            return {"QJL": "2406.03482", "CommVQ": "2506.18879"}.get(n)
+
+    monkeypatch.setattr(B, "get_bm25_searcher", lambda: _BM())
+    monkeypatch.setenv("RAG_NAME_LOOKUP", "1")
+    planner = {"route_type": "planner", "router_choice": "C"}
+    q = "QJL이랑 CommVQ 중 어느 쪽이 메모리를 더 많이 줄여?"
+    assert _revert_academic_misroute(q, q.lower(), dict(planner)) == {"route_type": "direct_answer", "router_choice": "B"}
+    other = "iPhone 배터리 오래 쓰는 법"
+    assert _revert_academic_misroute(other, other.lower(), dict(planner)) == planner
+    code = "QJL 논문 파이썬 코드로 구현해서 실행해줘"
+    assert _revert_academic_misroute(code, code.lower(), dict(planner)) == planner
+    monkeypatch.setenv("RAG_NAME_LOOKUP", "0")
+    assert _revert_academic_misroute(q, q.lower(), dict(planner)) == planner

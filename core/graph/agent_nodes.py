@@ -772,8 +772,10 @@ def _revert_academic_misroute(user_request: str, req_lower: str, result: dict) -
 
     끝단 평가에서 학술 질문 6개가 이렇게 샜다 (docs/experiments/topic_gate_llm_1010). 판정은 비용 0 인
     어휘 게이트만 쓴다 — 잡담·계획 오탐 0/61. 명시적 코딩 요청은 계획 경로를 그대로 둔다.
+    분야 용어 없이 DB 논문 이름만 있는 비교 질문("A랑 B 성능 비교해줘")도 계획(C)으로 샜다
+    (cross_metric_1113 5/20) → DB 논문 이름(RAG_NAME_LOOKUP)도 학술 근거로 본다.
     """
-    from core.rag.topic_gate import is_academic_query
+    from core.rag.topic_gate import is_academic_query, names_in_db
 
     if not (
         (result.get("route_type") == "direct_answer" and result.get("router_choice") == "A")
@@ -782,7 +784,7 @@ def _revert_academic_misroute(user_request: str, req_lower: str, result: dict) -
         return result
     if is_explicit_python_coding_request(user_request, req_lower):
         return result
-    if not is_academic_query(user_request):
+    if not (is_academic_query(user_request) or names_in_db(user_request)):
         return result
     print("[DEBUG] Router: 학술 질문 오분류 되돌림 → RAG(B)", flush=True)
     return {"route_type": "direct_answer", "router_choice": "B"}
