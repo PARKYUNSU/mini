@@ -50,6 +50,7 @@ from core.llm.agent_llm import (
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.conclusion_rewrite import brief_findings, rewrite_conclusion
+from core.llm.item_rewrite import rewrite_items
 from core.llm.conclusion_swap import swap_conclusion
 from core.llm.relevance_filter import filter_relevant
 from core.llm.query_reform import fill_slots
@@ -1557,6 +1558,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             answer, _rn = renumber_body_items(answer)
             if _rn:
                 print("[DEBUG] DirectAnswer: 본론 번호 다시 매김")
+            # 본론 항목을 논문마다 따로 다시 쓴다 (RAG_ITEM_REWRITE, docs/experiments/item_rewrite_1114)
+            if os.getenv("RAG_ITEM_REWRITE", "0").strip() == "1" and not _list_on:
+                answer, _ir = rewrite_items(answer, _rewrite_q, rag_context, _doc_ids, RAG_ANSWER_MODEL)
+                print(f"[DEBUG] DirectAnswer: 항목 다시 쓰기 = {_ir}")
+                rag_trace.mark(chat_id, "item_rewrite", result=_ir)
             if os.getenv("RAG_BODY_NUM_CHECK", "0").strip() == "1":  # docs/experiments/list_findings_v2_1026
                 answer, _bn = check_body_numbers(answer, rag_context, _doc_ids)
                 if _bn:
