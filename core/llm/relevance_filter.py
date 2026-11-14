@@ -95,7 +95,12 @@ def filter_relevant(question: str, context: str, model: str) -> tuple[str, str]:
     if keep is None:
         return context, "못 읽음"
     if not keep:
-        return context, "없음"
+        # '없음' 이면 다 남겼다 — 그 행의 문서는 주제 안이 8–15% 뿐이다 (docs/experiments/filter_none_1114)
+        top = int(os.getenv("RAG_FILTER_NONE_KEEP", "0") or 0)
+        if top <= 0 or top >= len(blocks):
+            return context, "없음"
+        keep = set(range(1, top + 1)) | protected(question, blocks)
+        return RAG_HIT_SEP.join(b for i, b in enumerate(blocks, 1) if i in keep), f"없음→{len(keep)}"
     keep |= protected(question, blocks)
     return RAG_HIT_SEP.join(b for i, b in enumerate(blocks, 1) if i in keep), f"{len(blocks)}→{len(keep)}"
 

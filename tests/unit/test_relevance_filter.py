@@ -50,3 +50,29 @@ def test_parse_graded():
     assert parse_graded("[1] 핵심\n2. **관련**\n3) 무관", 3) == {1: "핵심", 2: "관련", 3: "무관"}
     assert parse_graded("1: 핵심\n2: 무관", 3) is None  # 하나 빠지면 못 읽음
     assert parse_graded("관련: 1, 3", 3) is None
+
+
+def test_none_keep_top(monkeypatch):
+    # filter_none_1114: '관련: 없음' 이면 다 남기던 것을 RAG_FILTER_NONE_KEEP 편만 (이름 보호 문서는 남김)
+    import langchain_ollama
+
+    from core.llm import relevance_filter as RF
+    from core.llm.citation_fix import RAG_HIT_SEP
+
+    class _LLM:
+        def __init__(self, **kw):
+            pass
+
+        def invoke(self, p):
+            return type("R", (), {"content": "관련: 없음"})()
+
+    monkeypatch.setattr(langchain_ollama, "ChatOllama", _LLM)
+    blocks = [f"[240{i}.0000{i}v1] Paper{i}\n[초록] x" for i in range(1, 5)] + ["[2405.00005v1] World4RL: y\n[초록] z"]
+    ctx = RAG_HIT_SEP.join(blocks)
+    monkeypatch.delenv("RAG_FILTER_NONE_KEEP", raising=False)
+    assert RF.filter_relevant("질문", ctx, "m") == (ctx, "없음")
+    monkeypatch.setenv("RAG_FILTER_NONE_KEEP", "1")
+    out, st = RF.filter_relevant("World4RL 설명해줘", ctx, "m")
+    assert st == "없음→2" and out == RAG_HIT_SEP.join([blocks[0], blocks[4]])
+    out, st = RF.filter_relevant("질문", ctx, "m")
+    assert st == "없음→1" and out == blocks[0]
