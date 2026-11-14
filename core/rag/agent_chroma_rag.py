@@ -2238,6 +2238,12 @@ def warmup_chroma_rag() -> None:
     print("[ChromaRAG TRACE] warmup: in-process Chroma singleton", flush=True)
     _get_chroma_singleton()
     print("[ChromaRAG TRACE] warmup: Chroma singleton OK", flush=True)
+    # 첫 검색만 10–12s 였다(BM25 색인 · 캐시 지연 로드) — 재시작 직후 첫 질문이 느렸다. 한 번 미리 돌린다.
+    try:
+        get_chroma_rag_tool().search("retrieval augmented generation", top_k=5)
+        print("[ChromaRAG TRACE] warmup: first search OK", flush=True)
+    except Exception as e:  # 예열 실패해도 봇은 뜬다
+        print(f"[ChromaRAG TRACE] warmup: first search 실패 {type(e).__name__}: {e}", flush=True)
 
 
 def reset_chroma_rag_singleton_for_tests() -> None:
