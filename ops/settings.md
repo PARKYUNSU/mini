@@ -43,6 +43,7 @@
 | `RAG_NAME_LOOKUP` | `1` | 11-01 08:14 | 질문 속 고유 이름으로 논문을 찾아 앞에 둔다 | [`name_lookup_1101`](../docs/experiments/name_lookup_1101/README.md): held-out 이름 정답 상위 5 안 2/4→4/4 |
 | `RAG_FIX_PDF_DECIMAL` | `1` | 11-07 09:18 | PDF 본문의 깨진 소수점 `87 _._ 5%` 를 컨텍스트에서 `87.5%` 로 고친다. 재색인 없음 | [`pdf_decimal_1107`](../docs/experiments/pdf_decimal_1107/README.md): 깨진 소수점 15곳→0곳, 보호 통과. 조각 오류는 양쪽 0 이라 효과는 재현 안 됨. 버그 수정 |
 | `RAG_ANSWER_REPEAT_PENALTY` | `1.0` | 11-13 17:29 | 답 호출의 반복 억제(코드 기본 1.18). 다른 호출은 1.18 그대로. 되돌리기: 이 줄을 지우고 봇 재시작 | [`penalty_1113`](../docs/experiments/penalty_1113/README.md): 깨진 음차 용어 7/40→0/40 (p .016), 120 held-out 깨진 답 4→2 · 보호 P1–P6 통과(P7 시간은 35b 끼어듦으로 무효, 참고 +0.7초). 11-20 까지 운영 로그로 시간 · 깨짐 · 되풀이 확인 |
+| `RAG_ITEM_REWRITE` | `1` | 11-14 23:08 | 답을 낸 뒤 본론 항목(인용 논문 하나)을 그 논문 블록만 보고 2~3 문장으로 다시 쓴다. 문서 밖 숫자 · 한자 · 짧아짐이면 원래 항목 유지, 앞에서 최대 4 항목(`RAG_ITEM_REWRITE_MAX`), 목록 모드 제외. 문항 시간 +7s | [`item_rewrite_1114`](../docs/experiments/item_rewrite_1114/README.md): v2 held-out 쌍 72:9 p 2.5e-13, 보호 전부 통과. 숫자 순서 · 짝 바뀜은 못 잡음(새 쪽 2 건) |
 
 ## 2. 그 밖 설정 (값 공개 가능)
 
