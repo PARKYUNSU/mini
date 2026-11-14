@@ -47,8 +47,17 @@ def is_gemini_rate_limit_error(exc: BaseException) -> bool:
     return False
 
 
+def _gemini_chat_max_rounds() -> int:
+    """봇 경로 전 키 순환 횟수. 기본 1: 모두 429면 기다리지 않고 예외 → 호출부가 다음 경로로.
+    0 이면 예전처럼 쿨다운 후 무한 재시도. ``GEMINI_RATE_LIMIT_ROUNDS``."""
+    try:
+        return max(0, int(os.getenv("GEMINI_RATE_LIMIT_ROUNDS", "1")))
+    except ValueError:
+        return 1
+
+
 class RotatingGeminiChat:
-    """LangChain ChatGoogleGenerativeAI 호환: 429면 키 순환, 전 키 429면 쿨다운 후 무한 재시도."""
+    """LangChain ChatGoogleGenerativeAI 호환: 429면 키 순환, 전 키 429면 예외(기본) 또는 쿨다운 후 재시도."""
 
     def __init__(self, keys: list[str], model: str, temperature: float) -> None:
         self._keys = [k.strip() for k in keys if k and str(k).strip()]
@@ -64,7 +73,10 @@ class RotatingGeminiChat:
         if not self._keys:
             raise ValueError("Gemini API 키가 없습니다. GEMINI_API_KEY 또는 GEMINI_API_KEYS를 설정하세요.")
         cooldown = _gemini_rate_limit_cooldown_sec()
+        max_rounds = _gemini_chat_max_rounds()
+        rounds = 0
         while True:
+            rounds += 1
             for idx, key in enumerate(self._keys):
                 llm = ChatGoogleGenerativeAI(
                     model=self._model,
@@ -83,6 +95,9 @@ class RotatingGeminiChat:
                             )
                             time.sleep(1.5)
                             continue
+                        if max_rounds and rounds >= max_rounds:
+                            print(f"[Gemini] 등록된 {len(self._keys)}개 키 모두 Rate limit — 기다리지 않고 실패를 넘깁니다.", flush=True)
+                            raise
                         print(
                             f"[Gemini] 등록된 {len(self._keys)}개 키 모두 Rate limit — "
                             f"{cooldown}초 대기 후 1번 키부터 재시도합니다.",
