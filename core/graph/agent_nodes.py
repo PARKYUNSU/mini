@@ -420,7 +420,7 @@ def _extract_comparison_targets(user_request: str) -> list[str]:
     """
     prompt = f"""The user asks to compare two research methods, models, or papers.
 Return the two things being compared as two short English search queries for academic retrieval.
-Use only names that appear in the user question, copied exactly (keep Latin-script names as is). Never add names that are not in the question.
+Write both queries in English: translate Korean words into English, and keep Latin-script names exactly as written. Never add names that are not in the question.
 If a side has no name, describe it in 4-8 English words using only the question's content.
 Return exactly two lines and nothing else:
 A: <query>
@@ -429,17 +429,18 @@ B: <query>
 User question:
 {user_request}
 """
-    for llm_getter in (get_rag_query_rewrite_llm, get_executor_llm):
-        try:
-            raw = (normalize_ai_message_content(llm_getter().invoke([HumanMessage(content=prompt)])) or "").strip()
-        except Exception:
-            continue
-        got = re.findall(r"^\s*[AB]\s*[:：]\s*(.+?)\s*$", raw, re.M)
-        got = [re.sub(r"[^A-Za-z0-9 .,+\-_/()]", " ", g).strip() for g in got][:2]
-        got = [re.sub(r"\s+", " ", g) for g in got if len(g) >= 3]
-        if len(got) == 2:
-            return got
-    return []
+    # repeat_penalty 1.18 이면 A · B 를 한 줄에 붙여 45% 가 형식 실패 → Gemini 폴백이 429 로 수백 초 멈췄다.
+    # 로컬만 쓰고(1.0), 실패하면 기존 검색만 (docs/experiments/cmp_targets_1114)
+    try:
+        raw = (normalize_ai_message_content(
+            get_rag_query_rewrite_llm(repeat_penalty=1.0).invoke([HumanMessage(content=prompt)])) or "").strip()
+    except Exception:
+        return []
+    raw = re.sub(r"\s+(B\s*[:：])", r"\n\1", raw)  # "A: … B: …" 한 줄도 읽는다
+    got = re.findall(r"^\s*[AB]\s*[:：]\s*(.+?)\s*$", raw, re.M)
+    got = [re.sub(r"[^A-Za-z0-9 .,+\-_/()]", " ", g).strip() for g in got][:2]
+    got = [re.sub(r"\s+", " ", g) for g in got if len(g) >= 3]
+    return got if len(got) == 2 else []
 
 
 def _merge_rag_blocks(primary: str, extras: list[str], *, per_extra: int = 2) -> str:

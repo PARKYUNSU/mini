@@ -82,3 +82,30 @@ def test_router_reverts_planner_for_db_names(monkeypatch):
     assert _revert_academic_misroute(code, code.lower(), dict(planner)) == planner
     monkeypatch.setenv("RAG_NAME_LOOKUP", "0")
     assert _revert_academic_misroute(q, q.lower(), dict(planner)) == planner
+
+
+def test_comparison_targets_local_only(monkeypatch):
+    # cmp_targets_1114: 로컬이 "A: … B: …" 를 한 줄에 써도 읽고, 실패해도 Gemini 로 안 넘어간다
+    from core.graph import agent_nodes as N
+
+    seen = {}
+
+    class _LLM:
+        def __init__(self, out):
+            self.out = out
+
+        def invoke(self, msgs):
+            return type("R", (), {"content": self.out})()
+
+    def _getter(out):
+        def g(**kw):
+            seen.update(kw)
+            return _LLM(out)
+        return g
+
+    monkeypatch.setattr(N, "get_executor_llm", lambda: (_ for _ in ()).throw(AssertionError("Gemini 호출")))
+    monkeypatch.setattr(N, "get_rag_query_rewrite_llm", _getter("A: DPO offline preference learning B: PPO online RL"))
+    assert N._extract_comparison_targets("DPO랑 PPO 비교해줘") == ["DPO offline preference learning", "PPO online RL"]
+    assert seen.get("repeat_penalty") == 1.0
+    monkeypatch.setattr(N, "get_rag_query_rewrite_llm", _getter("A: 로짓 증류\nB: 특징 증류"))
+    assert N._extract_comparison_targets("로짓 증류랑 특징 증류 비교") == []
