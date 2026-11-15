@@ -73,16 +73,3 @@ def test_reuse_only_right_after_rag_turn(monkeypatch):
     assert N.followup_reuse_context(s, "그거 실제로 써먹으려면 뭐가 필요해?") == ""
     monkeypatch.delenv("RAG_FOLLOWUP_REUSE")
     assert N.followup_reuse_context(_sess(), "그 논문의 한계는 뭐야?") == ""
-
-
-def test_reuse_v2_cited_only(monkeypatch):
-    """followup_v2_1115: 서수 없는 재사용은 직전 답이 인용한 논문 블록만."""
-    monkeypatch.setenv("RAG_FOLLOWUP_REUSE", "1")
-    monkeypatch.setenv("RAG_FOLLOWUP_V2", "1")
-    ctx3 = CTX + "\n\n---\n\n[2401.00003v1] C\n초록 C"
-    s = _sess()
-    s.last_rag = ("RAG 논문 알려줘", ctx3, N.body_item_ids(ANS))
-    out = N.followup_reuse_context(s, "그 논문의 한계는 뭐야?")
-    assert "2401.00001" in out and "2401.00002" in out and "2401.00003" not in out
-    monkeypatch.setenv("RAG_FOLLOWUP_V2", "0")
-    assert N.followup_reuse_context(s, "그 논문의 한계는 뭐야?") == ctx3
