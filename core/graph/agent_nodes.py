@@ -321,6 +321,14 @@ def is_followup(user_request: str) -> bool:
     return len(re.sub(r"\s", "", q)) <= 8 or bool(_FOLLOWUP_RE.search(q))
 
 
+def query_hist_turns() -> int:
+    """검색어 재작성에 넣는 직전 대화 턴 수 (기본 2)."""
+    try:
+        return max(1, int(os.getenv("RAG_QUERY_HIST_TURNS", "2") or 2))
+    except ValueError:
+        return 2
+
+
 def rag_history_allowed(user_request: str) -> bool:
     """논문 질문에서 대화 기록(검색어 재작성 · 답변 프롬프트)을 쓸지. 게이트가 꺼져 있으면 항상 쓴다."""
     if os.getenv("RAG_HISTORY_GATE", "0").strip() != "1":
@@ -1250,7 +1258,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             # 단일은 Top-1, 다중은 Top-5로 LLM 컨텍스트를 제한하기 때문에
             # Chroma query는 넉넉히 가져와도 되고, 최종 전달은 뒤에서 잘라냄
             _hist_ok = rag_history_allowed(user_request)
-            _recent_ctx = session.get_recent_context(max_turns=2) if _hist_ok else ""
+            # 검색어 재작성에 넣는 대화 턴 수 (RAG_QUERY_HIST_TURNS, docs/experiments/query_hist_1115) — 2턴이면 9B 가
+            # 두 턴 전 주제로 검색어를 만들었다(followup_v2_1115 dev 5/5)
+            _recent_ctx = session.get_recent_context(max_turns=query_hist_turns()) if _hist_ok else ""
             rag_query = _extract_english_rag_query(user_request, session_context=_recent_ctx)
             rag_trace.mark(chat_id, "query", query=rag_query, history=bool(_recent_ctx))
             if prefer_single_hit:

@@ -73,3 +73,13 @@ def test_reuse_only_right_after_rag_turn(monkeypatch):
     assert N.followup_reuse_context(s, "그거 실제로 써먹으려면 뭐가 필요해?") == ""
     monkeypatch.delenv("RAG_FOLLOWUP_REUSE")
     assert N.followup_reuse_context(_sess(), "그 논문의 한계는 뭐야?") == ""
+
+
+def test_query_hist_turns(monkeypatch):
+    """query_hist_1115: 검색어 재작성 기록 턴 수."""
+    monkeypatch.delenv("RAG_QUERY_HIST_TURNS", raising=False)
+    assert N.query_hist_turns() == 2
+    monkeypatch.setenv("RAG_QUERY_HIST_TURNS", "1")
+    assert N.query_hist_turns() == 1
+    monkeypatch.setenv("RAG_QUERY_HIST_TURNS", "x")
+    assert N.query_hist_turns() == 2
