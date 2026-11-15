@@ -83,3 +83,18 @@ def test_query_hist_turns(monkeypatch):
     assert N.query_hist_turns() == 1
     monkeypatch.setenv("RAG_QUERY_HIST_TURNS", "x")
     assert N.query_hist_turns() == 2
+
+
+def test_exclude_prev(monkeypatch):
+    """exclude_prev_1115: 새 논문을 원하는 이어지는 질문은 직전 답 논문을 뺀다(남는 게 2편 미만이면 그대로)."""
+    monkeypatch.setenv("RAG_EXCLUDE_PREV", "1")
+    s = _sess()
+    assert N.prev_answer_papers(s, "비슷한 연구 더 찾아줘") == {"2401.00001", "2401.00002"}
+    assert N.prev_answer_papers(s, "그 논문의 한계는 뭐야?") == set()  # 새 논문을 원하지 않음
+    assert N.prev_answer_papers(s, "KV 캐시 양자화 최신 동향 정리해줘") == set()  # 이어지는 질문 아님
+    ctx = CTX + "\n\n---\n\n[2401.00003v1] C\n초록 C\n\n---\n\n[2401.00004v1] D\n초록 D"
+    out, n = N.drop_papers(ctx, {"2401.00001", "2401.00002"})
+    assert n == 2 and "2401.00003" in out and "2401.00001" not in out
+    assert N.drop_papers(CTX + "\n\n---\n\n[2401.00003v1] C\n초록 C", {"2401.00001", "2401.00002"}) == (CTX + "\n\n---\n\n[2401.00003v1] C\n초록 C", 0)
+    monkeypatch.setenv("RAG_EXCLUDE_PREV", "0")
+    assert N.prev_answer_papers(s, "비슷한 연구 더 찾아줘") == set()
