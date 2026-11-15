@@ -392,10 +392,14 @@ def prev_answer_papers(session, user_request: str) -> set[str]:
     return {p for p in item_ids if p}
 
 
+_BLOCK_ID = re.compile(r"\[(\d{4}\.\d{4,5})(?:v\d+)?\]")
+
+
 def drop_papers(rag_context: str, ids: set[str], *, keep_min: int = 2) -> tuple[str, int]:
     """``ids`` 논문 블록을 뺀다. 남는 블록이 ``keep_min`` 보다 적으면 그대로 둔다 — 새 논문이 없을 때 엉뚱한 답을 막는다."""
     blocks = [b for b in (rag_context or "").split(_RAG_HIT_SEP) if b.strip()]
-    keep = [b for b in blocks if not any(p in "\n".join(b.strip().split("\n", 2)[:2]) for p in ids)]  # 머리 두 줄(번호 · ID)
+    # 블록의 첫 논문 ID — 머리는 [Distance] · [발행일] · [ID] 제목 순이라 줄 위치로 찾지 않는다
+    keep = [b for b in blocks if (_BLOCK_ID.search(b) or [None, None])[1] not in ids]
     if len(keep) == len(blocks) or len(keep) < keep_min:
         return rag_context, 0
     return _RAG_HIT_SEP.join(keep), len(blocks) - len(keep)

@@ -96,5 +96,8 @@ def test_exclude_prev(monkeypatch):
     out, n = N.drop_papers(ctx, {"2401.00001", "2401.00002"})
     assert n == 2 and "2401.00003" in out and "2401.00001" not in out
     assert N.drop_papers(CTX + "\n\n---\n\n[2401.00003v1] C\n초록 C", {"2401.00001", "2401.00002"}) == (CTX + "\n\n---\n\n[2401.00003v1] C\n초록 C", 0)
+    real = "[Distance: 0.1]\n[발행일: 2024-01-01]\n[2401.00001v1] A\n초록\n\n---\n\n[Distance: 0.2]\n[발행일: 2024-01-01]\n[2401.00005v1] E\n초록\n\n---\n\n[Distance: 0.3]\n[발행일: 2024-01-01]\n[2401.00006v1] F\n초록"
+    out, n = N.drop_papers(real, {"2401.00001"})  # 실제 검색 블록 머리 형식
+    assert n == 1 and "2401.00001" not in out
     monkeypatch.setenv("RAG_EXCLUDE_PREV", "0")
     assert N.prev_answer_papers(s, "비슷한 연구 더 찾아줘") == set()
