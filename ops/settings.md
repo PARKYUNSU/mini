@@ -53,6 +53,7 @@
 | 모델 | `LOCAL_LLM_MODEL` | `"qwen3.5:9b"` | 잡담 · 계획 · 코딩 폴백 모델. 코딩 폴백과 묶여 있어 바꾸지 않는다 |
 | 모델 | `GROQ_CODING_MODEL` | `"openai/gpt-oss-120b"` | 코딩 모델 |
 | 모델 | `OLLAMA_KEEP_ALIVE` | `"30m"` | 모델을 메모리에 두는 시간 (10-18 01:54 설정) |
+| 모델 | Ollama 앱 `context_length` (`.env` 아님, 앱 설정 DB) | `8192` | 모델 컨텍스트 창. 4096 이면 이어지는 질문 답이 항목 중간에서 잘렸다(11-16 변경, [`trunc_1115`](../docs/experiments/trunc_1115/README.md)) |
 | 경로 | `CHROMA_DB_PATH` | `"/Volumes/T7 Shield/mini-chroma-rebuild2"` | 논문 DB 폴더 (T7) |
 | 경로 | `CHECKPOINT_DB_PATH` | `"/Users/yunsupark/Library/Application Support/mini-agent/agent_checkpoints.db"` | 대화 체크포인트 DB (내장 디스크) |
 | 수집 | `ARXIV_PIPELINE_SCHEDULE_AT` | `01:00` | arXiv 수집 시각 |
