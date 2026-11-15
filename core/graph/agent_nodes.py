@@ -379,32 +379,6 @@ def followup_reuse_context(session, user_request: str) -> str:
     return blocks[n - 1] if 0 < n <= len(blocks) else ctx
 
 
-def prev_answer_papers(session, user_request: str) -> set[str]:
-    """새 논문을 원하는 이어지는 질문이면 직전 답 본론이 인용한 논문 ID (RAG_EXCLUDE_PREV, docs/experiments/exclude_prev_1115).
-    텔레그램 11-15: "비슷한 연구 더 찾아줘" 가 직전 답 논문 한 편만 되풀이했다."""
-    if os.getenv("RAG_EXCLUDE_PREV", "0").strip() != "1" or not getattr(session, "last_rag", None):
-        return set()
-    prev_q, _, item_ids = session.last_rag
-    if not session.recent_messages or session.recent_messages[-1][0] != f"User: {prev_q}":
-        return set()
-    if not (is_followup(user_request) and _NEW_PAPERS_RE.search(user_request)):
-        return set()
-    return {p for p in item_ids if p}
-
-
-_BLOCK_ID = re.compile(r"\[(\d{4}\.\d{4,5})(?:v\d+)?\]")
-
-
-def drop_papers(rag_context: str, ids: set[str], *, keep_min: int = 2) -> tuple[str, int]:
-    """``ids`` 논문 블록을 뺀다. 남는 블록이 ``keep_min`` 보다 적으면 그대로 둔다 — 새 논문이 없을 때 엉뚱한 답을 막는다."""
-    blocks = [b for b in (rag_context or "").split(_RAG_HIT_SEP) if b.strip()]
-    # 블록의 첫 논문 ID — 머리는 [Distance] · [발행일] · [ID] 제목 순이라 줄 위치로 찾지 않는다
-    keep = [b for b in blocks if (_BLOCK_ID.search(b) or [None, None])[1] not in ids]
-    if len(keep) == len(blocks) or len(keep) < keep_min:
-        return rag_context, 0
-    return _RAG_HIT_SEP.join(keep), len(blocks) - len(keep)
-
-
 def list_mode_active(user_request: str, *, prefer_single_hit: bool = False) -> bool:
     """목록·동향 질문 모드 (RAG_LIST_MODE, docs/experiments/list_mode_1016) — list 게이트 질문만."""
     if os.getenv("RAG_LIST_MODE", "0").strip() != "1" or prefer_single_hit:
@@ -1380,10 +1354,6 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
 
                         _extras = [_search_target(t) for t in _targets]
                         rag_context = _merge_rag_blocks(rag_context, _extras)
-                _excl = prev_answer_papers(session, user_request) if not _reuse else set()
-                if _excl:
-                    rag_context, _n_ex = drop_papers(rag_context, _excl)
-                    rag_trace.mark(chat_id, "exclude_prev", n=_n_ex)
                 rag_trace.mark(chat_id, "search", src=_src, ids=rag_trace.paper_ids(rag_context),
                                **({"topics": _topics} if _topics else {}))
                 if _reuse:
