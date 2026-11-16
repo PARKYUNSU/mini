@@ -32,6 +32,7 @@ from core.config.agent_config import (
     resolve_agent_tool_py,
 )
 from core.llm.code_extract import extract_python_code
+from core.llm.format_fix import format_fix_active, partial_wording, strip_hanzi
 from core.llm.lang_guard import (
     hanzi_count,
     KOREAN_RETRY_NUDGE,
@@ -1612,6 +1613,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 answer, _rm = mark_related_items(answer)
                 if _rm:
                     print(f"[DEBUG] DirectAnswer: 관련 연구 표시 {_rm}항목")
+            # '없음' 문장을 "직접 다룬 연구는 없고 가장 가까운 연구는" 꼴로 · 남은 한자 지우기 (RAG_FORMAT_FIX, format_fix_1117)
+            if format_fix_active():
+                answer, _pw = partial_wording(answer) if _pick == "없음" else (answer, 0)
+                answer, _hz = strip_hanzi(answer)
+                rag_trace.mark(chat_id, "format_fix", partial=_pw, hanzi=_hz)
             # 결론 수치를 같은 논문의 본론 값에 맞추고 · 전각 문장부호를 반각으로 (cross_metric_1113)
             answer, _al = align_conclusion_numbers(answer)
             answer, _fw = normalize_fullwidth_punct(answer)

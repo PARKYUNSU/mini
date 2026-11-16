@@ -10,6 +10,8 @@ from __future__ import annotations
 import os
 import re
 
+from core.llm.format_fix import term_rule
+
 from core.llm.answer_fix import _CITED, _find
 from core.llm.citation_fix import RAG_HIT_SEP, fix_citations
 from core.llm.lang_guard import hanzi_count
@@ -49,7 +51,24 @@ PROMPT_V2 = """[질문]
 - 수치는 원문 숫자를 그대로 옮기고 계산하지 마라(예: "62-64%에서 72%로").
 - 대상이 좁으면(특정 도메인·비공개 데이터·소규모·정성 평가) 그 점을 밝힌다.
 - 각 논문의 방법을 다시 설명하지 마라.
-- 한국어로. 머리말·제목·번호 없이 결론 문장만 출력한다."""
+{term_rule}- 한국어로. 머리말·제목·번호 없이 결론 문장만 출력한다."""
+
+# v4 (format_fix_1117 B): 질문에 직접 답하는 결론 — 사용자 평가 11-16: 비교 질문에 비교 결론이 없고(1번) · 질문 조건
+# (한국어 등)을 무시하고(7번) · 결론이 본론을 되풀이했다(8번).
+PROMPT_V4 = """[질문]
+{question}
+
+[논문별 핵심 — 초록에서 뽑은 원문 문장]
+{findings}
+
+[할 일]
+질문에 **직접 답하는** 결론을 2~3문장으로 써라.
+- 첫 문장은 질문에 대한 답이다. 비교 질문(A와 B 중 무엇이 나은지)이면 문서 근거로 어느 쪽이 어떤 조건에서 나은지 말하고, 문서로 판단할 수 없으면 그렇다고 쓴다.
+- 질문에 조건(언어 · 문서 유형 · 대상 등)이 있는데 문서가 그 조건을 다루지 않으면 그 점을 밝힌다.
+- 마지막 문장은 문서 결과에서 바로 나오는 실무 권고 한 문장이다. 문서에 없는 방법 · 수치는 쓰지 마라.
+- 근거 논문을 [문서 N] 으로 인용하되, 같은 논문을 한 문장에 두 번 인용하지 마라.
+- 각 논문의 방법을 다시 설명하지 마라. 수치는 원문 숫자를 그대로 옮긴다.
+{term_rule}- 한국어로. 머리말·제목·번호 없이 결론 문장만 출력한다."""
 
 _RESULT_RE = re.compile(
     r"outperform|improv|reduc|increas|achiev|surpass|benefit|cost-effective|limit|degrad|drop|cliff|"
@@ -184,8 +203,10 @@ def rewrite_conclusion(
 
     b, c = _find("본론", answer), _find("결론", answer)
     mode = os.getenv("RAG_CONCLUSION_PROMPT", "v1").strip()
-    if mode == "v2":
-        prompt = PROMPT_V2.format(question=question, findings=_findings_text(blocks))
+    if mode == "v4":
+        prompt = PROMPT_V4.format(question=question, findings=_findings_text(blocks), term_rule=term_rule())
+    elif mode == "v2":
+        prompt = PROMPT_V2.format(question=question, findings=_findings_text(blocks), term_rule=term_rule())
     else:
         prompt = PROMPT.format(
             question=question, blocks=RAG_HIT_SEP.join(blocks.values()), body=answer[b.end():c.start()].strip()

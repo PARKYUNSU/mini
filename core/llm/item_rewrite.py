@@ -14,6 +14,7 @@ import re
 from core.llm.answer_fix import _CITED, _find
 from core.llm.body_numbers import _ITEM, _bad, _blocks
 from core.llm.lang_guard import hanzi_count
+from core.llm.format_fix import _GLUED, format_fix_active, term_rule
 
 __all__ = ["rewrite_items", "check_item"]
 
@@ -35,7 +36,7 @@ PROMPT = """[질문]
 3) 평가 대상·조건·한계 — 문서에 있을 때만
 - 문서에 적힌 내용만 쓴다. 이 논문이 질문에 답한다거나 질문과 관련 있다는 문장은 쓰지 마라.
 - 전문 용어는 문서의 뜻 그대로 옮긴다(예: hallucination = 환각).
-- 한국어로. 논문 이름·번호·인용·머리말 없이 문장만 출력한다."""
+{term_rule}- 한국어로. 논문 이름·번호·인용·머리말 없이 문장만 출력한다."""
 
 _NAME = re.compile(r"^((?:<b>[^<\n]+</b>|\*\*[^*\n]+\*\*)\s*[:：]?\s*)")
 _BLOCK_MAX = 2500
@@ -47,6 +48,8 @@ def check_item(text: str, old: str, src: str) -> str:
         return "길이"
     if hanzi_count(text):
         return "한자"
+    if format_fix_active() and _GLUED.search(text):
+        return "섞인 글자"
     if len(text) <= len(_CITED.sub("", old).strip()):
         return "짧아짐"
     for s in re.split(r"(?<=[.!?。])\s+", text):
@@ -91,7 +94,7 @@ def rewrite_items(
         name = (_NAME.match(text) or [""])[0]
         old = text[len(name):]
         try:
-            msg = PROMPT.format(question=question, block=src.strip()[:_BLOCK_MAX], item=_CITED.sub("", old).strip())
+            msg = PROMPT.format(question=question, block=src.strip()[:_BLOCK_MAX], item=_CITED.sub("", old).strip(), term_rule=term_rule())
             new = str(llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=msg)]).content or "").strip()
         except Exception as exc:  # 항목을 못 바꿔도 답은 낸다
             print(f"[DEBUG] item_rewrite 실패: {type(exc).__name__}: {str(exc)[:120]}")
