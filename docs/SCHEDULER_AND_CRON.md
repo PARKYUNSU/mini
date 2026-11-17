@@ -21,6 +21,7 @@
 | **Phase35 YES 심사·브리핑** | **`PHASE35_CURATOR_SCHEDULE_AT`** (기본 **08:00**) | 동일 마스터 스위치 | `python -m apps.backfill.phase35_auto_curator` **자식 Popen** | `.cron/phase35_curator_stdout.log` |
 | **Boardroom** | **`BOARDROOM_SCHEDULE_AT`** (기본 **10:00**) · **매일(월~일)** 기본 | `BOARDROOM_SCHEDULE_ENABLED`≠0 (기본 **켜짐**) | `python -m apps.boardroom.swarm_meeting` **자식 Popen** | `.cron/boardroom_stdout.log`, PID: `.cron/boardroom_child.pid` |
 | **주일 찬양 제목 정리** | **수 08:35** | `NOTION_TOKEN` 있음, `CHURCH_LYRICS_SCHEDULE_ENABLED`≠0 | `python -m apps.church_lyrics rename` (스레드) | `.cron/church_lyrics_stdout.log`, `.cron/job_runs.jsonl` |
+| **ProPresenter 찬양 사본** | **토 08:30** | `PROPRESENTER_URL` 있음 | `python -m apps.church_lyrics pp-sync` (스레드, GET 만) | `.cron/propresenter_songs.json` |
 | **주일 찬양 가사 게시** | **토 09:00** (콘티 없으면 **토 11~21시 2시간마다 · 주일 07:00** 재시도) | 동일 | `python -m apps.church_lyrics lyrics` (스레드) | 동일. 종료 코드 2 = 콘티 없음 → `.cron/church_lyrics_pending_*.marker` |
 | **주일 찬양 가사 DB 저장** | **매시 10분** | 동일 | `python -m apps.church_lyrics harvest` (스레드) | 동일. '확인 완료' 체크된 콜아웃의 가사를 찬양 가사 DB로 |
 

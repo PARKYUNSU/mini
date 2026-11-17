@@ -3,7 +3,7 @@ from datetime import date
 
 import pytest
 
-from apps.church_lyrics import compare, jobs, notion, sources
+from apps.church_lyrics import compare, jobs, notion, propresenter, sources
 
 pytestmark = pytest.mark.unit
 
@@ -54,6 +54,8 @@ def world(monkeypatch):
         sources.Candidate("https://a.example/1", LYRICS),
         sources.Candidate("https://b.example/2", LYRICS)])
     w["records"] = []
+    w["pp"] = []
+    monkeypatch.setattr(propresenter, "load", lambda: w["pp"])
     monkeypatch.setattr(jobs, "record", lambda logs: w["records"].extend(logs))   # 실제 .cron 에 쓰지 않음
     monkeypatch.setattr(sources, "proofread", lambda lyrics, title="": (w["spacing"], w["typos"]))
     w["spacing"], w["typos"] = [], []
@@ -236,3 +238,15 @@ def test_posted_and_dry_run_records(world):
     jobs.lyrics_job("2026-10-11")
     assert [r["stage"] for r in world["records"]] == ["posted", "posted"]
     assert world["records"][0]["sources"] == 2 and world["records"][0]["typos"] == 0
+
+
+def test_propresenter_title_then_lyrics_before_web(world):
+    pp_song = {"name": "첫째 곡", "uuid": "1", "lines": ["예배용 첫 줄", "예배용 둘째 줄"]}
+    world["pp"] = [pp_song, {"name": "아침 햇살이 창을 두드리면", "uuid": "2", "lines": LYRICS.splitlines()}]
+    jobs.lyrics_job("2026-10-11")
+    first, second = world["appended"][0][2]
+    assert first["callout"]["icon"]["emoji"] == "📘" and "(첫째 곡)" in header(first)          # 이름으로
+    assert second["callout"]["icon"]["emoji"] == "📘" and "웹 가사와 일치" in header(second)    # 웹 가사로
+    assert [r["stage"] for r in world["records"]] == ["pp_title", "pp_lyrics"]
+    todo = [k["type"] for k in first["callout"]["children"]]
+    assert todo[-1] == "to_do"     # 체크하면 가사 DB 로 → 다음부터 📗

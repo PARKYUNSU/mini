@@ -3,6 +3,7 @@
   python -m apps.church_lyrics rename              # 수요일: '2026-00-00 주일' 제목을 날짜로
   python -m apps.church_lyrics lyrics [--date YYYY-MM-DD] [--dry-run]   # 토요일: 가사 게시
   python -m apps.church_lyrics harvest             # '확인 완료' 체크된 가사를 가사 DB에 저장
+  python -m apps.church_lyrics pp-sync             # 교회 ProPresenter 찬양 라이브러리 사본 받기(GET 만)
 
 종료 코드: 0 정상 · 1 주일 페이지/'02 찬양' 제목 없음 · 2 콘티가 아직 비어 있음(스케줄러가 2시간 뒤 재시도)
 """
@@ -13,7 +14,7 @@ import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import compare, notion, setlist, sources
+from . import compare, notion, propresenter, setlist, sources
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 KST = timezone(timedelta(hours=9))
@@ -182,14 +183,23 @@ def callout(song, icon, color, status, lyrics, notes=(), todo=True):
     }}
 
 
-def build(song, index, log=None):
-    """곡 하나의 콜아웃. log 에는 어느 단계에서 끝났는지(stage)와 단계별 수를 남깁니다."""
+PP_STATUS = "사용 후 체크하면 가사 DB에 저장"
+
+
+def build(song, index, log=None, pp=()):
+    """곡 하나의 콜아웃. log 에는 어느 단계에서 끝났는지(stage)와 단계별 수를 남깁니다.
+    순서: 가사 DB(📗) → ProPresenter 곡 이름·첫 줄(📘) → 웹 검색 → 웹 가사와 겹치는 ProPresenter 곡(📘) → 웹 가사."""
     log = {} if log is None else log
     saved = index.get(setlist.norm(song.title))
     if saved and saved != "dry-run":
         log["stage"] = "db"
         return callout(song, "📗", "gray_background", "가사 DB에서 가져옴 (확인된 가사)",
                        lyrics_read(saved), todo=False)
+    known = propresenter.by_title(song.title, pp)
+    if known:
+        log["stage"], log["pp"] = "pp_title", known["name"]
+        return callout(song, "📘", "blue_background",
+                       f"ProPresenter 찬양 라이브러리에서 가져옴 ({known['name']}). {PP_STATUS}", "\n".join(known["lines"]))
     try:
         found = sources.candidates(song.title, song.url, trace=log)
     except Exception as e:  # 검색·모델 오류로 한 곡이 실패해도 나머지 곡은 계속
@@ -204,6 +214,12 @@ def build(song, index, log=None):
 
     result = compare.compare([c.lyrics for c in found], song.title,
                              tuple(i for i, c in enumerate(found) if c.verify_only))
+    known = propresenter.by_lyrics(result.lyrics, pp)
+    if known:  # 웹 가사로 찾은 같은 곡의 실제 예배용 가사
+        log["stage"], log["pp"], log["sources"] = "pp_lyrics", known["name"], len(found)
+        return callout(song, "📘", "blue_background",
+                       f"웹 가사와 일치하는 ProPresenter 곡 ({known['name']}). {PP_STATUS}", "\n".join(known["lines"]),
+                       [notion.text("웹 출처: ") + [r for i in result.used for r in notion.text(f"[{i + 1}] ", found[i].url)]])
     try:
         spacing, typos = sources.proofread(result.lyrics, song.title)
     except Exception:  # 검증이 실패해도 가사 게시는 계속
@@ -277,12 +293,12 @@ def lyrics_job(date=None, dry_run=False) -> int:
         return 2
 
     done = {setlist.norm(title) for _, title in auto_callouts(section)} | skip_titles()
-    blocks, logs = [], []
+    blocks, logs, pp_songs = [], [], propresenter.load()
     for song in songs:
         if setlist.norm(song.title) in done:
             continue
         log = {}
-        block = build(song, index, log)
+        block = build(song, index, log, pp_songs)
         header = notion.plain([{"plain_text": t["text"]["content"]} for t in block["callout"]["rich_text"]])
         print(header)
         blocks.append(block)
@@ -310,6 +326,7 @@ def main(argv=None) -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("rename")
     sub.add_parser("harvest")
+    sub.add_parser("pp-sync", help="교회 ProPresenter 찬양 라이브러리 사본 받기(GET 만)")
     p = sub.add_parser("lyrics")
     p.add_argument("--date", help="YYYY-MM-DD (기본: 다가오는 주일)")
     p.add_argument("--dry-run", action="store_true", help="노션에 쓰지 않고 결과만 출력")
@@ -318,4 +335,7 @@ def main(argv=None) -> int:
         return rename_job()
     if args.cmd == "harvest":
         return harvest_job()
+    if args.cmd == "pp-sync":
+        print("ProPresenter 사본:", propresenter.sync(), "곡")
+        return 0
     return lyrics_job(args.date, args.dry_run)
