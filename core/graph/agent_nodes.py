@@ -32,6 +32,14 @@ from core.config.agent_config import (
     resolve_agent_tool_py,
 )
 from core.llm.code_extract import extract_python_code
+from core.llm.cond_keep import (
+    add_missing_to_intro,
+    cond_keep_active,
+    judge_conditions,
+    keep_terms_note,
+    missing_conditions,
+    missing_sentence,
+)
 from core.llm.doc_judge import (
     agg_slots_active,
     agg_slots_template,
@@ -1460,6 +1468,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             _pick = None
             _agg = _doc_labels = None  # 문서별 판정 집계 (RAG_JUDGE_AGG)
             _agg_slots = False  # 판정대로 답 칸 (RAG_AGG_SLOTS)
+            _conds = None  # 질문 조건 (RAG_COND_KEEP)
             _v2 = None  # 판정 v2 결과 (RAG_JUDGE_V2)
             # 여러 주제 질문은 한 편을 찾는 판정이 '없음'으로 기운다 — 항목마다 문서를 묻고, 없는 항목은 답 앞에 밝힌다
             # (RAG_TOPIC_ANSWER, docs/experiments/topic_answer_1104). 항목을 못 읽거나 판정이 실패하면 기존 판정으로 간다.
@@ -1516,6 +1525,23 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     system_prompt = system_prompt + NO_DOC_HINT
                 elif _v2 is not None and _v2 != "없음" and _v2[0] == "부분":
                     system_prompt = system_prompt + PARTIAL_HINT
+            # 질문 조건(언어 · 문서 유형 · 분야 · 비교 대상)을 다룬 문서가 없으면 서론에 밝히고, 질문 표현을 지키게 한다
+            # (RAG_COND_KEEP, cond_keep_1118). 판정이 안 도는 비교 질문(W04)도 대상이라 판정 밖에서 부른다.
+            if cond_keep_active() and _doc_ids and not _list_on and not _item_docs and not image_base64:
+                _conds = judge_conditions(user_request, rag_context)
+                rag_trace.mark(chat_id, "cond_keep", conds=_conds)
+                if keep_terms_note(_conds) and not _agg_slots:
+                    prompt = direct_answer_rag_user(
+                        _answer_session_ctx,
+                        rag_context,
+                        last_ai,
+                        user_request,
+                        output_template_strict=output_template,
+                        rag_max_chars=rag_max_chars,
+                        doc_count=len(_doc_ids),
+                        list_mode=_list_on,
+                        extra_note=keep_terms_note(_conds),
+                    )
             # 일반 질문도 문서마다 한 칸 (RAG_DOC_SLOTS, docs/experiments/doc_slots_1111) — v13 은 일반 템플릿에서 거의 늘 2개만 채운다.
             # 판정 뒤에 바꾼다: 판정 호출의 프롬프트는 그대로이고, '없음' 판정은 v13 의 정답 없음 형식(최대 2개)을 그대로 둔다.
             _doc_slots = (
@@ -1541,6 +1567,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     output_template_strict=agg_slots_template(_doc_labels, _agg),
                     rag_max_chars=rag_max_chars,
                     doc_count=len(_doc_ids),
+                    extra_note=keep_terms_note(_conds),
                 )
             rag_trace.mark(chat_id, "judge", gates=gate_types(user_request), pick=_pick,
                            **({"v2": list(_v2) if isinstance(_v2, tuple) else _v2, "judge_model": RAG_JUDGE_MODEL} if os.getenv("RAG_JUDGE_V2", "0").strip() == "1" else {}),
@@ -1664,6 +1691,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 rag_trace.mark(chat_id, "format_fix", partial=_pw, hanzi=_hz)
             if _agg_slots and _agg == "c":
                 answer, _ = strip_no_doc_ids(answer)
+            if _conds:
+                answer, _cm = add_missing_to_intro(answer, missing_sentence(missing_conditions(_conds)))
             # 알려진 잘못된 음차 · 항목 제목 (RAG_TERM_FIX, term_fix_1118)
             if term_fix_active():
                 answer, _tf = fix_terms(answer)

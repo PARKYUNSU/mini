@@ -30,13 +30,13 @@ def judge_agg_active() -> bool:
     return os.getenv("RAG_JUDGE_AGG", "0").strip() == "1"
 
 
-def doc_blocks(rag_context: str) -> list[tuple[int, str]]:
-    """``[문서 N]`` 블록 → [(N, '제목\\n초록 900자')]."""
+def doc_blocks(rag_context: str, limit: int = 900) -> list[tuple[int, str]]:
+    """``[문서 N]`` 블록 → [(N, '제목\\n초록 limit 자')]."""
     out = []
     for m in re.finditer(r"\[문서 (\d+)\]\n(.*?)(?=\n\[문서 \d+\]\n|\Z)", rag_context or "", re.S):
         b = m.group(2)
         t = re.search(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*(.*)", b)
-        ab = re.sub(r"\s+", " ", b.split("[초록]", 1)[-1] if "[초록]" in b else b).strip()[:900]
+        ab = re.sub(r"\s+", " ", b.split("[초록]", 1)[-1] if "[초록]" in b else b).strip()[:limit]
         out.append((int(m.group(1)), (t.group(1).strip() if t else "") + "\n" + ab))
     return out
 
