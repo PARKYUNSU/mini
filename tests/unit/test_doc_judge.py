@@ -23,3 +23,14 @@ def test_aggregate():
     assert aggregate({1: "P", 2: "D", 3: "D"}) == ("a", 2)
     assert aggregate({1: "P", 2: "N"}) == ("b", "없음")
     assert aggregate({1: "N", 2: "N"}) == ("c", "없음")
+
+
+def test_agg_slots_template():
+    from core.llm.doc_judge import agg_slots_template
+    t = agg_slots_template({1: "D", 2: "N", 3: "P", 4: "D"}, "a")
+    assert "[문서 1]" in t and "[문서 2]" not in t and "[문서 3]" in t and "[문서 4]" in t
+    assert t.count("(관련 연구)") == 2  # 칸 하나 + 규칙 한 줄
+    b = agg_slots_template({1: "P", 2: "N"}, "b")
+    assert "질문이 찾는 연구가 없습니다" in b and "[문서 1]" in b
+    c = agg_slots_template({1: "N"}, "c")
+    assert "[문서 1]" not in c and "관련된 문서가 없습니다" in c

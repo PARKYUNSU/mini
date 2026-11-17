@@ -72,3 +72,45 @@ def judge_docs(question: str, rag_context: str) -> dict[int, str] | None:
     if len(got) < len(blocks):
         return None
     return {n: _LAB.get(got.get(i), "P") for i, (n, _) in enumerate(blocks, 1)}
+
+
+def agg_slots_active() -> bool:
+    return os.getenv("RAG_AGG_SLOTS", "0").strip() == "1"
+
+
+_NO_INTRO = "제공된 문서에는 질문이 찾는 연구가 없습니다."
+_NO_CONCL = "따라서 질문이 찾는 연구는 제공된 문서에서 찾을 수 없습니다."
+
+
+def agg_slots_template(labels: dict[int, str], agg: str) -> str:
+    """판정대로 답 칸 (RAG_AGG_SLOTS, docs/experiments/agg_slots_1117): 직접 · 부분 문서마다 한 칸, 무관 문서는 칸 없음."""
+    keep = [n for n in sorted(labels) if labels[n] in ("D", "P")][:5]
+    if agg == "c" or not keep:
+        intro, body, concl = f"`{_NO_INTRO}` 를 그대로 쓴다.", "질문과 관련된 문서가 없습니다.", f"`{_NO_CONCL}` 를 그대로 쓴다."
+    else:
+        tag = lambda n: " (관련 연구)" if labels[n] == "P" else ""
+        body = "\n".join(f"{i}. **{{핵심 접근·시스템 이름}}**{tag(n)}: 무엇을 했고 결과가 무엇인지 1~2문장 [문서 {n}]"
+                         for i, n in enumerate(keep, 1))
+        if agg == "b":
+            intro, concl = f"첫 문장은 `{_NO_INTRO}` 를 그대로 쓴다.", f"첫 문장은 `{_NO_CONCL}` 를 그대로 쓰고, 위 관련 연구가 질문의 어느 부분과 닿는지 한 문장."
+        else:
+            intro, concl = "질문이 가리키는 문제와 왜 어려운지 1~2문장. 핵심 용어는 **굵게**.", "위 항목들을 종합해 질문에 답하는 한 단락. 문서에 없는 처방을 지어내지 마세요."
+    return f"""[다중 문서 출력 템플릿 지시사항 - 판정된 문서별 칸]
+아래 뼈대를 그대로 따라 값만 채우세요.
+
+[출력 템플릿]
+### 서론
+{intro}
+
+### 본론
+{body}
+
+### 결론
+{concl}
+
+[규칙]
+- 본론의 칸은 모두 채운다. 칸을 빼거나 더하지 않는다. 칸 끝의 `[문서 k]` 는 그대로 둔다.
+- 각 칸에는 그 문서에 있는 내용만 쓴다. **arXiv ID 를 옮겨 적지 마세요.**
+- `(관련 연구)` 표시는 그대로 둔다.
+- 중괄호 안의 안내 문구는 출력 금지.
+"""
