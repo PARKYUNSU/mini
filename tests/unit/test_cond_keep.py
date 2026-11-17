@@ -14,3 +14,22 @@ def test_missing_sentence_and_intro():
 def test_keep_terms_note():
     assert "'기준 문서'" in keep_terms_note([{"종류": "문서 유형", "값": "기준 문서", "다룬 논문": []}])
     assert keep_terms_note([{"종류": "언어", "값": "한국어", "다룬 논문": []}]) == ""
+
+
+def test_judge_docs_and_conditions(monkeypatch):
+    import json
+
+    import requests
+
+    from core.llm.cond_keep import judge_docs_and_conditions
+
+    class R:
+        def json(self):
+            return {"message": {"content": json.dumps({"판정": [{"번호": 1, "관련도": "직접"}, {"번호": 2, "관련도": "무관"}],
+                                                       "조건": [{"종류": "언어", "값": "한국어", "다룬 논문": [2]},
+                                                              {"종류": "분야", "값": "우주", "다룬 논문": []}]})}}
+    monkeypatch.setattr(requests, "post", lambda *a, **k: R())
+    ctx = "[문서 3]\n[2401.00001] A\n[초록] a\n\n[문서 7]\n[2401.00002] B\n[초록] b"
+    labels, conds = judge_docs_and_conditions("한국어 문서 연구", ctx)
+    assert labels == {3: "D", 7: "N"}
+    assert conds == [{"종류": "언어", "값": "한국어", "다룬 논문": [7]}]  # '우주' 는 질문에 없어 버림, 번호는 문서 번호로

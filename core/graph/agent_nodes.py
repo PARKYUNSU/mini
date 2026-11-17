@@ -36,6 +36,7 @@ from core.llm.cond_keep import (
     add_missing_to_intro,
     cond_keep_active,
     judge_conditions,
+    judge_docs_and_conditions,
     keep_terms_note,
     missing_conditions,
     missing_sentence,
@@ -1500,7 +1501,12 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request) and not _topics and not _item_docs:
                 # 답변과 같은 앞부분으로 판정하면 답변 호출이 컨텍스트를 다시 읽지 않는다 (docs/experiments/judge_cache_1017)
                 # 문서별 직접/부분/무관 집계로 '없음' 여부를 정한다 (RAG_JUDGE_AGG, docs/experiments/judge_agg_1117). 실패하면 아래 기존 판정.
-                _doc_labels = judge_docs(user_request, rag_context) if judge_agg_active() and not image_base64 else None
+                _doc_labels = None
+                if judge_agg_active() and not image_base64:
+                    if cond_keep_active():  # 조건 판정을 같은 27B 호출에 합친다 (cond_keep_1118 §5)
+                        _doc_labels, _conds = judge_docs_and_conditions(user_request, rag_context)
+                    if _doc_labels is None:
+                        _doc_labels = judge_docs(user_request, rag_context)
                 if _doc_labels:
                     _agg, _pick = aggregate(_doc_labels)
                     _agg_slots = agg_slots_active() and not _list_on and not _item_docs
@@ -1511,6 +1517,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                             user_request, rag_query, rag_context, _doc_ids, _doc_labels, years=_py)
                         if _promoted:
                             _agg, _pick = aggregate(_doc_labels)
+                            _conds = None  # 올린 문서까지 보고 조건을 다시 본다
                         rag_trace.mark(chat_id, "ext_promote", promoted=_promoted)
                 elif os.getenv("RAG_JUDGE_V2", "0").strip() == "1" and not image_base64:
                     # 질문 꼴(특정 연구 · 주제 추천)을 먼저 가리고 있음 · 부분 · 없음 (docs/experiments/judge_v2_1113)
@@ -1528,8 +1535,10 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             # 질문 조건(언어 · 문서 유형 · 분야 · 비교 대상)을 다룬 문서가 없으면 서론에 밝히고, 질문 표현을 지키게 한다
             # (RAG_COND_KEEP, cond_keep_1118). 판정이 안 도는 비교 질문(W04)도 대상이라 판정 밖에서 부른다.
             if cond_keep_active() and _doc_ids and not _list_on and not _item_docs and not image_base64:
-                _conds = judge_conditions(user_request, rag_context)
-                rag_trace.mark(chat_id, "cond_keep", conds=_conds)
+                _merged = _conds is not None
+                if not _merged:  # 판정이 안 돈 질문(비교 질문 등) · 외부 문서를 올린 질문만 따로 부른다
+                    _conds = judge_conditions(user_request, rag_context)
+                rag_trace.mark(chat_id, "cond_keep", conds=_conds, merged=_merged)
                 if keep_terms_note(_conds) and not _agg_slots:
                     prompt = direct_answer_rag_user(
                         _answer_session_ctx,

@@ -87,3 +87,49 @@ def keep_terms_note(conds: list[dict] | None) -> str:
         return ""
     q = ", ".join(f"'{v}'" for v in vals)
     return f"\n- 질문의 표현 {q} 은(는) 답에서도 그대로 쓴다. 문서가 다른 유형(예: 법령 · 판례)을 다뤘으면 그 유형 이름은 그 논문 설명에만 쓰고, 질문의 표현을 그것으로 바꾸지 않는다.\n"
+
+
+_COMBINED_TAIL = """
+이어서, 질문이 연구에 거는 조건도 뽑아라. 조건 종류는 "언어"(예: 한국어), "문서 유형"(예: 지속가능경영보고서, 기준 문서, 회의록), "분야"(예: 금융, 의료), "비교 대상"(질문이 둘 이상을 비교하라고 할 때 그 대상들) 뿐이다. 질문에 명시된 것만, 질문에 쓰인 말 그대로 적는다. 일반적인 주제(RAG, LLM 평가 등)는 조건이 아니다. 조건이 없으면 빈 목록.
+조건마다 그 조건을 직접 다룬 논문 번호를 고른다. 언어 조건이면 그 언어를 실험에 포함한 논문, 비교 대상이면 그 대상들을 직접 비교한 논문, 문서 유형이면 바로 그 유형의 문서를 다룬 논문이다(비슷한 다른 유형은 아니다 — 예: 법령 · 판례 문서는 기업의 기준 문서가 아니고, 뉴스는 공시 문서가 아니다). 초록에 근거가 없으면 고르지 않는다.
+
+JSON 으로만 답하라: {{"판정": [{{"번호": 1, "관련도": "직접|부분|무관"}}, ...], "조건": [{{"종류": "언어", "값": "한국어", "다룬 논문": [2]}}]}}"""
+
+
+def judge_docs_and_conditions(question: str, rag_context: str):
+    """문서 판정(doc_judge 와 같은 지시 · 같은 초록 900자)과 조건 판정을 27B 한 번에 (cond_keep_1118 §5).
+
+    반환: (labels {문서 번호: D/P/N} | None, conds | None). 실패하면 (None, None) — 호출 쪽은 따로 부른다.
+    """
+    import requests
+
+    from core.config.agent_config import ollama_kwargs
+    from core.llm.doc_judge import _LAB, PROMPT as DOC_PROMPT, SCHEMA as DOC_SCHEMA, doc_blocks
+
+    blocks = doc_blocks(rag_context)
+    if not blocks:
+        return None, None
+    docs = "\n\n".join(f"[{i}] {text}" for i, (_, text) in enumerate(blocks, 1))
+    head = DOC_PROMPT.split("JSON 으로만 답하라")[0].rstrip()
+    schema = {"type": "object", "properties": {"판정": DOC_SCHEMA["properties"]["판정"], "조건": SCHEMA["properties"]["조건"]},
+              "required": ["판정", "조건"]}
+    kw = ollama_kwargs()
+    try:
+        r = requests.post(f"{kw['base_url']}/api/chat", json={
+            "model": os.getenv("RAG_DOC_JUDGE_MODEL", "qwen3.6:27b-q4_K_M"), "stream": False, "think": False,
+            "format": schema, "keep_alive": kw["keep_alive"], "options": {"temperature": 0, "num_ctx": 8192},
+            "messages": [{"role": "user", "content": head.format(q=question, docs=docs) + "\n" + _COMBINED_TAIL.format()}]},
+            timeout=150)
+        out = json.loads(r.json()["message"]["content"])
+        got = {x["번호"]: x["관련도"] for x in out["판정"]}
+        conds = out["조건"]
+    except Exception as e:  # noqa: BLE001
+        print(f"[WARN] doc+cond 판정 실패: {e}")
+        return None, None
+    if len(got) < len(blocks):
+        return None, None
+    labels = {n: _LAB.get(got.get(i), "P") for i, (n, _) in enumerate(blocks, 1)}
+    idx2num = {i: n for i, (n, _) in enumerate(blocks, 1)}
+    conds = [{**c, "다룬 논문": [idx2num[k] for k in c.get("다룬 논문", []) if k in idx2num]} for c in conds
+             if c.get("값") and all(w in question for w in re.split(r"\s*[·,/]\s*|\s+", c["값"].strip()) if w)]
+    return labels, conds
