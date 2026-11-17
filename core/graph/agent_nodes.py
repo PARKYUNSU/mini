@@ -32,6 +32,7 @@ from core.config.agent_config import (
     resolve_agent_tool_py,
 )
 from core.llm.code_extract import extract_python_code
+from core.llm.doc_judge import aggregate, judge_agg_active, judge_docs
 from core.llm.format_fix import format_fix_active, partial_wording, strip_hanzi
 from core.llm.lang_guard import (
     hanzi_count,
@@ -1441,6 +1442,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 list_mode=_list_on,
             )
             _pick = None
+            _agg = _doc_labels = None  # 문서별 판정 집계 (RAG_JUDGE_AGG)
             _v2 = None  # 판정 v2 결과 (RAG_JUDGE_V2)
             # 여러 주제 질문은 한 편을 찾는 판정이 '없음'으로 기운다 — 항목마다 문서를 묻고, 없는 항목은 답 앞에 밝힌다
             # (RAG_TOPIC_ANSWER, docs/experiments/topic_answer_1104). 항목을 못 읽거나 판정이 실패하면 기존 판정으로 간다.
@@ -1471,7 +1473,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     _rewrite_q = f"{user_request}\n(문서에 없는 항목: {', '.join(_missing)} — 결론에서 다루지 마라)"
             if os.getenv("RAG_PRESENCE_JUDGE", "0").strip() == "1" and _doc_ids and should_judge(user_request) and not _topics and not _item_docs:
                 # 답변과 같은 앞부분으로 판정하면 답변 호출이 컨텍스트를 다시 읽지 않는다 (docs/experiments/judge_cache_1017)
-                if os.getenv("RAG_JUDGE_V2", "0").strip() == "1" and not image_base64:
+                # 문서별 직접/부분/무관 집계로 '없음' 여부를 정한다 (RAG_JUDGE_AGG, docs/experiments/judge_agg_1117). 실패하면 아래 기존 판정.
+                _doc_labels = judge_docs(user_request, rag_context) if judge_agg_active() and not image_base64 else None
+                if _doc_labels:
+                    _agg, _pick = aggregate(_doc_labels)
+                elif os.getenv("RAG_JUDGE_V2", "0").strip() == "1" and not image_base64:
                     # 질문 꼴(특정 연구 · 주제 추천)을 먼저 가리고 있음 · 부분 · 없음 (docs/experiments/judge_v2_1113)
                     _v2 = judge_presence_shared_v2(system_prompt, prompt, user_request, RAG_JUDGE_MODEL)
                     _pick = _v2 if _v2 is None or _v2 == "없음" else _v2[1]
@@ -1503,7 +1509,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             rag_trace.mark(chat_id, "judge", gates=gate_types(user_request), pick=_pick,
                            **({"v2": list(_v2) if isinstance(_v2, tuple) else _v2, "judge_model": RAG_JUDGE_MODEL} if os.getenv("RAG_JUDGE_V2", "0").strip() == "1" else {}),
                            **({"items": _items, "item_docs": _item_docs} if _items else {}),
-                           **({"doc_slots": True} if _doc_slots else {}))
+                           **({"doc_slots": True} if _doc_slots else {}),
+                           **({"agg": _agg, "doc_labels": _doc_labels} if _agg else {}))
             # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다
             if external_search_active() and (
                 _pick == "없음" or _list_on or _item_docs
@@ -1615,7 +1622,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     print(f"[DEBUG] DirectAnswer: 관련 연구 표시 {_rm}항목")
             # '없음' 문장을 "직접 다룬 연구는 없고 가장 가까운 연구는" 꼴로 · 남은 한자 지우기 (RAG_FORMAT_FIX, format_fix_1117)
             if format_fix_active():
-                answer, _pw = partial_wording(answer) if _pick == "없음" else (answer, 0)
+                # 전부 무관(c)이면 "가장 가까운 연구" 로 바꾸지 않는다 (judge_agg_1117)
+                answer, _pw = partial_wording(answer) if _pick == "없음" and _agg != "c" else (answer, 0)
                 answer, _hz = strip_hanzi(answer)
                 rag_trace.mark(chat_id, "format_fix", partial=_pw, hanzi=_hz)
             # 결론 수치를 같은 논문의 본론 값에 맞추고 · 전각 문장부호를 반각으로 (cross_metric_1113)
