@@ -9,7 +9,7 @@
 - morning_scraper: 매일 **07:30** (기본) — ``MORNING_SCRAPER_SCHEDULE_AT`` (Phase35와 같은 마스터 스위치)
 - Boardroom(자율 R&D 회의): 기본 **매일(월~일)** 동일 시각 — ``BOARDROOM_SCHEDULE_DAILY=0`` 이면 **월~금만**
   - ``BOARDROOM_SCHEDULE_AT`` / ``BOARDROOM_SCHEDULE_ENABLED`` / ``BOARDROOM_SCHEDULE_SKIP_IF_NO_YES`` (swarm_meeting 자식)
-- 주일 찬양 가사(apps.church_lyrics): 수 08:35 ``rename`` · 토 09:00 ``lyrics`` (종료 코드 2=콘티 없음이면 토 11:00 한 번 더) · 매시 10분 ``harvest``.
+- 주일 찬양 가사(apps.church_lyrics): 수 08:35 ``rename`` · 토 09:00 ``lyrics`` (종료 코드 2=콘티 없음이면 토 11~21시 2시간마다 · 주일 07:00 다시) · 매시 10분 ``harvest``.
   ``NOTION_TOKEN`` 있고 ``CHURCH_LYRICS_SCHEDULE_ENABLED``≠0 일 때. 결과는 ``.cron/job_runs.jsonl`` (event=church_lyrics_run).
 - 주간 점검(docs/experiments/foundation_1031 §6): 일 **04:00** ``scripts/weekly_check.sh`` 백그라운드 → ``foundation_1031/weekly.md`` 에 한 줄.
 - cron_engine: 1분마다 due job 체크 → LangGraph 트리거 → 텔레그램 선톡 (agent_bot 단독 실행 시에도 동일 worker 가 뜸, 락으로 중복 방지)
@@ -570,8 +570,11 @@ def _church_lyrics_schedule_enabled() -> bool:
     return bool((os.getenv("NOTION_TOKEN") or "").strip()) and v not in ("0", "false", "no", "off", "")
 
 
-def _church_lyrics_pending_marker(d: date) -> Path:
-    return _CRON_DIR / f"church_lyrics_pending_{d.isoformat()}.marker"
+def _church_lyrics_pending_marker() -> Path:
+    """다가오는 주일 기준 마커. 토요일 재시도와 주일 아침 재시도가 같은 마커를 봅니다."""
+    today = _seoul_now().date()
+    sunday = today + timedelta(days=(6 - today.weekday()) % 7)
+    return _CRON_DIR / f"church_lyrics_pending_{sunday.isoformat()}.marker"
 
 
 def _run_church_lyrics_sync(cmd: str) -> None:
@@ -608,7 +611,7 @@ def _run_church_lyrics_sync(cmd: str) -> None:
     append_job_run(evt)
     print(f"   church_lyrics {cmd}: {status} (exit={rc}, 로그: .cron/church_lyrics_stdout.log)", flush=True)
     if cmd == "lyrics" and rc == 2:
-        _church_lyrics_pending_marker(_seoul_now().date()).write_text(
+        _church_lyrics_pending_marker().write_text(
             _seoul_now().isoformat(timespec="seconds") + "\n", encoding="utf-8"
         )
 
@@ -636,8 +639,8 @@ def run_church_harvest() -> None:
 
 
 def run_church_lyrics_retry() -> None:
-    """같은 날 09:00 실행이 콘티 없음(종료 코드 2)이었을 때만 한 번 더."""
-    m = _church_lyrics_pending_marker(_seoul_now().date())
+    """직전 실행이 콘티 없음(종료 코드 2)이었을 때만 다시. 또 비어 있으면 마커가 다시 생겨 다음 재시도로 이어집니다."""
+    m = _church_lyrics_pending_marker()
     if not m.is_file():
         return
     m.unlink(missing_ok=True)
@@ -708,7 +711,10 @@ def main() -> None:
     if _church_lyrics_schedule_enabled():
         schedule.every().wednesday.at("08:35").do(run_church_rename)
         schedule.every().saturday.at("09:00").do(run_church_lyrics)
-        schedule.every().saturday.at("11:00").do(run_church_lyrics_retry)
+        # 콘티가 늦게 올라와 11-15 가사가 통째로 빠졌다(11-14 09·11시 모두 콘티 없음) → 토요일 저녁까지 2시간마다 + 주일 아침
+        for _at in ("11:00", "13:00", "15:00", "17:00", "19:00", "21:00"):
+            schedule.every().saturday.at(_at).do(run_church_lyrics_retry)
+        schedule.every().sunday.at("07:00").do(run_church_lyrics_retry)
         schedule.every().hour.at(":10").do(run_church_harvest)
 
     schedule.every().sunday.at("04:00").do(run_weekly_check)
@@ -753,7 +759,7 @@ def main() -> None:
         print("   - Phase35/morning_scraper: PHASE35_SCHEDULE_ENABLED=0 — 등록 생략")
     if _church_lyrics_schedule_enabled():
         print(
-            "   - 주일 찬양: 수 08:35 제목 정리 · 토 09:00 가사 게시 (콘티 없으면 11:00 재시도) · 매시 10분 체크된 가사 DB 저장 ("
+            "   - 주일 찬양: 수 08:35 제목 정리 · 토 09:00 가사 게시 (콘티 없으면 토 11~21시 2시간마다 · 주일 07:00 재시도) · 매시 10분 체크된 가사 DB 저장 ("
             "로그: .cron/church_lyrics_stdout.log)"
         )
     else:

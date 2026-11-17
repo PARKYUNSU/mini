@@ -182,18 +182,25 @@ def callout(song, icon, color, status, lyrics, notes=(), todo=True):
     }}
 
 
-def build(song, index):
+def build(song, index, log=None):
+    """곡 하나의 콜아웃. log 에는 어느 단계에서 끝났는지(stage)와 단계별 수를 남깁니다."""
+    log = {} if log is None else log
     saved = index.get(setlist.norm(song.title))
     if saved and saved != "dry-run":
+        log["stage"] = "db"
         return callout(song, "📗", "gray_background", "가사 DB에서 가져옴 (확인된 가사)",
                        lyrics_read(saved), todo=False)
     try:
-        found = sources.candidates(song.title, song.url)
+        found = sources.candidates(song.title, song.url, trace=log)
     except Exception as e:  # 검색·모델 오류로 한 곡이 실패해도 나머지 곡은 계속
+        log["stage"], log["error"] = "error", type(e).__name__
         return callout(song, "❌", "red_background",
                        f"가사를 가져오지 못함 ({type(e).__name__}). 직접 붙여넣고 체크", "")
     if not found:
+        log["stage"] = "no_search" if not log.get("search") else "no_page" if not log.get("pages") else "not_located"
         return callout(song, "❌", "red_background", "가사를 찾지 못함. 직접 붙여넣고 체크", "")
+    log["stage"] = "posted"
+    log["sources"] = len(found)
 
     result = compare.compare([c.lyrics for c in found], song.title,
                              tuple(i for i, c in enumerate(found) if c.verify_only))
@@ -203,7 +210,9 @@ def build(song, index):
         spacing, typos = [], []
     result.lyrics = sources.apply_respace(result.lyrics, spacing)  # 띄어쓰기는 메모 없이 바로 고칩니다
     lines = len([ln for ln in result.lyrics.splitlines() if ln.strip()])
+    log["typos"] = len(typos)
     if lines >= compare.MIN_LINES and len(typos) * TYPO_LIMIT > lines:  # 실황 받아쓰기·자동 자막처럼 쓸 수 없는 가사
+        log["stage"] = "typo_drop"
         return callout(song, "❌", "red_background",
                        f"가사를 찾지 못함 (찾은 가사에 오탈자 의심 {len(typos)}/{lines}줄이라 버림). 직접 붙여넣고 체크", "",
                        [notion.text("버린 출처: ") + [r for i in result.used for r in notion.text(f"[{i + 1}] ", found[i].url)]])
@@ -237,6 +246,15 @@ def build(song, index):
     return callout(song, "⚠️", "yellow_background", status, result.lyrics, notes)
 
 
+def record(logs):
+    """곡별 결과를 .cron/job_runs.jsonl 에 남깁니다(실패 단계 집계용). 가사 글자는 남기지 않습니다."""
+    from tools.cron_engine.lib.storage import append_job_run
+
+    stamp = datetime.now(KST).strftime("%Y-%m-%dT%H:%M:%S")
+    for log in logs:
+        append_job_run({"started_at": stamp, **log})
+
+
 # ── 토요일 작업 ────────────────────────────────────────────────────────────
 def lyrics_job(date=None, dry_run=False) -> int:
     pages = recent_pages()
@@ -259,16 +277,21 @@ def lyrics_job(date=None, dry_run=False) -> int:
         return 2
 
     done = {setlist.norm(title) for _, title in auto_callouts(section)} | skip_titles()
-    blocks = []
+    blocks, logs = [], []
     for song in songs:
         if setlist.norm(song.title) in done:
             continue
-        block = build(song, index)
-        print(notion.plain([{"plain_text": t["text"]["content"]}
-                            for t in block["callout"]["rich_text"]]))
+        log = {}
+        block = build(song, index, log)
+        header = notion.plain([{"plain_text": t["text"]["content"]} for t in block["callout"]["rich_text"]])
+        print(header)
         blocks.append(block)
+        logs.append({"event": "church_lyrics_song", "sunday": date, "title": song.title, "role": song.role,
+                     "has_url": bool(song.url), "icon": block["callout"]["icon"]["emoji"],
+                     "status": header.split(" — ", 1)[-1][:80], **log})
     if blocks and not dry_run:
         notion.append(page["id"], blocks, after=anchor)
+        record(logs)
     print(f"{date}: {len(songs)}곡 중 {len(blocks)}곡 {'확인(dry-run)' if dry_run else '게시'}")
     return 0
 

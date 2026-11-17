@@ -182,3 +182,14 @@ def test_second_search_uses_title_from_video(fake, monkeypatch):
     monkeypatch.setattr(sources, "search", lambda q: asked.append(q) or [])
     assert sources.candidates("첫째 곡 노래 가사말", "https://youtu.be/x") == []
     assert asked == ["첫째 곡 노래 가사말 가사 찬양 CCM", "첫째 곡 노래 가사 찬양 CCM"]
+
+
+def test_trace_counts_each_stage(fake, monkeypatch):
+    trace = {}
+    sources.candidates("첫째 곡", trace=trace)
+    assert trace == {"search": 4, "pages": 2, "located": 2}
+    monkeypatch.setattr(sources, "youtube_title", lambda url: "팀 - 첫째 곡 노래 / Song")
+    monkeypatch.setattr(sources, "search", lambda q: [])
+    trace = {}
+    sources.candidates("첫째 곡 노래 가사말", "https://youtu.be/x", trace=trace)
+    assert trace == {"search": 0, "pages": 0, "located": 0, "retry": "첫째 곡 노래"}

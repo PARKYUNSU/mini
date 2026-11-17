@@ -50,9 +50,11 @@ def world(monkeypatch):
         w["saved"].append(body)
         return {"id": "new"}
     monkeypatch.setattr(notion, "call", call)
-    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None, **kw: [
         sources.Candidate("https://a.example/1", LYRICS),
         sources.Candidate("https://b.example/2", LYRICS)])
+    w["records"] = []
+    monkeypatch.setattr(jobs, "record", lambda logs: w["records"].extend(logs))   # 실제 .cron 에 쓰지 않음
     monkeypatch.setattr(sources, "proofread", lambda lyrics, title="": (w["spacing"], w["typos"]))
     w["spacing"], w["typos"] = [], []
     return w
@@ -116,7 +118,7 @@ def test_no_setlist_and_missing_page(world):
 
 
 def test_one_failing_song_does_not_stop_the_rest(world, monkeypatch):
-    def flaky(title, url=None):
+    def flaky(title, url=None, **kw):
         if title == "첫째 곡":
             raise RuntimeError("검색 실패")
         return [sources.Candidate("https://a.example/1", LYRICS)]
@@ -133,7 +135,7 @@ def test_skip_list_leaves_fixed_songs_out(world, monkeypatch):
 
 
 def test_completely_different_source_is_set_aside_not_listed(world, monkeypatch):
-    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None, **kw: [
         sources.Candidate("https://a.example/1", LYRICS),
         sources.Candidate("https://b.example/2", "전혀 다른 노래의\n가사 두 줄")])
     jobs.lyrics_job("2026-10-11")
@@ -147,7 +149,7 @@ def test_completely_different_source_is_set_aside_not_listed(world, monkeypatch)
 def test_issue_list_is_capped(world, monkeypatch):
     base = "\n".join(f"같은 줄 {i}" for i in range(20))
     other = "\n".join(f"같은 줄 {i}" for i in range(8)) + "\n" + "\n".join(f"바뀐 줄 {i}" for i in range(12))
-    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None, **kw: [
         sources.Candidate("https://a.example/1", base), sources.Candidate("https://b.example/2", other)])
     jobs.lyrics_job("2026-10-11")
     kids = world["appended"][0][2][0]["callout"]["children"]
@@ -177,7 +179,7 @@ def test_spacing_fix_is_applied_silently(world):
 
 def test_typo_suspects_are_flagged_not_applied(world, monkeypatch):
     four = LYRICS
-    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None, **kw: [
         sources.Candidate("https://a.example/1", four), sources.Candidate("https://b.example/2", four)])
     world["typos"] = [("나는 일어나 길을 나서네", "나는 일어나 길을 떠나네")]   # 4줄 중 1줄: 버리지 않음
     jobs.lyrics_job("2026-10-11")
@@ -200,7 +202,7 @@ def test_lyrics_with_too_many_typos_are_dropped(world):
 
 
 def test_one_line_source_verifies_but_multi_line_source_is_posted(world, monkeypatch):
-    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None, **kw: [
         sources.Candidate("https://bugs.example/1", " ".join(LYRICS.splitlines())),   # 줄바꿈 없는 가사 사이트
         sources.Candidate("https://blog.example/2", LYRICS)])
     jobs.lyrics_job("2026-10-11")
@@ -211,7 +213,26 @@ def test_one_line_source_verifies_but_multi_line_source_is_posted(world, monkeyp
 
 
 def test_only_one_line_source_is_posted_with_a_warning(world, monkeypatch):
-    monkeypatch.setattr(sources, "candidates", lambda title, url=None: [
+    monkeypatch.setattr(sources, "candidates", lambda title, url=None, **kw: [
         sources.Candidate("https://bugs.example/1", " ".join(LYRICS.splitlines()))])
     jobs.lyrics_job("2026-10-11")
     assert "줄바꿈이 없어 줄을 직접 나눠야 함" in header(world["appended"][0][2][0])
+
+
+def test_each_song_records_where_it_ended(world, monkeypatch):
+    def fake(title, url=None, trace=None, **kw):
+        trace.update({"첫째 곡": {"search": 0}, "둘째 곡": {"search": 5, "pages": 0}}[title])
+        return []
+    monkeypatch.setattr(sources, "candidates", fake)
+    jobs.lyrics_job("2026-10-11")
+    got = {r["title"]: (r["stage"], r["icon"], r["has_url"]) for r in world["records"]}
+    assert got == {"첫째 곡": ("no_search", "❌", True), "둘째 곡": ("no_page", "❌", False)}
+    assert all(r["event"] == "church_lyrics_song" and r["sunday"] == "2026-10-11" for r in world["records"])
+
+
+def test_posted_and_dry_run_records(world):
+    jobs.lyrics_job("2026-10-11", dry_run=True)
+    assert world["records"] == []          # dry-run 은 기록하지 않음
+    jobs.lyrics_job("2026-10-11")
+    assert [r["stage"] for r in world["records"]] == ["posted", "posted"]
+    assert world["records"][0]["sources"] == 2 and world["records"][0]["typos"] == 0

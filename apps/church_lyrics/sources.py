@@ -201,11 +201,13 @@ def youtube_song_title(hint: str | None, title: str) -> str | None:
     return None
 
 
-def _collect(title: str, hint: str | None, want: int, max_docs: int) -> list[Candidate]:
+def _collect(title: str, hint: str | None, want: int, max_docs: int, trace: dict) -> list[Candidate]:
     from .setlist import norm
 
     hits, domains = [], set()
-    for hit in search(f"{title} 가사 찬양 CCM"):
+    results = search(f"{title} 가사 찬양 CCM")
+    trace["search"] = trace.get("search", 0) + len(results)
+    for hit in results:
         domain = urllib.parse.urlparse(hit["url"]).netloc
         text = hit["raw_content"][:MAX_CHARS]
         if domain.endswith(EXCLUDED_DOMAINS) or domain.endswith("bugs.co.kr"):  # 벅스는 아래에서 직접 받습니다
@@ -216,6 +218,7 @@ def _collect(title: str, hint: str | None, want: int, max_docs: int) -> list[Can
         hits.append((hit["url"], [ln.rstrip() for ln in text.splitlines()][:MAX_LINES]))
         if len(hits) >= max_docs:
             break
+    trace["pages"] = trace.get("pages", 0) + len(hits)
     out = []
     if hits:
         for (page_url, lines), span in zip(hits, locate(title, hint, [lines for _, lines in hits])):
@@ -226,6 +229,7 @@ def _collect(title: str, hint: str | None, want: int, max_docs: int) -> list[Can
             if len(key(lyrics)) >= 15 and len(lyrics.splitlines()) <= 150:
                 out.append(Candidate(page_url, lyrics))
     out = out[:want]
+    trace["located"] = trace.get("located", 0) + len(out)
     # 벅스 robots.txt 가 자동 수집을 막고 있어 기본은 끕니다
     if os.getenv("CHURCH_LYRICS_BUGS") != "1":
         return out
@@ -236,12 +240,16 @@ def _collect(title: str, hint: str | None, want: int, max_docs: int) -> list[Can
     return out + [bugs] if bugs else out
 
 
-def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int = 4) -> list[Candidate]:
-    """서로 다른 사이트에서 가사 후보를 최대 want개 모읍니다. 없으면 영상 제목의 곡명으로 한 번 더 찾습니다."""
+def candidates(title: str, url: str | None = None, want: int = 3, max_docs: int = 4,
+               trace: dict | None = None) -> list[Candidate]:
+    """서로 다른 사이트에서 가사 후보를 최대 want개 모읍니다. 없으면 영상 제목의 곡명으로 한 번 더 찾습니다.
+    trace 에는 단계별 수(검색 결과 search · 곡명 있는 페이지 pages · 가사 위치 찾은 출처 located · 재검색 retry)를 남깁니다."""
+    trace = {} if trace is None else trace
     hint = youtube_title(url) if url else None
-    out = _collect(title, hint, want, max_docs)
+    out = _collect(title, hint, want, max_docs, trace)
     if not out and (other := youtube_song_title(hint, title)):
-        out = _collect(other, hint, want, max_docs)
+        trace["retry"] = other
+        out = _collect(other, hint, want, max_docs, trace)
     return out
 
 
