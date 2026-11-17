@@ -74,3 +74,15 @@ def test_plus_inside_parens_and_star_memo():
         Song("빛 되신 주", "https://youtu.be/b"),
         Song("예수 예수 예수", "https://youtu.be/b", note="브릿지+후렴만"),
     ]
+
+
+def test_bare_keys_and_tail_memo():
+    """11-15 페이지 모양: 괄호 없는 키, 끝의 (연주 메모)키."""
+    assert clean_title("주 하나님 지으신 모든 세계 Bb") == "주 하나님 지으신 모든 세계"
+    assert clean_title("감사로 주님께 나가세 D->E") == "감사로 주님께 나가세"
+    assert clean_title("감사 위에 감사(후렴,카피x)Bb") == "감사 위에 감사"
+    assert clean_title("은혜") == "은혜"
+    assert clean_title("주 은혜임을 (Live)") == "주 은혜임을 (Live)"
+    assert clean_title("Way Maker") == "Way Maker"            # 영어 곡명 끝 낱말은 키가 아님
+    songs = parse([("numbered", "감사 위에 감사(후렴,카피x)Bb\nhttps://youtu.be/a", [])])
+    assert songs == [Song("감사 위에 감사", "https://youtu.be/a", note="후렴,카피x")]

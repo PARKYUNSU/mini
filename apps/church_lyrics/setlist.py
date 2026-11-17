@@ -8,6 +8,10 @@ _KEY = r"[A-G][#b♭♯]?m?"
 # 키 표기만 떼어냅니다: (G), ( G -> A ), (A→B), (F, 후렴만)
 _KEY_PAREN = re.compile(rf"\s*[(（]\s*{_KEY}(\s*(->|=>|→|-|~|>)\s*{_KEY})*\s*(?:[,，/]([^)）]*))?[)）]")
 # 키 표기 뒤의 인도자 이름: "곡명 (B): 인화"
+# 괄호 없이 끝에 붙인 키: '곡명 Bb', '곡명 D->E', '곡명(메모)Bb'
+_BARE_KEY = re.compile(rf"(?:\s+|(?<=[)）]))({_KEY}(?:\s*(?:->|=>|→|-|~|>)\s*{_KEY})*)\s*$")
+# 끝의 괄호 연주 메모: (후렴,카피x)
+_TAIL_MEMO = re.compile(r"\s*[(（]([^)）]*(?:후렴|브릿지|카피|인트로|간주|엔딩|아웃트로|만|x|X)[^)）]*)[)）]\s*$")
 # 괄호 메모: (*뉴송?)
 _MEMO = re.compile(r"\s*[(（]\s*\*([^)）]*)[)）]")
 # 괄호 밖의 + 만 곡 구분입니다: (E, 브릿지+후렴만) 은 한 곡의 메모
@@ -34,6 +38,8 @@ def clean_title(raw: str) -> str:
     title = _URL.sub("", raw).strip()
     title = _LEADER.sub(r"\1", title)
     title = _MEMO.sub("", _KEY_PAREN.sub("", title))
+    title = _BARE_KEY.sub("", title.strip())
+    title = _TAIL_MEMO.sub("", title)
     return title.strip(" \t-·*")
 
 
@@ -47,6 +53,9 @@ def titles(raw: str) -> list[tuple[str, str]]:
             text = _URL.sub("", part)
             notes = [m.group(3).strip() for m in _KEY_PAREN.finditer(text) if m.group(3)]
             notes += [m.group(1).strip() for m in _MEMO.finditer(text)]
+            tail = _TAIL_MEMO.search(_BARE_KEY.sub("", _KEY_PAREN.sub("", _LEADER.sub(r"\1", text)).strip()))
+            if tail:
+                notes.append(tail.group(1).strip())
             out.append((title, ", ".join(n for n in notes if n)))
     return out
 
