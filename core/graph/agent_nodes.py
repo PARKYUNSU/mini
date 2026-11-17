@@ -32,7 +32,14 @@ from core.config.agent_config import (
     resolve_agent_tool_py,
 )
 from core.llm.code_extract import extract_python_code
-from core.llm.doc_judge import agg_slots_active, agg_slots_template, aggregate, judge_agg_active, judge_docs
+from core.llm.doc_judge import (
+    agg_slots_active,
+    agg_slots_template,
+    aggregate,
+    judge_agg_active,
+    judge_docs,
+    strip_no_doc_ids,
+)
 from core.llm.format_fix import format_fix_active, partial_wording, strip_hanzi
 from core.llm.lang_guard import (
     hanzi_count,
@@ -1638,6 +1645,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 answer, _pw = partial_wording(answer) if _pick == "없음" and _agg != "c" else (answer, 0)
                 answer, _hz = strip_hanzi(answer)
                 rag_trace.mark(chat_id, "format_fix", partial=_pw, hanzi=_hz)
+            if _agg_slots and _agg == "c":
+                answer, _ = strip_no_doc_ids(answer)
             # 결론 수치를 같은 논문의 본론 값에 맞추고 · 전각 문장부호를 반각으로 (cross_metric_1113)
             answer, _al = align_conclusion_numbers(answer)
             answer, _fw = normalize_fullwidth_punct(answer)

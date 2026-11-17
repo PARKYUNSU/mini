@@ -34,3 +34,11 @@ def test_agg_slots_template():
     assert "질문이 찾는 연구가 없습니다" in b and "[문서 1]" in b
     c = agg_slots_template({1: "N"}, "c")
     assert "[문서 1]" not in c and "관련된 문서가 없습니다" in c
+
+
+def test_strip_no_doc_ids():
+    from core.llm.doc_judge import strip_no_doc_ids
+    a = "본론\n질문과 관련된 문서가 없습니다. [2506.07315v2]\n\n결론\n따라서 ... [<a href=\"x\">2506.07315</a>]"
+    out, n = strip_no_doc_ids(a)
+    assert n == 1 and "없습니다.\n" in out and "결론\n따라서 ... [<a" in out
+    assert strip_no_doc_ids("질문과 관련된 문서가 없습니다.")[1] == 0

@@ -114,3 +114,11 @@ def agg_slots_template(labels: dict[int, str], agg: str) -> str:
 - `(관련 연구)` 표시는 그대로 둔다.
 - 중괄호 안의 안내 문구는 출력 금지.
 """
+
+
+_C_BODY_ID = re.compile(r"(관련된 문서가 없습니다\.?)[ \t]*(?:\[[^\]\n]*\][ \t]*)+")
+
+
+def strip_no_doc_ids(answer: str) -> tuple[str, int]:
+    """(c) 틀의 "질문과 관련된 문서가 없습니다." 뒤에 v13 이 붙인 인용 꼬리를 지운다 (agg_slots_1117 §6 결함)."""
+    return _C_BODY_ID.subn(r"\1", answer or "")
