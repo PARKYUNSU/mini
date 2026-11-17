@@ -122,3 +122,40 @@ _C_BODY_ID = re.compile(r"(관련된 문서가 없습니다\.?)[ \t]*(?:\[[^\]\n
 def strip_no_doc_ids(answer: str) -> tuple[str, int]:
     """(c) 틀의 "질문과 관련된 문서가 없습니다." 뒤에 v13 이 붙인 인용 꼬리를 지운다 (agg_slots_1117 §6 결함)."""
     return _C_BODY_ID.subn(r"\1", answer or "")
+
+
+def ext_promote_active() -> bool:
+    return os.getenv("RAG_EXT_PROMOTE", "0").strip() == "1"
+
+
+def promote_external(question: str, query: str, rag_context: str, doc_ids: dict, labels: dict,
+                     years=None, max_cands: int = 4, max_keep: int = 2):
+    """DB 밖(OpenAlex) 후보를 27B 로 판정해 직접 · 부분이면 컨텍스트에 붙인다 (RAG_EXT_PROMOTE, docs/experiments/ext_promote_1117).
+
+    반환: (rag_context, doc_ids, labels, 올린 [{arxiv, title, label}]). 실패하면 입력 그대로 · 빈 목록.
+    shortcut: arXiv ID 있는 후보만 올린다 — 학회판(DOI 만)은 인용 · 링크 형식이 arXiv 기준이라 뺀다.
+    """
+    from core.rag.external_search import search_openalex
+
+    titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context or ""))
+    items = search_openalex(query, {str(p) for p in doc_ids.values()}, exclude_titles=titles, years=years)
+    cands = [it for it in items if it.get("arxiv") and len(it.get("abstract") or "") >= 200][:max_cands]
+    if not cands:
+        return rag_context, doc_ids, labels, []
+    start = max(doc_ids) + 1 if doc_ids else 1
+    blocks = {start + i: f"[문서 {start + i}]\n[{c['arxiv']}] {c['title']}\n[초록] {c['abstract']}" for i, c in enumerate(cands)}
+    got = judge_docs(question, "\n\n".join(blocks.values()))
+    if not got:
+        return rag_context, doc_ids, labels, []
+    keep = [n for n in sorted(got) if got[n] in ("D", "P")][:max_keep]
+    if not keep:
+        return rag_context, doc_ids, labels, []
+    doc_ids, labels, added = dict(doc_ids), dict(labels), []
+    for k, n in enumerate(keep):
+        num = (max(doc_ids) + 1) if doc_ids else 1
+        c = cands[n - start]
+        rag_context = rag_context.rstrip() + "\n\n" + blocks[n].replace(f"[문서 {n}]", f"[문서 {num}]", 1)
+        doc_ids[num] = c["arxiv"]
+        labels[num] = got[n]
+        added.append({"arxiv": c["arxiv"], "title": c["title"], "label": got[n]})
+    return rag_context, doc_ids, labels, added

@@ -37,7 +37,9 @@ from core.llm.doc_judge import (
     agg_slots_template,
     aggregate,
     judge_agg_active,
+    ext_promote_active,
     judge_docs,
+    promote_external,
     strip_no_doc_ids,
 )
 from core.llm.format_fix import format_fix_active, partial_wording, strip_hanzi
@@ -1486,6 +1488,14 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 if _doc_labels:
                     _agg, _pick = aggregate(_doc_labels)
                     _agg_slots = agg_slots_active() and not _list_on and not _item_docs
+                    # 직접 연구가 없으면 DB 밖(OpenAlex) 후보를 판정해 본문으로 올린다 (RAG_EXT_PROMOTE, ext_promote_1117)
+                    if _agg_slots and _agg in ("b", "c") and ext_promote_active() and external_search_active():
+                        _py = year_condition(user_request) if os.getenv("RAG_COND_CHECK", "0").strip() == "1" else None
+                        rag_context, _doc_ids, _doc_labels, _promoted = promote_external(
+                            user_request, rag_query, rag_context, _doc_ids, _doc_labels, years=_py)
+                        if _promoted:
+                            _agg, _pick = aggregate(_doc_labels)
+                        rag_trace.mark(chat_id, "ext_promote", promoted=_promoted)
                 elif os.getenv("RAG_JUDGE_V2", "0").strip() == "1" and not image_base64:
                     # 질문 꼴(특정 연구 · 주제 추천)을 먼저 가리고 있음 · 부분 · 없음 (docs/experiments/judge_v2_1113)
                     _v2 = judge_presence_shared_v2(system_prompt, prompt, user_request, RAG_JUDGE_MODEL)
