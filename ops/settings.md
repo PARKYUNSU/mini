@@ -46,6 +46,7 @@
 | `RAG_ITEM_REWRITE` | `1` | 11-14 23:08 | 답을 낸 뒤 본론 항목(인용 논문 하나)을 그 논문 블록만 보고 2~3 문장으로 다시 쓴다. 문서 밖 숫자 · 한자 · 짧아짐이면 원래 항목 유지, 앞에서 최대 4 항목(`RAG_ITEM_REWRITE_MAX`), 목록 모드 제외. 문항 시간 +7s | [`item_rewrite_1114`](../docs/experiments/item_rewrite_1114/README.md): v2 held-out 쌍 72:9 p 2.5e-13, 보호 전부 통과. 숫자 순서 · 짝 바뀜은 못 잡음(새 쪽 2 건) |
 | `RAG_QUERY_HIST_TURNS` | `1` | 11-15 | 논문 질문 검색어 재작성에 넣는 대화 기록을 직전 1턴만(코드 기본 2). 2턴이면 9B 가 두 턴 전 주제로 검색어를 만들었다 | [`query_hist_1115`](../docs/experiments/query_hist_1115/README.md): held-out 이어지는 질문 12:2 p 0.013, 새 논문 찾기 9:0, 독립 검색어 바뀜 0 |
 | `RAG_FORMAT_FIX` | `1` | 11-17 | 항목 · 결론 다시 쓰기에 영어 용어 그대로 규칙, 한글 뒤 라틴 소문자 섞인 다시 쓰기 거부, 최종 답 한자 지우기, '없음' 답에 관련 연구 있으면 고정 문장을 '직접 다룬 연구는 없고 가장 가까운 연구' 로 | [`format_fix_1117`](../docs/experiments/format_fix_1117/README.md): held-out 30 깨짐 · 모순 답 7:0 p 0.016, 쌍 7:4:19, 시간 −1.3s |
+| `RAG_JUDGE_AGG` | `1` | 11-17 | '없음' 판정을 9B 대신 27B(`RAG_DOC_JUDGE_MODEL`, 기본 `qwen3.6:27b-q4_K_M`) 문서별 직접/부분/무관 집계로: 직접 있으면 있음 · 부분만이면 '없음'(가장 가까운 연구) · 전부 무관이면 '없음'(가장 가까운 문구 없음). 27B 17GB 상주 | [`judge_agg_1117`](../docs/experiments/judge_agg_1117/README.md): held-out '없음' 여부 맞음 19→25 (6:0 p 0.031), 쌍 6:5:19, +3.6s |
 
 ## 2. 그 밖 설정 (값 공개 가능)
 
