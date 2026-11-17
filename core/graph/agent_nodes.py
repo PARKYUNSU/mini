@@ -42,7 +42,14 @@ from core.llm.doc_judge import (
     promote_external,
     strip_no_doc_ids,
 )
-from core.llm.format_fix import format_fix_active, partial_wording, strip_hanzi
+from core.llm.format_fix import (
+    fix_item_titles,
+    fix_terms,
+    format_fix_active,
+    partial_wording,
+    strip_hanzi,
+    term_fix_active,
+)
 from core.llm.lang_guard import (
     hanzi_count,
     KOREAN_RETRY_NUDGE,
@@ -1657,6 +1664,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 rag_trace.mark(chat_id, "format_fix", partial=_pw, hanzi=_hz)
             if _agg_slots and _agg == "c":
                 answer, _ = strip_no_doc_ids(answer)
+            # 알려진 잘못된 음차 · 항목 제목 (RAG_TERM_FIX, term_fix_1118)
+            if term_fix_active():
+                answer, _tf = fix_terms(answer)
+                answer, _it = fix_item_titles(answer, rag_context)
+                rag_trace.mark(chat_id, "term_fix", terms=_tf, titles=_it)
             # 결론 수치를 같은 논문의 본론 값에 맞추고 · 전각 문장부호를 반각으로 (cross_metric_1113)
             answer, _al = align_conclusion_numbers(answer)
             answer, _fw = normalize_fullwidth_punct(answer)

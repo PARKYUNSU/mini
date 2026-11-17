@@ -46,3 +46,91 @@ def partial_wording(answer: str) -> tuple[str, int]:
     out, a = _LEAD_OLD.subn(LEAD_NEW, answer)
     out, b = _CONCL_OLD.subn(CONCL_NEW, out)
     return out, a + b
+
+
+# --- S7 용어 · 항목 제목 (RAG_TERM_FIX, docs/experiments/term_fix_1118) ---
+# 저장 답 2,551개(11-18)에서 실제로 나온 잘못된 음차만. 뒤 조사는 그대로 둔다.
+_TERMS = [
+    (re.compile(r"(?:차킹|채킹|청크링)"), "청킹"),  # chunking
+    (re.compile(r"허할루시네이션"), "환각"),
+    (re.compile(r"판판이"), "판정자가"), (re.compile(r"판판은"), "판정자는"), (re.compile(r"판판을"), "판정자를"),
+    (re.compile(r"판판"), "판정자"),  # judges — '판판하다'(평평하다)는 이 도메인 답에 안 나옴. 받침 달라 조사도 바꿈
+    (re.compile(r"(CoT)\s*[-‑]\s*(?:라울러|라테이션)"), r"\1 근거 설명"),  # CoT rationale
+]
+_ITEM = re.compile(r"^(\s*\d+\.\s+)(.*)$")
+_HANGUL = re.compile(r"[가-힣]")
+_REF_TITLE = re.compile(r"\[(\d{4}\.\d{4,5})(?:v\d+)?\]\s*([^\n\[]+)")
+
+
+def term_fix_active() -> bool:
+    return os.getenv("RAG_TERM_FIX", "0").strip() == "1"
+
+
+def fix_terms(answer: str) -> tuple[str, int]:
+    n = 0
+    for pat, rep in _TERMS:
+        answer, k = pat.subn(rep, answer or "")
+        n += k
+    return answer, n
+
+
+def _title_key(s: str) -> str:
+    return re.sub(r"[^0-9a-z]", "", (s or "").lower())
+
+
+def _short_title(title: str) -> str:
+    t = title.strip().split(":")[0].strip()
+    return t if len(t) <= 60 else t[:60].rsplit(" ", 1)[0]
+
+
+def fix_item_titles(answer: str, rag_context: str) -> tuple[str, int]:
+    """본론 항목을 '제목: 요약' 꼴로. 이름 뒤 콜론이 빠졌으면 넣고, 이름이 아예 없으면 인용 논문 제목을 붙인다."""
+    mb = re.search(r"^[ \t#*]*본론[ \t*]*$", answer or "", re.M)
+    if not mb:
+        return answer, 0
+    _full = dict(_REF_TITLE.findall(rag_context or ""))
+    titles = {pid: _short_title(t) for pid, t in _full.items()}
+    head, rest = answer[:mb.end()], answer[mb.end():]
+    mc = re.search(r"^[ \t#*]*결론[ \t*]*$", rest, re.M)
+    body, tail = (rest[:mc.start()], rest[mc.start():]) if mc else (rest, "")
+    out, n = [], 0
+    for line in body.split("\n"):
+        m = _ITEM.match(line)
+        if not m or ":" in m.group(2)[:120]:
+            out.append(line)
+            continue
+        num, text = m.groups()
+        cid = re.search(r"\[(\d{4}\.\d{4,5})", text)
+        t = titles.get(cid.group(1)) if cid else None
+        lead_id = re.match(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*", text)
+        bold = re.match(r"(\*\*[^*\n]+\*\*)\s*(\(관련 연구\))?\s*", text)
+        if lead_id:  # '[ID] 설명' — 이름 자리에 ID: 제목으로 바꾼다
+            if t:
+                line = f"{num}{t}: {text[lead_id.end():]}"
+                n += 1
+        elif text.startswith("(관련 연구)"):  # 이름 없이 표시만
+            if t:
+                line = f"{num}{t} (관련 연구): {text[len('(관련 연구)'):].lstrip(' :')}"
+                n += 1
+        elif bold:  # '**이름** (관련 연구) 설명' → '**이름** (관련 연구): 설명'
+            line = num + bold.group(1) + (" " + bold.group(2) if bold.group(2) else "") + ": " + text[bold.end():]
+            n += 1
+        elif "(관련 연구)" in text[:120]:  # 'X (관련 연구) 설명' → 'X (관련 연구): 설명'
+            line = num + text.replace("(관련 연구)", "(관련 연구):", 1)
+            n += 1
+        elif not _HANGUL.match(text) and _HANGUL.search(text):  # 'Name 설명' → 'Name: 설명'
+            k = _HANGUL.search(text).start()
+            k = text.rfind(" ", 0, k) + 1  # 'TabRAG은' 처럼 조사가 붙은 단어는 그 단어 앞에서 끊는다
+            name = text[:k].strip()
+            # 앞 영어가 논문 제목의 일부일 때만 이름으로 본다 — 'T5 기반 모델은' 같은 문장 첫 단어는 이름이 아니다
+            if k > 0 and (not t or _title_key(name)[:12] in _title_key(_full.get(cid.group(1), t))):
+                line = num + name + ": " + text[k:]
+                n += 1
+            elif t:
+                line = f"{num}{t}: {text}"
+                n += 1
+        elif t:  # 한글로 시작 — 이름 없음: 인용 논문 제목을 붙인다
+            line = f"{num}{t}: {text}"
+            n += 1
+        out.append(line)
+    return head + "\n".join(out) + tail, n
