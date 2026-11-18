@@ -70,3 +70,11 @@ def test_fix_item_titles_sentence_start():
     a = "본론\n1. T5 기반 모델은 82%다. [2406.19102v1]\n2. TabRAG TabRAG은 파싱. [2511.06582v1]\n결론\n끝"
     out, n = fix_item_titles(a, ctx)
     assert "1. Statements: T5 기반 모델은 82%다." in out and "2. TabRAG: TabRAG은 파싱." in out and n == 2
+
+
+def test_fix_terms_rationale_variants():
+    from core.llm.format_fix import fix_terms
+    for w in ("CoT-라우널을", "CoT‑라테이션과", "CoT 라울러로"):
+        out, n = fix_terms(w)
+        assert out.startswith("CoT 근거 설명") and n == 1, out
+    assert fix_terms("CoT 라벨을")[0] == "CoT 라벨을"  # 붙임표 없는 'CoT 라…' 는 알려진 음차만

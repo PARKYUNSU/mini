@@ -55,7 +55,7 @@ _TERMS = [
     (re.compile(r"허할루시네이션"), "환각"),
     (re.compile(r"판판이"), "판정자가"), (re.compile(r"판판은"), "판정자는"), (re.compile(r"판판을"), "판정자를"),
     (re.compile(r"판판"), "판정자"),  # judges — '판판하다'(평평하다)는 이 도메인 답에 안 나옴. 받침 달라 조사도 바꿈
-    (re.compile(r"(CoT)\s*[-‑]\s*(?:라울러|라테이션)"), r"\1 근거 설명"),  # CoT rationale
+    (re.compile(r"(CoT)\s*(?:[-‑]\s*)?(?:라울러|라테이션|라우널|(?<=[-‑])라[가-힣]{1,3}(?=[을를이가은는의과와로도]|\s|$))"), r"\1 근거 설명"),  # CoT rationale — 라울러 · 라테이션 · 라우널 … 매번 다르게 깨짐
 ]
 _ITEM = re.compile(r"^(\s*\d+\.\s+)(.*)$")
 _HANGUL = re.compile(r"[가-힣]")

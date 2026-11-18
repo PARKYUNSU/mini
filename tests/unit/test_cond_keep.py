@@ -8,6 +8,12 @@ def test_missing_sentence_and_intro():
     assert s.startswith("'한국어' 조건을 직접 다룬 연구 · 'BM25 · 밀집 검색' 비교를 직접 다룬 연구는")
     out, n = add_missing_to_intro("서론\n원래 서론.\n\n본론\n1. x", s)
     assert n == 1 and out.startswith("서론\n'한국어' 조건") and "\n원래 서론." in out
+    one = missing_sentence([{"종류": "언어", "값": "한국어", "다룬 논문": []}])
+    out, _ = add_missing_to_intro("서론\n질문을 직접 다룬 연구는 찾지 못했고, 가장 가까운 연구는 아래와 같습니다.\n본론", one)
+    assert out == "서론\n'한국어' 조건을 직접 다룬 연구는 찾지 못했고, 가장 가까운 연구는 아래와 같습니다.\n본론"
+    out, _ = add_missing_to_intro("서론\n제공된 문서에는 질문이 찾는 연구가 없습니다.\n본론", one)
+    assert out == "서론\n'한국어' 조건을 직접 다룬 연구를 포함해 질문이 찾는 연구는 제공된 문서에 없습니다.\n본론"
+    assert missing_conditions([{"종류": "문서 유형", "값": "보고서", "다룬 논문": []}]) == []
     assert add_missing_to_intro("서론\n a", "") == ("서론\n a", 0)
 
 

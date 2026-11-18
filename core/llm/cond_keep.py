@@ -56,8 +56,11 @@ def judge_conditions(question: str, rag_context: str) -> list[dict] | None:
             if c.get("값") and all(w in question for w in re.split(r"\s*[·,/]\s*|\s+", c["값"].strip()) if w)]
 
 
+_GENERIC = {"보고서", "문서", "논문", "데이터", "텍스트", "자료", "글", "연구"}  # 혼자서는 한정 조건이 아님(W01 '보고서')
+
+
 def missing_conditions(conds: list[dict] | None) -> list[dict]:
-    return [c for c in conds or [] if not c["다룬 논문"]]
+    return [c for c in conds or [] if not c["다룬 논문"] and c["값"].strip() not in _GENERIC]
 
 
 def missing_sentence(missing: list[dict]) -> str:
@@ -70,10 +73,19 @@ def missing_sentence(missing: list[dict]) -> str:
     return " · ".join(parts) + "는 제공된 문서에서 찾지 못했고, 아래는 그 조건을 벗어나 관련된 연구입니다."
 
 
+_LEAD_PARTIAL = "질문을 직접 다룬 연구는 찾지 못했고, 가장 가까운 연구는 아래와 같습니다."
+_LEAD_NONE = "제공된 문서에는 질문이 찾는 연구가 없습니다."
+
+
 def add_missing_to_intro(answer: str, sentence: str) -> tuple[str, int]:
-    """서론 머리 바로 다음 줄에 조건 문장을 넣는다. 이미 같은 값이 서론에 '찾지 못' 과 함께 있으면 그대로."""
+    """서론 머리에 조건 문장을 넣는다. 판정 안내 문장이 이미 있으면 한 문장으로 합친다(4차 피드백 T3)."""
     if not sentence:
         return answer, 0
+    cond = sentence.split("는 제공된 문서에서 찾지 못했고")[0]  # "'한국어' 조건을 직접 다룬 연구 · …"
+    if _LEAD_PARTIAL in (answer or ""):
+        return answer.replace(_LEAD_PARTIAL, f"{cond}는 찾지 못했고, 가장 가까운 연구는 아래와 같습니다.", 1), 1
+    if _LEAD_NONE in (answer or ""):
+        return answer.replace(_LEAD_NONE, f"{cond}를 포함해 질문이 찾는 연구는 제공된 문서에 없습니다.", 1), 1
     m = re.search(r"^[ \t#*]*서론[ \t*]*$\n?", answer or "", re.M)
     if not m:
         return sentence + "\n" + (answer or ""), 1
