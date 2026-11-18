@@ -51,6 +51,7 @@
 | `RAG_EXT_PROMOTE` | `1` | 11-17 | 판정 집계 (b)/(c) 때 답 전에 OpenAlex 후보(arXiv ID · 초록 200자+ 최대 4편)를 27B 로 판정해 직접 · 부분 최대 2편을 본문 칸으로 승격, 승격분은 📎 부록에서 빠짐 | [`ext_promote_1117`](../docs/experiments/ext_promote_1117/README.md): K+L 60 쌍 16:2 p 0.0013 · 승격 정밀도 18/19 · +4.5s · W06 2311.11123 본론 1번 |
 | `RAG_COND_KEEP` | `1` | 11-18 | 질문 조건(언어 · 문서 유형 · 분야 · 비교 대상)을 27B 로 뽑아(판정이 돌면 문서 판정 호출에 합침) 다룬 문서가 없으면 서론 머리에 "'X' 조건을 직접 다룬 연구는 … 찾지 못했고" 를 넣고, 문서 유형 · 분야 표현은 답에서 바꾸지 말라고 지시 | [`cond_keep_1118`](../docs/experiments/cond_keep_1118/README.md): 확인 라운드 N01–N30 쌍 10:2 p 0.039 · 거짓 '찾지 못' 25%(경계) · +7.1s |
 | `RAG_TERM_FIX` | `1` | 11-18 | 알려진 잘못된 음차 고정 표(차킹 · 채킹 · 청크링 → 청킹, 허할루시네이션 → 환각, 판판 → 판정자, CoT-라울러 → CoT 근거 설명) · 본론 항목 '제목: 요약' 꼴 보완 | [`term_fix_1118`](../docs/experiments/term_fix_1118/README.md): 저장 답 1,974 중 103 바뀜 · 비자명 제목 28 중 26 맞음 · 틀린 정보 0 |
+| `RAG_ANSWER_SEED` | `0` | 11-18 | 답 생성(v13) seed 고정 — temperature 0.2 그대로, 같은 입력이면 같은 답(실행 간 인용 흔들림 없앰). temperature 0(`RAG_ANSWER_TEMP=0`)은 쌍 1:4 로 미달 | [`stable_1118`](../docs/experiments/stable_1118/README.md): dev 10×3 인용 같음 8→10/10 · golden 12→12 · L30 쌍 1:3(경계) · −3.6s |
 
 ## 2. 그 밖 설정 (값 공개 가능)
 
