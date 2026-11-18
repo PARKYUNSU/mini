@@ -125,8 +125,10 @@ def get_rag_answer_llm():
     return ChatOllama(
         **ollama_kwargs(
             model=RAG_ANSWER_ONLY_MODEL,
-            temperature=0.2,
+            # 출력 안정화(4차 피드백 T1, stable_1118): RAG_ANSWER_TEMP=0 · RAG_ANSWER_SEED=0 이면 같은 입력에 같은 답
+            temperature=float(os.getenv("RAG_ANSWER_TEMP", "0.2")),
             top_p=0.8,
+            **({"seed": int(os.getenv("RAG_ANSWER_SEED"))} if os.getenv("RAG_ANSWER_SEED", "").strip() else {}),
             # 1.18 은 반복 용어 음차를 깨뜨린다(홉→홠 등, docs/experiments/penalty_1113) — 1.0 확인 중
             repeat_penalty=float(os.getenv("RAG_ANSWER_REPEAT_PENALTY", "1.18")),
             reasoning=False,
