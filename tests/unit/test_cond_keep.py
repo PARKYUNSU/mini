@@ -27,15 +27,20 @@ def test_judge_docs_and_conditions(monkeypatch):
 
     import requests
 
+    import core.llm.doc_judge as dj
     from core.llm.cond_keep import judge_docs_and_conditions
+
+    sent = []
 
     class R:
         def json(self):
-            return {"message": {"content": json.dumps({"판정": [{"번호": 1, "관련도": "직접"}, {"번호": 2, "관련도": "무관"}],
-                                                       "조건": [{"종류": "언어", "값": "한국어", "다룬 논문": [2]},
-                                                              {"종류": "분야", "값": "우주", "다룬 논문": []}]})}}
-    monkeypatch.setattr(requests, "post", lambda *a, **k: R())
+            return {"message": {"content": json.dumps({"조건": [{"종류": "언어", "값": "한국어", "다룬 논문": [2]},
+                                                                {"종류": "분야", "값": "우주", "다룬 논문": []}]})}}
+    monkeypatch.setattr(requests, "post", lambda *a, **k: sent.append(k["json"]["messages"][0]["content"]) or R())
+    monkeypatch.setattr(dj, "judge_docs", lambda q, ctx: {3: "D", 7: "N"})
     ctx = "[문서 3]\n[2401.00001] A\n[초록] a\n\n[문서 7]\n[2401.00002] B\n[초록] b"
     labels, conds = judge_docs_and_conditions("한국어 문서 연구", ctx)
-    assert labels == {3: "D", 7: "N"}
-    assert conds == [{"종류": "언어", "값": "한국어", "다룬 논문": [7]}]  # '우주' 는 질문에 없어 버림, 번호는 문서 번호로
+    assert labels == {3: "D", 7: "N"}  # 문서 판정은 단독 호출 그대로
+    assert conds == [{"종류": "언어", "값": "한국어", "다룬 논문": [7]}]
+    blocks_docs = "[1] A\na\n\n[2] B\nb"
+    assert sent[0].startswith(dj.PROMPT.format(q="한국어 문서 연구", docs=blocks_docs))  # 같은 앞부분 → 캐시
