@@ -37,7 +37,7 @@ def test_partial_wording():
 def test_fix_terms():
     from core.llm.format_fix import fix_terms
     out, n = fix_terms("동적 차킹과 채킹이 청크링을, 인간 판판이 허할루시네이션을 CoT‑라울러로")
-    assert out == "동적 청킹과 청킹이 청킹을, 인간 판정자가 환각을 CoT 근거 설명로" and n == 6
+    assert out == "동적 청킹과 청킹이 청킹을, 인간 판정자가 환각을 CoT 근거 설명으로" and n == 6
 
 
 def test_fix_item_titles():
@@ -78,3 +78,20 @@ def test_fix_terms_rationale_variants():
         out, n = fix_terms(w)
         assert out.startswith("CoT 근거 설명") and n == 1, out
     assert fix_terms("CoT 라벨을")[0] == "CoT 라벨을"  # 붙임표 없는 'CoT 라…' 는 알려진 음차만
+
+
+def test_fix_terms_rationale_tail_and_particle():  # U5 — 저장 답에서 실제로 나온 꼴
+    from core.llm.format_fix import fix_terms
+    cases = {
+        "CoT‑라벨링된 이유를 이용해": "CoT 근거 설명을 이용해",
+        "CoT‑라벨링된 합리화를 이용한": "CoT 근거 설명을 이용한",
+        "CoT‑라울린을 활용한": "CoT 근거 설명을 활용한",
+        "CoT-라울에 기반한": "CoT 근거 설명에 기반한",
+        "CoT‑라울러를 이용한": "CoT 근거 설명을 이용한",
+        "CoT‑라울러 기반": "CoT 근거 설명 기반",
+        "CoT‑라우널이 있다": "CoT 근거 설명이 있다",
+    }
+    for src, want in cases.items():
+        out, n = fix_terms(src)
+        assert out == want and n == 1, (src, out)
+    assert fix_terms("CoT‑라벨링된 데이터")[0] == "CoT‑라벨링된 데이터"  # 진짜 '라벨링된' 은 둔다
