@@ -203,14 +203,21 @@ class ExternalSearch:
     """답변 생성과 동시에 OpenAlex 를 부르고, 답변이 끝나면 남은 시간만 기다린다."""
 
     def __init__(self, query: str, exclude_ids: set[str], timeout: float = TIMEOUT_SEC,
-                 exclude_titles: set[str] | None = None, years: tuple[int | None, int | None] | None = None):
+                 exclude_titles: set[str] | None = None, years: tuple[int | None, int | None] | None = None,
+                 judge_question: str | None = None):
         self._items: list[dict] = []
-        self._deadline = time.time() + timeout
+        self.dropped = 0
+        self._judge_q = judge_question  # 주면 답변과 동시에 27B 로 무관 후보를 뺀다 (RAG_EXT_LIST_JUDGE)
+        self._deadline = time.time() + timeout + (60.0 if judge_question else 0.0)  # 판정은 27B 한 번 — 답변 생성 동안 끝난다
         self._t = threading.Thread(target=self._run, args=(query, exclude_ids, timeout, exclude_titles, years), daemon=True)
         self._t.start()
 
     def _run(self, query, exclude_ids, timeout, exclude_titles, years):
-        self._items = search_openalex(query, exclude_ids, timeout=timeout, exclude_titles=exclude_titles, years=years)
+        items = search_openalex(query, exclude_ids, timeout=timeout, exclude_titles=exclude_titles, years=years)
+        if self._judge_q and items:
+            from core.llm.doc_judge import judge_external_list
+            items, self.dropped = judge_external_list(self._judge_q, items)
+        self._items = items
 
     def result(self) -> tuple[list[dict], float]:
         """(결과, 답변 뒤 더 기다린 초)."""

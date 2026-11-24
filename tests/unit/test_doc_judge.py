@@ -59,3 +59,25 @@ def test_promote_external(monkeypatch):
     assert "[문서 3]\n[2311.11123] Regression Testing" in ctx and "2401.00002" not in ctx
     from core.llm.body_numbers import _blocks
     assert "Regression Testing" in _blocks(ctx, ids)["2311.11123"] and "Regression" not in _blocks(ctx, ids)["2401.00003"]
+
+
+def test_promote_external_uses_prefetched_items(monkeypatch):
+    import core.llm.doc_judge as dj
+    import core.rag.external_search as es
+    monkeypatch.setattr(es, "search_openalex", lambda *a, **k: (_ for _ in ()).throw(AssertionError("검색 다시 함")))
+    monkeypatch.setattr(dj, "judge_docs", lambda q, ctx: {2: "D"})
+    items = [{"arxiv": "2403.18802", "title": "Long-form factuality", "abstract": "y" * 250}]
+    ctx, ids, labs, added = dj.promote_external("q", "q", "[문서 1]\n[2401.00001] A\n[초록] a", {1: "2401.00001"}, {1: "D"}, items=items)
+    assert added[0]["arxiv"] == "2403.18802" and labs[2] == "D"
+
+
+def test_judge_external_list_drops_unrelated_keeps_unjudgeable(monkeypatch):
+    import core.llm.doc_judge as dj
+    monkeypatch.setattr(dj, "judge_docs", lambda q, ctx: {1: "N", 2: "P"})
+    items = [{"arxiv": "2302.06527", "title": "Unit tests", "abstract": "u" * 250},
+             {"arxiv": None, "title": "DOI only", "abstract": ""},
+             {"arxiv": "2105.09680", "title": "KLUE", "abstract": "k" * 250}]
+    kept, n = dj.judge_external_list("q", items)
+    assert n == 1 and [it["title"] for it in kept] == ["DOI only", "KLUE"]
+    monkeypatch.setattr(dj, "judge_docs", lambda q, ctx: None)
+    assert dj.judge_external_list("q", items) == (items, 0)

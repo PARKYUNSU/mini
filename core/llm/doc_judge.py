@@ -128,8 +128,32 @@ def ext_promote_active() -> bool:
     return os.getenv("RAG_EXT_PROMOTE", "0").strip() == "1"
 
 
+def ext_promote_a_active() -> bool:
+    """판정 (a) 직접 있음이어도 외부 승격 (RAG_EXT_PROMOTE_A, ext_promote_a_1124)."""
+    return os.getenv("RAG_EXT_PROMOTE_A", "0").strip() == "1"
+
+
+def ext_list_judge_active() -> bool:
+    """📎 DB 밖 목록도 27B 로 판정해 무관은 뺀다 (RAG_EXT_LIST_JUDGE, ext_promote_a_1124)."""
+    return os.getenv("RAG_EXT_LIST_JUDGE", "0").strip() == "1"
+
+
+def judge_external_list(question: str, items: list[dict]) -> tuple[list[dict], int]:
+    """📎 후보 중 초록 있는 것을 27B 로 판정해 무관(N)은 뺀다. 초록 없는 후보 · 판정 실패는 그대로 둔다. (남긴 것, 뺀 수)."""
+    judged = [(k, it) for k, it in enumerate(items) if len(it.get("abstract") or "") >= 200]
+    if not judged:
+        return items, 0
+    ctx = "\n\n---\n\n".join(f"[문서 {n}]\n[{it.get('arxiv') or ''}] {it.get('title') or ''}\n[초록] {it['abstract']}"
+                             for n, (_, it) in enumerate(judged, 1))
+    got = judge_docs(question, ctx)
+    if not got:
+        return items, 0
+    drop = {k for n, (k, _) in enumerate(judged, 1) if got.get(n) == "N"}
+    return [it for k, it in enumerate(items) if k not in drop], len(drop)
+
+
 def promote_external(question: str, query: str, rag_context: str, doc_ids: dict, labels: dict,
-                     years=None, max_cands: int = 4, max_keep: int = 2):
+                     years=None, max_cands: int = 4, max_keep: int = 2, items: list[dict] | None = None):
     """DB 밖(OpenAlex) 후보를 27B 로 판정해 직접 · 부분이면 컨텍스트에 붙인다 (RAG_EXT_PROMOTE, docs/experiments/ext_promote_1117).
 
     반환: (rag_context, doc_ids, labels, 올린 [{arxiv, title, label}]). 실패하면 입력 그대로 · 빈 목록.
@@ -138,7 +162,8 @@ def promote_external(question: str, query: str, rag_context: str, doc_ids: dict,
     from core.rag.external_search import search_openalex
 
     titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context or ""))
-    items = search_openalex(query, {str(p) for p in doc_ids.values()}, exclude_titles=titles, years=years)
+    if items is None:  # 미리 찾아 둔 결과가 없으면 지금 찾는다
+        items = search_openalex(query, {str(p) for p in doc_ids.values()}, exclude_titles=titles, years=years)
     cands = [it for it in items if it.get("arxiv") and len(it.get("abstract") or "") >= 200][:max_cands]
     if not cands:
         return rag_context, doc_ids, labels, []

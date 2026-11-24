@@ -46,6 +46,8 @@ from core.llm.doc_judge import (
     agg_slots_template,
     aggregate,
     judge_agg_active,
+    ext_list_judge_active,
+    ext_promote_a_active,
     ext_promote_active,
     judge_docs,
     promote_external,
@@ -1503,6 +1505,12 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 # 답변과 같은 앞부분으로 판정하면 답변 호출이 컨텍스트를 다시 읽지 않는다 (docs/experiments/judge_cache_1017)
                 # 문서별 직접/부분/무관 집계로 '없음' 여부를 정한다 (RAG_JUDGE_AGG, docs/experiments/judge_agg_1117). 실패하면 아래 기존 판정.
                 _doc_labels = None
+                _ext_pref = None  # 판정 (a) 에도 외부 승격 — OpenAlex 검색은 27B 판정과 동시에 미리 (RAG_EXT_PROMOTE_A, ext_promote_a_1124)
+                if judge_agg_active() and not image_base64 and ext_promote_a_active() and ext_promote_active() and external_search_active() \
+                        and agg_slots_active() and not _list_on and not _item_docs:
+                    _ext_pref = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()},
+                                               exclude_titles=set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context or "")),
+                                               years=year_condition(user_request) if os.getenv("RAG_COND_CHECK", "0").strip() == "1" else None)
                 if judge_agg_active() and not image_base64:
                     if cond_keep_active():  # 조건 판정을 같은 27B 호출에 합친다 (cond_keep_1118 §5)
                         _doc_labels, _conds = judge_docs_and_conditions(user_request, rag_context)
@@ -1512,10 +1520,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     _agg, _pick = aggregate(_doc_labels)
                     _agg_slots = agg_slots_active() and not _list_on and not _item_docs
                     # 직접 연구가 없으면 DB 밖(OpenAlex) 후보를 판정해 본문으로 올린다 (RAG_EXT_PROMOTE, ext_promote_1117)
-                    if _agg_slots and _agg in ("b", "c") and ext_promote_active() and external_search_active():
+                    if _agg_slots and (_agg in ("b", "c") or _ext_pref is not None) and ext_promote_active() and external_search_active():
                         _py = year_condition(user_request) if os.getenv("RAG_COND_CHECK", "0").strip() == "1" else None
                         rag_context, _doc_ids, _doc_labels, _promoted = promote_external(
-                            user_request, rag_query, rag_context, _doc_ids, _doc_labels, years=_py)
+                            user_request, rag_query, rag_context, _doc_ids, _doc_labels, years=_py,
+                            items=_ext_pref.result()[0] if _ext_pref is not None else None)
                         if _promoted:
                             _agg, _pick = aggregate(_doc_labels)
                             _conds = None  # 올린 문서까지 보고 조건을 다시 본다
@@ -1592,7 +1601,8 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 _titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context))
                 # 기간 질문이면 DB 밖 목록도 그 기간만 (RAG_COND_CHECK, answer_issues_1113)
                 _ext_years = year_condition(user_request) if os.getenv("RAG_COND_CHECK", "0").strip() == "1" else None
-                _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles, years=_ext_years)  # _doc_ids 는 {번호: 논문 ID}
+                _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles, years=_ext_years,
+                                      judge_question=user_request if ext_list_judge_active() else None)  # _doc_ids 는 {번호: 논문 ID}
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
             if _da_timeout is None:
@@ -1699,7 +1709,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 if _ext_items:
                     answer = answer.rstrip() + format_section(_ext_items)
                     record_candidates(user_request, _ext_items, years=_ext_years)
-                rag_trace.mark(chat_id, "external", n=len(_ext_items), wait=round(_ext_wait, 1))
+                rag_trace.mark(chat_id, "external", n=len(_ext_items), wait=round(_ext_wait, 1), dropped=_ext.dropped)
             # '없음' 판정 답에서 모델이 결론을 '없음' 으로 썼으면 본론 항목에 (관련 연구) 표시 (answer_issues_1113 ①)
             if _pick == "없음":
                 answer, _rm = mark_related_items(answer)
