@@ -86,3 +86,20 @@ def test_bare_keys_and_tail_memo():
     assert clean_title("Way Maker") == "Way Maker"            # 영어 곡명 끝 낱말은 키가 아님
     songs = parse([("numbered", "감사 위에 감사(후렴,카피x)Bb\nhttps://youtu.be/a", [])])
     assert songs == [Song("감사 위에 감사", "https://youtu.be/a", note="후렴,카피x")]
+
+
+def test_parse_1122_page_shape():
+    """11-22 페이지 모양: 날짜 머리 줄, 키 뒤 (원곡 X), '설교 후 찬양 – 곡'."""
+    items = [
+        ("other", "2026. 11. 22 드림공동체 주일 찬양", []),
+        ("numbered", "사랑하는 나의 아버지 Bb -> Cb (원곡C)\nhttps://youtu.be/a", []),
+        ("numbered", "주를 찾는 모든 자들이 F->G (원곡 G)\nhttps://youtu.be/b", []),
+        ("numbered", "주의 손이 E\nhttps://youtu.be/c", []),
+        ("other", "설교 후 찬양 – 그 사랑 얼마나 F", []),
+    ]
+    assert parse(items) == [
+        Song("사랑하는 나의 아버지", "https://youtu.be/a", note="원곡C"),
+        Song("주를 찾는 모든 자들이", "https://youtu.be/b", note="원곡 G"),
+        Song("주의 손이", "https://youtu.be/c"),
+        Song("그 사랑 얼마나", None, "설교 후 찬양"),
+    ]

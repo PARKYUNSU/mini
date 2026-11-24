@@ -11,7 +11,7 @@ _KEY_PAREN = re.compile(rf"\s*[(（]\s*{_KEY}(\s*(->|=>|→|-|~|>)\s*{_KEY})*\s*
 # 괄호 없이 끝에 붙인 키: '곡명 Bb', '곡명 D->E', '곡명(메모)Bb'
 _BARE_KEY = re.compile(rf"(?:\s+|(?<=[)）]))({_KEY}(?:\s*(?:->|=>|→|-|~|>)\s*{_KEY})*)\s*$")
 # 끝의 괄호 연주 메모: (후렴,카피x)
-_TAIL_MEMO = re.compile(r"\s*[(（]([^)）]*(?:후렴|브릿지|카피|인트로|간주|엔딩|아웃트로|만|x|X)[^)）]*)[)）]\s*$")
+_TAIL_MEMO = re.compile(r"\s*[(（]([^)）]*(?:후렴|브릿지|카피|인트로|간주|엔딩|아웃트로|원곡|만|x|X)[^)）]*)[)）]\s*$")
 # 괄호 메모: (*뉴송?)
 _MEMO = re.compile(r"\s*[(（]\s*\*([^)）]*)[)）]")
 # 괄호 밖의 + 만 곡 구분입니다: (E, 브릿지+후렴만) 은 한 곡의 메모
@@ -22,8 +22,10 @@ _NOT_SONG = {"인트로", "전주", "간주", "미정", "tbd", "추후공지"}
 _URL = re.compile(r"https?://\S+")
 _NUMBERED = re.compile(r"^\s*\d+\s*[.)]\s*(.+)$")
 _ROLE = re.compile(
-    r"^\s*\*?\s*(말씀\s*후\s*찬양|헌금\s*찬양|봉헌\s*찬양|파송\s*찬양|결단\s*찬양)\s*[:：]\s*(.+)$"
+    r"^\s*\*?\s*((?:말씀|설교)\s*후\s*찬양|헌금\s*찬양|봉헌\s*찬양|파송\s*찬양|결단\s*찬양)\s*[:：\-–—]\s*(.+)$"
 )
+# 콘티 머리 줄의 날짜: '2026. 11. 22 드림공동체 주일 찬양' 은 번호 목록이 아님
+_DATE_LINE = re.compile(r"^\s*\d{2,4}\s*[./-]\s*\d{1,2}\s*[./-]\s*\d{1,2}\b")
 
 
 @dataclass
@@ -37,10 +39,21 @@ class Song:
 def clean_title(raw: str) -> str:
     title = _URL.sub("", raw).strip()
     title = _LEADER.sub(r"\1", title)
-    title = _MEMO.sub("", _KEY_PAREN.sub("", title))
-    title = _BARE_KEY.sub("", title.strip())
-    title = _TAIL_MEMO.sub("", title)
+    title, _ = _strip_tail(_MEMO.sub("", _KEY_PAREN.sub("", title)))
     return title.strip(" \t-·*")
+
+
+def _strip_tail(text: str) -> tuple[str, list[str]]:
+    """끝의 키와 연주 메모를 번갈아 뗍니다: '곡 Bb -> Cb (원곡C)', '곡(후렴,카피x)Bb'. 뗀 메모도 돌려줍니다."""
+    notes, text = [], text.strip()
+    while True:
+        memo = _TAIL_MEMO.search(text)
+        new = _BARE_KEY.sub("", _TAIL_MEMO.sub("", text)).strip()
+        if memo:
+            notes.insert(0, memo.group(1).strip())
+        if new == text:
+            return text, notes
+        text = new
 
 
 def titles(raw: str) -> list[tuple[str, str]]:
@@ -53,9 +66,7 @@ def titles(raw: str) -> list[tuple[str, str]]:
             text = _URL.sub("", part)
             notes = [m.group(3).strip() for m in _KEY_PAREN.finditer(text) if m.group(3)]
             notes += [m.group(1).strip() for m in _MEMO.finditer(text)]
-            tail = _TAIL_MEMO.search(_BARE_KEY.sub("", _KEY_PAREN.sub("", _LEADER.sub(r"\1", text)).strip()))
-            if tail:
-                notes.append(tail.group(1).strip())
+            notes += _strip_tail(_KEY_PAREN.sub("", _LEADER.sub(r"\1", text)))[1]
             out.append((title, ", ".join(n for n in notes if n)))
     return out
 
@@ -83,6 +94,8 @@ def parse(items) -> list[Song]:
             role = _ROLE.match(ln)
             if role:
                 add(role.group(2), None, re.sub(r"\s+", " ", role.group(1)))
+                continue
+            if _DATE_LINE.match(ln):
                 continue
             numbered = _NUMBERED.match(ln)  # 번호 목록 대신 "1. 곡명 (G)"로 적은 경우
             if numbered:
