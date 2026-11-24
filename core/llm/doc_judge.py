@@ -154,7 +154,8 @@ def promote_external(question: str, query: str, rag_context: str, doc_ids: dict,
     for k, n in enumerate(keep):
         num = (max(doc_ids) + 1) if doc_ids else 1
         c = cands[n - start]
-        rag_context = rag_context.rstrip() + "\n\n" + blocks[n].replace(f"[문서 {n}]", f"[문서 {num}]", 1)
+        # 다른 블록과 같은 구분자 — 없으면 _blocks 가 앞 문서에 합쳐 항목 다시 쓰기 · 칸 채우기가 엉뚱한 초록을 본다(slot_fill_1124)
+        rag_context = rag_context.rstrip() + "\n\n---\n\n" + blocks[n].replace(f"[문서 {n}]", f"[문서 {num}]", 1)
         doc_ids[num] = c["arxiv"]
         labels[num] = got[n]
         added.append({"arxiv": c["arxiv"], "title": c["title"], "label": got[n]})

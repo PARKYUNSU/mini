@@ -53,7 +53,9 @@ def test_promote_external(monkeypatch):
         {"arxiv": None, "title": "ACL only", "abstract": ab},
         {"arxiv": "2401.00002", "title": "Unrelated", "abstract": ab}])
     monkeypatch.setattr(dj, "judge_docs", lambda q, ctx: {3: "P", 4: "N"})
-    ctx, ids, labs, added = dj.promote_external("q", "q", "[문서 1]\n[2401.00001] A\n[초록] a\n\n[문서 2]\n[2401.00003] B\n[초록] b",
+    ctx, ids, labs, added = dj.promote_external("q", "q", "[문서 1]\n[2401.00001] A\n[초록] a\n\n---\n\n[문서 2]\n[2401.00003] B\n[초록] b",
                                                 {1: "2401.00001", 2: "2401.00003"}, {1: "N", 2: "N"})
     assert [a["arxiv"] for a in added] == ["2311.11123"] and ids[3] == "2311.11123" and labs[3] == "P"
     assert "[문서 3]\n[2311.11123] Regression Testing" in ctx and "2401.00002" not in ctx
+    from core.llm.body_numbers import _blocks
+    assert "Regression Testing" in _blocks(ctx, ids)["2311.11123"] and "Regression" not in _blocks(ctx, ids)["2401.00003"]
