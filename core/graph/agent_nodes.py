@@ -78,6 +78,7 @@ from core.llm.agent_llm import (
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.conclusion_rewrite import brief_findings, rewrite_conclusion
 from core.llm.item_rewrite import rewrite_items
+from core.llm.slot_fill import dedupe_repeated_heads, fill_missing_slots, missing_ids, slot_fill_active
 from core.llm.conclusion_swap import swap_conclusion
 from core.llm.relevance_filter import filter_relevant
 from core.llm.query_reform import fill_slots
@@ -1648,11 +1649,23 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
             answer, _rn = renumber_body_items(answer)
             if _rn:
                 print("[DEBUG] DirectAnswer: 본론 번호 다시 매김")
+            _slot_on = slot_fill_active() and _agg_slots and _agg in ("a", "b") and bool(_doc_labels)
+            if _slot_on:  # 한 항목 안 같은 이름 머리 반복 지우기 (RAG_SLOT_FILL, slot_fill_1124)
+                answer, _dh = dedupe_repeated_heads(answer)
+                if _dh:
+                    print(f"[DEBUG] DirectAnswer: 같은 이름 머리 반복 {_dh}곳 지움")
             # 본론 항목을 논문마다 따로 다시 쓴다 (RAG_ITEM_REWRITE, docs/experiments/item_rewrite_1114)
             if os.getenv("RAG_ITEM_REWRITE", "0").strip() == "1" and not _list_on:
                 answer, _ir = rewrite_items(answer, _rewrite_q, rag_context, _doc_ids, RAG_ANSWER_MODEL)
                 print(f"[DEBUG] DirectAnswer: 항목 다시 쓰기 = {_ir}")
                 rag_trace.mark(chat_id, "item_rewrite", result=_ir)
+            if _slot_on:  # 칸 받은 논문 중 본론에 없는 논문을 항목으로 채운다 (RAG_SLOT_FILL, slot_fill_1124)
+                _miss = missing_ids(answer, _doc_labels, _doc_ids)
+                answer, _sf = fill_missing_slots(answer, _rewrite_q, rag_context, _doc_labels, _doc_ids, RAG_ANSWER_MODEL)
+                if _sf.get("채움"):
+                    answer, _ = renumber_body_items(answer)
+                print(f"[DEBUG] DirectAnswer: 칸 검사 빠짐 {len(_miss)} = {_sf}")
+                rag_trace.mark(chat_id, "slot_fill", missing=[p for p, _ in _miss], dedupe=_dh, result=_sf)
             if os.getenv("RAG_BODY_NUM_CHECK", "0").strip() == "1":  # docs/experiments/list_findings_v2_1026
                 answer, _bn = check_body_numbers(answer, rag_context, _doc_ids)
                 if _bn:
