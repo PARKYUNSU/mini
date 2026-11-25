@@ -122,3 +122,8 @@ def test_slides_never_leaves_blank_lines_from_double_spaces():
 def test_slides_breaks_after_linking_ending_not_after_modifier():
     assert slides("내 그물 버리고 내 사랑들 뒤로 하고") == "내 그물 버리고\n내 사랑들 뒤로 하고"
     assert slides("우리 보좌 앞에 모였네 함께 주를 찬양하며") == "우리 보좌 앞에 모였네\n함께 주를 찬양하며"
+
+
+def test_slides_drops_lines_with_only_invisible_chars():
+    # 웹 가사의 ​ 만 있는 줄은 노션에서 빈 줄로 보입니다
+    assert slides("주의 손이\n​\n나를 붙드네\n﻿ \n끝") == "주의 손이\n나를 붙드네\n끝"

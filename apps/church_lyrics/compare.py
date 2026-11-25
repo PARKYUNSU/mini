@@ -21,6 +21,9 @@ _ENGLISH_WORD = re.compile(r"[A-Za-z]+(?:'[A-Za-z]+)?")
 _PUNCT = re.compile(r"[,.!?;:…~\"“”、。，．！？；：]+|(?<![A-Za-z])['‘’]|['‘’](?![A-Za-z])")
 
 
+# 웹 가사에 섞인 폭 없는 문자(\u200b·\ufeff·\u2060 등). 이 문자만 있는 줄은 노션에서 빈 줄로 보입니다
+_INVISIBLE = re.compile("[\u00ad\u180e\u200b-\u200f\u2028-\u202e\u2060-\u2064\ufeff]")
+
 MAX_SLIDE = 18  # 슬라이드 한 줄 최대 글자 수(공백 포함). 완성본 예시의 가장 긴 줄이 17자
 
 
@@ -62,7 +65,7 @@ def slides(text: str) -> str:
     """자막 규격: 한 줄이 슬라이드 한 줄, 빈 줄 없이 이어 붙입니다(프로프리젠터가 2줄씩 슬라이드를 나눔).
     긴 줄만 나누고 통째로 반복되는 절은 한 번만 적습니다. 글자는 바꾸지 않습니다."""
     stanzas, current = [], []
-    for ln in text.splitlines():
+    for ln in _INVISIBLE.sub("", text).splitlines():
         if ln.strip():
             current += _cut(ln.strip())
         elif current:
@@ -84,7 +87,7 @@ def tidy(text: str) -> str:
     글자를 지우기만 하고 바꾸거나 더하지는 않습니다.
     """
     out: list[str] = []
-    for raw in text.replace("\r", "").split("\n"):
+    for raw in _INVISIBLE.sub("", text.replace("\r", "")).split("\n"):
         line = _BULLET.sub("", _MARKUP.sub("", _TIMESTAMP.sub("", raw)).strip())
         line = _REPEAT.sub("", line)
         if _LABEL.match(line):
