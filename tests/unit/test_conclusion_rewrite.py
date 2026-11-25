@@ -73,3 +73,18 @@ def test_brief_findings_long_result_truncated_not_dropped():
           "Extensive experiments demonstrate that TrustMem improves memory utility: " + "x " * 150 + "and reduces omission by 40.1\\%.")
     out = brief_findings(ab, 300)
     assert len(out) <= 300 and "we propose TrustMem" in out and out.endswith("…")
+
+
+def test_concl_check_helpers():
+    from core.llm.conclusion_rewrite import mark_combo_claims, must_cover, reversed_change
+
+    assert reversed_change("충실도를 0.621에서 0.347으로 높이고") == "0.621에서 0.347으로 높이고"
+    assert reversed_change("0.347에서 0.621로 높이고, 오류를 12%에서 5%로 줄였다") == ""
+    assert reversed_change("오류를 5%에서 12%로 줄였다") == "5%에서 12%로 줄였다"
+    a = "<b>서론</b>\nx\n<b>본론</b>\n1. A: a [2401.00001]\n2. B (관련 연구): b [2401.00002]\n<b>결론</b>\nA와 B를 결합하는 것이 효과적입니다. 끝."
+    blocks = {1: "[문서 1]\n[2401.00001v1] A", 2: "[문서 2]\n[2401.00002] B"}
+    assert must_cover(a, blocks) == {1}
+    out, n = mark_combo_claims(a)
+    assert n == 1 and "결합하는 것이 효과적입니다 (이 조합 자체는 논문에서 검증되지 않았습니다). 끝." in out
+    assert mark_combo_claims(out) == (out, 0)
+    assert mark_combo_claims("<b>본론</b>\n1. A와 B를 결합하는 것이 효과적")[1] == 0

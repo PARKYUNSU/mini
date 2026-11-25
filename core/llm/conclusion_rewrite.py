@@ -16,7 +16,7 @@ from core.llm.answer_fix import _CITED, _find
 from core.llm.citation_fix import RAG_HIT_SEP, fix_citations
 from core.llm.lang_guard import hanzi_count
 
-__all__ = ["brief_findings", "cited_blocks", "extract_findings", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
+__all__ = ["brief_findings", "concl_check_active", "mark_combo_claims", "must_cover", "reversed_change", "cited_blocks", "extract_findings", "ids_to_doc_refs", "check_conclusion", "replace_conclusion", "rewrite_conclusion"]
 
 SYSTEM = "너는 논문 검색 답변의 결론을 고쳐 쓰는 편집자다. 참고 문서에 적힌 내용만 쓴다."
 
@@ -167,6 +167,54 @@ def check_conclusion(text: str, blocks: dict[int, str]) -> str:
     return ""
 
 
+# --- 결론 검사기 (RAG_CONCL_CHECK, docs/experiments/concl_check_1125 — 5차 피드백 U2) ---
+_CHANGE = re.compile(r"(\d+(?:\.\d+)?)\s*%?\s*에서\s*(\d+(?:\.\d+)?)\s*%?\s*(?:으로|로)\s*([가-힣]{1,6})")
+_UP = re.compile(r"(높|향상|증가|개선|올)")
+_DOWN = re.compile(r"(낮|감소|줄|떨어|하락)")
+_COMBO = re.compile(r"(결합|병행|함께 (?:사용|활용|적용)|조합)[^.\n]{0,30}(효과적|유리|바람직|좋|성능을 높)")
+COMBO_NOTE = " (이 조합 자체는 논문에서 검증되지 않았습니다)"
+
+
+def concl_check_active() -> bool:
+    return os.getenv("RAG_CONCL_CHECK", "0").strip() == "1"
+
+
+def reversed_change(text: str) -> str:
+    """"0.621에서 0.347으로 높이고" 처럼 숫자 방향과 동사가 어긋난 첫 구절. 없으면 "" (N14)."""
+    for m in _CHANGE.finditer(text):
+        x, y, verb = float(m.group(1)), float(m.group(2)), m.group(3)
+        if (_UP.match(verb) and y < x) or (_DOWN.match(verb) and y > x):
+            return m.group(0)
+    return ""
+
+
+def must_cover(answer: str, blocks: dict[int, str]) -> set[int]:
+    """결론이 인용해야 할 문서 번호 — 본론 항목 중 "(관련 연구)" 표시가 없는 논문."""
+    b, c = _find("본론", answer), _find("결론", answer)
+    body = answer[b.end():c.start()] if b and c and c.start() > b.end() else ""
+    related = {pid for line in body.split("\n") if "관련 연구" in line for pid in _CITED.findall(line)}
+    out = set()
+    for n, blk in blocks.items():
+        ids = set(_CITED.findall(blk[:300]))
+        if ids and not ids & related:
+            out.add(n)
+    return out
+
+
+def mark_combo_claims(answer: str) -> tuple[str, int]:
+    """결론의 결합 · 병행 효과 문장에 '논문에서 검증되지 않음' 을 붙인다 (W05 · W09)."""
+    c = _find("결론", answer)
+    if not c:
+        return answer, 0
+    head, parts = answer[:c.end()], re.split(r"((?<!\d)\.(?!\d)|\n)", answer[c.end():])
+    n = 0
+    for k in range(0, len(parts), 2):  # 짝수 자리가 문장, 홀수 자리가 끝 부호
+        if _COMBO.search(parts[k]) and "검증되지 않" not in parts[k]:
+            parts[k] = parts[k].rstrip() + COMBO_NOTE
+            n += 1
+    return head + "".join(parts), n
+
+
 def replace_conclusion(answer: str, text: str) -> str:
     c = _find("결론", answer)
     return answer[:c.end()] + "\n" + text.strip() + "\n" if c else answer
@@ -186,8 +234,13 @@ def rewrite_conclusion(
 
     b, c = _find("본론", answer), _find("결론", answer)
     mode = os.getenv("RAG_CONCLUSION_PROMPT", "v1").strip()
+    check_on = concl_check_active() and mode == "v2"
+    must = must_cover(answer, blocks) if check_on else set()
     if mode == "v2":
-        prompt = PROMPT_V2.format(question=question, findings=_findings_text(blocks), term_rule=term_rule())
+        rule = term_rule()
+        if must:
+            rule += "- 다음 논문은 모두 한 번 이상 인용한다: " + ", ".join(f"[문서 {n}]" for n in sorted(must)) + "\n"
+        prompt = PROMPT_V2.format(question=question, findings=_findings_text(blocks), term_rule=rule)
     else:
         prompt = PROMPT.format(
             question=question, blocks=RAG_HIT_SEP.join(blocks.values()), body=answer[b.end():c.start()].strip()
@@ -200,6 +253,21 @@ def rewrite_conclusion(
         return answer, "호출 실패"
     text = ids_to_doc_refs(text, blocks)
     why = check_conclusion(text, blocks)
+    if check_on and not why:
+        miss = must - {int(n) for n in _DOC_N.findall(text)}
+        if miss:  # 빠진 논문을 알려 주고 한 번 더 — 통과하고 더 많이 다루면 그쪽을 쓴다
+            retry = prompt + f"\n\n[이전 결론]\n{text}\n\n이전 결론은 " + ", ".join(f"[문서 {n}]" for n in sorted(miss)) + \
+                " 의 결과를 빠뜨렸다. 그 논문들의 결과를 넣어 결론 전체를 다시 써라."
+            try:
+                t2 = str(llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=retry)]).content or "").strip()
+                t2 = ids_to_doc_refs(t2, blocks)
+                if not check_conclusion(t2, blocks) and not reversed_change(t2) and \
+                        len(must - {int(n) for n in _DOC_N.findall(t2)}) < len(miss):
+                    text = t2
+            except Exception as exc:  # noqa: BLE001 — 첫 결론으로 간다
+                print(f"[DEBUG] conclusion_rewrite 재시도 실패: {type(exc).__name__}")
+    if check_on and not why and reversed_change(text):
+        why = "숫자 방향"
     if why:
         return answer, why
     text, _ = fix_citations(text, numbered_context, doc_ids=doc_ids)
