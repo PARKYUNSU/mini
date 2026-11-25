@@ -44,3 +44,20 @@ def test_judge_docs_and_conditions(monkeypatch):
     assert conds == [{"종류": "언어", "값": "한국어", "다룬 논문": [7]}]
     blocks_docs = "[1] A\na\n\n[2] B\nb"
     assert sent[0].startswith(dj.PROMPT.format(q="한국어 문서 연구", docs=blocks_docs))  # 같은 앞부분 → 캐시
+
+
+def test_restore_cond_terms():
+    from core.llm.cond_keep import restore_cond_terms
+
+    c = [{"종류": "문서 유형", "값": "기준 문서", "다룬 논문": []}, {"종류": "비교 대상", "값": "검색 방법", "다룬 논문": []}]
+    a = "서론\n어려운 문제이다. 이러한 긴 법적 텍스트에서는 희석된다.\n본론\n1. X: 이러한 법률 문서를 나눈다.\n결론\n이런 방대한 법률 텍스트를 다룰 때"
+    out, n = restore_cond_terms(a, c)
+    assert n == 2
+    assert "이러한 긴 기준 문서에서는" in out and "이런 방대한 기준 문서를" in out
+    assert "1. X: 이러한 법률 문서를 나눈다." in out  # 본론 항목은 그대로
+    # 질문 유형과 같은 낱말 · 조건 둘 이상 · 조건 없음은 그대로
+    assert restore_cond_terms("이러한 규제 문서는", [{"종류": "문서 유형", "값": "규제 문서", "다룬 논문": []}]) == ("이러한 규제 문서는", 0)
+    two = c[:1] + [{"종류": "문서 유형", "값": "회의록", "다룬 논문": []}]
+    assert restore_cond_terms(a, two) == (a, 0)
+    assert restore_cond_terms(a, None) == (a, 0)
+    assert restore_cond_terms("이러한 긴 문서는", c) == ("이러한 긴 문서는", 0)

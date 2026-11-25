@@ -101,6 +101,35 @@ def keep_terms_note(conds: list[dict] | None) -> str:
     return f"\n- 질문의 표현 {q} 은(는) 답에서도 그대로 쓴다. 문서가 다른 유형(예: 법령 · 판례)을 다뤘으면 그 유형 이름은 그 논문 설명에만 쓰고, 질문의 표현을 그것으로 바꾸지 않는다.\n"
 
 
+_OTHER_TYPE = re.compile(
+    r"(이러한|이런|그러한|이와 같은)((?:\s+[가-힣]*[한운은는긴])*)\s+"
+    r"(법적|법률|법령|판례|규제|공시|계약|의료|금융|뉴스|학술|기술)\s*(텍스트|문서|자료)")
+
+
+def restore_cond_terms(answer: str, conds: list[dict] | None) -> tuple[str, int]:
+    """서론 · 결론이 지시어로 질문의 문서 유형을 받으면서 다른 유형 이름을 붙이면 질문 표현으로 되돌린다 (5차 피드백 U3).
+
+    W04: 질문 '기준 문서' → 서론 "이러한 긴 법적 텍스트". 본론 항목(번호 줄)은 논문 설명이라 건드리지 않는다.
+    문서 유형 조건이 하나일 때만 (둘 이상이면 어느 쪽인지 모름).
+    shortcut: 지시어 + 아는 유형 낱말만 잡는다 — 다른 꼴의 바꿔 부르기가 실사용에서 보이면 넓힌다.
+    """
+    vals = [c["값"].strip() for c in conds or [] if c.get("종류") == "문서 유형" and c.get("값")]
+    if len(vals) != 1 or not answer:
+        return answer, 0
+    v, flat = vals[0], vals[0].replace(" ", "")
+    n = 0
+
+    def sub(m):
+        nonlocal n
+        if m.group(3) in flat:
+            return m.group(0)
+        n += 1
+        return f"{m.group(1)}{m.group(2)} {v}"
+
+    lines = [ln if re.match(r"\s*\d+\.", ln) else _OTHER_TYPE.sub(sub, ln) for ln in answer.split("\n")]
+    return "\n".join(lines), n
+
+
 _COND_TAIL = """
 
 위 판정은 이미 받았다. 이번에는 판정 대신, 질문이 연구에 거는 조건을 뽑아라. 조건 종류는 "언어"(예: 한국어), "문서 유형"(예: 지속가능경영보고서, 기준 문서, 회의록), "분야"(예: 금융, 의료), "비교 대상"(질문이 둘 이상을 비교하라고 할 때 그 대상들) 뿐이다. 질문에 명시된 것만, 질문에 쓰인 말 그대로 적는다. 일반적인 주제(RAG, LLM 평가 등)는 조건이 아니다. 조건이 없으면 빈 목록.

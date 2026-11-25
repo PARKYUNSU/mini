@@ -40,6 +40,7 @@ from core.llm.cond_keep import (
     keep_terms_note,
     missing_conditions,
     missing_sentence,
+    restore_cond_terms,
 )
 from core.llm.doc_judge import (
     agg_slots_active,
@@ -1725,6 +1726,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 answer, _ = strip_no_doc_ids(answer)
             if _conds:
                 answer, _cm = add_missing_to_intro(answer, missing_sentence(missing_conditions(_conds)))
+                answer, _ct = restore_cond_terms(answer, _conds)  # 5차 피드백 U3 (W04 '법적 텍스트')
+                if _ct:
+                    rag_trace.mark(chat_id, "cond_terms", n=_ct)
             # 알려진 잘못된 음차 · 항목 제목 (RAG_TERM_FIX, term_fix_1118)
             if term_fix_active():
                 answer, _tf = fix_terms(answer)
