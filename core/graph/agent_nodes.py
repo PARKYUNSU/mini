@@ -79,7 +79,7 @@ from core.llm.agent_llm import (
     get_rag_answer_llm,
 )
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
-from core.llm.conclusion_rewrite import brief_findings, concl_check_active, mark_combo_claims, rewrite_conclusion
+from core.llm.conclusion_rewrite import brief_findings, mark_combo_claims, rewrite_conclusion
 from core.llm.item_rewrite import rewrite_items
 from core.llm.slot_fill import dedupe_repeated_heads, fill_missing_slots, missing_ids, slot_fill_active
 from core.llm.conclusion_swap import swap_conclusion
@@ -1734,7 +1734,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 answer, _tf = fix_terms(answer)
                 answer, _it = fix_item_titles(answer, rag_context)
                 rag_trace.mark(chat_id, "term_fix", terms=_tf, titles=_it)
-            if concl_check_active():  # 결론의 결합 · 병행 효과 주장 표시 (concl_check_1125, 5차 피드백 U2)
+            if os.getenv("RAG_COMBO_NOTE", "0").strip() == "1":  # 결론의 결합 · 병행 효과 주장 표시 (concl_check_1125 §6, 5차 피드백 U2)
                 answer, _cb = mark_combo_claims(answer)
                 if _cb:
                     rag_trace.mark(chat_id, "combo_note", n=_cb)
