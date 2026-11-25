@@ -84,6 +84,21 @@ def test_router_reverts_planner_for_db_names(monkeypatch):
     assert _revert_academic_misroute(q, q.lower(), dict(planner)) == planner
 
 
+def test_revert_academic_tool_misroute():
+    # W06(11-24~): 3단계가 학술 질문에 도구 이름 없는 B 를 골랐다 → RAG 로 되돌림. 하드룰 도구(이름 있음)는 그대로.
+    from core.graph.agent_nodes import _revert_academic_misroute
+
+    tool = {"route_type": "use_existing_tool", "router_choice": "B"}
+    q = "서비스 LLM을 다른 모델로 바꿀 때 품질 회귀를 확인하는 방법 연구 있어?"
+    assert _revert_academic_misroute(q, q.lower(), dict(tool)) == {"route_type": "direct_answer", "router_choice": "B"}
+    named = {**tool, "used_tool_name": "tavily_search_tool"}
+    assert _revert_academic_misroute(q, q.lower(), dict(named)) == named
+    other = "서울 지금 날씨 알려줘"
+    assert _revert_academic_misroute(other, other.lower(), dict(tool)) == tool
+    run = "아까 만든 arXiv 도구 실행해줘"  # 실사용 질문: 학술 어휘지만 도구 호출
+    assert _revert_academic_misroute(run, run.lower(), dict(tool)) == tool
+
+
 def test_comparison_targets_local_only(monkeypatch):
     # cmp_targets_1114: 로컬이 "A: … B: …" 를 한 줄에 써도 읽고, 실패해도 Gemini 로 안 넘어간다
     from core.graph import agent_nodes as N

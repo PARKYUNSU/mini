@@ -815,15 +815,21 @@ def _revert_academic_misroute(user_request: str, req_lower: str, result: dict) -
     어휘 게이트만 쓴다 — 잡담·계획 오탐 0/61. 명시적 코딩 요청은 계획 경로를 그대로 둔다.
     분야 용어 없이 DB 논문 이름만 있는 비교 질문("A랑 B 성능 비교해줘")도 계획(C)으로 샜다
     (cross_metric_1113 5/20) → DB 논문 이름(RAG_NAME_LOOKUP)도 학술 근거로 본다.
+    도구 이름 없는 기존 도구(B)도 되돌린다 — W06 이 라우터 검색에 끼어든 'regression' 동음이의 논문 탓에
+    도구로 샜다(11-24~, 5차 피드백 evidence_5th).
     """
     from core.rag.topic_gate import is_academic_query, names_in_db
 
     if not (
         (result.get("route_type") == "direct_answer" and result.get("router_choice") == "A")
         or result.get("route_type") == "planner"
+        or (result.get("route_type") == "use_existing_tool" and not result.get("used_tool_name"))
     ):
         return result
     if is_explicit_python_coding_request(user_request, req_lower):
+        return result
+    # "아까 만든 arXiv 도구 실행해줘" 처럼 도구를 직접 부르는 학술 질문은 도구 경로를 그대로 둔다
+    if result.get("route_type") == "use_existing_tool" and re.search(r"도구|툴|\btool\b", req_lower):
         return result
     if not (is_academic_query(user_request) or names_in_db(user_request)):
         return result
