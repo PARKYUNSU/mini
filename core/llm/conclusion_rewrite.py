@@ -176,7 +176,8 @@ COMBO_NOTE = " (이 조합 자체는 논문에서 검증되지 않았습니다)"
 
 
 def concl_check_active() -> bool:
-    return os.getenv("RAG_CONCL_CHECK", "0").strip() == "1"
+    """1: 프롬프트 규칙 + 재시도(1차, 기각) · 2: 누락일 때만 재시도(§4)."""
+    return os.getenv("RAG_CONCL_CHECK", "0").strip() in ("1", "2")
 
 
 def reversed_change(text: str) -> str:
@@ -238,7 +239,7 @@ def rewrite_conclusion(
     must = must_cover(answer, blocks) if check_on else set()
     if mode == "v2":
         rule = term_rule()
-        if must:
+        if must and os.getenv("RAG_CONCL_CHECK", "0").strip() == "1":
             rule += "- 다음 논문은 모두 한 번 이상 인용한다: " + ", ".join(f"[문서 {n}]" for n in sorted(must)) + "\n"
         prompt = PROMPT_V2.format(question=question, findings=_findings_text(blocks), term_rule=rule)
     else:

@@ -88,3 +88,29 @@ def test_concl_check_helpers():
     assert n == 1 and "결합하는 것이 효과적입니다 (이 조합 자체는 논문에서 검증되지 않았습니다). 끝." in out
     assert mark_combo_claims(out) == (out, 0)
     assert mark_combo_claims("<b>본론</b>\n1. A와 B를 결합하는 것이 효과적")[1] == 0
+
+
+def test_concl_check_retry_only(monkeypatch):
+    """RAG_CONCL_CHECK=2: 첫 프롬프트에 규칙 없음, 누락이면 재시도하고 더 많이 다루면 그쪽을 쓴다."""
+    import langchain_ollama
+
+    from core.llm import conclusion_rewrite as cr
+
+    prompts, outs = [], iter(["A 결과가 좋았다고 보고한다 [문서 1]. 그래서 상황에 따라 고르면 된다.",
+                              "A 결과가 좋았다 [문서 1]. B 결과는 조건에 따라 달랐다 [문서 2]. 상황에 따라 고르면 된다."])
+
+    class Fake:
+        def __init__(self, **kw): pass
+        def invoke(self, msgs):
+            prompts.append(msgs[-1].content)
+            return type("M", (), {"content": next(outs)})()
+    monkeypatch.setattr(langchain_ollama, "ChatOllama", Fake)
+    monkeypatch.setenv("RAG_CONCLUSION_PROMPT", "v2")
+    monkeypatch.setenv("RAG_CONCL_CHECK", "2")
+    ans = "<b>서론</b>\nx\n<b>본론</b>\n1. A: a [2401.00001]\n2. B: b [2401.00002]\n<b>결론</b>\n옛 결론."
+    ctx = "[문서 1]\n[2401.00001v1] A\n[초록] We show A improves. Results improve.\n\n---\n\n[문서 2]\n[2401.00002v1] B\n[초록] We show B. Results vary."
+    monkeypatch.setattr(cr, "RAG_HIT_SEP", "\n\n---\n\n", raising=False)
+    out, st = cr.rewrite_conclusion(ans, "q", ctx, {1: "2401.00001", 2: "2401.00002"}, "m")
+    assert st == "바꿈" and len(prompts) == 2
+    assert "모두 한 번 이상 인용" not in prompts[0] and "빠뜨렸다" in prompts[1]
+    assert "[2401.00002" in out.split("<b>결론</b>")[1]
