@@ -521,6 +521,29 @@ def main() -> None:
             except Exception:
                 pass
 
+    @bot.callback_query_handler(func=lambda c: answer_feedback.parse_digest(c.data) is not None)
+    def on_digest_feedback(call):
+        # 주간 다이제스트 항목별 👍/👎 (scripts/weekly_digest.py — 4주 뒤 주제별 정밀도)
+        chat_id = str(call.message.chat.id) if call.message else ""
+        if chat_id not in allowed_ids:
+            bot.answer_callback_query(call.id, "접근 권한이 없습니다.")
+            return
+        day, topic, item, rating = answer_feedback.parse_digest(call.data)
+        try:
+            answer_feedback.record_digest(day, topic, item, rating, chat_id)
+            bot.answer_callback_query(call.id, f"{item}번 {answer_feedback.RATINGS[rating]} 기록했어요")
+            kb = call.message.reply_markup
+            chosen = {**answer_feedback.chosen_from_markup(kb), item: rating}
+            n = len(getattr(kb, "keyboard", None) or [])
+            bot.edit_message_reply_markup(chat_id, call.message.message_id,
+                                          reply_markup=answer_feedback.digest_markup(day, topic, n, chosen))
+        except Exception as e:
+            print(f"[digest_feedback] {e}\n{traceback.format_exc()}", flush=True)
+            try:
+                bot.answer_callback_query(call.id, "기록 실패")
+            except Exception:
+                pass
+
     @bot.message_reaction_handler(func=lambda r: answer_feedback.reactions_enabled())
     def on_answer_reaction(reaction):
         # 답에 남긴 👍/👎 이모지 반응도 버튼과 같은 기록으로 (6차 피드백 — 실사용 신호를 놓치지 않게)

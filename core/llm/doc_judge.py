@@ -210,3 +210,89 @@ def promote_external(question: str, query: str, rag_context: str, doc_ids: dict,
         labels[num] = got[n]
         added.append({"arxiv": c["arxiv"], "title": c["title"], "label": got[n]})
     return rag_context, doc_ids, labels, added
+
+
+# 추천 · 방법 질문은 9B 선별(15→5)에서 평가 프레임워크 같은 핵심 논문이 빠졌다(7차 회신 §4, H18 RAGChecker · RAGAS).
+# RAG_REC_POOL=N 이면 거르기를 통과한 상위 N 편을 27B 로 먼저 판정해 직접 > 부분 > 무관 순으로 5편을 고른다(기본 0 = 끔).
+_METHOD = re.compile(r"방법|어떻게|어떤\s*(?:지표|방식|기법|척도)")
+
+
+def rec_pool_n() -> int:
+    try:
+        return max(0, int(os.getenv("RAG_REC_POOL", "0").strip() or 0))
+    except ValueError:
+        return 0
+
+
+def is_rec_or_method(question: str) -> bool:
+    return bool(_REC.search(question or "") or _METHOD.search(question or ""))
+
+
+def judge_pool_order(question: str, blocks: list[str], numbered: str) -> list[str] | None:
+    """번호 붙인 후보 컨텍스트를 27B 로 판정 → 블록을 D, P, N 순(같은 라벨은 검색 순위)으로. 실패하면 None."""
+    labels = judge_docs(question, numbered)
+    if not labels:
+        return None
+    rank = {"D": 0, "P": 1, "N": 2}
+    order = sorted(range(len(blocks)), key=lambda i: (rank.get(labels.get(i + 1, "P"), 1), i))
+    return [blocks[i] for i in order]
+
+
+# 구조 판정 (7차 회신 §2, .cron/work_1127/judge_struct.py): 27B 는 핵심 과제 일치만 보고, 조건은 조건 판정 결과로,
+# D/P/N 은 규칙으로 — 맞음 + 조건 모두 충족 → D · 맞음 + 조건 미충족 → P · 인접 → P · 아님 → N.
+# 확정 라벨 104쌍: 일치 73.1→76.0% · P→D 8→7 · P→N 15→5 · N→P/D 2→9 (RAG_JUDGE_STRUCT, 기본 0).
+TASK_PROMPT = """사용자 질문과 검색된 논문 목록이 있다. 논문마다 질문의 **핵심 과제**와 맞는지 하나로 판정하라.
+- 맞음: 논문이 질문의 핵심 과제 자체를 연구 · 제안 · 평가한다.
+- 인접: 핵심 과제 자체는 아니지만, 비슷한 과제나 일부 하위 과제를 다뤄 답에 쓸 만한 근거를 준다.
+- 아님: 주제 단어만 겹치고 질문에 쓸 만한 근거가 없다.
+언어 · 문서 유형 · 분야 · 비교 대상 같은 조건은 따로 확인하니 여기서는 보지 말고 과제만 보라.
+
+질문: {q}
+
+논문:
+{docs}
+
+JSON 으로만 답하라: {{"판정": [{{"번호": 1, "과제": "맞음|인접|아님"}}, ...]}}"""
+TASK_SCHEMA = {"type": "object", "properties": {"판정": {"type": "array", "items": {"type": "object",
+               "properties": {"번호": {"type": "integer"}, "과제": {"type": "string", "enum": ["맞음", "인접", "아님"]}},
+               "required": ["번호", "과제"]}}}, "required": ["판정"]}
+
+
+def struct_active() -> bool:
+    return os.getenv("RAG_JUDGE_STRUCT", "0").strip() == "1"
+
+
+def judge_task(question: str, rag_context: str) -> dict[int, str] | None:
+    """문서마다 맞음/인접/아님 (문서 번호 기준). 실패하면 None."""
+    import requests
+
+    from core.config.agent_config import ollama_kwargs
+
+    blocks = doc_blocks(rag_context)
+    if not blocks:
+        return None
+    kw = ollama_kwargs()
+    docs = "\n\n".join(f"[{i}] {text}" for i, (_, text) in enumerate(blocks, 1))
+    try:
+        r = requests.post(f"{kw['base_url']}/api/chat", json={
+            "model": os.getenv("RAG_DOC_JUDGE_MODEL", "qwen3.6:27b-q4_K_M"), "stream": False, "think": False,
+            "format": TASK_SCHEMA, "keep_alive": kw["keep_alive"], "options": {"temperature": 0, "num_ctx": 8192},
+            "messages": [{"role": "user", "content": TASK_PROMPT.format(q=question, docs=docs)}]}, timeout=150)
+        got = {x["번호"]: x["과제"] for x in json.loads(r.json()["message"]["content"])["판정"]}
+    except Exception as e:  # noqa: BLE001
+        print(f"[WARN] 과제 판정 실패: {e}")
+        return None
+    return {n: got.get(i, "인접") for i, (n, _) in enumerate(blocks, 1)}
+
+
+def combine_struct(task: dict[int, str], conds: list[dict]) -> dict[int, str]:
+    """과제 판정 + 조건 판정([{값, 다룬 논문}]) → D/P/N."""
+    out = {}
+    for n, t in task.items():
+        if t == "아님":
+            out[n] = "N"
+        elif t == "인접":
+            out[n] = "P"
+        else:
+            out[n] = "D" if all(n in (c.get("다룬 논문") or []) for c in conds) else "P"
+    return out

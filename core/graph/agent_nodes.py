@@ -52,6 +52,9 @@ from core.llm.doc_judge import (
     ext_promote_a_active,
     ext_promote_active,
     judge_docs,
+    judge_pool_order,
+    is_rec_or_method,
+    rec_pool_n,
     promote_external,
     strip_no_doc_ids,
 )
@@ -1427,7 +1430,14 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                                 search=lambda q: rag.search(q, top_k=top_k, session_context=_recent_ctx, wants_depth=wants_depth),
                             )
                             rag_trace.mark(chat_id, "reform", **_reform)
-                    rag_context = _rag_context_top_n_hits(rag_context, n=5)
+                    _pool_n = rec_pool_n()
+                    _ordered = None
+                    if _pool_n > 5 and judge_agg_active() and is_rec_or_method(user_request) and _RAG_HIT_SEP in rag_context:
+                        # 추천 · 방법 질문: 상위 N 편을 27B 로 먼저 판정해 5편 고르기 (RAG_REC_POOL, 7차 회신 §4)
+                        _pb = [b.strip() for b in rag_context.split(_RAG_HIT_SEP) if b.strip()][:_pool_n]
+                        _ordered = judge_pool_order(user_request, _pb, number_context_papers(_RAG_HIT_SEP.join(_pb))[0])
+                        rag_trace.mark(chat_id, "rec_pool", n=len(_pb), ok=_ordered is not None)
+                    rag_context = _RAG_HIT_SEP.join(_ordered[:5]) if _ordered else _rag_context_top_n_hits(rag_context, n=5)
                     _da_trace("rag_context top-5 only", f"len={len(rag_context)}")
 
             rag_trace.mark(chat_id, "select", filter=_rf_pre, ids=rag_trace.paper_ids(rag_context))

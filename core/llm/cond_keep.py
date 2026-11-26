@@ -149,10 +149,11 @@ def judge_docs_and_conditions(question: str, rag_context: str):
     import requests
 
     from core.config.agent_config import ollama_kwargs
-    from core.llm.doc_judge import PROMPT as DOC_PROMPT, doc_blocks, judge_docs
+    from core.llm.doc_judge import PROMPT as DOC_PROMPT, combine_struct, doc_blocks, judge_docs, judge_task, struct_active
 
-    labels = judge_docs(question, rag_context)
-    if labels is None:
+    struct = struct_active()  # 구조 판정(RAG_JUDGE_STRUCT): 과제 판정 + 아래 조건 판정을 규칙으로 합친다
+    labels = None if struct else judge_docs(question, rag_context)
+    if labels is None and not struct:
         return None, None
     blocks = doc_blocks(rag_context)
     docs = "\n\n".join(f"[{i}] {text}" for i, (_, text) in enumerate(blocks, 1))
@@ -166,8 +167,11 @@ def judge_docs_and_conditions(question: str, rag_context: str):
         conds = json.loads(r.json()["message"]["content"])["조건"]
     except Exception as e:  # noqa: BLE001
         print(f"[WARN] cond 판정 실패: {e}")
-        return labels, None
+        return (judge_docs(question, rag_context) if struct else labels), None
     idx2num = {i: n for i, (n, _) in enumerate(blocks, 1)}
     conds = [{**c, "다룬 논문": [idx2num[k] for k in c.get("다룬 논문", []) if k in idx2num]} for c in conds
              if c.get("값") and all(w in question for w in re.split(r"\s*[·,/]\s*|\s+", c["값"].strip()) if w)]
+    if struct:
+        task = judge_task(question, rag_context)
+        labels = combine_struct(task, conds) if task else judge_docs(question, rag_context)
     return labels, conds

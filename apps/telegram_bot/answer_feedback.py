@@ -118,3 +118,63 @@ def record(job: dict[str, Any] | None, job_id: int, rating: str, chat_id: str, s
     with p.open("a", encoding="utf-8") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")
     return row
+
+
+# ── 주간 다이제스트 항목별 👍/👎 (다이제스트 피드백 11-26 — 4주 뒤 주제별 정밀도) ──
+DIGEST_PREFIX = "dg"
+
+
+def digest_markup(day: str, topic: int, n_items: int, chosen: dict[int, str] | None = None) -> InlineKeyboardMarkup:
+    """항목마다 한 줄: ``n 👍 · n 👎``. ``day`` 는 YYYYMMDD, 고른 쪽엔 ✅."""
+    chosen = chosen or {}
+    kb = InlineKeyboardMarkup()
+    for i in range(1, n_items + 1):
+        kb.row(*[
+            InlineKeyboardButton(f"{'✅ ' if chosen.get(i) == r else ''}{i} {emo}",
+                                 callback_data=f"{DIGEST_PREFIX}:{day}:{topic}:{i}:{r}")
+            for r, emo in RATINGS.items()
+        ])
+    return kb
+
+
+def parse_digest(data: str | None) -> tuple[str, int, int, str] | None:
+    """``dg:<YYYYMMDD>:<주제>:<항목>:<up|down>`` → (day, topic, item, rating). 다른 데이터면 None."""
+    parts = (data or "").split(":")
+    if len(parts) != 5 or parts[0] != DIGEST_PREFIX or parts[4] not in RATINGS or not re.fullmatch(r"\d{8}", parts[1]):
+        return None
+    try:
+        return parts[1], int(parts[2]), int(parts[3]), parts[4]
+    except ValueError:
+        return None
+
+
+def chosen_from_markup(kb) -> dict[int, str]:
+    """지금 키보드에서 ✅ 붙은 항목 → 평가 (다시 그릴 때 다른 항목 선택을 지키려고)."""
+    out = {}
+    for row in getattr(kb, "keyboard", None) or []:
+        for b in row:
+            p = parse_digest(getattr(b, "callback_data", None))
+            if p and str(getattr(b, "text", "")).startswith("✅"):
+                out[p[2]] = p[3]
+    return out
+
+
+def record_digest(day: str, topic: int, item: int, rating: str, chat_id: str) -> dict[str, Any]:
+    """다이제스트 평가 한 줄 — 주제 · 논문은 ``.cron/digest/<YYYY-MM-DD>.json`` 에서 찾는다(못 찾아도 남긴다)."""
+    iso = f"{day[:4]}-{day[4:6]}-{day[6:]}"
+    paper: dict[str, Any] = {}
+    topic_name = ""
+    try:
+        log = json.loads((PROJECT_ROOT / ".cron" / "digest" / f"{iso}.json").read_text(encoding="utf-8"))
+        topic_name = log[topic]["topic"]
+        paper = log[topic]["kept"][item - 1]
+    except Exception:
+        pass
+    row = {"ts": time.strftime("%Y-%m-%d %H:%M:%S"), "digest": iso, "topic_idx": topic, "topic": topic_name,
+           "item": item, "paper": paper.get("id", ""), "title": paper.get("title", ""), "rating": rating,
+           "chat_id": chat_id}
+    p = log_path().with_name("digest_feedback.jsonl")
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with p.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return row

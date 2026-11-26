@@ -69,3 +69,37 @@ def test_recommend_mode(monkeypatch):
     assert is_recommend(q) and not is_recommend("추천 시스템 콜드 스타트 연구 있어?")
     assert "후보 이름" in agg_slots_template({1: "D"}, "a", rec=True) and "후보 이름" not in agg_slots_template({1: "D"}, "a")
     assert rec_query("esg domain language model recommendation selection criteria on") == "esg domain language model"
+
+
+def test_digest_buttons_roundtrip(tmp_path, monkeypatch):
+    from apps.telegram_bot import answer_feedback as af
+
+    kb = af.digest_markup("20261130", 1, 3, {2: "down"})
+    assert len(kb.keyboard) == 3
+    data = kb.keyboard[0][0].callback_data
+    assert af.parse_digest(data) == ("20261130", 1, 1, "up")
+    assert af.parse(data) is None  # 답 버튼 처리기와 안 겹친다
+    assert af.parse_digest("fb:3:up") is None and af.parse_digest("dg:2026113:1:1:up") is None
+    assert af.chosen_from_markup(kb) == {2: "down"}
+    monkeypatch.setenv("BOT_FEEDBACK_LOG", str(tmp_path / "fb.jsonl"))
+    row = af.record_digest("19990101", 0, 1, "up", "1")  # 기록 파일이 없어도 남긴다
+    assert row["rating"] == "up" and (tmp_path / "digest_feedback.jsonl").exists()
+
+
+def test_rec_pool_order(monkeypatch):
+    from core.llm import doc_judge as J
+
+    monkeypatch.setattr(J, "judge_docs", lambda q, ctx: {1: "N", 2: "P", 3: "D", 4: "D"})
+    assert J.judge_pool_order("q", ["a", "b", "c", "d", "e"], "x") == ["c", "d", "b", "e", "a"]  # 판정 없는 5번은 P
+    monkeypatch.setattr(J, "judge_docs", lambda q, ctx: None)
+    assert J.judge_pool_order("q", ["a"], "x") is None
+    assert J.is_rec_or_method("RAG 시스템 평가 프레임워크 추천해줘") and J.is_rec_or_method("어떤 지표로 평가해?")
+    assert not J.is_rec_or_method("BM25 와 dense 중 뭐가 나아?")
+
+
+def test_combine_struct():
+    from core.llm.doc_judge import combine_struct
+
+    task = {1: "맞음", 2: "맞음", 3: "인접", 4: "아님"}
+    assert combine_struct(task, [{"값": "한국어", "다룬 논문": [1]}]) == {1: "D", 2: "P", 3: "P", 4: "N"}
+    assert combine_struct(task, []) == {1: "D", 2: "D", 3: "P", 4: "N"}  # 조건 없으면 맞음 = 직접
