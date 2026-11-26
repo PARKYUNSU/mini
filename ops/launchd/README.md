@@ -6,6 +6,7 @@
 |---|---|---|
 | `com.mini.runscheduler` | 통합 스케줄러(01:00 수집 등) | `mini_run_scheduler_launcher.sh` → venv Python 이 `apps.scheduler.run_scheduler` 를 exec. KeepAlive |
 | `com.mini.telegrambot` (2026-10-13) | 재부팅 후 텔레그램 봇 자동 기동 | `mini_telegram_bot_launcher.sh` 가 T7·venv·Ollama 준비를 최대 10분 기다린 뒤 `start_telegram_bot.py`(venv Python)가 receiver·ai_worker 를 띄운다. 한 번 실행(KeepAlive 끔), `AbandonProcessGroup` |
+| `com.mini.digest` (2026-11-26) | 주간 논문 다이제스트 사용자 DM (월 08:30) | `mini_digest_launcher.sh` 가 Ollama 를 기다린 뒤 venv Python 으로 `scripts/weekly_digest.py --send`. 12-21 뒤로는 보내지 않는다(DM 4주, 연장 · 팀 채널은 사용자 결정). 로그 `~/Library/Logs/mini-digest.log` · 기록 `.cron/digest/` |
 
 **왜 bash 가 아니라 Python 으로 띄우나:** launchd 가 실행한 `/bin/bash` 는 macOS 권한(TCC) 때문에 외장 디스크(T7)의 파일을 읽지 못한다 (`bash: restart.sh: Operation not permitted`). venv Python(Homebrew Python.app)은 접근 권한이 있다.
 
