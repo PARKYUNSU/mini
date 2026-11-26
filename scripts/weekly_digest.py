@@ -17,6 +17,7 @@ import re
 import sys
 import time
 from datetime import date, timedelta
+from itertools import zip_longest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -28,8 +29,10 @@ load_dotenv()
 # 11-26 첫 발송 피드백: ESG 0편(저널 논문 제외 탓) → 검색어 넓힘 · 기업 공시 분석 포함, RAG 평가는 응용 시스템이 D 로 올라와 평가 연구로 좁힘
 TOPICS = [
     ("ESG · 지속가능성 공시 NLP",
-     ["ESG sustainability disclosure natural language processing", "climate disclosure", "sustainability reporting",
-      "greenwashing", "carbon accounting", "ESG rating"],
+     # 맨 단어 검색어("greenwashing" 등)는 NLP 아닌 재무 논문으로 상한을 채워 텍스트 분석 검색어를 붙인다
+     ["ESG sustainability disclosure natural language processing", "corporate risk disclosure text analysis",
+      "climate disclosure text analysis", "sustainability report language model", "greenwashing detection NLP",
+      "ESG rating carbon accounting language model"],
      "ESG · 지속가능성 · 기후 · 기업 위험 공시나 ESG 평가 · 그린워싱 · 탄소 회계 관련 기업 문서를 텍스트 분석 · NLP · LLM 으로 분석 · 추출 · 분류 · 평가하는 연구",
      r"\b(?:ESG|sustainab\w*|climate|TCFD|GRI|ISSB|disclosure|greenwash\w*|carbon accounting)"),
     ("RAG 평가 · 근거 충실도", ["retrieval-augmented generation evaluation faithfulness", "RAG evaluation benchmark metric"],
@@ -151,7 +154,9 @@ def build(today: date) -> tuple[list[str], list[dict]]:
     sections, log = [], []
     for name, queries, question, pattern in TOPICS:
         seen, cands = set(), []
-        for c in [c for q in queries for c in openalex_new(q, since, today)] + collected_new(pattern, since):
+        # 11-26 미리 보기: OpenAlex 가 상한을 먼저 채워 매일 수집분(arXiv)이 잘렸다 → 수집분 먼저, 검색어는 번갈아
+        oa = zip_longest(*[openalex_new(q, since, today) for q in queries])
+        for c in collected_new(pattern, since) + [x for row in oa for x in row if x]:
             if c["arxiv"] and c["arxiv"] not in seen:
                 seen.add(c["arxiv"])
                 cands.append(c)
