@@ -67,6 +67,7 @@ def is_academic_query(text: str) -> bool:
 _LLM_PROMPT = """You decide whether a user's message should be answered from a library of research papers (AI, machine learning, computer science, and other sciences).
 
 Answer YES if the user asks about a research method, model, system, benchmark, technique, or findings — something a research paper would describe, even if the word "paper" is not used.
+Also answer YES if the user asks how to evaluate or verify the output of an AI, NLP, retrieval, or document-processing system, or which models, tools, or methods to use for such a technical task.
 Answer NO for everyday life, personal advice, writing or messaging tasks, plans or step-by-step procedures for the user's own files or chores, coding tasks the user wants done, weather, news, or prices.
 
 Message:

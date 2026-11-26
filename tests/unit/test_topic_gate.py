@@ -71,7 +71,10 @@ def test_router_reverts_planner_for_db_names(monkeypatch):
         def named_paper(self, n):
             return {"QJL": "2406.03482", "CommVQ": "2506.18879"}.get(n)
 
+    import core.rag.topic_gate as G
+
     monkeypatch.setattr(B, "get_bm25_searcher", lambda: _BM())
+    monkeypatch.setattr(G, "is_academic_query_llm", lambda t: False)  # 이름 규칙만 본다
     monkeypatch.setenv("RAG_NAME_LOOKUP", "1")
     planner = {"route_type": "planner", "router_choice": "C"}
     q = "QJL이랑 CommVQ 중 어느 쪽이 메모리를 더 많이 줄여?"
@@ -84,9 +87,28 @@ def test_router_reverts_planner_for_db_names(monkeypatch):
     assert _revert_academic_misroute(q, q.lower(), dict(planner)) == planner
 
 
-def test_revert_academic_tool_misroute():
-    # W06(11-24~): 3단계가 학술 질문에 도구 이름 없는 B 를 골랐다 → RAG 로 되돌림. 하드룰 도구(이름 있음)는 그대로.
+def test_revert_practical_academic_planner(monkeypatch):
+    # 6차 H13 · H17: 어휘 규칙에 안 걸리는 실무형 학술 질문이 계획(C)으로 샜다 → LLM 판정까지 보고 되돌림
+    import core.rag.topic_gate as G
     from core.graph.agent_nodes import _revert_academic_misroute
+
+    yes = {"문서에서 추출한 KPI 숫자가 맞는지 어떻게 검증해?", "PDF에서 표를 뽑아내는 도구나 모델 추천해줘"}
+    monkeypatch.setattr(G, "is_academic_query_llm", lambda t: t in yes)
+    planner = {"route_type": "planner", "router_choice": "C"}
+    for q in yes:
+        assert _revert_academic_misroute(q, q.lower(), dict(planner)) == {"route_type": "direct_answer", "router_choice": "B"}
+    chore = "내 다운로드 폴더 PDF들 정리하는 계획 세워줘"
+    assert _revert_academic_misroute(chore, chore.lower(), dict(planner)) == planner
+    code = "PDF에서 표를 뽑아내는 파이썬 코드 짜서 실행해줘"
+    assert _revert_academic_misroute(code, code.lower(), dict(planner)) == planner
+
+
+def test_revert_academic_tool_misroute(monkeypatch):
+    # W06(11-24~): 3단계가 학술 질문에 도구 이름 없는 B 를 골랐다 → RAG 로 되돌림. 하드룰 도구(이름 있음)는 그대로.
+    import core.rag.topic_gate as G
+    from core.graph.agent_nodes import _revert_academic_misroute
+
+    monkeypatch.setattr(G, "is_academic_query_llm", lambda t: False)
 
     tool = {"route_type": "use_existing_tool", "router_choice": "B"}
     q = "서비스 LLM을 다른 모델로 바꿀 때 품질 회귀를 확인하는 방법 연구 있어?"

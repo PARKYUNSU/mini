@@ -113,3 +113,30 @@ def fill_missing_slots(
         return answer, stats
     body = answer[span[0]:span[1]].rstrip("\n")
     return answer[:span[0]] + body + "\n" + "\n".join(new_items) + "\n\n" + answer[span[1]:].lstrip("\n"), stats
+
+
+def drop_n_active() -> bool:
+    return os.getenv("RAG_DROP_N_CITES", "0").strip() == "1"
+
+
+def drop_n_cited(answer: str, labels: dict[int, str], doc_ids: dict[int, str]) -> tuple[str, int]:
+    """27B 가 무관(N)으로 판정한 논문만 인용한 본론 항목 · 결론 문장을 지운다 (6차 W03: 칸 틀에 없는 항목을 v13 이 더 씀).
+
+    직접 · 부분 논문도 같이 인용한 항목 · 문장은 둔다. ``(답, 지운 수)``.
+    """
+    n_ids = {re.sub(r"v\d+$", "", str(doc_ids[k])) for k, v in labels.items() if v == "N" and k in doc_ids}
+    span = _body_span(answer)
+    if not n_ids or not span:
+        return answer, 0
+    only_n = lambda s: bool(_CITED.findall(s)) and set(_CITED.findall(s)) <= n_ids
+    lines = answer[span[0]:span[1]].split("\n")
+    keep = [ln for ln in lines if not (_ITEM_LINE.match(ln) and only_n(ln))]
+    n = len(lines) - len(keep)
+    tail = answer[span[1]:]
+    c = _find("결론", tail)
+    if c:
+        sents = re.split(r"(?<=[.!?。\]])\s+(?=\S)", tail[c.end():])
+        ks = [s for s in sents if not only_n(s)]
+        n += len(sents) - len(ks)
+        tail = tail[:c.end()] + " ".join(ks)
+    return (answer[:span[0]] + "\n".join(keep) + tail, n) if n else (answer, 0)

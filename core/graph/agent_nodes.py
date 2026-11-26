@@ -43,6 +43,7 @@ from core.llm.cond_keep import (
     restore_cond_terms,
 )
 from core.llm.doc_judge import (
+    is_recommend,
     agg_slots_active,
     agg_slots_template,
     aggregate,
@@ -81,7 +82,14 @@ from core.llm.agent_llm import (
 from core.collapse_llm_repetition import sanitize_llm_news_like_blob
 from core.llm.conclusion_rewrite import brief_findings, mark_combo_claims, rewrite_conclusion
 from core.llm.item_rewrite import rewrite_items
-from core.llm.slot_fill import dedupe_repeated_heads, fill_missing_slots, missing_ids, slot_fill_active
+from core.llm.slot_fill import (
+    dedupe_repeated_heads,
+    drop_n_active,
+    drop_n_cited,
+    fill_missing_slots,
+    missing_ids,
+    slot_fill_active,
+)
 from core.llm.conclusion_swap import swap_conclusion
 from core.llm.relevance_filter import filter_relevant
 from core.llm.query_reform import fill_slots
@@ -89,7 +97,7 @@ from core.llm.question_conditions import count_notice, filter_by_year, year_cond
 from core.llm.body_numbers import check_body_numbers
 from core.llm.answer_fix import (align_conclusion_numbers, clean_internal_refs, drop_contradicted_no_doc, mark_related_items,
                                   merge_same_paper_items, normalize_fullwidth_punct, renumber_body_items)
-from core.rag.external_search import ExternalSearch, external_search_active, format_section, record_candidates
+from core.rag.external_search import ExternalSearch, external_search_active, format_section, rec_query, record_candidates
 from core.graph import rag_trace
 from core.llm.presence_judge import (
     NO_DOC_HINT,
@@ -817,8 +825,10 @@ def _revert_academic_misroute(user_request: str, req_lower: str, result: dict) -
     (cross_metric_1113 5/20) → DB 논문 이름(RAG_NAME_LOOKUP)도 학술 근거로 본다.
     도구 이름 없는 기존 도구(B)도 되돌린다 — W06 이 라우터 검색에 끼어든 'regression' 동음이의 논문 탓에
     도구로 샜다(11-24~, 5차 피드백 evidence_5th).
+    어휘 규칙만 보면 "KPI 숫자 검증 방법" · "표 뽑는 도구 추천" 같은 실무형 학술 질문이 계획(C)으로 샜다
+    (6차 H13 · H17) → 운영 진입점과 같은 LLM 판정까지 본다. 이 경로(3단계가 A · C · 이름 없는 B)에서만 부른다.
     """
-    from core.rag.topic_gate import is_academic_query, names_in_db
+    from core.rag.topic_gate import is_academic_query_full
 
     if not (
         (result.get("route_type") == "direct_answer" and result.get("router_choice") == "A")
@@ -831,7 +841,7 @@ def _revert_academic_misroute(user_request: str, req_lower: str, result: dict) -
     # "아까 만든 arXiv 도구 실행해줘" 처럼 도구를 직접 부르는 학술 질문은 도구 경로를 그대로 둔다
     if result.get("route_type") == "use_existing_tool" and re.search(r"도구|툴|\btool\b", req_lower):
         return result
-    if not (is_academic_query(user_request) or names_in_db(user_request)):
+    if not is_academic_query_full(user_request):
         return result
     print("[DEBUG] Router: 학술 질문 오분류 되돌림 → RAG(B)", flush=True)
     return {"route_type": "direct_answer", "router_choice": "B"}
@@ -1515,7 +1525,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 _ext_pref = None  # 판정 (a) 에도 외부 승격 — OpenAlex 검색은 27B 판정과 동시에 미리 (RAG_EXT_PROMOTE_A, ext_promote_a_1124)
                 if judge_agg_active() and not image_base64 and ext_promote_a_active() and ext_promote_active() and external_search_active() \
                         and agg_slots_active() and not _list_on and not _item_docs:
-                    _ext_pref = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()},
+                    _ext_pref = ExternalSearch(rec_query(rag_query) if is_recommend(user_request) else rag_query, {str(p) for p in _doc_ids.values()},
                                                exclude_titles=set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context or "")),
                                                years=year_condition(user_request) if os.getenv("RAG_COND_CHECK", "0").strip() == "1" else None)
                 if judge_agg_active() and not image_base64:
@@ -1590,7 +1600,7 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                     rag_context,
                     last_ai,
                     user_request,
-                    output_template_strict=agg_slots_template(_doc_labels, _agg),
+                    output_template_strict=agg_slots_template(_doc_labels, _agg, rec=is_recommend(user_request)),
                     rag_max_chars=rag_max_chars,
                     doc_count=len(_doc_ids),
                     extra_note=keep_terms_note(_conds),
@@ -1602,13 +1612,13 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                            **({"agg": _agg, "doc_labels": _doc_labels, "agg_slots": _agg_slots} if _agg else {}))
             # DB 에 없다고 판정됐거나 목록 질문이면 외부(OpenAlex)를 답변 생성과 동시에 찾아본다
             if external_search_active() and (
-                _pick == "없음" or _list_on or _item_docs
+                _pick == "없음" or _list_on or _item_docs or is_recommend(user_request)  # 추천형은 (a) 여도 (RAG_REC_MODE, 6차 H19)
             ):
                 # 학회판(arXiv ID 없음)은 제목으로 거른다 — job 129 · 130 에서 본론 2406.01549 의 ACL 판이 다시 실렸다
                 _titles = set(re.findall(r"\[\d{4}\.\d{4,5}(?:v\d+)?\]\s*([^\[\n]+)", rag_context))
                 # 기간 질문이면 DB 밖 목록도 그 기간만 (RAG_COND_CHECK, answer_issues_1113)
                 _ext_years = year_condition(user_request) if os.getenv("RAG_COND_CHECK", "0").strip() == "1" else None
-                _ext = ExternalSearch(rag_query, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles, years=_ext_years,
+                _ext = ExternalSearch(rec_query(rag_query) if is_recommend(user_request) else rag_query, {str(p) for p in _doc_ids.values()}, exclude_titles=_titles, years=_ext_years,
                                       judge_question=user_request if ext_list_judge_active() else None)  # _doc_ids 는 {번호: 논문 ID}
             content = _build_message_content(prompt, image_base64)
             # 로컬 9B + Top-5 RAG는 90초 초과가 흔함 — Ollama 1차 전용 하한(기본 300초, RAG_OLLAMA_TIMEOUT_SEC).
@@ -1728,6 +1738,11 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 answer, _pw = partial_wording(answer) if _pick == "없음" and _agg != "c" else (answer, 0)
                 answer, _hz = strip_hanzi(answer)
                 rag_trace.mark(chat_id, "format_fix", partial=_pw, hanzi=_hz)
+            if _agg_slots and _agg in ("a", "b") and _doc_labels and drop_n_active():  # 무관 판정 논문만 인용한 항목 · 문장 (6차 W03)
+                answer, _dn = drop_n_cited(answer, _doc_labels, _doc_ids)
+                if _dn:
+                    answer, _ = renumber_body_items(answer)
+                    rag_trace.mark(chat_id, "drop_n", n=_dn)
             if _agg_slots and _agg == "c":
                 answer, _ = strip_no_doc_ids(answer)
             if _conds:

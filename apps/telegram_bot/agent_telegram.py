@@ -166,13 +166,13 @@ def _telegram_send_impl(bot, chat_id: str, text: str, parse_mode=None, **kwargs)
     """네트워크 재시도 적용 전송 (일시적 에러만 1분→3분→5분 재시도)"""
     text = strip_thinking_tags(text)
     pm = _effective_parse_mode(text, parse_mode)
-    bot.send_message(chat_id, text, parse_mode=pm, **kwargs)
+    return bot.send_message(chat_id, text, parse_mode=pm, **kwargs)
 
 
-def safe_telegram_send(bot, chat_id: str, text: str, parse_mode=None, **kwargs) -> bool:
+def safe_telegram_send(bot, chat_id: str, text: str, parse_mode=None, **kwargs):
+    """보낸 Message(참) 또는 False. 이모지 반응을 답에 잇느라 메시지를 돌려준다 (answer_feedback)."""
     try:
-        _telegram_send_impl(bot, chat_id, text, parse_mode=parse_mode, **kwargs)
-        return True
+        return _telegram_send_impl(bot, chat_id, text, parse_mode=parse_mode, **kwargs) or True
     except (ConnectionError, BrokenPipeError) as e:
         print(f"[DEBUG] 텔레그램 전송 일시 오류 (무시): {e}")
         return False

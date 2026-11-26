@@ -51,9 +51,11 @@ from apps.telegram_bot.agent_telegram import (
     linkify_arxiv_html,
     main_keyboard,
     no_link_preview,
+    safe_telegram_edit,
     safe_telegram_send,
     strip_wake_word,
 )
+from core.bridge import progress
 from apps.telegram_bot import answer_feedback, rag_engine
 from apps.telegram_bot.paper_list_light import list_stored_papers_text as papers_list_stdlib
 
@@ -77,6 +79,25 @@ def _acquire_receiver_lock():
     fp.write(str(os.getpid()))
     fp.flush()
     return fp
+
+
+# 진행 메시지 (BOT_PROGRESS): job_id → [chat_id, '접수' 메시지 id, 마지막 문구, 접수 시각]
+_PROGRESS_MSGS: dict[int, list] = {}
+
+
+def _update_progress(bot) -> None:
+    for jid, v in list(_PROGRESS_MSGS.items()):
+        txt = progress.read(jid)
+        if txt and txt != v[2]:
+            v[2] = txt
+            safe_telegram_edit(bot, f"⏳ {txt}", v[0], v[1])
+
+
+def _finish_progress(bot, jid: int, ok: bool) -> None:
+    v = _PROGRESS_MSGS.pop(jid, None)
+    progress.clear(jid)
+    if v:
+        safe_telegram_edit(bot, f"✅ 답변 완료 ({time.time() - v[3]:.0f}초)" if ok else "⚠️ 처리 실패", v[0], v[1])
 
 
 def _split_telegram_chunks(text: str, limit: int = 3800) -> list[str]:
@@ -147,6 +168,7 @@ def _outbound_poller(bot: telebot.TeleBot, allowed_ids: list[str]) -> None:
     gap = max(0.0, min(gap, 5.0))
     while True:
         try:
+            _update_progress(bot)
             rows = fetch_outbound_for_receiver(30)
             for row in rows:
                 jid = int(row["id"])
@@ -170,6 +192,7 @@ def _outbound_poller(bot: telebot.TeleBot, allowed_ids: list[str]) -> None:
                     err = (row["error_text"] or "오류")[:4000]
                     safe_telegram_send(bot, chat_id, f"⚠️ {err}", parse_mode=None)
                     mark_delivered(jid)
+                    _finish_progress(bot, jid, False)
                     if gap:
                         time.sleep(gap)
                     continue
@@ -177,11 +200,11 @@ def _outbound_poller(bot: telebot.TeleBot, allowed_ids: list[str]) -> None:
                     body = row["result_text"] or ""
                     pm = row["result_parse_mode"]
                     # 답변 👍/👎 — 마지막 메시지에만 (answer_feedback.py)
-                    fb = {}
+                    fb, sent = {}, None
                     if answer_feedback.enabled() and row.get("job_kind") == "graph" and body.strip():
                         fb = {"reply_markup": answer_feedback.markup(jid)}
                     if pm == "Markdown":
-                        if not safe_telegram_send(bot, chat_id, body[:4000], parse_mode="Markdown", **fb):
+                        sent = safe_telegram_send(bot, chat_id, body[:4000], parse_mode="Markdown", **fb) or \
                             safe_telegram_send(bot, chat_id, body[:4000], parse_mode=None, **fb)
                         if gap:
                             time.sleep(gap)
@@ -190,17 +213,20 @@ def _outbound_poller(bot: telebot.TeleBot, allowed_ids: list[str]) -> None:
                         linked = linkify_arxiv_html(body)
                         if len(linked) > 4000:
                             linked = body[:4000]
-                        if not safe_telegram_send(bot, chat_id, linked, parse_mode="HTML", **fb, **no_link_preview()):
+                        sent = safe_telegram_send(bot, chat_id, linked, parse_mode="HTML", **fb, **no_link_preview()) or \
                             safe_telegram_send(bot, chat_id, body[:4000], parse_mode=None, **fb)
                         if gap:
                             time.sleep(gap)
                     else:
                         parts = _split_telegram_chunks(body, 4000)
                         for k, part in enumerate(parts):
-                            safe_telegram_send(bot, chat_id, part, parse_mode=None, **(fb if k == len(parts) - 1 else {}))
+                            sent = safe_telegram_send(bot, chat_id, part, parse_mode=None, **(fb if k == len(parts) - 1 else {}))
                             if gap:
                                 time.sleep(gap)
                     mark_delivered(jid)
+                    _finish_progress(bot, jid, True)
+                    if fb and getattr(sent, "message_id", None):  # 이모지 반응을 이 답에 잇는다
+                        answer_feedback.remember(chat_id, sent.message_id, jid)
         except Exception as e:
             print(f"[outbound_poller] {e}\n{traceback.format_exc()}")
         time.sleep(0.22)
@@ -466,13 +492,15 @@ def main() -> None:
             return
 
         tid = effective_graph_thread_id(chat_id)
-        enqueue_job(
+        jid = enqueue_job(
             chat_id=chat_id,
             graph_thread_id=tid,
             user_text=text,
             job_kind="graph",
         )
-        bot.reply_to(message, "⏳ 요청을 접수했습니다. AI 워커가 처리 중입니다…")
+        ack = bot.reply_to(message, "⏳ 요청을 접수했습니다. AI 워커가 처리 중입니다…")
+        if progress.active() and ack is not None:
+            _PROGRESS_MSGS[jid] = [chat_id, ack.message_id, "", time.time()]
 
     @bot.callback_query_handler(func=lambda c: answer_feedback.parse(c.data) is not None)
     def on_answer_feedback(call):
@@ -493,9 +521,24 @@ def main() -> None:
             except Exception:
                 pass
 
+    @bot.message_reaction_handler(func=lambda r: answer_feedback.reactions_enabled())
+    def on_answer_reaction(reaction):
+        # 답에 남긴 👍/👎 이모지 반응도 버튼과 같은 기록으로 (6차 피드백 — 실사용 신호를 놓치지 않게)
+        chat_id = str(reaction.chat.id)
+        if chat_id not in allowed_ids:
+            return
+        rating = answer_feedback.rating_from_reaction(reaction.new_reaction)
+        job_id = answer_feedback.job_for_message(chat_id, reaction.message_id)
+        if rating and job_id:
+            try:
+                answer_feedback.record(get_job(job_id), job_id, rating, chat_id, source="reaction")
+            except Exception as e:
+                print(f"[answer_feedback] reaction {e}", flush=True)
+
     print("📡 telegram_receiver 시작 (infinity_polling)", flush=True)
     bot.delete_webhook(drop_pending_updates=True)
-    bot.infinity_polling()
+    # 이모지 반응(message_reaction)은 allowed_updates 에 넣어야 온다
+    bot.infinity_polling(allowed_updates=telebot.util.update_types)
 
 
 if __name__ == "__main__":

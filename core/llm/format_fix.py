@@ -28,7 +28,8 @@ def term_rule() -> str:
     """다시 쓰기 · 결론 프롬프트에 넣는 용어 규칙 한 줄(꺼져 있으면 빈 문자열)."""
     if not format_fix_active():
         return ""
-    return "- 영어 전문 용어(예: poisoning · judge · rater · chunking)는 한글로 소리 나는 대로 옮기지 말고 영어 그대로 쓴다.\n"
+    return ("- 영어 전문 용어(예: poisoning · judge · chunking)는 한글로 소리 나는 대로 옮기지 말고 영어 그대로 쓴다.\n"
+            "- 다음은 정해진 번역을 쓴다: recall = 재현율, rater = 평가자, crowdsourced = 크라우드소싱, meta-classifier = 메타 분류기.\n")
 
 
 def strip_hanzi(answer: str) -> tuple[str, int]:
@@ -60,6 +61,14 @@ _TERMS = [
         r"CoT\s*(?:[-‑]\s*)?(?:라울러|라테이션|라우널|라울린|라울|라벨링된(?=\s+(?:이유|합리화))|(?<=[-‑])(?!라벨)라[가-힣]{1,4}?)"
         r"(?:\s+(?:이유|합리화))?(으로|[을를이가은는의과와로도에])?(?![가-힣])"), lambda m: "CoT 근거 설명" + _JONG.get(m.group(1) or "", m.group(1) or "")),
     # 'rationale' 를 '이유' · '합리화' 로 옮긴 꼬리는 같이 지운다(U5 "CoT 근거 설명 이유를"), 조사는 받침 있는 '설명' 에 맞춘다
+    # 6차 피드백 용어 사전 — 바꾼 말과 받침이 같아 뒤 조사는 그대로 둔다. 영어는 소문자 낱말만(논문 제목의 대문자는 둔다)
+    (re.compile(r"회고율"), "재현율"),
+    (re.compile(r"(?<![가-힣])라이터(?=들|에게|[가는를와의도로]|[^가-힣]|$)"), "평가자"),  # rater — 받침 없음 = 평가자
+    (re.compile(r"메타\s?클래(?:서퍼|시파이어|시퍼)"), "메타 분류기"),
+    (re.compile(r"(?<![A-Za-z0-9-])meta-classifiers?(?![A-Za-z0-9-])"), "메타 분류기"),
+    (re.compile(r"(?<![A-Za-z0-9-])crowdsourc(?:ed|ing)(?![A-Za-z0-9-])"), "크라우드소싱"),
+    (re.compile(r"(?<![A-Za-z0-9-])raters?(?![A-Za-z0-9-])"), "평가자"),
+    (re.compile(r"(?<![A-Za-z0-9@-])recall(?![A-Za-z0-9@-])"), "재현율"),
 ]
 _ITEM = re.compile(r"^(\s*\d+\.\s+)(.*)$")
 _HANGUL = re.compile(r"[가-힣]")

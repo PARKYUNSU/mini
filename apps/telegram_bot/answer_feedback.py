@@ -54,7 +54,49 @@ def parse(data: str | None) -> tuple[int, str] | None:
         return None
 
 
-def record(job: dict[str, Any] | None, job_id: int, rating: str, chat_id: str) -> dict[str, Any]:
+def reactions_enabled() -> bool:
+    """답 메시지에 남긴 👍/👎 이모지 반응도 기록 (``BOT_FEEDBACK_REACTIONS=1``, 6차 피드백)."""
+    return (os.getenv("BOT_FEEDBACK_REACTIONS") or "0").strip() == "1"
+
+
+_REACTION = {"👍": "up", "👎": "down"}
+
+
+def rating_from_reaction(new_reaction) -> str | None:
+    """새 반응 목록에서 👍/👎 (둘 다 없으면 None — 반응을 지운 것도 None)."""
+    for r in new_reaction or []:
+        got = _REACTION.get(getattr(r, "emoji", None) or "")
+        if got:
+            return got
+    return None
+
+
+def _msg_path() -> Path:
+    return log_path().with_name("answer_messages.jsonl")
+
+
+def remember(chat_id: str, message_id: int, job_id: int) -> None:
+    """답 메시지 → 잡 (이모지 반응은 메시지 id 만 준다). 실패는 삼킨다."""
+    try:
+        with _msg_path().open("a", encoding="utf-8") as f:
+            f.write(json.dumps({"chat_id": str(chat_id), "message_id": int(message_id), "job_id": int(job_id)}) + "\n")
+    except Exception:
+        pass
+
+
+def job_for_message(chat_id: str, message_id: int) -> int | None:
+    # shortcut: 파일 전체를 읽는다 — 하루 수십 줄이라 충분, 수만 줄이 되면 sqlite 로
+    try:
+        for line in reversed(_msg_path().read_text(encoding="utf-8").splitlines()):
+            r = json.loads(line)
+            if r["chat_id"] == str(chat_id) and r["message_id"] == int(message_id):
+                return int(r["job_id"])
+    except Exception:
+        pass
+    return None
+
+
+def record(job: dict[str, Any] | None, job_id: int, rating: str, chat_id: str, source: str = "button") -> dict[str, Any]:
     """평가 한 줄을 JSONL 에 덧붙이고 그 내용을 돌려준다. 잡이 지워졌어도 평가는 남긴다."""
     job = job or {}
     answer = job.get("result_text") or ""
@@ -63,6 +105,7 @@ def record(job: dict[str, Any] | None, job_id: int, rating: str, chat_id: str) -
         "job_id": job_id,
         "chat_id": chat_id,
         "rating": rating,
+        "source": source,
         "question": job.get("user_text") or "",
         "answer": answer,
         "answer_papers": sorted(set(_ARXIV_ID_RE.findall(answer))),

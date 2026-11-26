@@ -82,19 +82,44 @@ _NO_INTRO = "제공된 문서에는 질문이 찾는 연구가 없습니다."
 _NO_CONCL = "따라서 질문이 찾는 연구는 제공된 문서에서 찾을 수 없습니다."
 
 
-def agg_slots_template(labels: dict[int, str], agg: str) -> str:
-    """판정대로 답 칸 (RAG_AGG_SLOTS, docs/experiments/agg_slots_1117): 직접 · 부분 문서마다 한 칸, 무관 문서는 칸 없음."""
+def rec_active() -> bool:
+    return os.getenv("RAG_REC_MODE", "0").strip() == "1"
+
+
+# 추천형 질문(6차 H16–H19 👎 0/4): 모델 · 도구 · 방법 이름을 골라 달라는 요청. "추천 시스템" 같은 주제어는 안 잡게 동사꼴만.
+_REC = re.compile(r"추천\s*(?:해|좀|부탁|받|할\s*만)|뭘?\s*(?:써야|쓰면\s*좋)|어떤\s*(?:걸|것을?|모델|도구|툴|라이브러리|프레임워크)[^?]{0,15}(?:써야|쓰면|좋을까|좋아)")
+REC_CONCL_RULE = "- 추천 질문이다. 마지막 문장은 '…이 필요하면 A, …이면 B' 꼴로 상황별로 무엇을 쓸지 권고한다. 권고 근거는 위 논문 결과만 쓴다.\n"
+
+
+def is_recommend(question: str) -> bool:
+    return rec_active() and bool(_REC.search(question or ""))
+
+
+def agg_slots_template(labels: dict[int, str], agg: str, rec: bool = False) -> str:
+    """판정대로 답 칸 (RAG_AGG_SLOTS, docs/experiments/agg_slots_1117): 직접 · 부분 문서마다 한 칸, 무관 문서는 칸 없음.
+
+    rec(추천형, RAG_REC_MODE): 칸을 '후보 이름 / 무엇인지 / 근거 / 한계·조건' 으로, 결론은 상황별 권고로.
+    """
     keep = [n for n in sorted(labels) if labels[n] in ("D", "P")][:5]
     if agg == "c" or not keep:
         intro, body, concl = f"`{_NO_INTRO}` 를 그대로 쓴다.", "질문과 관련된 문서가 없습니다.", f"`{_NO_CONCL}` 를 그대로 쓴다."
     else:
         tag = lambda n: " (관련 연구)" if labels[n] == "P" else ""
-        body = "\n".join(f"{i}. **{{핵심 접근·시스템 이름}}**{tag(n)}: 무엇을 했고 결과가 무엇인지 1~2문장 [문서 {n}]"
+        slot = ("**{후보 이름(모델 · 도구 · 방법)}**{tag}: 무엇인지 한 문장 · 문서의 근거 결과 한 문장 · 한계나 쓸 조건 한 문장"
+                if rec else "**{{핵심 접근·시스템 이름}}**{tag}: 무엇을 했고 결과가 무엇인지 1~2문장")
+        body = "\n".join(f"{i}. " + slot.replace("{tag}", tag(n)).replace("{{", "{").replace("}}", "}") + f" [문서 {n}]"
                          for i, n in enumerate(keep, 1))
-        if agg == "b":
-            intro, concl = f"첫 문장은 `{_NO_INTRO}` 를 그대로 쓴다.", f"첫 문장은 `{_NO_CONCL}` 를 그대로 쓰고, 위 관련 연구가 질문의 어느 부분과 닿는지 한 문장."
+        if rec:
+            concl_a = "상황별로 무엇을 쓰면 좋은지 권고 2~3문장('…이 필요하면 A, …이면 B'). 권고 근거는 위 항목의 결과만 쓴다."
         else:
-            intro, concl = "질문이 가리키는 문제와 왜 어려운지 1~2문장. 핵심 용어는 **굵게**.", "위 항목들을 종합해 질문에 답하는 한 단락. 문서에 없는 처방을 지어내지 마세요."
+            concl_a = "위 항목들을 종합해 질문에 답하는 한 단락. 문서에 없는 처방을 지어내지 마세요."
+        if agg == "b":
+            concl_b = f"첫 문장은 `{_NO_CONCL}` 를 그대로 쓰고, 위 관련 연구가 질문의 어느 부분과 닿는지 한 문장."
+            if rec:
+                concl_b += " 그다음 위 관련 연구 중 조건이 맞을 때 쓸 만한 것을 '…이면 A' 꼴로 한 문장."
+            intro, concl = f"첫 문장은 `{_NO_INTRO}` 를 그대로 쓴다.", concl_b
+        else:
+            intro, concl = "질문이 가리키는 문제와 왜 어려운지 1~2문장. 핵심 용어는 **굵게**.", concl_a
     return f"""[다중 문서 출력 템플릿 지시사항 - 판정된 문서별 칸]
 아래 뼈대를 그대로 따라 값만 채우세요.
 

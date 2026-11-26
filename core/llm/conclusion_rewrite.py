@@ -222,6 +222,9 @@ def replace_conclusion(answer: str, text: str) -> str:
     return answer[:c.end()] + "\n" + text.strip() + "\n" if c else answer
 
 
+from core.llm.doc_judge import REC_CONCL_RULE, is_recommend  # noqa: E402
+
+
 def rewrite_conclusion(
     answer: str, question: str, numbered_context: str, doc_ids: dict[int, str], model: str
 ) -> tuple[str, str]:
@@ -240,6 +243,8 @@ def rewrite_conclusion(
     must = must_cover(answer, blocks) if check_on else set()
     if mode == "v2":
         rule = term_rule()
+        if is_recommend(question):  # 추천형은 결론을 상황별 권고로 (RAG_REC_MODE, 6차 피드백 P3)
+            rule += REC_CONCL_RULE
         if must and os.getenv("RAG_CONCL_CHECK", "0").strip() == "1":
             rule += "- 다음 논문은 모두 한 번 이상 인용한다: " + ", ".join(f"[문서 {n}]" for n in sorted(must)) + "\n"
         prompt = PROMPT_V2.format(question=question, findings=_findings_text(blocks), term_rule=rule)

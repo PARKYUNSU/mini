@@ -19,6 +19,8 @@ _ITEM = re.compile(r"^(\s*(?:<b>)?\d+\.\s)(.*)$", re.M)
 _DOC_N = re.compile(r"\[\s*문서\s*(\d{1,2})\s*\]")
 _NUM = re.compile(r"\d+(?:[.,]\d+)?")
 _YEAR = re.compile(r"\b(?:19|20)\d{2}\b")
+_NAME = re.compile(r"(?:<b>[^<\n]+</b>|\*\*[^*\n]+\*\*)(?:\s*\(관련 연구\))?\s*[:：]\s*")
+_LEAD_CONJ = re.compile(r"^\s*(?:또한|그리고|아울러|한편|더불어|이와 함께|이에 더해|또)\s*,?\s*")
 _NOT_TEXT = re.compile(r"\[[^\]\n]*\]|\([^()\n]*\)|<b>[^<\n]*</b>|\*\*[^*\n]*\*\*|<[^>]+>")  # 인용 · 괄호 · 굵은 이름 · 태그
 
 
@@ -66,11 +68,14 @@ def check_body_numbers(answer: str, numbered_context: str, doc_ids: dict[int, st
         src = "\n".join(by.get(r, "") for r in refs)
         if not refs or not src:
             return m.group(0)
-        sents = re.split(r"(?<=[.!?。])\s+", text)
+        name = (_NAME.match(text) or [""])[0]  # 첫 문장을 빼도 항목 이름은 둔다
+        sents = re.split(r"(?<=[.!?。])\s+", text[len(name):])
         keep = [s for s in sents if not _bad(s, src)]
         if len(keep) == len(sents) or not any(_has_text(s) for s in keep):
             return m.group(0)
-        out = " ".join(keep)
+        # 앞 문장을 빼면 "또한 …" 조각이 머리에 선다(6차 W10) — 잇는 말만 지운다
+        keep[0] = _LEAD_CONJ.sub("", keep[0]) if keep[0] is not sents[0] else keep[0]
+        out = name + " ".join(keep)
         missing = [t for r, t in dict(zip(refs, (x.group(0) for x in _CITED.finditer(text)))).items() if r not in _CITED.findall(out)]
         dropped += len(sents) - len(keep)
         return head + out + "".join(missing)

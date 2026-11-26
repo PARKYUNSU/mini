@@ -57,6 +57,16 @@ def clean_query(query: str) -> str:
     while kept and kept[-1].lower() == "large":
         kept.pop()
     return " ".join(kept) if len(kept) >= 3 else (query or "").strip()
+# 추천형 질문(RAG_REC_MODE) 검색어 군말 — "… recommendation selection criteria academic research on" 이 OpenAlex 결과를
+# 1편으로 줄여 ESG 특화 모델을 놓쳤다(6차 H19). "recommendation system" 주제를 지우지 않게 추천형 질문에서만 쓴다.
+_REC_WORDS = re.compile(r"\b(?:recommend\w*|selection|select|criteria|choos\w*|choice|which|on|for|to|of)\b", re.I)
+
+
+def rec_query(query: str) -> str:
+    q = re.sub(r"\s+", " ", _REC_WORDS.sub(" ", query or "")).strip()
+    return q if len(q.split()) >= 3 else (query or "")
+
+
 _ARXIV = re.compile(r"(?:arxiv\.org/abs/|10\.48550/arxiv\.)(\d{4}\.\d{4,5})", re.I)
 
 

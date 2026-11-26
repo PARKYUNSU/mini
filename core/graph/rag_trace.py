@@ -50,6 +50,9 @@ def mark(key: str, stage: str, **data) -> None:
         now = time.perf_counter()
         t["stages"].append({"stage": stage, "s": round(now - t["_t"], 2), **data})
         t["_t"] = now
+        from core.bridge import progress  # 텔레그램 진행 메시지 (BOT_PROGRESS)
+
+        progress.write(t.get("job_id"), stage)
     except Exception:
         pass
 
