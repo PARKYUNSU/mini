@@ -4,7 +4,7 @@
 
 **`.env` 를 잃으면:** `RAG_*` 는 코드 기본값으로 돌아간다. 기본값은 대부분 꺼짐(`0`)이고 나머지는 옛 값(초록 800자, 결론 v1, 답 모델은 기본 모델)이라 오류 없이 품질만 떨어진다. 복원은 이 표의 값을 다시 넣고, §3 의 키는 각 서비스에서 다시 받는다. `.env` 백업은 내장 디스크 `~/backups/mini/` 에 있다: 바꾸기 전 복사본은 `env_history/`(11-11 에 `.cron/env.bak*` 24개를 옮김 — 암호화 안 된 T7 에 비밀 값 복사본이 644 로 쌓여 있었다), 전체 백업은 [`ops/backup.sh`](backup.sh) 가 만드는 `YYYY-MM-DD/env.backup`. **앞으로 `.env` 를 바꾸기 전 복사본은 `~/backups/mini/env_history/` 에 600 으로 둔다(T7 · `.cron` 에 두지 않는다).**
 
-## 1. RAG 기능 (32개, 켠 순서)
+## 1. RAG 기능 (48개, 켠 순서)
 
 켠 때는 라운드 문서와 `.env` 복사본(`env.bak*`, 지금은 `~/backups/mini/env_history/`) 시각으로 맞췄다. 날짜만 적은 앞쪽 4개(10-11 · 10-12)는 백업이 없던 때라 라운드 문서 기준이다. 측정 수치는 그 라운드의 dev · held-out 결과이고, 지금 다시 잰 값이 아니다.
 
@@ -55,6 +55,9 @@
 | `RAG_COMBO_NOTE` | `1` | 11-25 | 최종 답 결론에서 "…를 결합/병행하는 것이 효과적·바람직" 꼴 권고 문장 끝에 "(이 조합 자체는 논문에서 검증되지 않았습니다)" 를 붙인다(5차 피드백 U2). 논문 자체 결과("결합한 시스템이 효과적임을 보여준다")는 두다. 같은 라운드의 결론 누락 검사 `RAG_CONCL_CHECK` 는 기각, 0 | [`concl_check_1125`](../docs/experiments/concl_check_1125/README.md) §6: 저장 고유 답 8,343 중 28 에 붙음, 모두 권고 꼴 |
 | `RAG_TERM_FIX` | `1` | 11-18 | 알려진 잘못된 음차 고정 표(차킹 · 채킹 · 청크링 → 청킹, 허할루시네이션 → 환각, 판판 → 판정자, CoT-라울러 → CoT 근거 설명) · 본론 항목 '제목: 요약' 꼴 보완 | [`term_fix_1118`](../docs/experiments/term_fix_1118/README.md): 저장 답 1,974 중 103 바뀜 · 비자명 제목 28 중 26 맞음 · 틀린 정보 0 |
 | `RAG_ANSWER_SEED` | `0` | 11-18 | 답 생성(v13) seed 고정 — temperature 0.2 그대로, 같은 입력이면 같은 답(실행 간 인용 흔들림 없앰). temperature 0(`RAG_ANSWER_TEMP=0`)은 쌍 1:4 로 미달 | [`stable_1118`](../docs/experiments/stable_1118/README.md): dev 10×3 인용 같음 8→10/10 · golden 12→12 · L30 쌍 1:3(경계) · −3.6s |
+| `RAG_REC_MODE` | `1` | 11-26 23:24 | 추천 질문(동사꼴 정규식)이면 칸을 후보 이름 / 무엇인지 / 근거 / 한계·조건으로, 결론을 "…이면 A, …이면 B" 로 쓰고, (a) 판정이어도 📎 외부 검색을 돌린다(검색어는 `rec_query` 로 군말 뺌) | 7차 r7(.cron/work_1127/report_7th_final.md): H19 ESG 특화 LLM 2편 인용, 시간 p50 53.6→53.8s, W 3회 같음 |
+| `RAG_DROP_N_CITES` | `1` | 11-26 23:24 | 27B 가 N 으로 본 논문만 인용한 본론 항목 · 결론 문장을 지운다 | 7차 r7: W03 N 논문(2506.00281) 인용 제거 |
+| `RAG_REC_POOL` | `10` | 11-26 23:24 | 추천 · 방법 질문이면 거르기 통과 상위 10편을 27B 로 판정해 D → P 순으로 5칸을 채운다(그 밖 질문은 5편 자르기 그대로) | 7차 r7p: H18 RAGChecker 답 본문 진입, 해당 질문만 +9~19s. 짝 플래그 `RAG_JUDGE_STRUCT`(구조 판정)는 N→P 2→9 로 0 유지 |
 
 ## 2. 그 밖 설정 (값 공개 가능)
 
@@ -77,6 +80,8 @@
 | 스케줄 | `PHASE35_CURATOR_SCHEDULE_AT` | `08:00` | YES 심사 시각 (꺼져 있어 안 돎) |
 | 스케줄 | `LLM_DEBATE_SCHEDULE_ENABLED` | `0` | 논문 토론 배치 끔 |
 | 스케줄 | `AGENT_BOT_CRON_WORKER` | `0` | 봇 프로세스 안 cron worker 끔 |
+| 봇 | `BOT_PROGRESS` | `1` | 접수 메시지를 🔎 검색 → ⚖️ 판정 → ✍️ 작성 → 다듬기 → ✅ 완료(N초)로 고쳐 쓴다 (11-26 23:24) |
+| 봇 | `BOT_FEEDBACK_REACTIONS` | `1` | 답 메시지의 👍/👎 이모지 반응을 버튼과 같은 기록에 `source=reaction` 으로 남긴다 (11-26 23:24) |
 | 회의 배치 | `BOARDROOM_SCHEDULE_ENABLED` | `0` | 회의 배치 스케줄 끔 |
 | 회의 배치 | `BOARDROOM_SCHEDULE_DAILY` | `1` | 주말 포함 매일 실행 (`0` 이면 월~금. 스케줄이 꺼져 있어 안 돎) |
 | 회의 배치 | `BOARDROOM_MINUTES_OLLAMA_MAX_CHARS` | `8000` | 회의록 입력 상한 |

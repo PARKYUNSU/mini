@@ -67,8 +67,15 @@ _TERMS = [
     (re.compile(r"메타\s?클래(?:서퍼|시파이어|시퍼)"), "메타 분류기"),
     (re.compile(r"(?<![A-Za-z0-9-])meta-classifiers?(?![A-Za-z0-9-])"), "메타 분류기"),
     (re.compile(r"(?<![A-Za-z0-9-])crowdsourc(?:ed|ing)(?![A-Za-z0-9-])"), "크라우드소싱"),
+    (re.compile(r"(?<=평가자)\s*\(raters?\)"), ""),  # '평가자(rater)' 중복 괄호
     (re.compile(r"(?<![A-Za-z0-9-])raters?(?![A-Za-z0-9-])"), "평가자"),
     (re.compile(r"(?<![A-Za-z0-9@-])recall(?![A-Za-z0-9@-])"), "재현율"),
+    # 7차 회신(다이제스트) 용어 — '규격'은 표준 뜻이 흔해 '…에서' 앞(일부 규격에서는 = specifications)만
+    (re.compile(r"인스턴트(?=\s*(?:로|를|가|이|의|와|은|는|$|[^가-힣]))"), "인스턴스"),
+    (re.compile(r"프롬팅"), "프롬프팅"),
+    (re.compile(r"규격(?=에서)"), "모형 설정"),
+    (re.compile(r"허풍\s*\(\s*~?\s*puffery\s*\)"), "과장 표현(puffery)"),
+    (re.compile(r"허풍"), "과장 표현"),
 ]
 _ITEM = re.compile(r"^(\s*\d+\.\s+)(.*)$")
 _HANGUL = re.compile(r"[가-힣]")

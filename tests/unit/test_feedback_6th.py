@@ -103,3 +103,13 @@ def test_combine_struct():
     task = {1: "맞음", 2: "맞음", 3: "인접", 4: "아님"}
     assert combine_struct(task, [{"값": "한국어", "다룬 논문": [1]}]) == {1: "D", 2: "P", 3: "P", 4: "N"}
     assert combine_struct(task, []) == {1: "D", 2: "D", 3: "P", 4: "N"}  # 조건 없으면 맞음 = 직접
+
+
+def test_digest_terms_7th():
+    from core.llm.format_fix import fix_terms
+
+    s = "30,000개의 인스턴트로 구성. 원샷 프롬팅과 차킹. 일부 규격에서는 허풍(~puffery)과 허풍."
+    out = fix_terms(s)[0]
+    assert out == "30,000개의 인스턴스로 구성. 원샷 프롬프팅과 청킹. 일부 모형 설정에서는 과장 표현(puffery)과 과장 표현."
+    assert fix_terms("국제 규격을 따른다")[0] == "국제 규격을 따른다"
+    assert fix_terms("두 동료 평가자(rater)가 판정")[0] == "두 동료 평가자가 판정"

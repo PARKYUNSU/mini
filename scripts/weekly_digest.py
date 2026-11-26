@@ -28,25 +28,30 @@ load_dotenv()
 # (이름, OpenAlex 검색어들, 27B 판정 질문, 매일 수집분 거르기 정규식)
 # 11-26 첫 발송 피드백: ESG 0편(저널 논문 제외 탓) → 검색어 넓힘 · 기업 공시 분석 포함, RAG 평가는 응용 시스템이 D 로 올라와 평가 연구로 좁힘
 TOPICS = [
-    ("ESG · 지속가능성 공시 NLP",
+    # 7차 회신: 주제를 기업 공시 전반으로 넓힘 — AI · 사이버 위험 공시도 포함(2611.25841)
+    ("기업 공시 NLP (ESG · 지속가능성 중심)",
      # 맨 단어 검색어("greenwashing" 등)는 NLP 아닌 재무 논문으로 상한을 채워 텍스트 분석 검색어를 붙인다
      ["ESG sustainability disclosure natural language processing", "corporate risk disclosure text analysis",
       "climate disclosure text analysis", "sustainability report language model", "greenwashing detection NLP",
-      "ESG rating carbon accounting language model"],
-     "ESG · 지속가능성 · 기후 · 기업 위험 공시나 ESG 평가 · 그린워싱 · 탄소 회계 관련 기업 문서를 텍스트 분석 · NLP · LLM 으로 분석 · 추출 · 분류 · 평가하는 연구",
-     r"\b(?:ESG|sustainab\w*|climate|TCFD|GRI|ISSB|disclosure|greenwash\w*|carbon accounting)"),
+      "ESG rating carbon accounting language model", "AI risk cybersecurity disclosure 10-K text analysis"],
+     "기업 공시 문서(ESG · 지속가능성 · 기후 공시, 기업 위험 공시 — AI · 사이버 위험 공시 포함 — , ESG 평가 · 그린워싱 · 탄소 회계)를"
+     " 텍스트 분석 · NLP · LLM 으로 분석 · 추출 · 분류 · 평가하는 연구",
+     r"\b(?:ESG|sustainab\w*|climate|TCFD|GRI|ISSB|disclosure|10-K|greenwash\w*|carbon accounting)"),
     ("RAG 평가 · 근거 충실도", ["retrieval-augmented generation evaluation faithfulness", "RAG evaluation benchmark metric"],
      "RAG 시스템이나 LLM 답변의 근거 충실도 · 인용 정확도 · 검색 품질을 평가하는 방법 · 지표 · 벤치마크를 제안하거나 비교하는 연구"
      " (근거 기반 응용 시스템을 만들고 자기 성능만 보고한 논문은 해당하지 않는다)",
      r"\b(?:RAG|retrieval-augmented|faithful\w*|grounded\w*|citation)"),
     ("문서 · 표 추출", ["document parsing table extraction PDF"],
-     "PDF 등 문서에서 표 · 구조 · 숫자를 추출하거나 파싱하는 연구", r"\b(?:table|tabular|document parsing|PDF|layout)"),
+     "PDF 등 문서에서 표 · 구조 · 숫자를 추출하거나 파싱하는 방법이나 그 평가를 다루는 연구"
+     " (추출 · 파싱을 한 단계로 쓰기만 하는 응용 시스템은 해당하지 않는다)", r"\b(?:table|tabular|document parsing|PDF|layout)"),
     ("LLM 판정자 · 평가", ["LLM as a judge evaluation agreement"],
      "LLM 을 판정자로 쓸 때 사람 판단과의 일치 · 신뢰성을 다루는 연구", r"\b(?:LLM-as-a-judge|LLM judge|judges?|evaluator)"),
 ]
-MAX_PER_TOPIC = 5
+MAX_PER_TOPIC = 4  # 7차 회신: 섹션당 최대 4편
 MAX_CANDS = 36  # 27B 에 12편씩 3번까지
 OUT_DIR = Path(".cron/digest")
+# 7차 회신: 저품질 출처 — IGI 책 챕터 · IRJMETS · IJARSCT (DOI 접두어)
+EXCLUDE_DOI = ("10.4018/", "10.56726/", "10.48175/")
 
 
 def openalex_new(query: str, since: date, today: date) -> list[dict]:
@@ -82,6 +87,8 @@ def openalex_new(query: str, since: date, today: date) -> list[dict]:
             if not (since.isoformat() <= (w.get("publication_date") or "") <= today.isoformat()):
                 continue
             doi = re.sub(r"^https?://doi\.org/", "", str(w.get("doi") or ""))
+            if doi.lower().startswith(EXCLUDE_DOI):
+                continue
             pid = doi or str(w.get("id") or "").rsplit("/", 1)[-1]
             url = f"https://doi.org/{doi}" if doi else str(w.get("id") or "")
         out.append({"arxiv": pid, "url": url, "title": re.sub(r"\s+", " ", w.get("title") or "").strip(), "abstract": ab[:1500]})
@@ -108,11 +115,11 @@ def collected_new(pattern: str, since: date) -> list[dict]:
     return out
 
 
-def summarize(question: str, c: dict, llm) -> str | None:
-    """항목 다시 쓰기와 같은 프롬프트 · 검사(초록 밖 숫자 · 길이 · 한자) — 통과 못 하면 None."""
+def summarize(question: str, c: dict, llm) -> tuple[str | None, str]:
+    """항목 다시 쓰기와 같은 프롬프트 · 검사(초록 밖 숫자 · 길이 · 한자) → (요약 1~2문장, 실패 사유). 통과 못 하면 None."""
     from langchain_core.messages import HumanMessage, SystemMessage
 
-    from core.llm.format_fix import term_rule
+    from core.llm.format_fix import fix_terms, term_rule
     from core.llm.item_rewrite import PROMPT, SYSTEM, check_item
 
     src = f"[{c['arxiv']}] {c['title']}\n[초록] {c['abstract']}"
@@ -120,10 +127,21 @@ def summarize(question: str, c: dict, llm) -> str | None:
         text = str(llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=PROMPT.format(
             question=question, block=src, item="(아직 없음)", term_rule=term_rule()))]).content or "").strip()
     except Exception as exc:
-        print(f"[digest] 요약 실패: {type(exc).__name__}")
-        return None
-    text = re.sub(r"\s+", " ", re.sub(r"\[[^\]]*\]", "", text)).strip()
-    return None if check_item(text, "", src) else text
+        return None, f"호출 실패 {type(exc).__name__}"
+    text = fix_terms(re.sub(r"\s+", " ", re.sub(r"\[[^\]]*\]", "", text)).strip())[0]
+    why = check_item(text, "", src)
+    if why == "문서 밖 숫자":
+        # '8-billion' → '80억' 처럼 바르게 옮긴 숫자도 걸린다(10.68212/2958-6631.1078) — 걸린 문장만 빼고 남은 게 충분하면 쓴다
+        from core.llm.item_rewrite import _bad
+
+        rest = " ".join(x for x in re.split(r"(?<=[.!?])\s+", text) if not _bad(x, src))
+        if len(rest) >= 80:
+            text, why = rest, ""
+        else:
+            why = "문서 밖 숫자(남은 문장 짧음)"
+    if why:
+        return None, why
+    return " ".join(re.split(r"(?<=[.!?])\s+", text)[:2]), ""  # 7차 회신: 1~2문장
 
 
 def _judge(question: str, cands: list[dict]) -> dict[int, str]:
@@ -162,26 +180,27 @@ def build(today: date) -> tuple[list[str], list[dict]]:
                 cands.append(c)
         cands = cands[:MAX_CANDS]
         labels = _judge(question, cands) if cands else {}
-        # 첫 미리 보기(11-26): 부분(P) 5편 중 4편이 주제 밖이었다 → 요약은 직접(D)만, 부분은 제목만 2편까지
+        # 첫 미리 보기(11-26): 부분(P) 5편 중 4편이 주제 밖이었다 → 요약은 직접(D)만
         keep = [cands[n - 1] for n in sorted(labels) if labels[n] == "D"][:MAX_PER_TOPIC]
+        # 7차 회신: '가까운 것'은 정밀도가 낮아(P 판정도 주제 밖 다수) 싣지 않고 기록에만 남긴다
         near = [cands[n - 1] for n in sorted(labels) if labels[n] == "P"][:2]
-        if not keep and not near:
+        fails = {}
+        if not keep:
             lines = [f"■ {name} — 이번 주 없음"]
         else:
             lines = [f"■ {name}"]
-            if not keep:
-                lines.append("  직접 해당 없음")
             for i, c in enumerate(keep, 1):
-                s = summarize(question, c, llm)
+                s, why = summarize(question, c, llm)
                 lines.append(f"{i}. {c['title']} {_ref(c)}")
-                if s:  # 요약 검사를 통과 못 하면 제목만 (내부 문구는 안 보인다)
+                if s:  # 요약 검사를 통과 못 하면 제목만 (사유는 기록에만)
                     lines.append(f"  {s}")
-            if near:
-                lines.append("  가까운 것: " + " · ".join(f"{c['title']} {_ref(c)}" for c in near))
+                else:
+                    fails[c["arxiv"]] = why
         sections.append("\n".join(lines))
         log.append({"topic": name, "candidates": len(cands), "labels": {str(k): v for k, v in labels.items()},
                     "cand_ids": [c["arxiv"] for c in cands],
-                    "kept": [{"id": c["arxiv"], "title": c["title"]} for c in keep], "near": [c["arxiv"] for c in near]})
+                    "kept": [{"id": c["arxiv"], "title": c["title"]} for c in keep], "near": [c["arxiv"] for c in near],
+                    "summary_fail": fails})
         time.sleep(1)
     sections[0] = f"📬 주간 논문 다이제스트 ({since.isoformat()} ~ {today.isoformat()})\n\n" + sections[0]
     sections[-1] += "\n\n항목마다 👍/👎 를 눌러 주세요. 빠진 논문은 답장으로 알려 주세요."
