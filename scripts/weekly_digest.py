@@ -115,6 +115,11 @@ def collected_new(pattern: str, since: date) -> list[dict]:
     return out
 
 
+# 미리 보기 1126c: 프롬프트의 "논문 이름 … 없이" 때문에 결과 문장 주어("ESGPT가")가 빠져 뜻이 반대로 읽혔다
+SUBJECT_RULE = ("- 단, 결과를 말하는 문장 · 절마다 주어(제안한 모델 · 방법 이름)를 쓴다. 특히 '…지만' 으로 다른 대상과 대조한 뒤에는"
+                " 뒤 절의 주어를 반드시 다시 쓴다(예: '일반 모델은 A 지만, 제안 모델 X 는 B'). 이름을 빼라는 말은 맨 앞 머리말에만 해당한다.\n")
+
+
 def summarize(question: str, c: dict, llm) -> tuple[str | None, str]:
     """항목 다시 쓰기와 같은 프롬프트 · 검사(초록 밖 숫자 · 길이 · 한자) → (요약 1~2문장, 실패 사유). 통과 못 하면 None."""
     from langchain_core.messages import HumanMessage, SystemMessage
@@ -125,7 +130,7 @@ def summarize(question: str, c: dict, llm) -> tuple[str | None, str]:
     src = f"[{c['arxiv']}] {c['title']}\n[초록] {c['abstract']}"
     try:
         text = str(llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=PROMPT.format(
-            question=question, block=src, item="(아직 없음)", term_rule=term_rule()))]).content or "").strip()
+            question=question, block=src, item="(아직 없음)", term_rule=term_rule() + SUBJECT_RULE))]).content or "").strip()
     except Exception as exc:
         return None, f"호출 실패 {type(exc).__name__}"
     text = fix_terms(re.sub(r"\s+", " ", re.sub(r"\[[^\]]*\]", "", text)).strip())[0]
@@ -165,10 +170,12 @@ def build(today: date) -> tuple[list[str], list[dict]]:
     """섹션별 텍스트(처음 것에 머리말) · 기록. 섹션 i 의 항목 버튼은 log[i]['kept'] 순서."""
     from langchain_ollama import ChatOllama
 
-    from core.config.agent_config import RAG_ANSWER_MODEL, ollama_kwargs
+    from core.config.agent_config import ollama_kwargs
 
     since = today - timedelta(days=7)
-    llm = ChatOllama(**ollama_kwargs(model=RAG_ANSWER_MODEL, temperature=0.0, seed=0, reasoning=False, num_predict=400))
+    # 미리 보기 1126c: 9B(v13)는 주어 규칙을 넣어도 대조 절 주어를 뺐다 → 판정과 같은 27B 로 요약(모델 교체도 없음, 요약당 ~10s)
+    model = os.getenv("RAG_DOC_JUDGE_MODEL", "qwen3.6:27b-q4_K_M")
+    llm = ChatOllama(**ollama_kwargs(model=model, temperature=0.0, seed=0, reasoning=False, num_predict=400))
     sections, log = [], []
     for name, queries, question, pattern in TOPICS:
         seen, cands = set(), []
