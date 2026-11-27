@@ -262,8 +262,8 @@ def struct_active() -> bool:
     return os.getenv("RAG_JUDGE_STRUCT", "0").strip() == "1"
 
 
-def judge_task(question: str, rag_context: str) -> dict[int, str] | None:
-    """문서마다 맞음/인접/아님 (문서 번호 기준). 실패하면 None."""
+def judge_task(question: str, rag_context: str, prompt: str | None = None) -> dict[int, str] | None:
+    """문서마다 맞음/인접/아님 (문서 번호 기준). 실패하면 None. prompt 없으면 TASK_PROMPT."""
     import requests
 
     from core.config.agent_config import ollama_kwargs
@@ -277,12 +277,67 @@ def judge_task(question: str, rag_context: str) -> dict[int, str] | None:
         r = requests.post(f"{kw['base_url']}/api/chat", json={
             "model": os.getenv("RAG_DOC_JUDGE_MODEL", "qwen3.6:27b-q4_K_M"), "stream": False, "think": False,
             "format": TASK_SCHEMA, "keep_alive": kw["keep_alive"], "options": {"temperature": 0, "num_ctx": 8192},
-            "messages": [{"role": "user", "content": TASK_PROMPT.format(q=question, docs=docs)}]}, timeout=150)
+            "messages": [{"role": "user", "content": (prompt or TASK_PROMPT).format(q=question, docs=docs)}]}, timeout=150)
         got = {x["번호"]: x["과제"] for x in json.loads(r.json()["message"]["content"])["판정"]}
     except Exception as e:  # noqa: BLE001
         print(f"[WARN] 과제 판정 실패: {e}")
         return None
     return {n: got.get(i, "인접") for i, (n, _) in enumerate(blocks, 1)}
+
+
+# 조건부 승격 (11-28 회신, .cron/work_1127e/report_fs.md): 운영 판정은 그대로 두고, 운영 N 이면서
+# few-shot 과제 판정 + 조건 → P 이고 그 문서가 일반 명사 아닌 명시 조건 하나 이상을 다루면 P 로만 올린다(D 는 안 낮춤).
+# 확정 라벨 103쌍(기존 결과 계산): 일치 72.8→77.7% · P→N 15→10 · N→P/D 2 그대로 (RAG_COND_PROMOTE, 기본 0).
+TASK_FS_PROMPT = """사용자 질문과 검색된 논문 목록이 있다. 논문마다 질문의 **핵심 과제**와 맞는지 하나로 판정하라.
+- 맞음: 논문이 질문의 핵심 과제 자체를 연구 · 제안 · 평가한다.
+- 인접: 핵심 과제 자체는 아니지만, 비슷한 과제나 일부 하위 과제를 다뤄 답에 쓸 만한 근거를 준다.
+  질문이 말한 언어 · 문서 유형 · 분야의 데이터셋, 벤치마크, 분류 · 추출 연구는 핵심 물음(예: 옮길 때 성능 저하, 두 방법 비교)을 직접 재지 않아도 **인접**이다.
+- 아님: 주제 단어만 겹치고 질문에 쓸 만한 근거가 없다. 다른 분야 · 다른 과제에서 같은 단어만 나오면 아님이다.
+언어 · 문서 유형 · 분야 · 비교 대상 같은 조건이 맞는지는 따로 확인하니, 여기서는 과제가 얼마나 가까운지만 보라.
+
+예시 (논문 내용은 요약):
+질문: 영어 판례로 학습한 요약 모델을 일본어 판결문에 쓰면 품질이 얼마나 떨어져?
+- "일본어 판결문 요약 데이터셋 구축과 기준 모델" → 인접 (질문의 언어 · 문서 유형과 같은 데이터셋 · 과제 연구, 성능 저하는 직접 안 잼)
+- "다국어 법률 문서 분류에서 언어 간 전이 성능 비교" → 인접 (언어 간 전이를 재지만 요약이 아니라 분류)
+- "영어 판례 요약 모델을 일본어 · 한국어 판결문에 옮겼을 때 ROUGE 하락 분석" → 맞음
+- "일본어 뉴스 기사 감성 분석" → 아님 (언어만 같고 문서 유형 · 과제가 다름)
+질문: 의료 상담 챗봇 답변의 환각을 자동으로 잡는 방법 있어?
+- "의료 질의응답 데이터셋에서 LLM 답변 사실성 평가 벤치마크" → 인접 (같은 분야의 답변 사실성 평가)
+- "일반 도메인 LLM 환각 탐지기 제안" → 인접 (분야는 다르지만 같은 과제)
+- "의료 영상 분할 모델의 오류 분석" → 아님 (분야 단어만 같음)
+
+질문: {q}
+
+논문:
+{docs}
+
+JSON 으로만 답하라: {{"판정": [{{"번호": 1, "과제": "맞음|인접|아님"}}, ...]}}"""
+
+
+def cond_promote_active() -> bool:
+    return os.getenv("RAG_COND_PROMOTE", "0").strip() == "1"
+
+
+def promote_labels(labels: dict[int, str], conds: list[dict], fs: dict[int, str]) -> dict[int, str]:
+    """운영 N · fs P · 일반 명사 아닌 조건 하나 이상 다룸 → P. 나머지는 운영 라벨 그대로."""
+    from core.llm.cond_keep import _GENERIC
+
+    cov = {n for c in conds or [] if c.get("값", "").strip() not in _GENERIC for n in c.get("다룬 논문") or []}
+    return {n: "P" if lab == "N" and fs.get(n) == "P" and n in cov else lab for n, lab in labels.items()}
+
+
+def promote_by_conditions(question: str, rag_context: str, labels: dict[int, str], conds: list[dict] | None):
+    """조건부 승격. 일반 명사 아닌 명시 조건이 있고 운영 N 이 있을 때만 few-shot 과제 판정(27B 1회)을 더 부른다.
+    반환: (라벨, 올린 문서 번호 목록)."""
+    from core.llm.cond_keep import _GENERIC
+
+    if not labels or "N" not in labels.values() or not any(c.get("값", "").strip() not in _GENERIC for c in conds or []):
+        return labels, []
+    task = judge_task(question, rag_context, TASK_FS_PROMPT)
+    if not task:
+        return labels, []
+    new = promote_labels(labels, conds, combine_struct(task, conds))
+    return new, [n for n in new if new[n] != labels[n]]
 
 
 def combine_struct(task: dict[int, str], conds: list[dict]) -> dict[int, str]:

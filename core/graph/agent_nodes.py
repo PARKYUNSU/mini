@@ -44,6 +44,8 @@ from core.llm.cond_keep import (
 )
 from core.llm.doc_judge import (
     is_recommend,
+    cond_promote_active,
+    promote_by_conditions,
     agg_slots_active,
     agg_slots_template,
     aggregate,
@@ -1541,6 +1543,9 @@ def direct_answer_node(state: AgentState, *, config: RunnableConfig) -> dict:
                 if judge_agg_active() and not image_base64:
                     if cond_keep_active():  # 조건 판정을 같은 27B 호출에 합친다 (cond_keep_1118 §5)
                         _doc_labels, _conds = judge_docs_and_conditions(user_request, rag_context)
+                        if cond_promote_active() and _doc_labels:  # 운영 N 을 조건부로 P 로 (RAG_COND_PROMOTE, .cron/work_1127e)
+                            _doc_labels, _up = promote_by_conditions(user_request, rag_context, _doc_labels, _conds)
+                            rag_trace.mark(chat_id, "cond_promote", promoted=_up)
                     if _doc_labels is None:
                         _doc_labels = judge_docs(user_request, rag_context)
                 if _doc_labels:
