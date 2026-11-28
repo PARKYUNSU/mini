@@ -30,3 +30,13 @@ def test_promote_calls_fs_prompt(monkeypatch):
 def test_flag_default_off(monkeypatch):
     monkeypatch.delenv("RAG_COND_PROMOTE", raising=False)
     assert not J.cond_promote_active()
+
+
+def test_gate_skips_when_no_n_doc_covers_condition(monkeypatch):
+    called = []
+    monkeypatch.setattr(J, "judge_task", lambda *a, **k: called.append(1) or {1: "인접", 2: "인접"})
+    # G02 꼴: 조건 다룬 문서는 1(P), N 은 2 → 교집합 없음 · G07 꼴: 조건 다룬 문서 없음 · G08 꼴: '기업' 은 일반 명사
+    assert J.promote_by_conditions("q", "c", {1: "P", 2: "N"}, [{"값": "한국어", "다룬 논문": [1]}]) == ({1: "P", 2: "N"}, [])
+    assert J.promote_by_conditions("q", "c", {1: "N"}, [{"값": "공시 문서", "다룬 논문": []}]) == ({1: "N"}, [])
+    assert J.promote_by_conditions("q", "c", {1: "N"}, [{"값": "기업", "다룬 논문": [1]}]) == ({1: "N"}, [])
+    assert not called

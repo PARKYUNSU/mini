@@ -327,11 +327,12 @@ def promote_labels(labels: dict[int, str], conds: list[dict], fs: dict[int, str]
 
 
 def promote_by_conditions(question: str, rag_context: str, labels: dict[int, str], conds: list[dict] | None):
-    """조건부 승격. 일반 명사 아닌 명시 조건이 있고 운영 N 이 있을 때만 few-shot 과제 판정(27B 1회)을 더 부른다.
-    반환: (라벨, 올린 문서 번호 목록)."""
+    """조건부 승격. '운영 N 문서 ∩ 일반 명사 아닌 조건을 다룬 문서' 가 있을 때만 few-shot 과제 판정(27B 1회)을 더 부른다
+    (올릴 수 있는 문서가 없으면 결과가 같으니 건너뜀, G02 · G07 · G10). 반환: (라벨, 올린 문서 번호 목록)."""
     from core.llm.cond_keep import _GENERIC
 
-    if not labels or "N" not in labels.values() or not any(c.get("값", "").strip() not in _GENERIC for c in conds or []):
+    cov = {n for c in conds or [] if c.get("값", "").strip() not in _GENERIC for n in c.get("다룬 논문") or []}
+    if not labels or not any(lab == "N" and n in cov for n, lab in labels.items()):
         return labels, []
     task = judge_task(question, rag_context, TASK_FS_PROMPT)
     if not task:

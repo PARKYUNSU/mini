@@ -56,7 +56,7 @@ def judge_conditions(question: str, rag_context: str) -> list[dict] | None:
             if c.get("값") and all(w in question for w in re.split(r"\s*[·,/]\s*|\s+", c["값"].strip()) if w)]
 
 
-_GENERIC = {"보고서", "문서", "논문", "데이터", "텍스트", "자료", "글", "연구"}  # 혼자서는 한정 조건이 아님(W01 '보고서')
+_GENERIC = {"보고서", "문서", "논문", "데이터", "텍스트", "자료", "글", "연구", "기업"}  # 혼자서는 한정 조건이 아님(W01 '보고서' · G08 '기업')
 
 
 def missing_conditions(conds: list[dict] | None) -> list[dict]:
